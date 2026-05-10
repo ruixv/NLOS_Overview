@@ -1,0 +1,36 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+# Compiled output PDF (not source figure PDFs)
+bare_jrnl.pdf
+*.toc
+*.lof
+*.lot
+*.brf
+*.idx
+*.ilg
+*.ind
+*.gz
+
+# Editor files
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Keep the source LaTeX files
+!bare_jrnl.tex
+!egbib.bib
+!article/*.tex

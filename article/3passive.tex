@@ -1,0 +1,168 @@
+\bookmark[dest=\HyperLocalCurrentHref,level=1]{Passive Methods}
+\section{Passive Methods} \label{sec3}
+Passive NLOS imaging aims to see hidden scenes without using a controllable external light source, which is a very challenging problem. This section has a similar structure with Sec.~\ref{sec2}. It reviews passive NLOS imaging from three aspects: data acquisition devices, physical models, and reconstruction algorithms. Finally, we discuss the challenges and prospects of passive NLOS imaging.
+Table~\ref{tab:passive} summarizes the existing passive NLOS imaging technologies, as well as their lighting conditions, sensors, available information, and target tasks.
+
+\bookmark[dest=\HyperLocalCurrentHref,level=2]{Cameras in passive methods}
+\subsection{Cameras in passive methods} \label{sec31}
+
+\bookmark[dest=\HyperLocalCurrentHref,level=3]{Conventional camera}
+\subsubsection{Conventional camera}
+In the absence of a controllable light source, the light field remains steady. Therefore, the most useful information is intensity, which can be recorded by conventional cameras, i.e.,  charge-coupled device (CCD) and complementary metal-oxide-semiconductor (CMOS). Most passive NLOS imaging research used conventional cameras to collect data. However, their illumination was uncontrollable and different, including ambient light\cite{saundersComputationalPeriscopyOrdinary2019,aittalaComputationalMirrorsBlind2019} and active incoherent light\cite{katz2014non}\footnote{Although active illumination is used, it is still considered as passive NLOS imaging because the light source is on the side of the hidden object and is uncontrollable.}.
+When using ambient light, the hidden scene produces shadows (or speckles) on the wall. The only information available at this time is the intensity information of the shadows. However, if a narrowband spatially-incoherent source is used for illumination, the obtained speckles can encode the hidden scene's information, which can be reconstructed by the optical memory effect\cite{fengCorrelationsFluctuationsCoherent1988,freundMemoryEffectsPropagation1988,osnabruggeGeneralizedOpticalMemory2017}. 
+
+Conventional cameras are the most inexpensive but have at least two limitations among all the cameras discussed in this article. First, the shadow is very sensitive to ambient light intensity, i.e., SNR decreases as the ambient light intensity increases. Second, for broadband illumination, the optical memory effect is no longer valid, due to which the problem is extremely ill-posed and usually requires additional constraints and priors.
+
+
+\bookmark[dest=\HyperLocalCurrentHref,level=3]{Interferometer}
+\subsubsection{Interferometer}
+Considering the limitations of intensity information, some studies employ interferometry to obtain phase information and use coherence to solve it, as illustrated in Tab.~\ref{tab:passive}. 
+Batarseh~\etal~used the Dual-Phase Sagnac Interferometer (DuPSaI) to measure the spatial coherence of the light field~\cite{batarsehPassiveSensingCorner2018a}, thereby completing the detection and positioning of the hidden broadband ambient light source. Beckus~\etal~combined spatial coherence and intensity information to complete multi-modal passive NLOS imaging~\cite{beckusMultiModalNonLineofSightPassive2019}. In addition to spatial coherence, temporal coherence can also be used to obtain depth information. Boger-Lombard~\etal~utilized a diffuser and an ordinary camera to provide passive ToF information through the time coherence of the measurement~\cite{boger-lombardPassiveOpticalTimeofflight2019}. 
+The interferometer enables depth information measurement in passive NLOS scenes and can be fused with intensity information to improve imaging quality. However, it requires a precise and complex calibration process, and the depth information it contains is very limited, which can only be used for discrete scenes.
+
+\bookmark[dest=\HyperLocalCurrentHref,level=3]{Hyperspectral and Multispectral Cameras}
+\subsubsection{Hyperspectral and Multispectral Cameras}
+Capturing richer spectral information beyond a single visible-light band can substantially improve passive NLOS imaging quality. Chen~\etal~proposed Hyper-NLOS, which uses a hyperspectral camera to capture NLOS measurements across many spectral bands and fuses them with a dedicated hyperspectral fusion network (HFN-Net)~\cite{chenHyperNLOS2024}. The additional spectral channels provide complementary cues that help discriminate hidden objects from background clutter. A band selection strategy can further select the most informative spectral bands to reduce measurement cost~\cite{chenHyperNLOS2024}. Building on this, Liu~\etal~proposed a multispectral passive NLOS approach via deep fusion photography that significantly improves long-distance reconstruction quality~\cite{laiHoloRadar2025}. These hyperspectral and multispectral approaches represent an important direction for improving passive NLOS imaging without increasing hardware complexity on the active illumination side.
+
+\bookmark[dest=\HyperLocalCurrentHref,level=2]{Physical model}
+\subsection{Forward imaging model}
+Considering the classic intensity-based passive NLOS imaging scene, as shown in Fig.~\ref{fig:introFig}-(c), the goal is to reconstruct the hidden scene based on the speckle area's intensity information $d$ on the wall. Assuming that each point on the hidden scene is an independent point light source, the measured intensity information is
+
+\begin{equation}
+   I_{\tau}(d)=\int\int_{s\in S} A(s,d)I_{\rho}(s)ds
+\end{equation}
+Here $ I_ {\tau}$ is the observed projection image of resolution $p\times q$, $I_{y}(\tau)$ is the light intensity on the projection area $d$. $ I_ {\rho}$ is the hidden target image of resolution $m \times n$ displayed on the screen, and $I_{\rho}(s)$ is the intensity of the pixel point $s$ of $I_x$. Besides, $A(s,d)$ is the optical transport from the point light source $s$ to area $d$ on the relay wall, and $S$ denotes all pixels on the whole screen. The model can be discretized as
+\begin{equation}
+   \mathbf{I_{\tau}} = \mathbf{A}\mathbf{I_{\rho}} + \mathbf{N}
+   \label{eq2_1}
+\end{equation}
+where $\mathbf{N}$ is an additional background term.
+
+It can be seen that Eq.~(\ref{eq2}) and Eq.~(\ref{eq2_1}) look very similar. Because passive NLOS imaging usually only collects intensity information, the condition number of $\mathbf{A}$ in Eq.~(\ref{eq2_1}) is larger, meaning more ill-posed. 
+In addition to the above-mentioned intensity-based forward model, imaging models based on other principles and settings (including the Fresnel model\cite{beckusMultiModalNonLineofSightPassive2019}, partial occlusion\cite{saundersComputationalPeriscopyOrdinary2019,seidelTwoDimensionalNonLineofSightScene2020}, spatial coherence\cite{batarsehPassiveSensingCorner2018a,beckusMultiModalNonLineofSightPassive2019}, and polarizers\cite{tanakaPolarizedNonLineofSightImaging2020}) can all be discretized to inverse optimization problems similar with Eq.~(\ref{eq2_1}). 
+Passive methods based on speckle coherence have a special imaging model and reconstruction process, which will be explained in the following (see Eq.~(\ref{eqK_2})).
+
+
+\begin{table*}[!t]
+   \caption{Passive NLOS imaging \label{tab:passive}}%%%Table caption goes heree
+   {\begin{tabular}{m{2.5cm}m{3.5cm}m{3cm}m{4cm}m{3cm}}%%%The number of columns has to be defined here
+   \hline
+   Ref & Illumination & Sensor & Information and constraints & Task\\ %%%% Table body
+   \hline
+
+   \cite{boger-lombardPassiveOpticalTimeofflight2019} & Incoherent light source (object side) & Conventional camera & Temporal coherence &  Detection/ Tracking/ Identification\\%%%% Table body
+   \cite{katz2014non} & Incoherent light source (object side) & Conventional camera & Speckle coherence &  2D reconstruction\\%%%% Table body
+   \cite{batarsehPassiveSensingCorner2018a} & Incoherent light source (object side) & Interferometer & Spatial coherence &  Detection/ Tracking/ Identification\\%%%% Table body
+   \cite{beckusMultiModalNonLineofSightPassive2019} & Ambient light & Interferometer + Conventional camera & Spatial coherence + Intensity&  2D reconstruction\\%%%% Table body
+   \cite{yedidiaUsingUnknownOccluders2019,torralbaAccidentalPinholePinspeck2012,aittalaComputationalMirrorsBlind2019,DBLP:conf/iccp/SeidelMMSFYG19,saundersComputationalPeriscopyOrdinary2019,seidelTwoDimensionalNonLineofSightScene2020} & Ambient light & Conventional camera & Intensity with partial occluder &  2D reconstruction\\%%%% Table body
+   \cite{tanakaPolarizedNonLineofSightImaging2020} & Ambient light & Conventional camera & Intensity with polarizer &  2D reconstruction\\%%%% Table body
+   \cite{boumanTurningCornersCameras2017} & Ambient light & Conventional camera & Intensity of moving object &  2D reconstruction\\%%%% Table body
+   \cite{boumanTurningCornersCameras2017} & Ambient light & Conventional camera & Intensity &  Detection/ Tracking/ Identification\\%%%% Table body
+   \cite{8747343} & Infrared radiation & Infrared camera & Infrared intensity &  Detection/ Tracking/ Identification\\%%%% Table body
+
+   \hline
+   \end{tabular}}{}
+   \end{table*}%%%End of the table
+
+\bookmark[dest=\HyperLocalCurrentHref,level=2]{Reconstruction with constraints}
+\subsection{Reconstruction with constraints} \label{memoryEffect1}
+Passive NLOS imaging is extremely ill-posed, and it is difficult to complete high-quality reconstruction only with conventional cameras. Existing researches reduce the condition number of the transport matrix $\mathbf{A}$ by adding additional constraints, thereby improving the imaging quality, as shown in Tab.~\ref{tab:passive}. This section will discuss reconstruction algorithms under three common constraints, including partial occluder\cite{saundersComputationalPeriscopyOrdinary2019,yedidiaUsingUnknownOccluders2019}, coherence\cite{beckusMultiModalNonLineofSightPassive2019} and polarizer\cite{tanakaPolarizedNonLineofSightImaging2020}.
+Data-driven scene priors are another common constraint, which will be explained in Sec.~\ref{sec4}.
+
+
+\bookmark[dest=\HyperLocalCurrentHref,level=3]{Partial occluder}
+\subsubsection{Partial occluder}
+In the most primitive cameras, large-area obstructions can be used to form pinholes to tighten the beam and complete imaging\cite{newhallHistoryPhotography1982}. In other early computational imaging applications, such as stereo vision\cite{andersonRolePartialOcclusion1994}, light field recovery\cite{baradadInferringLightFields2018a,veeraraghavanDappledPhotographyMask2007} and image synthesis\cite{10.1145/1073204.1073257}, partial occlusion also played an important role. 
+In the field of passive NLOS imaging, many state-of-the-art works also exploit partial occlusion. Among them, some tasks need to know or estimate the prior knowledge of occlusion (such as position and shape) before they can reconstruct hidden scenes using the prior as constraints\cite{saundersComputationalPeriscopyOrdinary2019}. Others only utilized partial occlusion to improve the conditioning of the problem without knowing its specific information\cite{torralbaAccidentalPinholePinspeck2012,yedidiaUsingUnknownOccluders2019,aittalaComputationalMirrorsBlind2019,seidelTwoDimensionalNonLineofSightScene2020,boumanTurningCornersCameras2017}, as illustrated in Fig~\ref{fig:passive}-(a).
+
+Passive NLOS imaging modelled by Eq.~(\ref{eq2_1}) can be solved as an optimal problem
+\begin{equation}
+\mathbf{I_{\rho,opt}}=\underset{\mathbf{I_{\rho}}}{\operatorname{argmin}} \frac{1}{2}\|\mathbf{A} \mathbf{I_{\rho}} -\mathbf{I_{\tau}}\|_{2}^{2}+\Gamma(\mathbf{I_{\rho}})
+\label{eqK_2}
+\end{equation}
+where $\Gamma$ represents regularization terms, such as total variation (TV) or other sparsity constraints. When the position of the partial occlusion $p$ is known, the optical transport matrix $\mathbf{A}$ can be estimated, after which the inverse problem can be solved through Eq.~(\ref{eqK_2}). The results of \cite{saundersComputationalPeriscopyOrdinary2019}, a representative work using TV regularization, are shown in Fig.~\ref{fig:passive}-(b).
+When the partially occluded position $p$ cannot be obtained, the constraints at different times can also be used to estimate the optical transport matrix $\mathbf{A}$ and the corresponding hidden scene $I_{\rho}$. For example, Aittala~\etal~performed matrix decomposition through an unsupervised learning method to complete passive NLOS imaging\cite{aittalaComputationalMirrorsBlind2019}. This is essentially similar similar to blind deconvolution\cite{chanTotalVariationBlind1998,kundurBlindImageDeconvolution1996,levinUnderstandingEvaluatingBlind2009}, as discussed in \cite{yedidiaUsingUnknownOccluders2019}.
+
+\bookmark[dest=\HyperLocalCurrentHref,level=3]{Polarizer}
+\subsubsection{Polarizer}
+Although partial occlusion is inevitable in many NLOS scenes, adding occlusion may still change the hidden scene. However, in practical applications, it is not the hidden scene but the imaging system that can be changed. 
+A demonstrated alternative method is to add a polarizer in front of the camera, as shown in Fig.~\ref{fig:passive}-(a). In this case, a small angle difference between the light paths leads to a large intensity change, and the optical transport matrix $\mathbf{A}$ becomes\cite{tanakaPolarizedNonLineofSightImaging2020}
+$$
+A^{\prime}(s, d)=A(s, d) \lambda\left(\boldsymbol{\omega}_{\mathbf{i}}, \boldsymbol{\omega}_{\mathbf{o}}, \mathbf{p}\right)
+$$
+where $\lambda$ indicates the light leaking/blocking effect caused by the polarizer. $\omega_\mathbf{i}$,$\omega_\mathbf{o}$ and $\mathbf{p}$ indicate viewing vector, incident vector and the polarizer axis, respectively. $\lambda$ decreases the condition number of matrix $\mathbf{A}$, thereby improving the image quality.
+
+
+\bookmark[dest=\HyperLocalCurrentHref,level=3]{Coherence}
+\subsubsection{Coherence} \label{memoryEffect}
+Three types of coherence, speckle coherence, spatial coherence and time coherence, have been used in passive non-line-of-sight imaging. Among them, speckle coherence does not require a special interferometer, but needs a narrowband incoherent light source as illumination. 
+The speckle coherence model is based on the optical memory effect\cite{freundMemoryEffectsPropagation1988}, which completes NLOS imaging through the scattering medium and corner objects by analyzing the coherence information between hidden object intensity and measured speckle
+\begin{equation}
+   [\mathbf{I_{\tau}} \star \mathbf{I_{\tau}}](\theta)= [\mathbf{I_{\rho}} \star \mathbf{I_{\rho}}](\theta)
+   \label{eq2_2}
+\end{equation}
+where $\star$ represents the autocorrelation operation. Using the phase recovery algorithm\cite{fienupPhaseRetrievalAlgorithms1982,bertolottiNoninvasiveImagingOpaque2012a}, hidden object's diffraction-limited image $\mathbf{I_{\tau}}$ can be recovered from its autocorrelation\cite{katz2014non}. The field of view of speckle autocorrelation imaging depends on the range of memory effect, which is generally very small. This is the bottleneck that limits the speckle correlation based on the memory effect.
+
+
+Reconstruction algorithms based on spatial and temporal coherence are no longer subject to the viewing angle limitation caused by the optical memory effect\cite{freundMemoryEffectsPropagation1988}, but require a very sensitive and costly interferometer. Since the interference effect is sensitive to the light source's number and size, spatial coherence and temporal coherence can usually only be used to complete the positioning, detection of discrete points, and very simple shape restoration. The combination of coherence and intensity information can effectively overcome this limitation. For example, multi-modal passive NLOS imaging that combines intensity information and spatial coherence can achieve promising results\cite{beckusMultiModalNonLineofSightPassive2019}.
+
+\bookmark[dest=\HyperLocalCurrentHref,level=3]{Real-Time Passive NLOS Tracking}
+\subsubsection{Real-Time Passive NLOS Tracking}
+A practically important task for passive NLOS imaging is real-time tracking of moving persons. Wang~\etal~proposed PAC-Net (Propagate-and-Calibrate), a purely passive method that tracks a person walking in an invisible room by observing only a relay wall~\cite{wangPropagateCalibrate2023}. PAC-Net uses difference frames as carriers of temporal-local motion information and alternates propagation and calibration modules to leverage both dynamic and static cues at frame-level granularity. The authors also released NLOS-Track, the first large-scale dynamic passive NLOS tracking dataset containing thousands of video clips with corresponding trajectories, enabling systematic evaluation of passive NLOS tracking methods.
+
+3D passive NLOS reconstruction has also advanced significantly. Czajkowski and Murray-Bruce demonstrated full-color, three-dimensional passive NLOS imaging with an ordinary camera by exploiting two orthogonal edges of an occluding structure for transverse resolution and an information-orthogonal scene representation for range resolution~\cite{czajkowskiTwoEdge2024}. This work achieves accurate 3D reconstruction from inexpensive, ubiquitous hardware without calibration images, opening passive NLOS to practical indoor applications such as reconnaissance and search-and-rescue.
+
+\bookmark[dest=\HyperLocalCurrentHref,level=3]{Deep Learning}
+\subsubsection{Deep Learning} \label{deepLearning}
+Data-driven scene priors are another common constraint, which can be exploited by deep learning methods. Although data-driven passive methods~\cite{DBLP:journals/corr/abs-1810-11710,zhouNonlineofsightImagingPhong2020,yuNonLineofSightImagingDeep2019} also belong to passive NLOS imaging, this article will explain it in Sec.~\ref{sec4} together with active data-driven NLOS methods to highlight the application of deep learning in this field.
+Besides, in Sec.~\ref{sec4}, unsupervised passive NLOS imaging algorithms~\cite{aittalaComputationalMirrorsBlind2019} based on physical constraints (matrix factorization) are also introduced.
+
+% 今天上午
+\bookmark[dest=\HyperLocalCurrentHref,level=2]{Challenges and prospects}
+\subsection{Challenges and prospects}
+Because there is no controllable light source, passive NLOS imaging can only obtain intensity information and limited coherent information, leading to low reconstruction quality. The two main challenges for passive NLOS imaging are high ill-posedness and limited measurement.
+
+\bookmark[dest=\HyperLocalCurrentHref, level=3]{Ill-posedness}
+\subsubsection{Ill-posedness}
+Passive NLOS imaging is an extremely ill-posed problem. The reasons can be summarized as follows. (1) The collected data contains little effective information. Since most of the information collected by passive NLOS imaging is intensity information, it can be regarded as a projection of a hidden scene on a two-dimensional plane, without any available temporal information. (2) There is no effective space coding. The problem of passive NLOS imaging is somewhat similar to the recent lensless imaging, but there are no encoders such as moiré fringes\cite{tajima_lensless_2017}, optical phased array\cite{fatemi_88_2017} and known scattering medium\cite{sahoo_single-shot_2017}, which results in the data collected on diffuse reflection surfaces (without valid BRDF encoding) being messy and the degree of ill-posedness being high. (3) The influence of ambient light. When there is ambient light, it is difficult to separate the ambient light from the effective speckle, which also leads to an increase in the ill-posedness\cite{maedaRecentAdvancesImaging2019}.
+
+\vspace{0.8em}
+\noindent\textbf{Adding constraints.} 
+Adding constraints is an effective way to improve the condition. When the additional constrained parameters are unknown, accurate estimation of constrained parameters (such as the position and shape of partial occlusion) can also improve the imaging effect. Besides partial occlusion~\cite{saundersComputationalPeriscopyOrdinary2019,yedidiaUsingUnknownOccluders2019} and polarizer~\cite{tanakaPolarizedNonLineofSightImaging2020} discussed above, the data-driven methods have a good application prospect, which will be discussed in Sec.~\ref{sec4}.
+
+\begin{table*}[!t]
+   \caption{NLOS imaging based on deep learning\label{tab:deeplearning}}%%%Table caption goes heree
+   {\begin{tabular}{>{\raggedright}m{1.5cm}m{2.3cm}m{2cm}m{2.7cm}m{4cm}m{3cm}}%%%The number of columns has to be defined here
+   \hline
+   Ref & Network & Input & Output & NLOS Scene& Train set\\ %%%% Table body
+   \hline
+   \cite{zhouNonlineofsightImagingPhong2020} & End-to-End: U-Net & Scattering image & 2D Image &  Ambient light + conventional camera like \cite{saundersComputationalPeriscopyOrdinary2019} & Experimental and synthetic data\\%%%% Table body
+   \cite{yuNonLineofSightImagingDeep2019} & End-to-End: a variant of the U-Net & Speckle image & 2D Image &  Incoherent light source + conventional camera like \cite{katz2014non} & Experimental data\\%%%% Table body
+   \cite{chenSteadystateNonLineofSightImaging2019} & End-to-End: a variant of the U-Net & Scattering image & 3D reconstruction &  CW laser + conventional camera & Synthetic data\\%%%% 
+   \cite{chopiteDeepNonLineofSightReconstruction2020} & End-to-End: a variant of the U-Net & Transient images & 3D reconstruction &  pulsed laser + SPAD like \cite{otooleConfocalNonlineofsightImaging2018} & Synthetic data\\%%%% 
+   \cite{DBLP:journals/corr/abs-1810-11710} & End-to-End: CNN/ VAE & Scattering image & 2D Localization/ identification/ reconstruction &  Incoherent light source + conventional camera like \cite{chandranAdaptiveLightingDataDriven2019} & Synthetic data\\%%%% Table body
+   \cite{musarraDetectionIdentificationTracking2019,caramazzaNeuralNetworkIdentification2017} & End-to-End: CNN & Temporal histogram & Detection/ Identification/ Tracing &  Pulsed laser + SPAD like \cite{otooleConfocalNonlineofsightImaging2018} & Experimental data\\ %%%%
+   \cite{leiDirectObjectRecognition2019} & End-to-End: ResNet & Steady image & Identification &  CW laser + conventional camera like \cite{chenSteadystateNonLineofSightImaging2019} & Synthetic data\\ %%%%
+   \cite{aittalaComputationalMirrorsBlind2019} & Deep matrix factorization & Scattering image/ video & 2D image/ video &  Ambient light + conventional camera like \cite{saundersComputationalPeriscopyOrdinary2019} & Experimental data\\%%%% Table body
+   \cite{metzlerDeepinverseCorrelographyRealtime2020} & Deep-inverse correlography & Speckle image & 2D Image &  CW laser + conventional camera like \cite{chenSteadystateNonLineofSightImaging2019} & Synthetic data\\%%%% 
+   \cite{chen_learned_2020} & Learned feature embeddings & Transient images & 3D reconstruction &  Pulsed laser + SPAD like \cite{otooleConfocalNonlineofsightImaging2018} & Synthetic data\\%%%%
+   \cite{zhuFastNonlineofsightImaging2021a} & Learned feature embeddings & Depth and intensity images & 3D reconstruction &  Commercial LiDAR & Synthetic data\\%%%%
+   \cite{isogawaOpticalNonLineofSightPhysicsBased2020} & Physics-based deepRL framework & Transient images & Pose estimation &  Pulsed laser + SPAD like \cite{otooleConfocalNonlineofsightImaging2018} & Synthetic data\\ %%%%
+
+   \hline
+   \end{tabular}}{}
+   \end{table*} %%% End of the table
+
+\bookmark[dest=\HyperLocalCurrentHref, level=3]{Limited measurement}
+\subsubsection{Limited measurement} 
+In practical application scenes, adding appropriate constraints between the hidden object and the observation wall may not be allowed, which leads to the limitation of passive NLOS measurement. Therefore, passive NLOS imaging only exploiting intensity information is extremely challenging~\cite{saundersComputationalPeriscopyOrdinary2019}. Existing research can obtain coherence through the interferometer, which contains some depth information but is limited by the shape and size of hidden objects and cannot complete high-quality reconstruction.
+
+
+\vspace{0.8em}
+\noindent\textbf{Multimodal measurements fusion}
+Beckus~\etal~combined spatial coherence information and intensity information to complete multimodal passive NLOS imaging, which provides a path to improve the imaging quality\cite{beckusMultiModalNonLineofSightPassive2019}.
+The basic principle of passive NLOS imaging is to collect visible light emitted/reflected from hidden objects. However, in addition to visible light, hidden objects also emit/reflect electromagnetic waves on other wavelengths, such as infrared ($\sim 780nm$) and radio signals everywhere in the environment. On the other hand, NLOS imaging based on infrared wave\cite{8747343} and radio\cite{he_non-line--sight_2020} has also been explored in recent years. Therefore, if visible light can be fused with other types of electromagnetic waves to obtain multimodal measurement information, it will hopefully break through the bottleneck of passive NLOS imaging and achieve high-quality reconstruction without occlusion and scene constraint.
+
+\vspace{0.8mm}
+\noindent \textbf{Spectral and Polarization Fusion.}
+Building on multimodal measurement, recent works have leveraged spectral and polarization information as additional passive cues. Hyper-NLOS~\cite{chenHyperNLOS2024} and related multispectral approaches demonstrate that fusing across tens of spectral bands measurably improves reconstruction quality. On the polarization side, the PI-NLOS framework combines polarization imaging with long-wavelength infrared (LWIR) sensing to improve reconstruction under challenging lighting conditions, exploiting the geometric cues encoded in the polarization state of diffusely reflected light. Turning rough surfaces into relay surfaces is another recent direction: Li~\etal~showed that rough surfaces with mixed diffuse-specular reflectance can serve as NLOS relay surfaces by developing a modified light transport model that accounts for the specular component~\cite{liRoughSurfaces2025}, greatly expanding the set of surfaces usable for NLOS sensing in uncontrolled environments.
