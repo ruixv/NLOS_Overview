@@ -489,7 +489,7 @@ NLOS Imaging
 
 | Title | Authors | Venue | Link |
 |-------|---------|-------|------|
-| **Non-line-of-sight Imaging** (comprehensive review) | Faccio et al. | **Nature Physics 2020** | [Link](https://www.nature.com/articles/s41567-020-0858-7) |
+| [Non-line-of-sight Imaging](https://www.nature.com/articles/s42254-020-0174-8) (comprehensive review) | Faccio, Velten, Wetzstein | **Nature Reviews Physics 2020** | [Link](https://www.nature.com/articles/s42254-020-0174-8) |
 
 ---
 
