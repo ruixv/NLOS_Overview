@@ -330,6 +330,14 @@ NLOS Imaging
 | Passive Optical Time-of-Flight Non-Line-of-Sight Imaging — Boger-Lombard et al. | Optica 2019 | Temporal coherence for passive depth |
 | [Polarized Non-Line-of-Sight Imaging](https://openaccess.thecvf.com/content_CVPR_2020/html/Tanaka_Polarized_Non-Line-of-Sight_Imaging_CVPR_2020_paper.html) — Tanaka et al. | CVPR 2020 | Polarizer reduces condition number |
 
+### Optimization-Based Passive Reconstruction
+
+| Paper | Venue | Key Contribution |
+|-------|-------|-----------------|
+| Passive Non-Line-of-Sight Imaging Using Optimal Transport — Geng et al. | **IEEE TIP 2022** | OT/Wasserstein-based objective; more robust to non-Gaussian noise than TV/ℓ₂ baselines |
+| Passive Non-Line-of-Sight Imaging with Light Transport Modulation — Zhang et al. | **IEEE TIP 2025** | Adaptive transport modulation reduces condition number; improved reconstruction stability |
+| Passive Non-Line-of-Sight Imaging with Parallel Encoder — Du et al. | ICASSP 2025 | Parallel multi-scale encoder; improved passive NLOS fidelity and inference efficiency |
+
 ### Real-Time Passive Tracking
 
 | Paper | Venue | Key Contribution |
@@ -350,6 +358,7 @@ NLOS Imaging
 | [Learned Feature Embeddings for Non-Line-of-Sight Imaging](https://dl.acm.org/doi/10.1145/3414685.3417825) — Chen et al. | SIGGRAPH Asia 2020 | Physics-constrained feature embedding |
 | Non-Line-of-Sight Imaging Using Deep Learning — Yu et al. | Opt. Express 2019 | U-Net for passive speckle NLOS |
 | Non-Line-of-Sight Imaging and Tracking of Any Object — Tancik et al. | 2018 | CNN/VAE for passive NLOS; classification |
+| NLOS-R 2: Alternate Reconstruction and Recognition — Wang, Geng et al. | ICME 2025 | Mutual-refinement loop: reconstruction ↔ recognition; joint NLOS understanding |
 | Physics Rescue: Deep Network for High-Speed NLOS — Mu et al. | **TPAMI 2022** | Physics model + DL; 5 fps, 10× speedup |
 | Two-Step Deep Remapping — Zhu et al. | 2022 | Non-confocal to confocal remapping; 4× FK speedup |
 | Untrained Deep Decoder for NLOS — Wu et al. | 2022 | Deep image prior without training data |

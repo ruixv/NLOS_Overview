@@ -59,6 +59,8 @@ Passive methods based on speckle coherence have a special imaging model and reco
    \cite{boumanTurningCornersCameras2017} & Ambient light & Conventional camera & Intensity of moving object &  2D reconstruction\\%%%% Table body
    \cite{boumanTurningCornersCameras2017} & Ambient light & Conventional camera & Intensity &  Detection/ Tracking/ Identification\\%%%% Table body
    \cite{8747343} & Infrared radiation & Infrared camera & Infrared intensity &  Detection/ Tracking/ Identification\\%%%% Table body
+   \cite{geng2022passive} & Ambient/incoherent light & Conventional camera & Intensity via optimal transport &  2D reconstruction\\%%%% Table body
+   \cite{zhang2025passive} & Ambient light & Conventional camera & Modulated light transport intensity &  2D/3D reconstruction\\%%%% Table body
 
    \hline
    \end{tabular}}{}
@@ -106,6 +108,17 @@ where $\star$ represents the autocorrelation operation. Using the phase recovery
 
 Reconstruction algorithms based on spatial and temporal coherence are no longer subject to the viewing angle limitation caused by the optical memory effect\cite{freundMemoryEffectsPropagation1988}, but require a very sensitive and costly interferometer. Since the interference effect is sensitive to the light source's number and size, spatial coherence and temporal coherence can usually only be used to complete the positioning, detection of discrete points, and very simple shape restoration. The combination of coherence and intensity information can effectively overcome this limitation. For example, multi-modal passive NLOS imaging that combines intensity information and spatial coherence can achieve promising results\cite{beckusMultiModalNonLineofSightPassive2019}.
 
+\bookmark[dest=\HyperLocalCurrentHref,level=3]{Optimal Transport and Transport Modulation}
+\subsubsection{Optimal Transport and Transport Modulation}
+
+\vspace{0.8em}
+\noindent\textbf{Optimal transport formulation.}
+Going beyond standard $\ell_2$ and TV regularization, Geng~\etal~formulated passive NLOS reconstruction as an optimal transport (OT) problem~\cite{geng2022passive}. The method minimizes a Wasserstein-type distance between the predicted and measured light distributions on the relay wall, providing a geometrically meaningful and noise-robust objective. By casting the ill-posed passive measurement model (Eq.~(\ref{eq2_1})) in the OT framework, the approach handles non-Gaussian measurement noise more gracefully than conventional least-squares methods. Validated on both synthetic and real passive NLOS scenes, the OT-based reconstruction yields measurably improved quality over TV-regularized baselines published in IEEE Transactions on Image Processing.
+
+\vspace{0.8em}
+\noindent\textbf{Light transport modulation.}
+Zhang~\etal~proposed to improve passive NLOS reconstruction quality by modulating the light transport between the hidden scene and the relay surface~\cite{zhang2025passive}. Rather than treating the transport matrix $\mathbf{A}$ as fixed, the modulation strategy adaptively adjusts the imaging conditions to reduce the condition number of the inverse problem, thereby enabling more stable and accurate reconstruction from passive measurements captured with ordinary cameras. The method achieves state-of-the-art reconstruction performance on IEEE Transactions on Image Processing benchmarks.
+
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Real-Time Passive NLOS Tracking}
 \subsubsection{Real-Time Passive NLOS Tracking}
 A practically important task for passive NLOS imaging is real-time tracking of moving persons. Wang~\etal~proposed PAC-Net (Propagate-and-Calibrate), a purely passive method that tracks a person walking in an invisible room by observing only a relay wall~\cite{wangPropagateCalibrate2023}. PAC-Net uses difference frames as carriers of temporal-local motion information and alternates propagation and calibration modules to leverage both dynamic and static cues at frame-level granularity. The authors also released NLOS-Track, the first large-scale dynamic passive NLOS tracking dataset containing thousands of video clips with corresponding trajectories, enabling systematic evaluation of passive NLOS tracking methods.
@@ -148,6 +161,8 @@ Adding constraints is an effective way to improve the condition. When the additi
    \cite{chen_learned_2020} & Learned feature embeddings & Transient images & 3D reconstruction &  Pulsed laser + SPAD like \cite{otooleConfocalNonlineofsightImaging2018} & Synthetic data\\%%%%
    \cite{zhuFastNonlineofsightImaging2021a} & Learned feature embeddings & Depth and intensity images & 3D reconstruction &  Commercial LiDAR & Synthetic data\\%%%%
    \cite{isogawaOpticalNonLineofSightPhysicsBased2020} & Physics-based deepRL framework & Transient images & Pose estimation &  Pulsed laser + SPAD like \cite{otooleConfocalNonlineofsightImaging2018} & Synthetic data\\ %%%%
+   \cite{du2025passive} & End-to-End: Parallel Encoder & Scattering image & 2D Image &  Ambient light + conventional camera & Synthetic data\\ %%%%
+   \cite{wang2025nlos} & End-to-End: Alternate R\&R & Scattering image & 2D reconstruction + recognition &  Ambient light + conventional camera & Synthetic data\\ %%%%
 
    \hline
    \end{tabular}}{}
