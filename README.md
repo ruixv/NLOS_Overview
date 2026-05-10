@@ -496,7 +496,6 @@ NLOS Imaging
 | Title | Authors | Venue | Link |
 |-------|---------|-------|------|
 | **Non-line-of-sight Imaging** (comprehensive review) | Faccio et al. | **Nature Physics 2020** | [Link](https://www.nature.com/articles/s41567-020-0858-7) |
-| **Non-Line-of-Sight Imaging: A Comprehensive Survey** | Geng, Hu, Chen et al. | IEEE TGRS 2022 (updated 2026) | [Paper] |
 | Unlocking the Potential of NLOS Sensing | Scheiner et al. | 2022 | — |
 | NLOS Imaging: A Review of Recent Advances | Chen et al. | 2023 | — |
 
