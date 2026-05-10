@@ -5,7 +5,6 @@
 **A comprehensive, curated survey of Non-Line-of-Sight Imaging research**
 
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
-[![Paper](https://img.shields.io/badge/Survey_Paper-IEEE_TGRS-blue)](https://doi.org/)
 [![Papers](https://img.shields.io/badge/Papers-200+-green)]()
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
