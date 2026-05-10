@@ -11,7 +11,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Last Updated](https://img.shields.io/badge/Last_Updated-2026-red)]()
 
-*Based on the survey: "Non-Line-of-Sight Imaging: A Comprehensive Survey" (2021, Updated 2022–2026)*  
+*Based on the survey: "Recent Advances on Non-Line-of-Sight Imaging: Conventional Physical Models, Deep Learning, and New Scenes" (2022, Updated 2022–2026)*  
 *Authors: Ruixu Geng · Yang Hu · Yan Chen*
 
 </div>
