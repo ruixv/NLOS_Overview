@@ -7,8 +7,8 @@
 *.log
 *.out
 *.synctex.gz
-# Compiled output PDF (not source figure PDFs)
-bare_jrnl.pdf
+# Compiled output PDF excluded (tracked separately for GitHub Pages)
+# bare_jrnl.pdf
 *.toc
 *.lof
 *.lot
