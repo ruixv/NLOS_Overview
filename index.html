@@ -104,9 +104,9 @@
 
     /* ─── STATS ─── */
     #stats { background: var(--bg); }
-    .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+    .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
     .stat-card {
-      background: var(--card); border-radius: var(--radius); padding: 1.5rem;
+      background: var(--card); border-radius: var(--radius); padding: 1.25rem 1rem;
       box-shadow: var(--shadow); text-align: center; border-top: 4px solid transparent;
     }
     .stat-card.blue   { border-top-color: var(--blue); }
@@ -114,16 +114,25 @@
     .stat-card.purple { border-top-color: var(--purple); }
     .stat-card.green  { border-top-color: var(--green); }
     .stat-card.amber  { border-top-color: var(--amber); }
-    .stat-num { font-size: 2.5rem; font-weight: 800; line-height: 1; }
+    .stat-card.red    { border-top-color: #ef4444; }
+    .stat-card.indigo { border-top-color: #6366f1; }
+    .stat-card.rose   { border-top-color: #f43f5e; }
+    .stat-num { font-size: 2.2rem; font-weight: 800; line-height: 1; }
     .blue .stat-num   { color: var(--blue); }
     .teal .stat-num   { color: var(--teal); }
     .purple .stat-num { color: var(--purple); }
     .green .stat-num  { color: var(--green); }
     .amber .stat-num  { color: var(--amber); }
-    .stat-label { font-size: .8rem; color: var(--text-muted); margin-top: .4rem; font-weight: 500; }
+    .red .stat-num    { color: #ef4444; }
+    .indigo .stat-num { color: #6366f1; }
+    .rose .stat-num   { color: #f43f5e; }
+    .stat-label { font-size: .75rem; color: var(--text-muted); margin-top: .4rem; font-weight: 500; line-height: 1.3; }
     .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
     .chart-card { background: var(--card); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
-    .chart-card h3 { font-size: .95rem; font-weight: 700; margin-bottom: 1.2rem; color: var(--text); }
+    .chart-card.full { grid-column: 1 / -1; }
+    .chart-card h3 { font-size: .95rem; font-weight: 700; margin-bottom: .3rem; color: var(--text); }
+    .chart-sub { font-size: .75rem; color: var(--text-muted); margin-bottom: 1.1rem; }
+    @media (max-width: 640px) { .charts-grid { grid-template-columns: 1fr; } .chart-card.full { grid-column: 1; } }
 
     /* ─── TIMELINE ─── */
     #timeline { background: #fff; }
@@ -322,40 +331,76 @@
 <section id="stats">
   <div class="container">
     <h2 class="section-title">Field at a Glance</h2>
-    <p class="section-sub">Statistics based on papers covered in this survey (approximate)</p>
+    <p class="section-sub">Multi-dimensional statistics across 170+ papers (2008–2026) — all figures approximate</p>
 
     <div class="stat-cards">
       <div class="stat-card blue">
-        <div class="stat-num">150+</div>
-        <div class="stat-label">Total Papers Surveyed</div>
+        <div class="stat-num">170+</div>
+        <div class="stat-label">Papers Surveyed</div>
       </div>
       <div class="stat-card teal">
-        <div class="stat-num">~70</div>
+        <div class="stat-num">~72</div>
         <div class="stat-label">Active NLOS</div>
       </div>
-      <div class="stat-card purple">
-        <div class="stat-num">~35</div>
-        <div class="stat-label">Deep Learning</div>
-      </div>
       <div class="stat-card green">
-        <div class="stat-num">~28</div>
+        <div class="stat-num">~32</div>
         <div class="stat-label">Passive NLOS</div>
       </div>
+      <div class="stat-card purple">
+        <div class="stat-num">~48</div>
+        <div class="stat-label">Deep Learning</div>
+      </div>
       <div class="stat-card amber">
-        <div class="stat-num">~15</div>
+        <div class="stat-num">~20</div>
         <div class="stat-label">New NLOS Scenes</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-num">19</div>
+        <div class="stat-label">Years Covered<br>2008 – 2026</div>
+      </div>
+      <div class="stat-card indigo">
+        <div class="stat-num">30+</div>
+        <div class="stat-label">Publication Venues<br>&amp; Journals</div>
+      </div>
+      <div class="stat-card rose">
+        <div class="stat-num">5+</div>
+        <div class="stat-label">Physical Modalities<br>(optical, radar…)</div>
       </div>
     </div>
 
     <div class="charts-grid">
+
+      <!-- Row 1: full-width stacked trend -->
+      <div class="chart-card full">
+        <h3>Annual Publication Trend by Research Category</h3>
+        <p class="chart-sub">Stacked bars show how Active NLOS, Passive NLOS, Deep Learning, and New Scenes each grew year by year</p>
+        <canvas id="trendChart" height="110"></canvas>
+      </div>
+
+      <!-- Row 2: venues + tasks -->
       <div class="chart-card">
-        <h3>Papers by Category</h3>
-        <canvas id="catChart" height="220"></canvas>
+        <h3>Top Publication Venues</h3>
+        <p class="chart-sub">Distribution across leading optics, vision, and AI venues (selected major venues)</p>
+        <canvas id="venueChart" height="260"></canvas>
       </div>
       <div class="chart-card">
-        <h3>Publication Trend by Year (approximate)</h3>
-        <canvas id="yearChart" height="220"></canvas>
+        <h3>Research Task / Output</h3>
+        <p class="chart-sub">Primary goal of each paper — reconstruction, detection, tracking, or recognition (papers may span multiple tasks)</p>
+        <canvas id="taskChart" height="260"></canvas>
       </div>
+
+      <!-- Row 3: sensor + DL arch -->
+      <div class="chart-card">
+        <h3>Sensor / Hardware Platform</h3>
+        <p class="chart-sub">Hardware diversity across surveyed papers; some papers use multiple sensor types</p>
+        <canvas id="sensorChart" height="280"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Deep Learning Architecture Types</h3>
+        <p class="chart-sub">Among ~48 deep-learning NLOS papers — how network design has diversified since 2018</p>
+        <canvas id="dlChart" height="280"></canvas>
+      </div>
+
     </div>
   </div>
 </section>
@@ -789,44 +834,122 @@ const papers = [
   { cat:'dataset', title:'NLOS-OT: Optimal Transport Reconstruction Code', authors:'Geng et al.', year:2022, venue:'IEEE TIP', venueClass:'venue-tpami', url:'https://github.com/ruixv/NLOS-OT', key:'OT-based passive NLOS reconstruction; includes NLOS-Passive dataset and evaluation scripts' },
 ];
 
-// ─── CHART: CATEGORY ───
-new Chart(document.getElementById('catChart'), {
+// ─── CHART 1: STACKED TREND ───
+const trendYears = ['2008','2010','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'];
+new Chart(document.getElementById('trendChart'), {
   type: 'bar',
   data: {
-    labels: ['Active NLOS', 'Deep Learning', 'Passive NLOS', 'New Scenes', 'Datasets/Tools'],
-    datasets: [{
-      data: [70, 35, 28, 15, 10],
-      backgroundColor: ['#2563eb','#7c3aed','#0d9488','#d97706','#10b981'],
-      borderRadius: 6, borderSkipped: false,
-    }]
+    labels: trendYears,
+    datasets: [
+      { label: 'Active NLOS',   data: [1,1,2,1,2,2,3,4,7,8,9,6,8,8,6,4,1], backgroundColor: '#2563eb' },
+      { label: 'Passive NLOS',  data: [0,0,0,0,0,1,1,1,2,4,4,3,5,5,4,3,1], backgroundColor: '#0d9488' },
+      { label: 'Deep Learning', data: [0,0,0,0,0,0,0,1,1,4,6,4,5,7,7,5,2], backgroundColor: '#7c3aed' },
+      { label: 'New Scenes',    data: [0,0,0,0,0,0,0,0,1,1,2,2,3,4,4,3,2], backgroundColor: '#d97706' },
+    ]
   },
   options: {
-    plugins: { legend: { display: false } },
+    plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 14 } } },
+    responsive: true,
     scales: {
-      y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
-      x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
     }
   }
 });
 
-// ─── CHART: YEAR TREND ───
-new Chart(document.getElementById('yearChart'), {
-  type: 'line',
+// ─── CHART 2: TOP VENUES (horizontal bar) ───
+new Chart(document.getElementById('venueChart'), {
+  type: 'bar',
   data: {
-    labels: ['2012','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'],
+    labels: [
+      'Optics / Photonics Journals',
+      'CV Conferences (CVPR/ICCV/ECCV)',
+      'IEEE Transactions',
+      'Other Conferences',
+      'ACM SIGGRAPH / TOG',
+      'AI Conferences (NeurIPS/AAAI/ICML)',
+      'Nature / Science Family'
+    ],
     datasets: [{
-      label: 'Papers (approx.)',
-      data: [2, 2, 2, 2, 5, 7, 14, 18, 12, 15, 18, 16, 10, 3],
-      borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,.1)',
-      fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#2563eb',
+      data: [28, 22, 18, 14, 9, 8, 8],
+      backgroundColor: ['#7c3aed','#2563eb','#0d9488','#10b981','#d97706','#6366f1','#f43f5e'],
+      borderRadius: 4,
     }]
   },
   options: {
+    indexAxis: 'y',
     plugins: { legend: { display: false } },
     scales: {
-      y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
-      x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
     }
+  }
+});
+
+// ─── CHART 3: RESEARCH TASK (horizontal bar) ───
+new Chart(document.getElementById('taskChart'), {
+  type: 'bar',
+  data: {
+    labels: [
+      '3D Volume Reconstruction',
+      'Detection / Localization',
+      '2D Image Reconstruction',
+      'Object Tracking',
+      'Recognition / Classification',
+      '3D Surface Reconstruction',
+      'Human Pose Estimation'
+    ],
+    datasets: [{
+      data: [55, 28, 25, 18, 14, 10, 8],
+      backgroundColor: ['#2563eb','#0d9488','#7c3aed','#d97706','#10b981','#6366f1','#f43f5e'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  }
+});
+
+// ─── CHART 4: SENSOR / HARDWARE (doughnut) ───
+new Chart(document.getElementById('sensorChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Conventional Camera','SPAD / Single-Photon','Radar / RF','Streak Camera','Acoustic / Ultrasound','Interferometer','LiDAR / Other'],
+    datasets: [{
+      data: [42, 36, 14, 10, 8, 6, 5],
+      backgroundColor: ['#2563eb','#0d9488','#ef4444','#d97706','#7c3aed','#10b981','#6366f1'],
+      borderWidth: 2, borderColor: '#fff',
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 12, padding: 8 } }
+    },
+    cutout: '55%',
+  }
+});
+
+// ─── CHART 5: DL ARCHITECTURE (doughnut) ───
+new Chart(document.getElementById('dlChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['End-to-End CNN / U-Net','Physics-Guided Hybrid','Transformer','Neural Implicit (NeRF/NeuS)','Diffusion Model','Mamba / SSM','Graph Neural Network'],
+    datasets: [{
+      data: [18, 12, 6, 4, 4, 2, 2],
+      backgroundColor: ['#2563eb','#0d9488','#7c3aed','#d97706','#10b981','#ef4444','#6366f1'],
+      borderWidth: 2, borderColor: '#fff',
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 12, padding: 8 } }
+    },
+    cutout: '55%',
   }
 });
 
