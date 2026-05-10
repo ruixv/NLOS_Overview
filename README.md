@@ -479,6 +479,7 @@ NLOS Imaging
 | **f-k Dataset** | Lindell et al. (SIGGRAPH 2019) | 2019 | Active, confocal SPAD | [Link](https://github.com/computational-imaging/nlos-fk) |
 | **Galindo Benchmark** | Galindo et al. | 2019 | Active SPAD, benchmarking | [Link](https://doi.org/10.1364/OE.380140) |
 | **NLOS-Track** | Wang et al. (CVPR 2023) | 2023 | Passive NLOS tracking; first large-scale dynamic passive dataset | — |
+| **NLOS-Passive** | Geng et al. (IEEE TIP 2022) | 2022 | Passive NLOS imaging dataset; real captured passive measurements | [Link](https://github.com/ruixv/NLOS-OT) |
 | **NLOS Transient Renderer** | Royo et al. | 2022 | Synthetic renderer for NLOS scene data generation | — |
 | **Fast Differentiable Transient Renderer** | Plack et al. | 2023 | Differentiable transient renderer; supports auto-differentiation | — |
 
@@ -491,6 +492,7 @@ NLOS Imaging
 | [nlos-fk](https://github.com/computational-imaging/nlos-fk) | Lindell et al. (SIGGRAPH 2019) | f-k migration wave-based NLOS (Python/MATLAB) |
 | [acoustic-nlos](https://github.com/computational-imaging/acoustic-nlos) | Lindell et al. (SIGGRAPH 2019) | Acoustic NLOS imaging |
 | [NLOS_imaging_over_1.43km](https://github.com/quantum-inspired-lidar/NLOS_imaging_over_1.43km) | Wu et al. (Nature Comm. 2021) | Long-range 1.43 km NLOS imaging code |
+| [NLOS-OT](https://github.com/ruixv/NLOS-OT) | Geng et al. (IEEE TIP 2022) | NLOS-Passive dataset + optimal transport reconstruction code |
 
 ---
 
