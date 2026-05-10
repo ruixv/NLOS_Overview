@@ -589,12 +589,6 @@ We welcome contributions! Please:
 
 3. **Add a code repository:** If a paper has released code that is not listed, please add it to the Open-Source Code section.
 
-**Guidelines:**
-- Papers should be peer-reviewed (conference or journal) or have significant community impact.
-- Include a concise description of the key contribution.
-- Link to the official paper page or arXiv preprint when possible.
-- For code repositories, prefer official author repositories.
-
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
@@ -602,8 +596,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 <div align="center">
 
 **Star this repository if you find it helpful!**
-
-Maintained by [Ruixu Geng](mailto:gengruixu@std.uestc.edu.cn) · University of Electronic Science and Technology of China
 
 *Last updated: May 2026*
 
