@@ -75,7 +75,11 @@
 | 2026 | [Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling](https://arxiv.org/abs/2605.17865) — Somasundaram et al. | Nature 2026 | Demonstrates plug-and-play NLOS using smartphone-grade / consumer LiDAR with motion-induced aperture sampling. |
 | 2026 | [Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals](https://arxiv.org/abs/2605.29098) — Lu et al. | CVPR 2026 | GeRaF 2.0: neural RF geometry reconstruction that combines LoS visual priors with NLoS radar propagation. |
 | 2026 | [A comprehensive study of time-of-flight non-line-of-sight imaging](https://arxiv.org/abs/2603.09548) — Marco et al. | arXiv 2026 | A valuable comparative study that unifies ToF NLOS forward/inverse models and evaluates methods under common hardware constraints. |
+| 2026 | [Around-the-corner Radar Sensing Using Reconfigurable Intelligent Surface](https://arxiv.org/abs/2602.11471) — Yasmeen et al. | arXiv 2026 | Uses a programmable RIS to steer radar energy into NLOS regions and recover human micro-Doppler signatures around corners. |
+| 2025 | [3D Reconstruction from Transient Measurements with Time-Resolved Transformer](https://arxiv.org/abs/2510.09205) — Li et al. | arXiv 2025 | Introduces TRT/TRT-NLOS, a spatio-temporal transformer for photon-efficient transient 3D reconstruction with code and datasets. |
 | 2025 | [Fast and Memory-efficient Non-line-of-sight Imaging with Quasi-Fresnel Transform](https://arxiv.org/abs/2508.02003) — Wei et al. | arXiv 2025 | Recasts hidden scenes as 2D functions and reduces runtime/memory by orders of magnitude for lightweight NLOS. |
+| 2025 | [MARMOT: Masked Autoencoder for Modeling Transient Imaging](https://arxiv.org/abs/2506.08470) — Shen et al. | arXiv 2025 | Brings self-supervised masked pretraining to NLOS transients and introduces TransVerse-scale transient data for downstream NLOS tasks. |
+| 2025 | [Passive acoustic non-line-of-sight localization without a relay surface](https://arxiv.org/abs/2506.08471) — Sommer, Katz | arXiv 2025 | Uses knife-edge diffraction and doorway/corner geometry for passive 3D acoustic localization without conventional relay surfaces. |
 | 2025 | [Geometric Constrained Non-Line-of-Sight Imaging](https://arxiv.org/abs/2503.17992) — Liu et al. | arXiv 2025 | Joint albedo/surface reconstruction with normal-field regularization for higher-detail hidden geometry. |
 | 2025 | [Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms](https://arxiv.org/abs/2501.05244) — Sultan et al. | arXiv 2025 | Uses NUFFT/SFFT to support irregular relay sampling and flexible hidden-volume sampling while retaining FFT-like scalability. |
 | 2024 | [Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy](https://arxiv.org/abs/2601.12257) — Raji, Murray-Bruce | ECCV 2024 | Extends passive shadow-based computational periscopy to 3D from a single ordinary NLOS photograph via an SNLLS model and a physics-inspired neural solver. |
@@ -124,11 +128,15 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Sun et al.: learnable physical priors for generalization [CVPR]
    │     Su et al.: DG-NLOS — graph neural network [AAAI]
    │     Lai et al.: HoloRadar — full 3D NLOS radar reconstruction [NeurIPS]
+   │     Shen et al.: MARMOT — masked autoencoder pretraining for transient/NLOS data
+   │     Li et al.: Time-Resolved Transformer for LOS/NLOS transient reconstruction
+   │     Sommer & Katz: passive acoustic NLOS without relay surfaces
    │     Wei et al.: Quasi-Fresnel Transform — lightweight 2D NLOS inversion
    │
 2026 ── Somasundaram et al.: consumer LiDAR NLOS via motion-induced sampling [Nature]
         Lu et al.: GeRaF 2.0 — RF/radar NLOS 3D reconstruction [CVPR]
         Wang et al.: 3D Gaussian Transient Rendering for arbitrary relay geometry [SIGGRAPH]
+        Yasmeen et al.: RIS-assisted around-corner radar sensing
 ```
 
 ---
@@ -152,13 +160,16 @@ NLOS Imaging
 │   ├── CNN / U-Net / encoder-decoder
 │   ├── Physics-guided networks and learned priors
 │   ├── Transformer, Mamba, GNN, diffusion
+│   ├── Self-supervised transient pretraining
 │   └── Neural implicit fields and Gaussian primitives
 │
 └── New scenes and modalities
     ├── Two-bounce and keyhole imaging
     ├── Consumer LiDAR / mobile NLOS
     ├── Radar / RF / mmWave NLOS
+    ├── RIS-assisted around-corner radar
     ├── Acoustic / ultrasound NLOS
+    ├── Relay-free acoustic diffraction localization
     ├── Human pose estimation
     └── Arbitrary / non-planar / spatially limited relay surfaces
 ```
@@ -348,6 +359,8 @@ NLOS Imaging
 | TransiT: Transient Imaging Transformer for Videographic NLOS Reconstruction — Li et al. | **CVPR 2025** | 10 fps NLOS video; sparse transients via transfer learning. |
 | ST-Mamba: Spatial-Temporal Mamba for NLOS Videography — Li et al. | **NeurIPS 2024** | First Mamba model for NLOS; temporal consistency. |
 | DG-NLOS: Dual-Branch Graph Neural Network for NLOS Reconstruction — Su et al. | **AAAI 2025** | First GNN-style NLOS reconstruction framework. |
+| [MARMOT: Masked Autoencoder for Modeling Transient Imaging](https://arxiv.org/abs/2506.08470) — Shen et al. | arXiv 2025 | Self-supervised masked autoencoder pretraining for transient/NLOS data; supports arbitrary sampling and downstream NLOS tasks. |
+| [3D Reconstruction from Transient Measurements with Time-Resolved Transformer](https://arxiv.org/abs/2510.09205) — Li et al. | arXiv 2025 | TRT/TRT-NLOS spatio-temporal transformer for photon-efficient LOS/NLOS transient 3D reconstruction. |
 | Model-Guided Iterative Diffusion Sampling for NLOS Reconstruction — Su et al. | 2024 | Diffusion model guided by NLOS forward model. |
 
 ### Neural Implicit / Differentiable Representations
@@ -389,6 +402,7 @@ NLOS Imaging
 | [Seeing Around Street Corners: Non-Line-of-Sight Detection and Tracking in-the-Wild Using Doppler Radar](https://openaccess.thecvf.com/content_CVPR_2020/html/Scheiner_Seeing_Around_Street_Corners_Non-Line-of-Sight_Detection_and_Tracking_in-the-Wild_CVPR_2020_paper.html) — Scheiner et al. | CVPR 2020 | Doppler radar NLOS for automotive vehicle detection. |
 | HoloRadar: Full 3D NLOS Reconstruction via mmWave Radar on a Mobile Robot — Lai et al. | **NeurIPS 2025** | Full 3D scene reconstruction with a single mobile mmWave radar. |
 | [Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals](https://arxiv.org/abs/2605.29098) — Lu et al. | **CVPR 2026** | GeRaF 2.0: combines LoS visual priors and NLoS RF propagation for neural geometry reconstruction. |
+| [Around-the-corner Radar Sensing Using Reconfigurable Intelligent Surface](https://arxiv.org/abs/2602.11471) — Yasmeen et al. | arXiv 2026 | RIS-assisted NLOS radar sensing at 5.5 GHz; improves access to non-specular around-corner regions and human micro-Doppler signatures. |
 
 ### Acoustic / Ultrasound NLOS
 
@@ -396,6 +410,7 @@ NLOS Imaging
 |-------|-------|------------------|------|
 | Acoustic Non-Line-of-Sight Imaging — Lindell et al. | SIGGRAPH 2019 | Microphone-array acoustic NLOS; same algorithms as optical. | [Code](https://github.com/computational-imaging/acoustic-nlos) |
 | Ultrasound NLOS Imaging via Synthetic Aperture | Commun. Physics 2025 | Bat-echolocation frequency; cm-scale depth resolution; 3D multi-target reconstruction. | — |
+| [Passive acoustic non-line-of-sight localization without a relay surface](https://arxiv.org/abs/2506.08471) — Sommer, Katz | arXiv 2025 | Relay-free passive acoustic NLOS: knife-edge diffraction and doorway/corner geometry for 3D source localization. | — |
 
 ### Human Pose / Polarization / Super-FoV
 
@@ -423,6 +438,8 @@ NLOS Imaging
 | **acoustic-nlos** | Lindell et al. | 2019 | Acoustic NLOS code | [Link](https://github.com/computational-imaging/acoustic-nlos) |
 | **NLOS_imaging_over_1.43km** | Wu et al. | 2021 | Long-range NLOS code/data | [Link](https://github.com/quantum-inspired-lidar/NLOS_imaging_over_1.43km) |
 | **NLOS-OT** | Geng et al. | 2022 | Passive NLOS OT code/data | [Link](https://github.com/ruixv/NLOS-OT) |
+| **TRT Code / Datasets** | Li et al. | 2025 | Time-resolved LOS/NLOS transformer code and transient datasets | [Link](https://github.com/Depth2World/TRT) |
+| **TransVerse / MARMOT** | Shen et al. | 2025 | Large-scale synthetic transient pretraining dataset for NLOS-oriented masked modeling | — |
 
 ---
 
