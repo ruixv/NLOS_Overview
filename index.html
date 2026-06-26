@@ -4,27 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Recent Advances on Non-Line-of-Sight Imaging</title>
-  <meta name="description" content="Curated survey homepage for Non-Line-of-Sight Imaging research, updated June 2026 with 180+ papers across active optical, passive optical, learning-based, radar/RF, acoustic, LiDAR, and arbitrary-relay NLOS." />
+  <meta name="description" content="Curated survey homepage for Non-Line-of-Sight Imaging research, updated June 2026 with 180+ papers across active optical, passive optical, learning-based, event-camera, radar/RF, acoustic, LiDAR, and arbitrary-relay NLOS." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #f4f7fb;
-      --card: #ffffff;
-      --ink: #0f172a;
-      --muted: #64748b;
-      --line: #dbe3ef;
-      --blue: #2563eb;
-      --blue-dark: #1e3a8a;
-      --teal: #0f766e;
-      --violet: #7c3aed;
-      --amber: #d97706;
-      --rose: #e11d48;
-      --green: #059669;
-      --shadow: 0 8px 28px rgba(15,23,42,.08);
-      --radius: 18px;
-    }
+    :root { --bg:#f4f7fb; --card:#fff; --ink:#0f172a; --muted:#64748b; --line:#dbe3ef; --blue:#2563eb; --blue-dark:#1e3a8a; --teal:#0f766e; --violet:#7c3aed; --amber:#d97706; --rose:#e11d48; --green:#059669; --shadow:0 8px 28px rgba(15,23,42,.08); --radius:18px; }
     html { scroll-behavior: smooth; }
     body { font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.65; }
     a { color: inherit; }
@@ -42,10 +27,7 @@
     .subtitle { color: #dbeafe; max-width: 780px; font-size: 1.08rem; margin-bottom: 1.5rem; }
     .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; border-radius: 11px; padding: .72rem 1.05rem; text-decoration: none; font-weight: 800; font-size: .9rem; transition: .18s ease; }
-    .btn.primary { background: #fff; color: #172554; }
-    .btn.dark { background: #111827; color: #fff; }
-    .btn.ghost { border: 1px solid rgba(255,255,255,.45); color: #fff; }
-    .btn:hover { transform: translateY(-2px); }
+    .btn.primary { background: #fff; color: #172554; } .btn.dark { background: #111827; color: #fff; } .btn.ghost { border: 1px solid rgba(255,255,255,.45); color: #fff; } .btn:hover { transform: translateY(-2px); }
     .hero-card { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius); padding: 1.25rem; box-shadow: 0 16px 50px rgba(0,0,0,.16); }
     .hero-card h3 { font-size: .95rem; margin-bottom: .65rem; color: #dbeafe; }
     .signal-map { font-family: 'JetBrains Mono', monospace; white-space: pre; font-size: .76rem; color: #bfdbfe; overflow-x: auto; }
@@ -60,15 +42,9 @@
     .latest-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
     .paper-card, .tile { background: var(--card); border: 1px solid rgba(219,227,239,.85); border-radius: var(--radius); padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
     .paper-card { border-left: 5px solid var(--blue); }
-    .paper-card.latest { border-left-color: var(--rose); }
-    .paper-card.active { border-left-color: var(--blue); }
-    .paper-card.passive { border-left-color: var(--teal); }
-    .paper-card.learning { border-left-color: var(--violet); }
-    .paper-card.modality { border-left-color: var(--amber); }
-    .paper-card.dataset { border-left-color: var(--green); }
+    .paper-card.latest { border-left-color: var(--rose); } .paper-card.active { border-left-color: var(--blue); } .paper-card.passive { border-left-color: var(--teal); } .paper-card.learning { border-left-color: var(--violet); } .paper-card.modality { border-left-color: var(--amber); } .paper-card.dataset { border-left-color: var(--green); }
     .paper-title { font-weight: 800; font-size: .98rem; line-height: 1.36; margin-bottom: .45rem; }
-    .paper-title a { text-decoration: none; }
-    .paper-title a:hover { color: var(--blue); text-decoration: underline; }
+    .paper-title a { text-decoration: none; } .paper-title a:hover { color: var(--blue); text-decoration: underline; }
     .meta { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; color: var(--muted); font-size: .78rem; font-weight: 650; }
     .tag { display: inline-flex; border-radius: 999px; padding: .15rem .48rem; font-size: .68rem; font-weight: 850; background: #eef2ff; color: #3730a3; }
     .key { margin-top: .55rem; color: var(--muted); font-size: .84rem; }
@@ -76,11 +52,9 @@
     .tl { display: grid; grid-template-columns: 90px 1fr; gap: 1.1rem; margin-bottom: 1rem; }
     .year { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--blue); text-align: right; padding-top: .15rem; }
     .tl-body { background: var(--card); border: 1px solid var(--line); border-radius: 15px; padding: .95rem 1.05rem; box-shadow: 0 4px 18px rgba(15,23,42,.05); }
-    .tl-body strong { display: block; margin-bottom: .18rem; }
-    .tl-body p { color: var(--muted); font-size: .86rem; }
+    .tl-body strong { display: block; margin-bottom: .18rem; } .tl-body p { color: var(--muted); font-size: .86rem; }
     .taxonomy { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-    .tile h3 { font-size: 1rem; margin-bottom: .55rem; }
-    .tile ul { padding-left: 1.05rem; color: var(--muted); font-size: .88rem; }
+    .tile h3 { font-size: 1rem; margin-bottom: .55rem; } .tile ul { padding-left: 1.05rem; color: var(--muted); font-size: .88rem; }
     .controls { display: grid; grid-template-columns: 1fr auto; gap: .8rem; margin-bottom: 1rem; }
     input[type="search"] { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; padding: .78rem 1rem; font: inherit; background: #fff; outline: none; }
     input[type="search"]:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(37,99,235,.1); }
@@ -96,143 +70,64 @@
   </style>
 </head>
 <body>
-  <nav>
-    <div class="container">
-      <a class="brand" href="#">NLOS Overview</a>
-      <ul class="links">
-        <li><a href="#latest">Latest</a></li>
-        <li><a href="#timeline">Timeline</a></li>
-        <li><a href="#taxonomy">Map</a></li>
-        <li><a href="#papers">Papers</a></li>
-        <li><a href="https://github.com/ruixv/NLOS_Overview" target="_blank" rel="noopener">GitHub</a></li>
-      </ul>
-    </div>
-  </nav>
+  <nav><div class="container"><a class="brand" href="#">NLOS Overview</a><ul class="links"><li><a href="#latest">Latest</a></li><li><a href="#timeline">Timeline</a></li><li><a href="#taxonomy">Map</a></li><li><a href="#papers">Papers</a></li><li><a href="https://github.com/ruixv/NLOS_Overview" target="_blank" rel="noopener">GitHub</a></li></ul></div></nav>
 
   <header>
     <div class="container hero-grid">
       <div>
-        <div class="eyebrow">Updated 26 June 2026 · 180+ papers</div>
+        <div class="eyebrow">Updated 27 June 2026 · 180+ papers</div>
         <h1>Recent Advances on Non-Line-of-Sight Imaging</h1>
-        <p class="subtitle">A curated roadmap of how NLOS imaging evolved from transient optical reconstruction to passive imaging, deep neural inverse models, arbitrary relay surfaces, consumer LiDAR, radar/RF, acoustic, and multimodal hidden-scene understanding.</p>
-        <div class="hero-actions">
-          <a class="btn primary" href="bare_jrnl.pdf" target="_blank" rel="noopener">📄 Updated Survey PDF</a>
-          <a class="btn ghost" href="#latest">🆕 See Latest Additions</a>
-          <a class="btn dark" href="https://github.com/ruixv/NLOS_Overview" target="_blank" rel="noopener">⭐ GitHub Repository</a>
-        </div>
+        <p class="subtitle">A curated roadmap of how NLOS imaging evolved from transient optical reconstruction to passive imaging, event-camera NLOS, deep neural inverse models, arbitrary relay surfaces, consumer LiDAR, radar/RF, acoustic, and multimodal hidden-scene understanding.</p>
+        <div class="hero-actions"><a class="btn primary" href="bare_jrnl.pdf" target="_blank" rel="noopener">📄 Updated Survey PDF</a><a class="btn ghost" href="#latest">🆕 See Latest Additions</a><a class="btn dark" href="https://github.com/ruixv/NLOS_Overview" target="_blank" rel="noopener">⭐ GitHub Repository</a></div>
       </div>
-      <div class="hero-card">
-        <h3>Core NLOS inverse problem</h3>
-        <div class="signal-map">Emitter/Sensor
+      <div class="hero-card"><h3>Core NLOS inverse problem</h3><div class="signal-map">Emitter/Sensor
     │
     ├─ relay surface / wall
     │      └─ hidden object
     │             └─ indirect return
     ↓
-Transient / intensity / RF / acoustic data
+Transient / intensity / event / RF / acoustic data
     ↓
 Physical model + computational inversion
     ↓
-Hidden geometry, albedo, motion, identity</div>
-      </div>
+Hidden geometry, albedo, motion, identity</div></div>
     </div>
   </header>
 
   <main>
-    <div class="container stats">
-      <div class="stat"><b>180+</b><span>curated papers</span></div>
-      <div class="stat"><b>2008–2026</b><span>development history</span></div>
-      <div class="stat"><b>12</b><span>June 2026 additions</span></div>
-      <div class="stat"><b>6+</b><span>sensing modalities</span></div>
-    </div>
+    <div class="container stats"><div class="stat"><b>180+</b><span>curated papers</span></div><div class="stat"><b>2008–2026</b><span>development history</span></div><div class="stat"><b>14</b><span>June 2026 additions</span></div><div class="stat"><b>7+</b><span>sensing modalities</span></div></div>
 
-    <section id="latest">
-      <div class="container">
-        <div class="section-head">
-          <h2>Latest Additions</h2>
-          <p>New or newly completed entries added in the 26 June 2026 update run. These are the most important items to read first if you want the current frontier.</p>
-        </div>
-        <div class="latest-grid" id="latestGrid"></div>
-      </div>
-    </section>
+    <section id="latest"><div class="container"><div class="section-head"><h2>Latest Additions</h2><p>New or newly completed entries added in the June 2026 update runs. These are the most important items to read first if you want the current frontier and recent coverage backfills.</p></div><div class="latest-grid" id="latestGrid"></div></div></section>
 
-    <section id="timeline">
-      <div class="container">
-        <div class="section-head">
-          <h2>Development Timeline</h2>
-          <p>A compact reading path for understanding the field's historical trajectory.</p>
-        </div>
-        <div class="timeline">
-          <div class="tl"><div class="year">2008</div><div class="tl-body"><strong>5D time-light transport</strong><p>The conceptual foundation for using transient light transport to sense hidden scenes.</p></div></div>
-          <div class="tl"><div class="year">2012</div><div class="tl-body"><strong>First experimental 3D NLOS reconstruction</strong><p>Velten et al. used ultrafast ToF measurements and filtered backprojection to reconstruct hidden 3D shape.</p></div></div>
-          <div class="tl"><div class="year">2018</div><div class="tl-body"><strong>Confocal LCT and virtual-wave thinking</strong><p>Light-cone transform and phasor-field formulations made NLOS reconstruction faster and more wave-optics aware.</p></div></div>
-          <div class="tl"><div class="year">2019</div><div class="tl-body"><strong>f-k migration and passive periscopy</strong><p>The field split into efficient wave-based active NLOS and ordinary-camera passive NLOS.</p></div></div>
-          <div class="tl"><div class="year">2021</div><div class="tl-body"><strong>Long-range and neural-field NLOS</strong><p>1.43 km NLOS imaging expanded range; NeTF showed neural implicit fields can invert transient measurements without paired supervision.</p></div></div>
-          <div class="tl"><div class="year">2023</div><div class="tl-body"><strong>Transformers, passive tracking, neural surfaces</strong><p>NLOST, PAC-Net, and NLOS-NeuS marked the shift toward modern neural architectures and richer scene outputs.</p></div></div>
-          <div class="tl"><div class="year">2024</div><div class="tl-body"><strong>Real-time video and passive 3D computational periscopy</strong><p>Dynamic room-sized NLOS video, Mamba-style temporal modeling, unsupervised virtual scanning, and SSD-style passive 3D computational periscopy became central.</p></div></div>
-          <div class="tl"><div class="year">2025</div><div class="tl-body"><strong>Generalization, pretraining, radar, and lightweight transforms</strong><p>Learned physical priors, GNN-style reconstruction, HoloRadar, MARMOT pretraining, Time-Resolved Transformers, passive acoustic NLOS, quasi-Fresnel transforms, and optimized FFT sampling broadened the toolbox.</p></div></div>
-          <div class="tl"><div class="year">2026</div><div class="tl-body"><strong>Arbitrary relay surfaces, consumer LiDAR, RF geometry, and RIS radar</strong><p>The frontier moves toward real-world geometry: non-planar limited relays, smartphone-grade LiDAR motion sampling, RF/radar NLOS 3D reconstruction, and RIS-assisted around-corner radar sensing.</p></div></div>
-        </div>
-      </div>
-    </section>
+    <section id="timeline"><div class="container"><div class="section-head"><h2>Development Timeline</h2><p>A compact reading path for understanding the field's historical trajectory.</p></div><div class="timeline">
+      <div class="tl"><div class="year">2008</div><div class="tl-body"><strong>5D time-light transport</strong><p>The conceptual foundation for using transient light transport to sense hidden scenes.</p></div></div>
+      <div class="tl"><div class="year">2012</div><div class="tl-body"><strong>First experimental 3D NLOS reconstruction</strong><p>Velten et al. used ultrafast ToF measurements and filtered backprojection to reconstruct hidden 3D shape.</p></div></div>
+      <div class="tl"><div class="year">2018</div><div class="tl-body"><strong>Confocal LCT and virtual-wave thinking</strong><p>Light-cone transform and phasor-field formulations made NLOS reconstruction faster and more wave-optics aware.</p></div></div>
+      <div class="tl"><div class="year">2019</div><div class="tl-body"><strong>f-k migration and passive periscopy</strong><p>The field split into efficient wave-based active NLOS and ordinary-camera passive NLOS.</p></div></div>
+      <div class="tl"><div class="year">2021</div><div class="tl-body"><strong>Long-range and neural-field NLOS</strong><p>1.43 km NLOS imaging expanded range; NeTF showed neural implicit fields can invert transient measurements without paired supervision.</p></div></div>
+      <div class="tl"><div class="year">2022</div><div class="tl-body"><strong>High-resolution active NLOS and event-camera passive NLOS</strong><p>UNCOVER pushed sub-mm active NLOS; event-based passive NLOS introduced asynchronous sensing for moving hidden targets and NLOS-ES.</p></div></div>
+      <div class="tl"><div class="year">2023</div><div class="tl-body"><strong>Transformers, passive tracking, neural surfaces</strong><p>NLOST, PAC-Net, and NLOS-NeuS marked the shift toward modern neural architectures and richer scene outputs.</p></div></div>
+      <div class="tl"><div class="year">2024</div><div class="tl-body"><strong>Real-time video, passive 3D periscopy, and neuromorphic cues</strong><p>Dynamic room-sized NLOS video, Mamba-style temporal modeling, unsupervised virtual scanning, SSD, and event-enhanced passive NLOS became central.</p></div></div>
+      <div class="tl"><div class="year">2025</div><div class="tl-body"><strong>Generalization, pretraining, radar, and lightweight transforms</strong><p>Learned physical priors, GNN-style reconstruction, HoloRadar, MARMOT pretraining, Time-Resolved Transformers, passive acoustic NLOS, quasi-Fresnel transforms, and optimized FFT sampling broadened the toolbox.</p></div></div>
+      <div class="tl"><div class="year">2026</div><div class="tl-body"><strong>Arbitrary relay surfaces, consumer LiDAR, RF geometry, and RIS radar</strong><p>The frontier moves toward real-world geometry: non-planar limited relays, smartphone-grade LiDAR motion sampling, RF/radar NLOS 3D reconstruction, and RIS-assisted around-corner radar sensing.</p></div></div>
+    </div></div></section>
 
-    <section id="taxonomy">
-      <div class="container">
-        <div class="section-head">
-          <h2>How to Read the Field</h2>
-          <p>The repository is organized as a roadmap rather than a flat bibliography.</p>
-        </div>
-        <div class="taxonomy">
-          <div class="tile"><h3>1. Physical model</h3><ul><li>ToF ellipsoids and light-cone transform</li><li>Wave / phasor / f-k migration</li><li>Differentiable transient rendering</li></ul></div>
-          <div class="tile"><h3>2. Acquisition regime</h3><ul><li>Dense scanning versus sparse sampling</li><li>Scannerless / real-time systems</li><li>Motion-induced and irregular sampling</li></ul></div>
-          <div class="tile"><h3>3. Sensor modality</h3><ul><li>SPAD, ToF, LiDAR, camera</li><li>Radar / RF / mmWave / RIS</li><li>Acoustic, ultrasound, diffraction cues</li></ul></div>
-          <div class="tile"><h3>4. Reconstruction target</h3><ul><li>Albedo, volume, surface, mesh</li><li>Motion, tracking, human pose</li><li>Recognition and scene understanding</li></ul></div>
-          <div class="tile"><h3>5. Learning paradigm</h3><ul><li>CNN / transformer / Mamba / GNN</li><li>Self-supervised transient pretraining</li><li>Neural implicit and Gaussian primitives</li></ul></div>
-          <div class="tile"><h3>6. Real-world frontier</h3><ul><li>Non-planar relay surfaces</li><li>Limited relay visibility</li><li>Low-cost mobile hardware</li></ul></div>
-        </div>
-      </div>
-    </section>
+    <section id="taxonomy"><div class="container"><div class="section-head"><h2>How to Read the Field</h2><p>The repository is organized as a roadmap rather than a flat bibliography.</p></div><div class="taxonomy">
+      <div class="tile"><h3>1. Physical model</h3><ul><li>ToF ellipsoids and light-cone transform</li><li>Wave / phasor / f-k migration</li><li>Differentiable transient rendering</li></ul></div>
+      <div class="tile"><h3>2. Acquisition regime</h3><ul><li>Dense scanning versus sparse sampling</li><li>Scannerless / real-time systems</li><li>Motion-induced, event-driven, and irregular sampling</li></ul></div>
+      <div class="tile"><h3>3. Sensor modality</h3><ul><li>SPAD, ToF, LiDAR, camera</li><li>Event camera / neuromorphic sensor</li><li>Radar / RF / mmWave / RIS</li><li>Acoustic, ultrasound, diffraction cues</li></ul></div>
+      <div class="tile"><h3>4. Reconstruction target</h3><ul><li>Albedo, volume, surface, mesh</li><li>Motion, tracking, human pose</li><li>Recognition and scene understanding</li></ul></div>
+      <div class="tile"><h3>5. Learning paradigm</h3><ul><li>CNN / transformer / Mamba / GNN</li><li>Self-supervised transient pretraining</li><li>Physical embedding and neural priors</li><li>Neural implicit and Gaussian primitives</li></ul></div>
+      <div class="tile"><h3>6. Real-world frontier</h3><ul><li>Non-planar relay surfaces</li><li>Dynamic hidden targets</li><li>Limited relay visibility</li><li>Low-cost mobile hardware</li></ul></div>
+    </div></div></section>
 
-    <section id="papers">
-      <div class="container">
-        <div class="section-head">
-          <h2>Searchable Paper Explorer</h2>
-          <p>Filter by category or search by title, author, venue, year, or contribution keyword.</p>
-        </div>
-        <div class="tabs" id="tabs"></div>
-        <div class="controls">
-          <input type="search" id="search" placeholder="Search: Gaussian transient rendering, radar, passive, transformer, MARMOT, acoustic, LCT, f-k, LiDAR…" />
-          <div class="count" id="count"></div>
-        </div>
-        <div class="grid" id="paperGrid"></div>
-      </div>
-    </section>
+    <section id="papers"><div class="container"><div class="section-head"><h2>Searchable Paper Explorer</h2><p>Filter by category or search by title, author, venue, year, or contribution keyword.</p></div><div class="tabs" id="tabs"></div><div class="controls"><input type="search" id="search" placeholder="Search: event camera, Gaussian transient rendering, radar, passive, transformer, MARMOT, acoustic, LCT, f-k, LiDAR…" /><div class="count" id="count"></div></div><div class="grid" id="paperGrid"></div></div></section>
   </main>
 
-  <footer>
-    <div class="container">
-      <p>Based on <em>Recent Advances on Non-Line-of-Sight Imaging: Conventional Physical Models, Deep Learning, and New Scenes</em>.</p>
-      <div class="footer-links">
-        <a href="https://github.com/ruixv/NLOS_Overview" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://arxiv.org/pdf/2104.13807" target="_blank" rel="noopener">Original arXiv Survey</a>
-        <a href="bare_jrnl.pdf" target="_blank" rel="noopener">Updated PDF</a>
-      </div>
-      <p style="margin-top:1rem;">Last updated: 26 June 2026</p>
-    </div>
-  </footer>
+  <footer><div class="container"><p>Based on <em>Recent Advances on Non-Line-of-Sight Imaging: Conventional Physical Models, Deep Learning, and New Scenes</em>.</p><div class="footer-links"><a href="https://github.com/ruixv/NLOS_Overview" target="_blank" rel="noopener">GitHub</a><a href="https://arxiv.org/pdf/2104.13807" target="_blank" rel="noopener">Original arXiv Survey</a><a href="bare_jrnl.pdf" target="_blank" rel="noopener">Updated PDF</a></div><p style="margin-top:1rem;">Last updated: 27 June 2026</p></div></footer>
 
   <script>
-    const categories = [
-      ['all', 'All'],
-      ['latest', 'Latest'],
-      ['active', 'Active Optical / ToF'],
-      ['passive', 'Passive Optical'],
-      ['learning', 'Learning / Neural'],
-      ['modality', 'New Modalities'],
-      ['dataset', 'Datasets & Code'],
-      ['survey', 'Surveys / Benchmarks']
-    ];
-
+    const categories = [['all','All'],['latest','Latest'],['active','Active Optical / ToF'],['passive','Passive Optical'],['learning','Learning / Neural'],['modality','New Modalities'],['dataset','Datasets & Code'],['survey','Surveys / Benchmarks']];
     const papers = [
       {cat:'latest learning active', title:'Non-line-of-sight imaging with arbitrary relay surface geometries via 3D Gaussian Transient Rendering', authors:'Yi Wang et al.', year:2026, venue:'SIGGRAPH 2026', url:'https://arxiv.org/abs/2606.21270', key:'3D Gaussian primitives + differentiable transient rendering for spatially limited and non-planar relay surfaces.'},
       {cat:'latest active modality', title:'Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling', authors:'Somasundaram et al.', year:2026, venue:'Nature 2026', url:'https://arxiv.org/abs/2605.17865', key:'Plug-and-play NLOS using smartphone-grade / consumer LiDAR and multi-frame motion-induced aperture sampling.'},
@@ -246,6 +141,8 @@ Hidden geometry, albedo, motion, identity</div>
       {cat:'latest active', title:'Geometric Constrained Non-Line-of-Sight Imaging', authors:'Liu et al.', year:2025, venue:'arXiv 2025', url:'https://arxiv.org/abs/2503.17992', key:'Joint albedo/surface reconstruction with normal-field geometric regularization.'},
       {cat:'latest active', title:'Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms', authors:'Sultan et al.', year:2025, venue:'arXiv 2025', url:'https://arxiv.org/abs/2501.05244', key:'NUFFT/SFFT sampling strategy for sparse irregular relay grids and scalable hidden-volume reconstruction.'},
       {cat:'latest passive learning', title:'Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy', authors:'Raji and Murray-Bruce', year:2024, venue:'ECCV 2024', url:'https://arxiv.org/abs/2601.12257', key:'Passive 3D computational periscopy from a single ordinary NLOS photograph via SNLLS modeling and a physics-inspired neural solver.'},
+      {cat:'latest passive learning modality', title:'Event-enhanced Passive Non-line-of-sight imaging for moving objects with Physical embedding', authors:'Conghe Wang et al.', year:2024, venue:'arXiv 2024', url:'https://arxiv.org/abs/2404.05977', key:'EPNP: event-camera dynamic diffusion-spot features plus physical embedding for moving passive NLOS targets.'},
+      {cat:'latest passive modality dataset', title:'Passive Non-line-of-sight Imaging for Moving Targets with an Event Camera', authors:'Conghe Wang et al.', year:2022, venue:'arXiv 2022', url:'https://arxiv.org/abs/2209.13300', key:'Introduces event-based passive NLOS imaging for moving targets and the NLOS-ES event-camera dataset.'},
 
       {cat:'active', title:'Recovering Three-Dimensional Shape Around a Corner using Ultrafast Time-of-Flight Imaging', authors:'Velten et al.', year:2012, venue:'Nature Communications', url:'https://www.nature.com/articles/ncomms1747', key:'First experimental 3D NLOS reconstruction with ultrafast transient measurements.'},
       {cat:'active', title:'Diffuse Mirrors: 3D Reconstruction from Diffuse Indirect Illumination Using Inexpensive Time-of-Flight Sensors', authors:'Heide et al.', year:2014, venue:'SIGGRAPH / TOG', url:'https://dl.acm.org/doi/10.1145/2601097.2601205', key:'Optimization-based ToF-camera NLOS reconstruction.'},
@@ -261,6 +158,8 @@ Hidden geometry, albedo, motion, identity</div>
       {cat:'passive', title:'Turning Corners into Cameras: Principles and Methods', authors:'Bouman et al.', year:2017, venue:'ICCV', url:'https://openaccess.thecvf.com/content_iccv_2017/html/Bouman_Turning_Corners_Into_ICCV_2017_paper.html', key:'Passive NLOS from ordinary intensity measurements and motion/occlusion cues.'},
       {cat:'passive', title:'Computational Periscopy with an Ordinary Digital Camera', authors:'Saunders et al.', year:2019, venue:'Nature', url:'https://www.nature.com/articles/s41586-019-0928-6', key:'Ordinary-camera passive 3D NLOS using a partial occluder.'},
       {cat:'passive learning', title:'Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy', authors:'Raji and Murray-Bruce', year:2024, venue:'ECCV 2024', url:'https://arxiv.org/abs/2601.12257', key:'Single ordinary NLOS photograph to 3D hidden scene using shadow transport, SNLLS, and physics-inspired learning.'},
+      {cat:'passive modality dataset', title:'Passive Non-line-of-sight Imaging for Moving Targets with an Event Camera', authors:'Conghe Wang et al.', year:2022, venue:'arXiv 2022', url:'https://arxiv.org/abs/2209.13300', key:'Asynchronous event data for passive imaging of moving hidden targets; includes NLOS-ES.'},
+      {cat:'passive learning modality', title:'Event-enhanced Passive Non-line-of-sight imaging for moving objects with Physical embedding', authors:'Conghe Wang et al.', year:2024, venue:'arXiv 2024', url:'https://arxiv.org/abs/2404.05977', key:'Event-enhanced passive NLOS prototype with physical embedding and simulation-to-real fine-tuning.'},
       {cat:'passive', title:'Non-invasive Single-Shot Imaging Through Scattering Layers and Around Corners via Speckle Correlations', authors:'Katz et al.', year:2014, venue:'Nature Photonics', url:'https://www.nature.com/articles/nphoton.2014.234', key:'Speckle-correlation / memory-effect route to passive hidden-scene imaging.'},
       {cat:'passive', title:'Passive Sensing Around the Corner Using Spatial Coherence', authors:'Batarseh et al.', year:2018, venue:'Nature Communications', url:'https://www.nature.com/articles/s41467-018-05985-w', key:'Spatial coherence cues for passive NLOS sensing.'},
       {cat:'passive', title:'Polarized Non-Line-of-Sight Imaging', authors:'Tanaka et al.', year:2020, venue:'CVPR', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Tanaka_Polarized_Non-Line_of-Sight_Imaging_CVPR_2020_paper.html', key:'Polarization as a passive constraint that improves conditioning.'},
@@ -297,6 +196,7 @@ Hidden geometry, albedo, motion, identity</div>
       {cat:'dataset', title:'nlos-fk', authors:"O'Toole / Lindell lab", year:2018, venue:'Code / Dataset', url:'https://github.com/computational-imaging/nlos-fk', key:'Confocal SPAD datasets and f-k / LCT reconstruction code.'},
       {cat:'dataset', title:'acoustic-nlos', authors:'Lindell et al.', year:2019, venue:'Code', url:'https://github.com/computational-imaging/acoustic-nlos', key:'Open-source acoustic NLOS imaging code.'},
       {cat:'dataset', title:'NLOS_imaging_over_1.43km', authors:'Wu et al.', year:2021, venue:'Code / Data', url:'https://github.com/quantum-inspired-lidar/NLOS_imaging_over_1.43km', key:'Code and data for kilometer-scale NLOS imaging.'},
+      {cat:'dataset', title:'NLOS-ES', authors:'Conghe Wang et al.', year:2022, venue:'Dataset', url:'https://arxiv.org/abs/2209.13300', key:'Event-camera passive NLOS dataset for moving hidden targets.'},
       {cat:'dataset', title:'NLOS-OT', authors:'Geng et al.', year:2022, venue:'Code / Dataset', url:'https://github.com/ruixv/NLOS-OT', key:'Passive NLOS optimal transport reconstruction and dataset.'},
       {cat:'dataset', title:'TRT Code / Datasets', authors:'Yue Li et al.', year:2025, venue:'Code / Dataset', url:'https://github.com/Depth2World/TRT', key:'Code and datasets for Time-Resolved Transformer LOS/NLOS transient 3D reconstruction.'},
       {cat:'dataset', title:'NLOS-Track Dataset', authors:'Wang et al.', year:2023, venue:'CVPR Dataset', url:'', key:'Large-scale real-time passive NLOS tracking dataset.'},
@@ -304,52 +204,17 @@ Hidden geometry, albedo, motion, identity</div>
       {cat:'survey', title:'Non-line-of-sight Imaging', authors:'Faccio, Velten, Wetzstein', year:2020, venue:'Nature Reviews Physics', url:'https://www.nature.com/articles/s42254-020-0174-8', key:'Comprehensive review of physical principles and early NLOS imaging progress.'},
       {cat:'survey', title:'Recent Advances on Non-Line-of-Sight Imaging: Conventional Physical Models, Deep Learning, and New Scenes', authors:'Geng, Hu, Chen', year:2022, venue:'APSIPA TSIP', url:'https://doi.org/10.1561/116.00000019', key:'Survey organized around physical models, deep learning, and new scenes.'}
     ];
-
     const latestGrid = document.getElementById('latestGrid');
-    const latest = papers.filter(p => p.cat.includes('latest'));
-    latestGrid.innerHTML = latest.map(cardHTML).join('');
-
+    latestGrid.innerHTML = papers.filter(p => p.cat.includes('latest')).map(cardHTML).join('');
     let activeCat = 'all';
     const tabs = document.getElementById('tabs');
-    tabs.innerHTML = categories.map(([id, label]) => `<button class="tab ${id === 'all' ? 'active' : ''}" data-cat="${id}">${label}</button>`).join('');
-    tabs.addEventListener('click', e => {
-      if (!e.target.matches('.tab')) return;
-      activeCat = e.target.dataset.cat;
-      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
-      render();
-    });
+    tabs.innerHTML = categories.map(([id,label]) => `<button class="tab ${id === 'all' ? 'active' : ''}" data-cat="${id}">${label}</button>`).join('');
+    tabs.addEventListener('click', e => { if (!e.target.matches('.tab')) return; activeCat = e.target.dataset.cat; document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat)); render(); });
     document.getElementById('search').addEventListener('input', render);
-
-    function esc(s) {
-      return String(s || '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-    }
-    function primaryCat(p) {
-      if (p.cat.includes('latest')) return 'latest';
-      if (p.cat.includes('passive')) return 'passive';
-      if (p.cat.includes('learning')) return 'learning';
-      if (p.cat.includes('modality')) return 'modality';
-      if (p.cat.includes('dataset')) return 'dataset';
-      return 'active';
-    }
-    function cardHTML(p) {
-      const title = p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.title)}</a>` : esc(p.title);
-      const catClass = primaryCat(p);
-      return `<article class="paper-card ${catClass}">
-        <div class="paper-title">${title}</div>
-        <div class="meta"><span>${esc(p.authors)}</span><span>·</span><span>${esc(p.year)}</span><span>·</span><span class="tag">${esc(p.venue)}</span></div>
-        <div class="key">${esc(p.key)}</div>
-      </article>`;
-    }
-    function render() {
-      const q = document.getElementById('search').value.trim().toLowerCase();
-      const filtered = papers.filter(p => {
-        const catOK = activeCat === 'all' || p.cat.split(/\s+/).includes(activeCat);
-        const haystack = [p.title, p.authors, p.year, p.venue, p.key, p.cat].join(' ').toLowerCase();
-        return catOK && (!q || haystack.includes(q));
-      }).sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
-      document.getElementById('paperGrid').innerHTML = filtered.map(cardHTML).join('');
-      document.getElementById('count').textContent = `${filtered.length} papers`;
-    }
+    function esc(s) { return String(s || '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+    function primaryCat(p) { if (p.cat.includes('latest')) return 'latest'; if (p.cat.includes('passive')) return 'passive'; if (p.cat.includes('learning')) return 'learning'; if (p.cat.includes('modality')) return 'modality'; if (p.cat.includes('dataset')) return 'dataset'; return 'active'; }
+    function cardHTML(p) { const title = p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.title)}</a>` : esc(p.title); return `<article class="paper-card ${primaryCat(p)}"><div class="paper-title">${title}</div><div class="meta"><span>${esc(p.authors)}</span><span>·</span><span>${esc(p.year)}</span><span>·</span><span class="tag">${esc(p.venue)}</span></div><div class="key">${esc(p.key)}</div></article>`; }
+    function render() { const q = document.getElementById('search').value.trim().toLowerCase(); const filtered = papers.filter(p => { const catOK = activeCat === 'all' || p.cat.split(/\s+/).includes(activeCat); const haystack = [p.title, p.authors, p.year, p.venue, p.key, p.cat].join(' ').toLowerCase(); return catOK && (!q || haystack.includes(q)); }).sort((a, b) => b.year - a.year || a.title.localeCompare(b.title)); document.getElementById('paperGrid').innerHTML = filtered.map(cardHTML).join(''); document.getElementById('count').textContent = `${filtered.length} papers`; }
     render();
   </script>
 </body>
