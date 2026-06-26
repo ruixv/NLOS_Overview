@@ -142,7 +142,7 @@ Hidden geometry, albedo, motion, identity</div>
     <div class="container stats">
       <div class="stat"><b>180+</b><span>curated papers</span></div>
       <div class="stat"><b>2008–2026</b><span>development history</span></div>
-      <div class="stat"><b>7</b><span>June 2026 additions</span></div>
+      <div class="stat"><b>8</b><span>June 2026 additions</span></div>
       <div class="stat"><b>6+</b><span>sensing modalities</span></div>
     </div>
 
@@ -169,7 +169,7 @@ Hidden geometry, albedo, motion, identity</div>
           <div class="tl"><div class="year">2019</div><div class="tl-body"><strong>f-k migration and passive periscopy</strong><p>The field split into efficient wave-based active NLOS and ordinary-camera passive NLOS.</p></div></div>
           <div class="tl"><div class="year">2021</div><div class="tl-body"><strong>Long-range and neural-field NLOS</strong><p>1.43 km NLOS imaging expanded range; NeTF showed neural implicit fields can invert transient measurements without paired supervision.</p></div></div>
           <div class="tl"><div class="year">2023</div><div class="tl-body"><strong>Transformers, passive tracking, neural surfaces</strong><p>NLOST, PAC-Net, and NLOS-NeuS marked the shift toward modern neural architectures and richer scene outputs.</p></div></div>
-          <div class="tl"><div class="year">2024</div><div class="tl-body"><strong>Real-time NLOS video and irregular undersampling</strong><p>Dynamic room-sized NLOS video, Mamba-style temporal modeling, and unsupervised virtual scanning became central.</p></div></div>
+          <div class="tl"><div class="year">2024</div><div class="tl-body"><strong>Real-time video, passive 3D periscopy, and irregular undersampling</strong><p>Dynamic room-sized NLOS video, Soft Shadow Diffusion for passive 3D computational periscopy, Mamba-style temporal modeling, and unsupervised virtual scanning became central.</p></div></div>
           <div class="tl"><div class="year">2025</div><div class="tl-body"><strong>Generalization, graph models, radar, and lightweight transforms</strong><p>Learned physical priors, GNN-style reconstruction, HoloRadar, quasi-Fresnel transforms, and optimized FFT sampling broadened the toolbox.</p></div></div>
           <div class="tl"><div class="year">2026</div><div class="tl-body"><strong>Arbitrary relay surfaces, consumer LiDAR, and RF geometry</strong><p>The frontier moves toward real-world geometry: non-planar limited relays, smartphone-grade LiDAR motion sampling, and RF/radar NLOS 3D reconstruction.</p></div></div>
         </div>
@@ -241,6 +241,7 @@ Hidden geometry, albedo, motion, identity</div>
       {cat:'latest active', title:'Fast and Memory-efficient Non-line-of-sight Imaging with Quasi-Fresnel Transform', authors:'Wei et al.', year:2025, venue:'arXiv 2025', url:'https://arxiv.org/abs/2508.02003', key:'2D hidden-scene representation and Quasi-Fresnel direct inversion for lightweight/mobile NLOS.'},
       {cat:'latest active', title:'Geometric Constrained Non-Line-of-Sight Imaging', authors:'Liu et al.', year:2025, venue:'arXiv 2025', url:'https://arxiv.org/abs/2503.17992', key:'Joint albedo/surface reconstruction with normal-field geometric regularization.'},
       {cat:'latest active', title:'Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms', authors:'Sultan et al.', year:2025, venue:'arXiv 2025', url:'https://arxiv.org/abs/2501.05244', key:'NUFFT/SFFT sampling strategy for sparse irregular relay grids and scalable hidden-volume reconstruction.'},
+      {cat:'latest passive learning', title:'Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy', authors:'Raji and Murray-Bruce', year:2024, venue:'ECCV 2024', url:'https://arxiv.org/abs/2601.12257', key:'Passive 3D computational periscopy from a single ordinary NLOS photograph via SNLLS modeling and a physics-inspired neural solver.'},
 
       {cat:'active', title:'Recovering Three-Dimensional Shape Around a Corner using Ultrafast Time-of-Flight Imaging', authors:'Velten et al.', year:2012, venue:'Nature Communications', url:'https://www.nature.com/articles/ncomms1747', key:'First experimental 3D NLOS reconstruction with ultrafast transient measurements.'},
       {cat:'active', title:'Diffuse Mirrors: 3D Reconstruction from Diffuse Indirect Illumination Using Inexpensive Time-of-Flight Sensors', authors:'Heide et al.', year:2014, venue:'SIGGRAPH / TOG', url:'https://dl.acm.org/doi/10.1145/2601097.2601205', key:'Optimization-based ToF-camera NLOS reconstruction.'},
@@ -255,6 +256,7 @@ Hidden geometry, albedo, motion, identity</div>
 
       {cat:'passive', title:'Turning Corners into Cameras: Principles and Methods', authors:'Bouman et al.', year:2017, venue:'ICCV', url:'https://openaccess.thecvf.com/content_iccv_2017/html/Bouman_Turning_Corners_Into_ICCV_2017_paper.html', key:'Passive NLOS from ordinary intensity measurements and motion/occlusion cues.'},
       {cat:'passive', title:'Computational Periscopy with an Ordinary Digital Camera', authors:'Saunders et al.', year:2019, venue:'Nature', url:'https://www.nature.com/articles/s41586-019-0928-6', key:'Ordinary-camera passive 3D NLOS using a partial occluder.'},
+      {cat:'passive learning', title:'Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy', authors:'Raji and Murray-Bruce', year:2024, venue:'ECCV 2024', url:'https://arxiv.org/abs/2601.12257', key:'Single ordinary NLOS photograph to 3D hidden scene using shadow transport, SNLLS, and physics-inspired learning.'},
       {cat:'passive', title:'Non-invasive Single-Shot Imaging Through Scattering Layers and Around Corners via Speckle Correlations', authors:'Katz et al.', year:2014, venue:'Nature Photonics', url:'https://www.nature.com/articles/nphoton.2014.234', key:'Speckle-correlation / memory-effect route to passive hidden-scene imaging.'},
       {cat:'passive', title:'Passive Sensing Around the Corner Using Spatial Coherence', authors:'Batarseh et al.', year:2018, venue:'Nature Communications', url:'https://www.nature.com/articles/s41467-018-05985-w', key:'Spatial coherence cues for passive NLOS sensing.'},
       {cat:'passive', title:'Polarized Non-Line-of-Sight Imaging', authors:'Tanaka et al.', year:2020, venue:'CVPR', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Tanaka_Polarized_Non-Line-of-Sight_Imaging_CVPR_2020_paper.html', key:'Polarization as a passive constraint that improves conditioning.'},
@@ -266,6 +268,7 @@ Hidden geometry, albedo, motion, identity</div>
       {cat:'learning', title:'Deep Non-Line-of-Sight Reconstruction', authors:'Chopite et al.', year:2020, venue:'CVPR', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Chopite_Deep_Non-Line-of-Sight_Reconstruction_CVPR_2020_paper.html', key:'3D U-Net mapping transient volumes to hidden geometry.'},
       {cat:'learning', title:'Non-Line-of-Sight Imaging via Neural Transient Fields', authors:'Shen et al.', year:2021, venue:'TPAMI', url:'https://ieeexplore.ieee.org/document/9645260', key:'Unsupervised neural implicit transient field for NLOS reconstruction.'},
       {cat:'learning', title:'Physics Rescue: Deep Network for High-Speed NLOS Reconstruction', authors:'Mu et al.', year:2022, venue:'TPAMI', url:'', key:'Physics-model rescue module plus deep network for faster reconstruction.'},
+      {cat:'learning', title:'Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy', authors:'Raji and Murray-Bruce', year:2024, venue:'ECCV 2024', url:'https://arxiv.org/abs/2601.12257', key:'Physics-inspired learning for passive 3D computational periscopy from ordinary shadow measurements.'},
       {cat:'learning', title:'NLOST: Non-Line-of-Sight Imaging with Transformer', authors:'Li et al.', year:2023, venue:'CVPR', url:'', key:'Transformer architecture for spatial-temporal transient volumes.'},
       {cat:'learning', title:'NLOS-NeuS: Non-Line-of-Sight Neural Implicit Surface', authors:'Fujimura et al.', year:2023, venue:'ICCV', url:'', key:'SDF-based neural implicit surface reconstruction.'},
       {cat:'learning', title:'ST-Mamba: Spatial-Temporal Mamba for NLOS Videography', authors:'Li et al.', year:2024, venue:'NeurIPS', url:'', key:'State-space model for temporally consistent NLOS video.'},
