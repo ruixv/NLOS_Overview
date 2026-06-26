@@ -67,7 +67,7 @@
 
 ## Latest Additions
 
-**Update run: 26 June 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 27 June 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
@@ -83,6 +83,8 @@
 | 2025 | [Geometric Constrained Non-Line-of-Sight Imaging](https://arxiv.org/abs/2503.17992) — Liu et al. | arXiv 2025 | Joint albedo/surface reconstruction with normal-field regularization for higher-detail hidden geometry. |
 | 2025 | [Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms](https://arxiv.org/abs/2501.05244) — Sultan et al. | arXiv 2025 | Uses NUFFT/SFFT to support irregular relay sampling and flexible hidden-volume sampling while retaining FFT-like scalability. |
 | 2024 | [Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy](https://arxiv.org/abs/2601.12257) — Raji, Murray-Bruce | ECCV 2024 | Extends passive shadow-based computational periscopy to 3D from a single ordinary NLOS photograph via an SNLLS model and a physics-inspired neural solver. |
+| 2024 | [Event-enhanced Passive Non-line-of-sight imaging for moving objects with Physical embedding](https://arxiv.org/abs/2404.05977) — Wang et al. | arXiv 2024 | Uses an event camera for dynamic diffusion-spot features and a physics-embedded model for passive NLOS imaging of moving objects. |
+| 2022 | [Passive Non-line-of-sight Imaging for Moving Targets with an Event Camera](https://arxiv.org/abs/2209.13300) — Wang et al. | arXiv 2022 | Introduces event-based passive NLOS for moving targets and the NLOS-ES event-camera dataset. |
 
 ---
 
@@ -113,6 +115,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
 2022 ── Cao et al.: UNCOVER — sub-mm resolution via wavefront shaping [Nature Photonics]
    │     Mu et al.: Physics-rescue deep NLOS [TPAMI]
+   │     Wang et al.: first event-camera passive NLOS for moving targets
    │
 2023 ── Li et al.: NLOST — first transformer for NLOS [CVPR]
    │     Wang et al.: PAC-Net + NLOS-Track dataset — passive tracking [CVPR]
@@ -123,6 +126,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Cui et al.: Virtual Scanning — unsupervised irregular undersampling [NeurIPS]
    │     Czajkowski et al.: 3D passive NLOS with ordinary camera [Nature Comm.]
    │     Raji & Murray-Bruce: SSD for 3D computational periscopy [ECCV]
+   │     Wang et al.: event-enhanced passive NLOS with physical embedding
    │
 2025 ── Li et al.: TransiT — transient transformer for video NLOS [CVPR]
    │     Sun et al.: learnable physical priors for generalization [CVPR]
@@ -154,6 +158,7 @@ NLOS Imaging
 │   ├── Intensity / shadow / penumbra
 │   ├── Coherence / speckle correlation
 │   ├── Polarization / hyperspectral cues
+│   ├── Event-camera / neuromorphic motion cues
 │   └── Real-time passive tracking
 │
 ├── Learning-based NLOS
@@ -170,6 +175,7 @@ NLOS Imaging
     ├── RIS-assisted around-corner radar
     ├── Acoustic / ultrasound NLOS
     ├── Relay-free acoustic diffraction localization
+    ├── Event-camera passive NLOS
     ├── Human pose estimation
     └── Arbitrary / non-planar / spatially limited relay surfaces
 ```
@@ -304,6 +310,13 @@ NLOS Imaging
 | [Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy](https://arxiv.org/abs/2601.12257) — Raji, Murray-Bruce | **ECCV 2024** | Single ordinary NLOS photograph → 3D hidden scene; SNLLS model + physics-inspired neural solver. |
 | Full-Color 3D Passive NLOS with an Ordinary Camera — Czajkowski, Murray-Bruce | **Nature Comm. 2024** | 3D reconstruction from ordinary camera; two orthogonal edges. |
 
+### Event-Camera / Neuromorphic Passive NLOS
+
+| Paper | Venue | Key Contribution | Dataset |
+|-------|-------|------------------|---------|
+| [Passive Non-line-of-sight Imaging for Moving Targets with an Event Camera](https://arxiv.org/abs/2209.13300) — Wang et al. | arXiv 2022 | First event-based passive NLOS imaging for moving targets; uses asynchronous event data to preserve dynamic information and reduce speckle degradation. | NLOS-ES |
+| [Event-enhanced Passive Non-line-of-sight imaging for moving objects with Physical embedding](https://arxiv.org/abs/2404.05977) — Wang et al. | arXiv 2024 | EPNP prototype: event-camera dynamic diffusion-spot features + simulation pretraining and limited real-data fine-tuning with physical embedding. | — |
+
 ### Hyperspectral / Multispectral Passive NLOS
 
 | Paper | Venue | Key Contribution |
@@ -345,6 +358,7 @@ NLOS Imaging
 | NLOS-R 2: Alternate Reconstruction and Recognition — Wang, Geng et al. | ICME 2025 | Mutual-refinement loop: reconstruction ↔ recognition. |
 | Physics Rescue: Deep Network for High-Speed NLOS — Mu et al. | **TPAMI 2022** | Physics model + DL; 5 fps, 10× speedup. |
 | Untrained Deep Decoder for NLOS — Wu et al. | 2022 | Deep image prior without training data. |
+| [Event-enhanced Passive Non-line-of-sight imaging for moving objects with Physical embedding](https://arxiv.org/abs/2404.05977) — Wang et al. | arXiv 2024 | Physics-embedded learning with event-camera features for moving passive NLOS targets. |
 | [Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy](https://arxiv.org/abs/2601.12257) — Raji, Murray-Bruce | ECCV 2024 | Physics-inspired learning for passive 3D computational periscopy from ordinary shadow measurements. |
 | [Learnable Physical Priors for Generalizable NLOS Reconstruction](https://arxiv.org/abs/2409.14011) — Sun et al. | CVPR 2025 | Adaptive learned priors for cross-system and low-SNR generalization. |
 | Virtual Scanning — Cui et al. | NeurIPS 2024 | SURE-based denoiser; no paired training data. |
@@ -381,6 +395,8 @@ NLOS Imaging
 | TransiT: Transient Imaging Transformer — Li et al. | CVPR 2025 | 10 fps at 64×64; sparse transient input. |
 | Plug-and-Play Dynamic NLOS — Ye et al. | 2024 | PnP + deep denoiser; frequency-domain physics filtering. |
 | Dynamic NLOS via Single-Pixel Detection — Pei et al. | Opt. Express 2021 | Dynamic NLOS from single-pixel detector. |
+| [Passive Non-line-of-sight Imaging for Moving Targets with an Event Camera](https://arxiv.org/abs/2209.13300) — Wang et al. | arXiv 2022 | Asynchronous event data for moving passive NLOS targets. |
+| [Event-enhanced Passive Non-line-of-sight imaging for moving objects with Physical embedding](https://arxiv.org/abs/2404.05977) — Wang et al. | arXiv 2024 | Event-camera + physical embedding for dynamic passive NLOS. |
 
 ---
 
@@ -412,13 +428,20 @@ NLOS Imaging
 | Ultrasound NLOS Imaging via Synthetic Aperture | Commun. Physics 2025 | Bat-echolocation frequency; cm-scale depth resolution; 3D multi-target reconstruction. | — |
 | [Passive acoustic non-line-of-sight localization without a relay surface](https://arxiv.org/abs/2506.08471) — Sommer, Katz | arXiv 2025 | Relay-free passive acoustic NLOS: knife-edge diffraction and doorway/corner geometry for 3D source localization. | — |
 
+### Event-Camera / Neuromorphic NLOS
+
+| Paper | Venue | Key Contribution |
+|-------|-------|------------------|
+| [Passive Non-line-of-sight Imaging for Moving Targets with an Event Camera](https://arxiv.org/abs/2209.13300) — Wang et al. | arXiv 2022 | Uses asynchronous event streams to image moving NLOS targets and introduces NLOS-ES. |
+| [Event-enhanced Passive Non-line-of-sight imaging for moving objects with Physical embedding](https://arxiv.org/abs/2404.05977) — Wang et al. | arXiv 2024 | Event-enhanced passive NLOS prototype with physical embedding and simulation-to-real fine-tuning. |
+
 ### Human Pose / Polarization / Super-FoV
 
 | Paper | Venue | Key Contribution |
 |-------|-------|------------------|
 | [Optical Non-Line-of-Sight Physics-Based 3D Human Pose Estimation](https://openaccess.thecvf.com/content_CVPR_2020/html/Isogawa_Optical_Non-Line-of-Sight_Physics-Based_3D_Human_Pose_Estimation_CVPR_2020_paper.html) — Isogawa et al. | CVPR 2020 | LSTM+physics for NLOS pose estimation. |
 | NLOS Human Pose Estimation — Xiao et al. | OLE 2026 | Joint transient + volume feature extraction; multi-resolution pipeline. |
-| [Polarized Non-Line-of-Sight Imaging](https://openaccess.thecvf.com/content_CVPR_2020/html/Tanaka_Polarized_Non-Line-of-Sight_Imaging_CVPR_2020_paper.html) — Tanaka et al. | CVPR 2020 | Polarizer as passive NLOS constraint. |
+| [Polarized Non-Line-of-Sight Imaging](https://openaccess.thecvf.com/content_CVPR_2020/html/Tanaka_Polarized_Non-Line_of-Sight_Imaging_CVPR_2020_paper.html) — Tanaka et al. | CVPR 2020 | Polarizer as passive NLOS constraint. |
 | Polarization-Based Scanning-Free Single-Pixel NLOS — Zhou et al. | PRL 2026 | Polarization-encoded speckle patterns; no scanning, no temporal resolution needed. |
 | Super-Field-of-View NLOS via Spatial Encoding — Li et al. | Photonics Research 2026 | Spatial encoding pushes FoV beyond relay-surface limits. |
 
@@ -430,6 +453,7 @@ NLOS Imaging
 |----------|-------|------|------|------|
 | **LCT / f-k Confocal Dataset** | O'Toole et al.; Lindell et al. | 2018–2019 | Active, confocal SPAD | [Link](https://github.com/computational-imaging/nlos-fk) |
 | **Galindo Benchmark** | Galindo et al. | 2019 | Active SPAD benchmark | [Link](https://doi.org/10.1364/OE.380140) |
+| **NLOS-ES** | Wang et al. | 2022 | Passive event-camera NLOS dataset | [arXiv](https://arxiv.org/abs/2209.13300) |
 | **NLOS-Track** | Wang et al. | 2023 | Passive NLOS tracking dataset | — |
 | **NLOS-Passive** | Geng et al. | 2022 | Passive NLOS imaging dataset | [Link](https://github.com/ruixv/NLOS-OT) |
 | **NLOS Transient Renderer** | Royo et al. | 2022 | Synthetic renderer | — |
@@ -438,8 +462,7 @@ NLOS Imaging
 | **acoustic-nlos** | Lindell et al. | 2019 | Acoustic NLOS code | [Link](https://github.com/computational-imaging/acoustic-nlos) |
 | **NLOS_imaging_over_1.43km** | Wu et al. | 2021 | Long-range NLOS code/data | [Link](https://github.com/quantum-inspired-lidar/NLOS_imaging_over_1.43km) |
 | **NLOS-OT** | Geng et al. | 2022 | Passive NLOS OT code/data | [Link](https://github.com/ruixv/NLOS-OT) |
-| **TRT Code / Datasets** | Li et al. | 2025 | Time-resolved LOS/NLOS transformer code and transient datasets | [Link](https://github.com/Depth2World/TRT) |
-| **TransVerse / MARMOT** | Shen et al. | 2025 | Large-scale synthetic transient pretraining dataset for NLOS-oriented masked modeling | — |
+| **TRT Code / Datasets** | Li et al. | 2025 | Transient transformer code/datasets | [Link](https://github.com/Depth2World/TRT) |
 
 ---
 
@@ -518,6 +541,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 **Star this repository if you find it helpful!**
 
-*Last updated: 26 June 2026*
+*Last updated: 27 June 2026*
 
 </div>
