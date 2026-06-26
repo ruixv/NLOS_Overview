@@ -3,1002 +3,341 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Recent Advances on Non-Line-of-Sight Imaging — Survey Homepage</title>
-  <meta name="description" content="Survey homepage for 'Recent Advances on Non-Line-of-Sight Imaging: Conventional Physical Models, Deep Learning, and New Scenes' — 150+ papers from 2008 to 2026." />
-
-  <!-- Fonts -->
+  <title>Recent Advances on Non-Line-of-Sight Imaging</title>
+  <meta name="description" content="Curated survey homepage for Non-Line-of-Sight Imaging research, updated June 2026 with 180+ papers across active optical, passive optical, learning-based, radar/RF, acoustic, LiDAR, and arbitrary-relay NLOS." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --blue-dark:   #1e3a8a;
-      --blue:        #2563eb;
-      --blue-light:  #60a5fa;
-      --teal:        #0d9488;
-      --green:       #10b981;
-      --purple:      #7c3aed;
-      --amber:       #d97706;
-      --bg:          #f1f5f9;
-      --card:        #ffffff;
-      --text:        #0f172a;
-      --text-muted:  #64748b;
-      --border:      #e2e8f0;
-      --shadow:      0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
-      --radius:      12px;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #dbe3ef;
+      --blue: #2563eb;
+      --blue-dark: #1e3a8a;
+      --teal: #0f766e;
+      --violet: #7c3aed;
+      --amber: #d97706;
+      --rose: #e11d48;
+      --green: #059669;
+      --shadow: 0 8px 28px rgba(15,23,42,.08);
+      --radius: 18px;
     }
-
     html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
-
-    /* ─── NAV ─── */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(255,255,255,.92); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem; height: 60px;
-    }
-    .nav-brand { font-weight: 700; font-size: 1rem; color: var(--blue-dark); text-decoration: none; }
-    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
-    .nav-links a { text-decoration: none; font-size: .875rem; font-weight: 500; color: var(--text-muted); transition: color .2s; }
-    .nav-links a:hover { color: var(--blue); }
-
-    /* ─── HERO ─── */
-    #hero {
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #0d9488 100%);
-      color: #fff; padding: 5rem 2rem 4rem; text-align: center; position: relative; overflow: hidden;
-    }
-    #hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    }
-    #hero .container { position: relative; max-width: 900px; margin: 0 auto; }
-    .hero-badge {
-      display: inline-block; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
-      border-radius: 100px; padding: .3rem 1rem; font-size: .75rem; font-weight: 600;
-      letter-spacing: .05em; text-transform: uppercase; margin-bottom: 1.5rem; color: #bfdbfe;
-    }
-    #hero h1 { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800; line-height: 1.2; margin-bottom: 1rem; }
-    #hero .subtitle { font-size: 1.1rem; color: #bfdbfe; margin-bottom: .75rem; }
-    #hero .authors { font-size: .95rem; color: #93c5fd; margin-bottom: 2rem; }
-    .hero-buttons { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: center; }
-    .btn {
-      display: inline-flex; align-items: center; gap: .5rem;
-      padding: .65rem 1.4rem; border-radius: 8px; font-size: .875rem; font-weight: 600;
-      text-decoration: none; transition: all .2s; cursor: pointer; border: none;
-    }
-    .btn-primary   { background: #fff; color: var(--blue-dark); }
-    .btn-primary:hover { background: #e0f2fe; transform: translateY(-1px); }
-    .btn-outline   { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.5); }
-    .btn-outline:hover { background: rgba(255,255,255,.1); transform: translateY(-1px); }
-    .btn-github    { background: #24292e; color: #fff; }
-    .btn-github:hover { background: #404448; transform: translateY(-1px); }
-
-    /* ─── SECTIONS ─── */
-    section { padding: 4rem 2rem; }
-    .container { max-width: 1100px; margin: 0 auto; }
-    .section-title {
-      font-size: 1.75rem; font-weight: 800; color: var(--text);
-      margin-bottom: .5rem; text-align: center;
-    }
-    .section-sub { text-align: center; color: var(--text-muted); margin-bottom: 2.5rem; font-size: .95rem; }
-
-    /* ─── ABOUT ─── */
-    #about { background: #fff; }
-    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
-    .about-text p { color: var(--text-muted); margin-bottom: 1rem; line-height: 1.8; }
-    .nlos-diagram {
-      background: #0f172a; border-radius: var(--radius); padding: 1.5rem;
-      font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: #94a3b8; line-height: 1.7;
-    }
-    .nlos-diagram .hl  { color: #60a5fa; }
-    .nlos-diagram .hl2 { color: #34d399; }
-    .nlos-diagram .hl3 { color: #f59e0b; }
-
-    /* ─── STATS ─── */
-    #stats { background: var(--bg); }
-    .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
-    .stat-card {
-      background: var(--card); border-radius: var(--radius); padding: 1.25rem 1rem;
-      box-shadow: var(--shadow); text-align: center; border-top: 4px solid transparent;
-    }
-    .stat-card.blue   { border-top-color: var(--blue); }
-    .stat-card.teal   { border-top-color: var(--teal); }
-    .stat-card.purple { border-top-color: var(--purple); }
-    .stat-card.green  { border-top-color: var(--green); }
-    .stat-card.amber  { border-top-color: var(--amber); }
-    .stat-card.red    { border-top-color: #ef4444; }
-    .stat-card.indigo { border-top-color: #6366f1; }
-    .stat-card.rose   { border-top-color: #f43f5e; }
-    .stat-num { font-size: 2.2rem; font-weight: 800; line-height: 1; }
-    .blue .stat-num   { color: var(--blue); }
-    .teal .stat-num   { color: var(--teal); }
-    .purple .stat-num { color: var(--purple); }
-    .green .stat-num  { color: var(--green); }
-    .amber .stat-num  { color: var(--amber); }
-    .red .stat-num    { color: #ef4444; }
-    .indigo .stat-num { color: #6366f1; }
-    .rose .stat-num   { color: #f43f5e; }
-    .stat-label { font-size: .75rem; color: var(--text-muted); margin-top: .4rem; font-weight: 500; line-height: 1.3; }
-    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .chart-card { background: var(--card); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
-    .chart-card.full { grid-column: 1 / -1; }
-    .chart-card h3 { font-size: .95rem; font-weight: 700; margin-bottom: .3rem; color: var(--text); }
-    .chart-sub { font-size: .75rem; color: var(--text-muted); margin-bottom: 1.1rem; }
-    @media (max-width: 640px) { .charts-grid { grid-template-columns: 1fr; } .chart-card.full { grid-column: 1; } }
-
-    /* ─── TIMELINE ─── */
-    #timeline { background: #fff; }
-    .timeline { position: relative; max-width: 800px; margin: 0 auto; }
-    .timeline::before {
-      content: ''; position: absolute; left: 120px; top: 0; bottom: 0;
-      width: 2px; background: linear-gradient(to bottom, var(--blue), var(--teal));
-    }
-    .tl-item { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; align-items: flex-start; }
-    .tl-year {
-      width: 80px; min-width: 80px; text-align: right;
-      font-weight: 700; font-size: .9rem; color: var(--blue); padding-top: .1rem;
-    }
-    .tl-dot {
-      width: 14px; min-width: 14px; height: 14px; border-radius: 50%;
-      background: var(--blue); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--blue);
-      margin-top: .15rem; margin-left: 18px;
-    }
-    .tl-dot.big { background: var(--teal); box-shadow: 0 0 0 2px var(--teal); width: 18px; min-width: 18px; height: 18px; }
-    .tl-content { flex: 1; }
-    .tl-content h4 { font-size: .9rem; font-weight: 700; color: var(--text); line-height: 1.4; }
-    .tl-content p  { font-size: .82rem; color: var(--text-muted); margin-top: .2rem; }
-    .tl-badge {
-      display: inline-block; font-size: .68rem; font-weight: 600; padding: .15rem .5rem;
-      border-radius: 100px; margin-left: .5rem; vertical-align: middle;
-    }
-    .badge-nature   { background: #dbeafe; color: #1d4ed8; }
-      .badge-siggraph { background: #d1fae5; color: #065f46; }
-    .badge-cvpr     { background: #ede9fe; color: #5b21b6; }
-    .badge-neurips  { background: #fef3c7; color: #92400e; }
-    .badge-new      { background: #fee2e2; color: #991b1b; }
-
-    /* ─── PAPERS ─── */
-    #papers { background: var(--bg); }
-    .tab-bar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 2rem; }
-    .tab-btn {
-      padding: .5rem 1.1rem; border-radius: 100px; border: 1.5px solid var(--border);
-      background: var(--card); font-size: .82rem; font-weight: 600; cursor: pointer;
-      transition: all .2s; color: var(--text-muted);
-    }
-    .tab-btn:hover, .tab-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
-    .search-bar {
-      display: flex; align-items: center; gap: .75rem; margin-bottom: 1.5rem;
-    }
-    .search-bar input {
-      flex: 1; padding: .6rem 1rem; border-radius: 8px; border: 1.5px solid var(--border);
-      font-size: .875rem; font-family: 'Inter', sans-serif; outline: none; transition: border .2s;
-      background: var(--card);
-    }
-    .search-bar input:focus { border-color: var(--blue); }
-    .paper-count { font-size: .82rem; color: var(--text-muted); white-space: nowrap; }
-
-    .paper-grid { display: grid; gap: .85rem; }
-    .paper-card {
-      background: var(--card); border-radius: var(--radius); padding: 1.1rem 1.3rem;
-      box-shadow: var(--shadow); border-left: 4px solid transparent;
-      transition: transform .15s, box-shadow .15s;
-      display: flex; gap: 1rem; align-items: flex-start;
-    }
-    .paper-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,.1); }
-    .paper-card.cat-active  { border-left-color: var(--blue); }
-    .paper-card.cat-passive { border-left-color: var(--teal); }
-    .paper-card.cat-dl      { border-left-color: var(--purple); }
-    .paper-card.cat-new     { border-left-color: var(--amber); }
-    .paper-card.cat-dataset { border-left-color: var(--green); }
-    .paper-meta { flex: 1; min-width: 0; }
-    .paper-title { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: .3rem; line-height: 1.4; }
-    .paper-title a { color: inherit; text-decoration: none; }
+    body { font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.65; }
+    a { color: inherit; }
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 1.4rem; }
+    nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(14px); background: rgba(255,255,255,.88); border-bottom: 1px solid var(--line); }
+    nav .container { height: 62px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-weight: 800; color: var(--blue-dark); text-decoration: none; letter-spacing: -.02em; }
+    .links { display: flex; gap: 1.1rem; list-style: none; }
+    .links a { text-decoration: none; font-size: .88rem; font-weight: 600; color: var(--muted); }
+    .links a:hover { color: var(--blue); }
+    header { background: radial-gradient(circle at 20% 10%, rgba(96,165,250,.35), transparent 35%), linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #0f766e 100%); color: #fff; padding: 5.2rem 0 4.3rem; overflow: hidden; }
+    .hero-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 2rem; align-items: center; }
+    .eyebrow { display: inline-flex; gap: .5rem; align-items: center; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22); color: #bfdbfe; border-radius: 999px; padding: .35rem .8rem; font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1.2rem; }
+    h1 { font-size: clamp(2.1rem, 5vw, 4.2rem); line-height: 1.04; letter-spacing: -.055em; margin-bottom: 1rem; }
+    .subtitle { color: #dbeafe; max-width: 780px; font-size: 1.08rem; margin-bottom: 1.5rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; border-radius: 11px; padding: .72rem 1.05rem; text-decoration: none; font-weight: 800; font-size: .9rem; transition: .18s ease; }
+    .btn.primary { background: #fff; color: #172554; }
+    .btn.dark { background: #111827; color: #fff; }
+    .btn.ghost { border: 1px solid rgba(255,255,255,.45); color: #fff; }
+    .btn:hover { transform: translateY(-2px); }
+    .hero-card { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius); padding: 1.25rem; box-shadow: 0 16px 50px rgba(0,0,0,.16); }
+    .hero-card h3 { font-size: .95rem; margin-bottom: .65rem; color: #dbeafe; }
+    .signal-map { font-family: 'JetBrains Mono', monospace; white-space: pre; font-size: .76rem; color: #bfdbfe; overflow-x: auto; }
+    section { padding: 4rem 0; }
+    .section-head { text-align: center; max-width: 760px; margin: 0 auto 2.2rem; }
+    .section-head h2 { font-size: clamp(1.6rem, 3vw, 2.25rem); line-height: 1.15; letter-spacing: -.03em; margin-bottom: .55rem; }
+    .section-head p { color: var(--muted); }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: -2.1rem; position: relative; z-index: 3; }
+    .stat { background: var(--card); border-radius: 16px; padding: 1.15rem; box-shadow: var(--shadow); border: 1px solid rgba(219,227,239,.75); }
+    .stat b { display: block; font-size: 2rem; line-height: 1; color: var(--blue); letter-spacing: -.04em; }
+    .stat span { display: block; color: var(--muted); font-size: .82rem; font-weight: 650; margin-top: .35rem; }
+    .latest-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .paper-card, .tile { background: var(--card); border: 1px solid rgba(219,227,239,.85); border-radius: var(--radius); padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
+    .paper-card { border-left: 5px solid var(--blue); }
+    .paper-card.latest { border-left-color: var(--rose); }
+    .paper-card.active { border-left-color: var(--blue); }
+    .paper-card.passive { border-left-color: var(--teal); }
+    .paper-card.learning { border-left-color: var(--violet); }
+    .paper-card.modality { border-left-color: var(--amber); }
+    .paper-card.dataset { border-left-color: var(--green); }
+    .paper-title { font-weight: 800; font-size: .98rem; line-height: 1.36; margin-bottom: .45rem; }
+    .paper-title a { text-decoration: none; }
     .paper-title a:hover { color: var(--blue); text-decoration: underline; }
-    .paper-info { font-size: .78rem; color: var(--text-muted); }
-    .paper-info span + span::before { content: ' · '; }
-    .paper-key { font-size: .72rem; color: var(--text-muted); margin-top: .3rem; font-style: italic; }
-    .venue-tag {
-      font-size: .68rem; font-weight: 700; padding: .15rem .5rem; border-radius: 100px;
-      white-space: nowrap; flex-shrink: 0; align-self: flex-start; margin-top: .1rem;
-    }
-    .venue-nature   { background: #dbeafe; color: #1d4ed8; }
-    .venue-siggraph { background: #d1fae5; color: #065f46; }
-    .venue-cvpr     { background: #ede9fe; color: #5b21b6; }
-    .venue-neurips  { background: #fef3c7; color: #92400e; }
-    .venue-iccv     { background: #ffe4e6; color: #9f1239; }
-    .venue-tpami    { background: #f0fdf4; color: #166534; }
-    .venue-other    { background: #f1f5f9; color: #475569; }
-    .venue-aaai     { background: #fff7ed; color: #9a3412; }
-    .venue-new      { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-
-    /* ─── DATASETS ─── */
-    #datasets { background: #fff; }
-    .ds-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.2rem; }
-    .ds-card {
-      border-radius: var(--radius); padding: 1.3rem; border: 1.5px solid var(--border);
-      background: var(--card); transition: border-color .2s;
-    }
-    .ds-card:hover { border-color: var(--blue); }
-    .ds-card h4 { font-size: .9rem; font-weight: 700; margin-bottom: .4rem; }
-    .ds-card p  { font-size: .8rem; color: var(--text-muted); margin-bottom: .6rem; }
-    .ds-card a  { font-size: .8rem; color: var(--blue); text-decoration: none; font-weight: 600; }
-
-    /* ─── FOOTER ─── */
-    footer {
-      background: #0f172a; color: #94a3b8; text-align: center;
-      padding: 2.5rem 2rem; font-size: .85rem;
-    }
-    footer a { color: #60a5fa; text-decoration: none; }
-    footer .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-top: .75rem; flex-wrap: wrap; }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 700px) {
-      .about-grid  { grid-template-columns: 1fr; }
-      .charts-grid { grid-template-columns: 1fr; }
-      .timeline::before { left: 70px; }
-      .tl-year { width: 50px; min-width: 50px; font-size: .8rem; }
-      nav { padding: 0 1rem; }
-      .nav-links { display: none; }
-    }
-
-    .hidden { display: none !important; }
-    .star-icon { color: #f59e0b; }
+    .meta { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; color: var(--muted); font-size: .78rem; font-weight: 650; }
+    .tag { display: inline-flex; border-radius: 999px; padding: .15rem .48rem; font-size: .68rem; font-weight: 850; background: #eef2ff; color: #3730a3; }
+    .key { margin-top: .55rem; color: var(--muted); font-size: .84rem; }
+    .timeline { max-width: 900px; margin: 0 auto; position: relative; }
+    .tl { display: grid; grid-template-columns: 90px 1fr; gap: 1.1rem; margin-bottom: 1rem; }
+    .year { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--blue); text-align: right; padding-top: .15rem; }
+    .tl-body { background: var(--card); border: 1px solid var(--line); border-radius: 15px; padding: .95rem 1.05rem; box-shadow: 0 4px 18px rgba(15,23,42,.05); }
+    .tl-body strong { display: block; margin-bottom: .18rem; }
+    .tl-body p { color: var(--muted); font-size: .86rem; }
+    .taxonomy { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .tile h3 { font-size: 1rem; margin-bottom: .55rem; }
+    .tile ul { padding-left: 1.05rem; color: var(--muted); font-size: .88rem; }
+    .controls { display: grid; grid-template-columns: 1fr auto; gap: .8rem; margin-bottom: 1rem; }
+    input[type="search"] { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; padding: .78rem 1rem; font: inherit; background: #fff; outline: none; }
+    input[type="search"]:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(37,99,235,.1); }
+    .count { align-self: center; color: var(--muted); font-weight: 800; font-size: .86rem; white-space: nowrap; }
+    .tabs { display: flex; flex-wrap: wrap; gap: .45rem; margin-bottom: 1.2rem; }
+    .tab { border: 1.5px solid var(--line); background: #fff; color: var(--muted); border-radius: 999px; padding: .48rem .9rem; font-weight: 800; font-size: .78rem; cursor: pointer; }
+    .tab.active, .tab:hover { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .grid { display: grid; gap: .85rem; }
+    footer { background: #0f172a; color: #94a3b8; padding: 2.8rem 0; text-align: center; font-size: .88rem; }
+    footer a { color: #93c5fd; text-decoration: none; font-weight: 700; }
+    .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: .8rem; }
+    @media (max-width: 860px) { .hero-grid, .latest-grid, .taxonomy, .stats { grid-template-columns: 1fr; } .links { display: none; } .tl { grid-template-columns: 58px 1fr; gap: .75rem; } .year { font-size: .82rem; } .controls { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-
-<!-- ══════════════ NAV ══════════════ -->
-<nav>
-  <a class="nav-brand" href="#">Recent Advances on NLOS Imaging</a>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#stats">Statistics</a></li>
-    <li><a href="#timeline">Timeline</a></li>
-    <li><a href="#papers">Papers</a></li>
-    <li><a href="#datasets">Datasets</a></li>
-    <li><a href="https://github.com/ruixv/NLOS_Overview" target="_blank">GitHub</a></li>
-  </ul>
-</nav>
-
-<!-- ══════════════ HERO ══════════════ -->
-<section id="hero">
-  <div class="container">
-    <div class="hero-badge">NLOS Imaging Survey · 2022 · Updated 2026</div>
-    <h1>Recent Advances on Non-Line-of-Sight Imaging</h1>
-    <p class="subtitle">Conventional Physical Models · Deep Learning · New Scenes</p>
-    <p class="authors">Ruixu Geng &nbsp;·&nbsp; Yang Hu &nbsp;·&nbsp; Yan Chen</p>
-    <div class="hero-buttons">
-      <a class="btn btn-primary" href="https://arxiv.org/pdf/2104.13807" target="_blank">
-        📄 Original Survey (arXiv 2021)
-      </a>
-      <a class="btn btn-primary" href="bare_jrnl.pdf" target="_blank">
-        📄 Updated Survey (2026)
-      </a>
-      <a class="btn btn-outline" href="#papers">
-        🔍 Browse 150+ Papers
-      </a>
-      <a class="btn btn-github" href="https://github.com/ruixv/NLOS_Overview" target="_blank">
-        ⭐ GitHub Repository
-      </a>
+  <nav>
+    <div class="container">
+      <a class="brand" href="#">NLOS Overview</a>
+      <ul class="links">
+        <li><a href="#latest">Latest</a></li>
+        <li><a href="#timeline">Timeline</a></li>
+        <li><a href="#taxonomy">Map</a></li>
+        <li><a href="#papers">Papers</a></li>
+        <li><a href="https://github.com/ruixv/NLOS_Overview" target="_blank" rel="noopener">GitHub</a></li>
+      </ul>
     </div>
-  </div>
-</section>
+  </nav>
 
-<!-- ══════════════ ABOUT ══════════════ -->
-<section id="about">
-  <div class="container">
-    <h2 class="section-title">What is NLOS Imaging?</h2>
-    <p class="section-sub">Seeing around corners — reconstructing hidden scenes from multiply-scattered light</p>
-    <div class="about-grid">
-      <div class="about-text">
-        <p><strong>Non-Line-of-Sight (NLOS) imaging</strong> reconstructs hidden scenes that cannot be directly observed. Light emitted by a laser hits a visible relay surface (e.g., a wall), bounces into the hidden space, reflects off the hidden object, and returns to the relay surface where a sensor captures it. Computational algorithms then invert this light transport to recover the hidden scene.</p>
-        <p>NLOS imaging spans a rich diversity of hardware platforms (streak cameras, SPADs, ToF cameras, interferometers, radar, acoustic transducers), physical models (time-of-flight ellipsoidal models, wave-based phasor field models), and reconstruction algorithms (back-projection, LCT, f-k migration, deep learning, neural implicit representations).</p>
-        <p><strong>Applications:</strong> autonomous driving, search-and-rescue, medical imaging, robotics, surveillance — anywhere seeing beyond the direct line of sight matters.</p>
+  <header>
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">Updated 26 June 2026 · 180+ papers</div>
+        <h1>Recent Advances on Non-Line-of-Sight Imaging</h1>
+        <p class="subtitle">A curated roadmap of how NLOS imaging evolved from transient optical reconstruction to passive imaging, deep neural inverse models, arbitrary relay surfaces, consumer LiDAR, radar/RF, acoustic, and multimodal hidden-scene understanding.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="bare_jrnl.pdf" target="_blank" rel="noopener">📄 Updated Survey PDF</a>
+          <a class="btn ghost" href="#latest">🆕 See Latest Additions</a>
+          <a class="btn dark" href="https://github.com/ruixv/NLOS_Overview" target="_blank" rel="noopener">⭐ GitHub Repository</a>
+        </div>
       </div>
-      <div class="nlos-diagram">
-<pre>
-  <span class="hl">[Laser / Detector]</span>
-        │
-        │ ① 1st bounce (relay wall)
-        ↓
-  ┌─────────────────────┐
-  │  <span class="hl2">Visible relay wall</span>  │
-  │  ② 2nd bounce ──►  <span class="hl3">Hidden</span> │
-  │          ◄── ③ 3rd bounce  <span class="hl3">Object</span>│
-  └─────────────────────┘
-        │
-        ↓ Measurement  τ(x, y, t)
-  <span class="hl2">[Reconstruction Algorithm]</span>
-        │
-        ↓ Hidden scene  ρ(x, y, z)
-  <span class="hl">FBP · LCT · f-k · Phasor Field</span>
-  <span class="hl">Transformer · Mamba · GNN · Diffusion</span>
-</pre>
+      <div class="hero-card">
+        <h3>Core NLOS inverse problem</h3>
+        <div class="signal-map">Emitter/Sensor
+    │
+    ├─ relay surface / wall
+    │      └─ hidden object
+    │             └─ indirect return
+    ↓
+Transient / intensity / RF / acoustic data
+    ↓
+Physical model + computational inversion
+    ↓
+Hidden geometry, albedo, motion, identity</div>
       </div>
     </div>
-  </div>
-</section>
+  </header>
 
-<!-- ══════════════ STATS ══════════════ -->
-<section id="stats">
-  <div class="container">
-    <h2 class="section-title">Field at a Glance</h2>
-    <p class="section-sub">Multi-dimensional statistics across 170+ papers (2008–2026) — all figures approximate</p>
-
-    <div class="stat-cards">
-      <div class="stat-card blue">
-        <div class="stat-num">170+</div>
-        <div class="stat-label">Papers Surveyed</div>
-      </div>
-      <div class="stat-card teal">
-        <div class="stat-num">~72</div>
-        <div class="stat-label">Active NLOS</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-num">~32</div>
-        <div class="stat-label">Passive NLOS</div>
-      </div>
-      <div class="stat-card purple">
-        <div class="stat-num">~48</div>
-        <div class="stat-label">Deep Learning</div>
-      </div>
-      <div class="stat-card amber">
-        <div class="stat-num">~20</div>
-        <div class="stat-label">New NLOS Scenes</div>
-      </div>
-      <div class="stat-card red">
-        <div class="stat-num">19</div>
-        <div class="stat-label">Years Covered<br>2008 – 2026</div>
-      </div>
-      <div class="stat-card indigo">
-        <div class="stat-num">30+</div>
-        <div class="stat-label">Publication Venues<br>&amp; Journals</div>
-      </div>
-      <div class="stat-card rose">
-        <div class="stat-num">5+</div>
-        <div class="stat-label">Physical Modalities<br>(optical, radar…)</div>
-      </div>
+  <main>
+    <div class="container stats">
+      <div class="stat"><b>180+</b><span>curated papers</span></div>
+      <div class="stat"><b>2008–2026</b><span>development history</span></div>
+      <div class="stat"><b>7</b><span>June 2026 additions</span></div>
+      <div class="stat"><b>6+</b><span>sensing modalities</span></div>
     </div>
 
-    <div class="charts-grid">
+    <section id="latest">
+      <div class="container">
+        <div class="section-head">
+          <h2>Latest Additions</h2>
+          <p>New or newly completed entries added in the 26 June 2026 update run. These are the most important items to read first if you want the current frontier.</p>
+        </div>
+        <div class="latest-grid" id="latestGrid"></div>
+      </div>
+    </section>
 
-      <!-- Row 1: full-width stacked trend -->
-      <div class="chart-card full">
-        <h3>Annual Publication Trend by Research Category</h3>
-        <p class="chart-sub">Stacked bars show how Active NLOS, Passive NLOS, Deep Learning, and New Scenes each grew year by year</p>
-        <canvas id="trendChart" height="110"></canvas>
+    <section id="timeline">
+      <div class="container">
+        <div class="section-head">
+          <h2>Development Timeline</h2>
+          <p>A compact reading path for understanding the field's historical trajectory.</p>
+        </div>
+        <div class="timeline">
+          <div class="tl"><div class="year">2008</div><div class="tl-body"><strong>5D time-light transport</strong><p>The conceptual foundation for using transient light transport to sense hidden scenes.</p></div></div>
+          <div class="tl"><div class="year">2012</div><div class="tl-body"><strong>First experimental 3D NLOS reconstruction</strong><p>Velten et al. used ultrafast ToF measurements and filtered backprojection to reconstruct hidden 3D shape.</p></div></div>
+          <div class="tl"><div class="year">2018</div><div class="tl-body"><strong>Confocal LCT and virtual-wave thinking</strong><p>Light-cone transform and phasor-field formulations made NLOS reconstruction faster and more wave-optics aware.</p></div></div>
+          <div class="tl"><div class="year">2019</div><div class="tl-body"><strong>f-k migration and passive periscopy</strong><p>The field split into efficient wave-based active NLOS and ordinary-camera passive NLOS.</p></div></div>
+          <div class="tl"><div class="year">2021</div><div class="tl-body"><strong>Long-range and neural-field NLOS</strong><p>1.43 km NLOS imaging expanded range; NeTF showed neural implicit fields can invert transient measurements without paired supervision.</p></div></div>
+          <div class="tl"><div class="year">2023</div><div class="tl-body"><strong>Transformers, passive tracking, neural surfaces</strong><p>NLOST, PAC-Net, and NLOS-NeuS marked the shift toward modern neural architectures and richer scene outputs.</p></div></div>
+          <div class="tl"><div class="year">2024</div><div class="tl-body"><strong>Real-time NLOS video and irregular undersampling</strong><p>Dynamic room-sized NLOS video, Mamba-style temporal modeling, and unsupervised virtual scanning became central.</p></div></div>
+          <div class="tl"><div class="year">2025</div><div class="tl-body"><strong>Generalization, graph models, radar, and lightweight transforms</strong><p>Learned physical priors, GNN-style reconstruction, HoloRadar, quasi-Fresnel transforms, and optimized FFT sampling broadened the toolbox.</p></div></div>
+          <div class="tl"><div class="year">2026</div><div class="tl-body"><strong>Arbitrary relay surfaces, consumer LiDAR, and RF geometry</strong><p>The frontier moves toward real-world geometry: non-planar limited relays, smartphone-grade LiDAR motion sampling, and RF/radar NLOS 3D reconstruction.</p></div></div>
+        </div>
       </div>
+    </section>
 
-      <!-- Row 2: venues + tasks -->
-      <div class="chart-card">
-        <h3>Top Publication Venues</h3>
-        <p class="chart-sub">Distribution across leading optics, vision, and AI venues (selected major venues)</p>
-        <canvas id="venueChart" height="260"></canvas>
+    <section id="taxonomy">
+      <div class="container">
+        <div class="section-head">
+          <h2>How to Read the Field</h2>
+          <p>The repository is organized as a roadmap rather than a flat bibliography.</p>
+        </div>
+        <div class="taxonomy">
+          <div class="tile"><h3>1. Physical model</h3><ul><li>ToF ellipsoids and light-cone transform</li><li>Wave / phasor / f-k migration</li><li>Differentiable transient rendering</li></ul></div>
+          <div class="tile"><h3>2. Acquisition regime</h3><ul><li>Dense scanning versus sparse sampling</li><li>Scannerless / real-time systems</li><li>Motion-induced and irregular sampling</li></ul></div>
+          <div class="tile"><h3>3. Sensor modality</h3><ul><li>SPAD, ToF, LiDAR, camera</li><li>Radar / RF / mmWave</li><li>Acoustic and ultrasound</li></ul></div>
+          <div class="tile"><h3>4. Reconstruction target</h3><ul><li>Albedo, volume, surface, mesh</li><li>Motion, tracking, human pose</li><li>Recognition and scene understanding</li></ul></div>
+          <div class="tile"><h3>5. Learning paradigm</h3><ul><li>CNN / transformer / Mamba / GNN</li><li>Physics-guided priors</li><li>Neural implicit and Gaussian primitives</li></ul></div>
+          <div class="tile"><h3>6. Real-world frontier</h3><ul><li>Non-planar relay surfaces</li><li>Limited relay visibility</li><li>Low-cost mobile hardware</li></ul></div>
+        </div>
       </div>
-      <div class="chart-card">
-        <h3>Research Task / Output</h3>
-        <p class="chart-sub">Primary goal of each paper — reconstruction, detection, tracking, or recognition (papers may span multiple tasks)</p>
-        <canvas id="taskChart" height="260"></canvas>
-      </div>
+    </section>
 
-      <!-- Row 3: sensor + DL arch -->
-      <div class="chart-card">
-        <h3>Sensor / Hardware Platform</h3>
-        <p class="chart-sub">Hardware diversity across surveyed papers; some papers use multiple sensor types</p>
-        <canvas id="sensorChart" height="280"></canvas>
+    <section id="papers">
+      <div class="container">
+        <div class="section-head">
+          <h2>Searchable Paper Explorer</h2>
+          <p>Filter by category or search by title, author, venue, year, or contribution keyword.</p>
+        </div>
+        <div class="tabs" id="tabs"></div>
+        <div class="controls">
+          <input type="search" id="search" placeholder="Search: Gaussian transient rendering, radar, passive, transformer, LCT, f-k, LiDAR…" />
+          <div class="count" id="count"></div>
+        </div>
+        <div class="grid" id="paperGrid"></div>
       </div>
-      <div class="chart-card">
-        <h3>Deep Learning Architecture Types</h3>
-        <p class="chart-sub">Among ~48 deep-learning NLOS papers — how network design has diversified since 2018</p>
-        <canvas id="dlChart" height="280"></canvas>
-      </div>
+    </section>
+  </main>
 
+  <footer>
+    <div class="container">
+      <p>Based on <em>Recent Advances on Non-Line-of-Sight Imaging: Conventional Physical Models, Deep Learning, and New Scenes</em>.</p>
+      <div class="footer-links">
+        <a href="https://github.com/ruixv/NLOS_Overview" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://arxiv.org/pdf/2104.13807" target="_blank" rel="noopener">Original arXiv Survey</a>
+        <a href="bare_jrnl.pdf" target="_blank" rel="noopener">Updated PDF</a>
+      </div>
+      <p style="margin-top:1rem;">Last updated: 26 June 2026</p>
     </div>
-  </div>
-</section>
+  </footer>
 
-<!-- ══════════════ TIMELINE ══════════════ -->
-<section id="timeline">
-  <div class="container">
-    <h2 class="section-title">Development History</h2>
-    <p class="section-sub">Key milestones that shaped the NLOS Imaging field</p>
-    <div class="timeline">
+  <script>
+    const categories = [
+      ['all', 'All'],
+      ['latest', 'Latest'],
+      ['active', 'Active Optical / ToF'],
+      ['passive', 'Passive Optical'],
+      ['learning', 'Learning / Neural'],
+      ['modality', 'New Modalities'],
+      ['dataset', 'Datasets & Code'],
+      ['survey', 'Surveys / Benchmarks']
+    ];
 
-      <div class="tl-item">
-        <div class="tl-year">2008</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Raskar &amp; Davis — "5D Time-Light Transport"</h4>
-          <p>Theoretical foundation for transient NLOS imaging.</p>
-        </div>
-      </div>
+    const papers = [
+      {cat:'latest learning active', title:'Non-line-of-sight imaging with arbitrary relay surface geometries via 3D Gaussian Transient Rendering', authors:'Yi Wang et al.', year:2026, venue:'SIGGRAPH / arXiv', url:'https://arxiv.org/abs/2606.21270', key:'3D Gaussian primitives + differentiable transient rendering for spatially limited and non-planar relay surfaces.'},
+      {cat:'latest active modality', title:'Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling', authors:'Somasundaram et al.', year:2026, venue:'arXiv', url:'https://arxiv.org/abs/2605.17865', key:'Plug-and-play NLOS using smartphone-grade / consumer LiDAR and multi-frame motion-induced aperture sampling.'},
+      {cat:'latest modality learning', title:'Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals', authors:'Lu et al.', year:2026, venue:'CVPR / arXiv', url:'https://arxiv.org/abs/2605.29098', key:'GeRaF 2.0: neural RF geometry reconstruction combining LoS visual priors and NLoS radar propagation.'},
+      {cat:'latest survey active', title:'A comprehensive study of time-of-flight non-line-of-sight imaging', authors:'Marco et al.', year:2026, venue:'arXiv', url:'https://arxiv.org/abs/2603.09548', key:'Unified comparison of representative ToF NLOS models and reconstruction methods under common constraints.'},
+      {cat:'latest active', title:'Fast and Memory-efficient Non-line-of-sight Imaging with Quasi-Fresnel Transform', authors:'Wei et al.', year:2025, venue:'arXiv', url:'https://arxiv.org/abs/2508.02003', key:'2D hidden-scene representation and Quasi-Fresnel direct inversion for lightweight/mobile NLOS.'},
+      {cat:'latest active', title:'Geometric Constrained Non-Line-of-Sight Imaging', authors:'Liu et al.', year:2025, venue:'arXiv', url:'https://arxiv.org/abs/2503.17992', key:'Joint albedo/surface reconstruction with normal-field geometric regularization.'},
+      {cat:'latest active', title:'Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms', authors:'Sultan et al.', year:2025, venue:'arXiv', url:'https://arxiv.org/abs/2501.05244', key:'NUFFT/SFFT sampling strategy for sparse irregular relay grids and scalable hidden-volume reconstruction.'},
 
-      <div class="tl-item">
-        <div class="tl-year">2012</div>
-        <div class="tl-dot big"></div>
-        <div class="tl-content">
-          <h4>Velten et al. — First Experimental 3D NLOS Reconstruction <span class="tl-badge badge-nature">Nature Comm.</span></h4>
-          <p>Streak camera + Filter Back Projection. Proved NLOS imaging is experimentally feasible.</p>
-        </div>
-      </div>
+      {cat:'active', title:'Recovering Three-Dimensional Shape Around a Corner using Ultrafast Time-of-Flight Imaging', authors:'Velten et al.', year:2012, venue:'Nature Communications', url:'https://www.nature.com/articles/ncomms1747', key:'First experimental 3D NLOS reconstruction with ultrafast transient measurements.'},
+      {cat:'active', title:'Diffuse Mirrors: 3D Reconstruction from Diffuse Indirect Illumination Using Inexpensive Time-of-Flight Sensors', authors:'Heide et al.', year:2014, venue:'SIGGRAPH / TOG', url:'https://dl.acm.org/doi/10.1145/2601097.2601205', key:'Optimization-based ToF-camera NLOS reconstruction.'},
+      {cat:'active', title:'Non-line-of-sight imaging using a time-gated single photon avalanche diode', authors:'Buttafava et al.', year:2015, venue:'Optics Express', url:'https://opg.optica.org/oe/fulltext.cfm?uri=oe-23-16-20997', key:'SPAD-based NLOS imaging that lowered hardware barriers.'},
+      {cat:'active', title:'Confocal Non-Line-of-Sight Imaging Based on the Light-Cone Transform', authors:"O'Toole et al.", year:2018, venue:'Nature', url:'https://www.nature.com/articles/s41586-018-0862-6', key:'LCT converts confocal NLOS reconstruction to a fast 3D deconvolution problem.'},
+      {cat:'active', title:'Wave-Based Non-Line-of-Sight Imaging Using Fast f-k Migration', authors:'Lindell et al.', year:2019, venue:'SIGGRAPH / TOG', url:'https://dl.acm.org/doi/10.1145/3306346.3322996', key:'Wave-based NLOS reconstruction via seismic-style f-k migration.'},
+      {cat:'active', title:'Virtual Wave Optics for Non-Line-of-Sight Imaging', authors:'Liu et al.', year:2020, venue:'SIGGRAPH / TOG', url:'https://dl.acm.org/doi/10.1145/3386569.3392470', key:'Phasor-field formulation: NLOS as a virtual LOS diffraction problem.'},
+      {cat:'active', title:'Non-line-of-sight imaging over 1.43 km', authors:'Wu et al.', year:2021, venue:'Nature Communications', url:'https://www.nature.com/articles/s41467-021-25279-2', key:'Long-range active NLOS at kilometer scale.'},
+      {cat:'active', title:'High-Resolution Non-Line-of-Sight Imaging with Wavefront Shaping (UNCOVER)', authors:'Cao et al.', year:2022, venue:'Nature Photonics', url:'https://www.nature.com/articles/s41566-022-01009-8', key:'Sub-millimeter NLOS resolution through wavefront shaping.'},
+      {cat:'active learning', title:'Virtual Scanning: Unsupervised NLOS from Irregular Undersampled Transients', authors:'Cui et al.', year:2024, venue:'NeurIPS', url:'', key:'Unsupervised reconstruction from irregular sparse transient measurements.'},
+      {cat:'active learning', title:'Real-Time Non-Line-of-Sight Imaging of Dynamic Scenes', authors:'Ye et al.', year:2024, venue:'Nature Computational Science', url:'https://www.nature.com/articles/s43588-024-00711-5', key:'4 fps room-sized dynamic NLOS video.'},
 
-      <div class="tl-item">
-        <div class="tl-year">2014</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Heide et al. — "Diffuse Mirrors" <span class="tl-badge badge-siggraph">SIGGRAPH</span></h4>
-          <p>Low-cost ToF camera + TV optimization for NLOS imaging.</p>
-        </div>
-      </div>
+      {cat:'passive', title:'Turning Corners into Cameras: Principles and Methods', authors:'Bouman et al.', year:2017, venue:'ICCV', url:'https://openaccess.thecvf.com/content_iccv_2017/html/Bouman_Turning_Corners_Into_ICCV_2017_paper.html', key:'Passive NLOS from ordinary intensity measurements and motion/occlusion cues.'},
+      {cat:'passive', title:'Computational Periscopy with an Ordinary Digital Camera', authors:'Saunders et al.', year:2019, venue:'Nature', url:'https://www.nature.com/articles/s41586-019-0928-6', key:'Ordinary-camera passive 3D NLOS using a partial occluder.'},
+      {cat:'passive', title:'Non-invasive Single-Shot Imaging Through Scattering Layers and Around Corners via Speckle Correlations', authors:'Katz et al.', year:2014, venue:'Nature Photonics', url:'https://www.nature.com/articles/nphoton.2014.234', key:'Speckle-correlation / memory-effect route to passive hidden-scene imaging.'},
+      {cat:'passive', title:'Passive Sensing Around the Corner Using Spatial Coherence', authors:'Batarseh et al.', year:2018, venue:'Nature Communications', url:'https://www.nature.com/articles/s41467-018-05985-w', key:'Spatial coherence cues for passive NLOS sensing.'},
+      {cat:'passive', title:'Polarized Non-Line-of-Sight Imaging', authors:'Tanaka et al.', year:2020, venue:'CVPR', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Tanaka_Polarized_Non-Line-of-Sight_Imaging_CVPR_2020_paper.html', key:'Polarization as a passive constraint that improves conditioning.'},
+      {cat:'passive', title:'Passive Non-Line-of-Sight Imaging Using Optimal Transport', authors:'Geng et al.', year:2022, venue:'IEEE TIP', url:'https://github.com/ruixv/NLOS-OT', key:'Optimal-transport objective for robust passive NLOS reconstruction.'},
+      {cat:'passive', title:'Propagate-and-Calibrate: Real-Time Passive Non-Planar NLOS Tracking', authors:'Wang et al.', year:2023, venue:'CVPR', url:'https://openaccess.thecvf.com/content/CVPR2023/html/Wang_Propagate-and-Calibrate_Real-Time_Passive_Non-Planar_NLOS_Tracking_CVPR_2023_paper.html', key:'PAC-Net and NLOS-Track dataset for real-time passive tracking.'},
+      {cat:'passive', title:'Full-Color 3D Passive NLOS with an Ordinary Camera', authors:'Czajkowski and Murray-Bruce', year:2024, venue:'Nature Communications', url:'', key:'Full-color 3D passive NLOS with ordinary camera and no calibration images.'},
 
-      <div class="tl-item">
-        <div class="tl-year">2015</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Buttafava et al. — SPAD-Based NLOS</h4>
-          <p>Demonstrated SPAD as an affordable alternative to streak cameras, democratizing the field.</p>
-        </div>
-      </div>
+      {cat:'learning', title:'Steady-State Non-Line-of-Sight Imaging', authors:'Chen et al.', year:2019, venue:'CVPR', url:'https://openaccess.thecvf.com/content_CVPR_2019/html/Chen_Steady-State_Non-Line-of-Sight_Imaging_CVPR_2019_paper.html', key:'Continuous-wave illumination + U-Net style 3D NLOS reconstruction.'},
+      {cat:'learning', title:'Deep Non-Line-of-Sight Reconstruction', authors:'Chopite et al.', year:2020, venue:'CVPR', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Chopite_Deep_Non-Line-of-Sight_Reconstruction_CVPR_2020_paper.html', key:'3D U-Net mapping transient volumes to hidden geometry.'},
+      {cat:'learning', title:'Non-Line-of-Sight Imaging via Neural Transient Fields', authors:'Shen et al.', year:2021, venue:'TPAMI', url:'https://ieeexplore.ieee.org/document/9645260', key:'Unsupervised neural implicit transient field for NLOS reconstruction.'},
+      {cat:'learning', title:'Physics Rescue: Deep Network for High-Speed NLOS Reconstruction', authors:'Mu et al.', year:2022, venue:'TPAMI', url:'', key:'Physics-model rescue module plus deep network for faster reconstruction.'},
+      {cat:'learning', title:'NLOST: Non-Line-of-Sight Imaging with Transformer', authors:'Li et al.', year:2023, venue:'CVPR', url:'', key:'Transformer architecture for spatial-temporal transient volumes.'},
+      {cat:'learning', title:'NLOS-NeuS: Non-Line-of-Sight Neural Implicit Surface', authors:'Fujimura et al.', year:2023, venue:'ICCV', url:'', key:'SDF-based neural implicit surface reconstruction.'},
+      {cat:'learning', title:'ST-Mamba: Spatial-Temporal Mamba for NLOS Videography', authors:'Li et al.', year:2024, venue:'NeurIPS', url:'', key:'State-space model for temporally consistent NLOS video.'},
+      {cat:'learning', title:'Generalizable Non-Line-of-Sight Imaging with Learnable Physical Priors', authors:'Sun et al.', year:2025, venue:'CVPR / arXiv', url:'https://arxiv.org/abs/2409.14011', key:'Learnable physical priors for cross-system and low-SNR generalization.'},
+      {cat:'learning', title:'DG-NLOS: Dual-Branch Graph Neural Network for NLOS Reconstruction', authors:'Su et al.', year:2025, venue:'AAAI', url:'', key:'Graph-neural-style reconstruction for hidden albedo and depth.'},
+      {cat:'learning', title:'TransiT: Transient Imaging Transformer for Videographic NLOS Reconstruction', authors:'Li et al.', year:2025, venue:'CVPR', url:'', key:'Transient transformer for video-rate NLOS from sparse measurements.'},
 
-      <div class="tl-item">
-        <div class="tl-year">2018</div>
-        <div class="tl-dot big"></div>
-        <div class="tl-content">
-          <h4>O'Toole et al. — Confocal NLOS + Light-Cone Transform (LCT) <span class="tl-badge badge-nature">Nature</span></h4>
-          <p>Reduced reconstruction from O(N⁵) to O(N³ log N). Landmark paper enabling real-time NLOS.</p>
-        </div>
-      </div>
+      {cat:'modality', title:'Keyhole Imaging: NLOS Imaging and Tracking Along a Single Optical Path', authors:'Metzler et al.', year:2021, venue:'Science Advances', url:'https://www.science.org/doi/10.1126/sciadv.abg2187', key:'Beamsplitter confocal NLOS without full relay scanning.'},
+      {cat:'modality', title:'Seeing Around Street Corners: NLOS Detection and Tracking Using Doppler Radar', authors:'Scheiner et al.', year:2020, venue:'CVPR', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Scheiner_Seeing_Around_Street_Corners_Non-Line-of-Sight_Detection_and_Tracking_in-the-Wild_CVPR_2020_paper.html', key:'Automotive radar for around-corner vehicle detection and tracking.'},
+      {cat:'modality', title:'HoloRadar: Full 3D NLOS Reconstruction via mmWave Radar on a Mobile Robot', authors:'Lai et al.', year:2025, venue:'NeurIPS', url:'', key:'Full 3D NLOS reconstruction with single mobile mmWave radar.'},
+      {cat:'modality', title:'Acoustic Non-Line-of-Sight Imaging', authors:'Lindell et al.', year:2019, venue:'SIGGRAPH / TOG', url:'https://github.com/computational-imaging/acoustic-nlos', key:'Acoustic analogue of optical NLOS using microphone arrays.'},
+      {cat:'modality', title:'Ultrasound NLOS Imaging via Synthetic Aperture', authors:'—', year:2025, venue:'Communications Physics', url:'', key:'Ultrasound / bat-echolocation-frequency NLOS with synthetic aperture.'},
+      {cat:'modality', title:'Optical Non-Line-of-Sight Physics-Based 3D Human Pose Estimation', authors:'Isogawa et al.', year:2020, venue:'CVPR', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Isogawa_Optical_Non-Line-of-Sight_Physics-Based_3D_Human_Pose_Estimation_CVPR_2020_paper.html', key:'Physics-based hidden human pose estimation.'},
+      {cat:'modality', title:'Polarization-Based Scanning-Free Single-Pixel NLOS Imaging', authors:'Zhou et al.', year:2026, venue:'PRL', url:'', key:'Polarization-encoded speckle patterns for scanning-free single-pixel NLOS.'},
+      {cat:'modality', title:'Super-Field-of-View NLOS via Spatial Encoding', authors:'Li et al.', year:2026, venue:'Photonics Research', url:'', key:'Spatial encoding to exceed relay-surface FoV limits.'},
 
-      <div class="tl-item">
-        <div class="tl-year">2018</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Liu et al. — Phasor Field Virtual Wave Optics</h4>
-          <p>Reformulated NLOS imaging as a virtual LOS diffraction problem, enabling new algorithms.</p>
-        </div>
-      </div>
+      {cat:'dataset', title:'nlos-fk', authors:"O'Toole / Lindell lab", year:2018, venue:'Code / Dataset', url:'https://github.com/computational-imaging/nlos-fk', key:'Confocal SPAD datasets and f-k / LCT reconstruction code.'},
+      {cat:'dataset', title:'acoustic-nlos', authors:'Lindell et al.', year:2019, venue:'Code', url:'https://github.com/computational-imaging/acoustic-nlos', key:'Open-source acoustic NLOS imaging code.'},
+      {cat:'dataset', title:'NLOS_imaging_over_1.43km', authors:'Wu et al.', year:2021, venue:'Code / Data', url:'https://github.com/quantum-inspired-lidar/NLOS_imaging_over_1.43km', key:'Code and data for kilometer-scale NLOS imaging.'},
+      {cat:'dataset', title:'NLOS-OT', authors:'Geng et al.', year:2022, venue:'Code / Dataset', url:'https://github.com/ruixv/NLOS-OT', key:'Passive NLOS optimal transport reconstruction and dataset.'},
+      {cat:'dataset', title:'NLOS-Track Dataset', authors:'Wang et al.', year:2023, venue:'CVPR Dataset', url:'', key:'Large-scale real-time passive NLOS tracking dataset.'},
 
-      <div class="tl-item">
-        <div class="tl-year">2019</div>
-        <div class="tl-dot big"></div>
-        <div class="tl-content">
-          <h4>Lindell et al. — f-k Migration (Wave-Based) <span class="tl-badge badge-siggraph">SIGGRAPH</span></h4>
-          <p>Applied seismic f-k migration to NLOS. Robust wave-based reconstruction at O(N³ log N).</p>
-        </div>
-      </div>
+      {cat:'survey', title:'Non-line-of-sight Imaging', authors:'Faccio, Velten, Wetzstein', year:2020, venue:'Nature Reviews Physics', url:'https://www.nature.com/articles/s42254-020-0174-8', key:'Comprehensive review of physical principles and early NLOS imaging progress.'},
+      {cat:'survey', title:'Recent Advances on Non-Line-of-Sight Imaging: Conventional Physical Models, Deep Learning, and New Scenes', authors:'Geng, Hu, Chen', year:2022, venue:'APSIPA TSIP', url:'https://doi.org/10.1561/116.00000019', key:'Survey organized around physical models, deep learning, and new scenes.'}
+    ];
 
-      <div class="tl-item">
-        <div class="tl-year">2019</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Saunders et al. — Computational Periscopy <span class="tl-badge badge-nature">Nature</span></h4>
-          <p>3D passive NLOS with an ordinary camera and partial occluder.</p>
-        </div>
-      </div>
+    const latestGrid = document.getElementById('latestGrid');
+    const latest = papers.filter(p => p.cat.includes('latest'));
+    latestGrid.innerHTML = latest.map(cardHTML).join('');
 
-      <div class="tl-item">
-        <div class="tl-year">2020</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Liu et al. — Phasor Field Diffraction <span class="tl-badge badge-siggraph">SIGGRAPH</span></h4>
-          <p>Extended phasor field to non-confocal NLOS settings with O(N³ log N) complexity.</p>
-        </div>
-      </div>
+    let activeCat = 'all';
+    const tabs = document.getElementById('tabs');
+    tabs.innerHTML = categories.map(([id, label]) => `<button class="tab ${id === 'all' ? 'active' : ''}" data-cat="${id}">${label}</button>`).join('');
+    tabs.addEventListener('click', e => {
+      if (!e.target.matches('.tab')) return;
+      activeCat = e.target.dataset.cat;
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.cat === activeCat));
+      render();
+    });
+    document.getElementById('search').addEventListener('input', render);
 
-      <div class="tl-item">
-        <div class="tl-year">2021</div>
-        <div class="tl-dot big"></div>
-        <div class="tl-content">
-          <h4>Wu et al. — 1.43 km Long-Range NLOS <span class="tl-badge badge-nature">Nature Comm.</span></h4>
-          <p>Extended NLOS imaging range from meters to 1.43 km — three orders of magnitude.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2021</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Shen et al. — Neural Transient Field (NeTF) <span class="tl-badge badge-tpami" style="background:#f0fdf4;color:#166534;">TPAMI</span></h4>
-          <p>First unsupervised neural implicit field for NLOS — no paired training data required.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2022</div>
-        <div class="tl-dot big"></div>
-        <div class="tl-content">
-          <h4>Cao et al. — UNCOVER, Sub-mm NLOS <span class="tl-badge badge-nature">Nature Photonics</span></h4>
-          <p>Wavefront shaping achieves ~0.6 mm resolution at 0.55 m — 900× distance-to-resolution ratio.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2023</div>
-        <div class="tl-dot big"></div>
-        <div class="tl-content">
-          <h4>Li et al. — NLOST: First Transformer for NLOS <span class="tl-badge badge-cvpr">CVPR</span></h4>
-          <p>Spatial-temporal self-attention captures multi-scale correlations in 3D transient volumes.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2023</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Wang et al. — PAC-Net + NLOS-Track Dataset <span class="tl-badge badge-cvpr">CVPR</span></h4>
-          <p>Real-time passive NLOS tracking; first large-scale dynamic passive NLOS dataset.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2023</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Fujimura et al. — NLOS-NeuS: Neural Implicit Surface <span class="tl-badge badge-cvpr" style="background:#ffe4e6;color:#9f1239;">ICCV</span></h4>
-          <p>SDF-based neural implicit surface reconstruction for smooth 3D NLOS geometry.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2024</div>
-        <div class="tl-dot big"></div>
-        <div class="tl-content">
-          <h4>Ye et al. — Real-Time 4 fps NLOS Video <span class="tl-badge badge-nature">Nat. Comput. Sci.</span></h4>
-          <p>Spectrum filtering + interleaved scanning achieves 4 fps NLOS video of room-sized dynamic scenes.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2024</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Li et al. — ST-Mamba <span class="tl-badge badge-neurips">NeurIPS</span> &nbsp; Cui et al. — Virtual Scanning <span class="tl-badge badge-neurips">NeurIPS</span></h4>
-          <p>First Mamba model for NLOS video (temporal consistency); unsupervised reconstruction from irregular undersampled transients.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2024</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Czajkowski &amp; Murray-Bruce — 3D Passive NLOS with Ordinary Camera <span class="tl-badge badge-nature">Nature Comm.</span></h4>
-          <p>Full-color 3D passive NLOS reconstruction requiring no calibration images.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2025</div>
-        <div class="tl-dot big"></div>
-        <div class="tl-content">
-          <h4>Li et al. — TransiT: 10 fps NLOS Video <span class="tl-badge badge-cvpr">CVPR</span></h4>
-          <p>64×64 NLOS video at 10 fps from 16×16 sparse transient inputs via transfer learning.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2025</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>Su et al. — DG-NLOS (GNN) <span class="tl-badge badge-neurips" style="background:#fff7ed;color:#9a3412;">AAAI</span> &nbsp; Sun et al. — Learnable Physical Priors <span class="tl-badge badge-cvpr">CVPR</span></h4>
-          <p>First GNN for NLOS reconstruction; learnable physical priors for generalization across diverse scene conditions.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2025</div>
-        <div class="tl-dot big"></div>
-        <div class="tl-content">
-          <h4>Lai et al. — HoloRadar: mmWave 3D NLOS <span class="tl-badge badge-neurips">NeurIPS</span></h4>
-          <p>Full 3D NLOS scene reconstruction with a single mobile mmWave radar.</p>
-        </div>
-      </div>
-
-      <div class="tl-item">
-        <div class="tl-year">2026</div>
-        <div class="tl-dot"></div>
-        <div class="tl-content">
-          <h4>New frontiers <span class="tl-badge badge-new">2026</span></h4>
-          <p>Human pose estimation (OLE), polarization single-pixel scanning-free NLOS (PRL), super-field-of-view imaging (Photonics Research).</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════ PAPERS ══════════════ -->
-<section id="papers">
-  <div class="container">
-    <h2 class="section-title">Paper List</h2>
-    <p class="section-sub">Key papers from the survey, organized by category. Filter or search below.</p>
-
-    <div class="tab-bar" id="tabBar">
-      <button class="tab-btn active" data-cat="all">All</button>
-      <button class="tab-btn" data-cat="active">Active NLOS</button>
-      <button class="tab-btn" data-cat="passive">Passive NLOS</button>
-      <button class="tab-btn" data-cat="dl">Deep Learning</button>
-      <button class="tab-btn" data-cat="new">New Scenes</button>
-      <button class="tab-btn" data-cat="dataset">Datasets &amp; Tools</button>
-    </div>
-
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Search by title, author, or venue…" />
-      <span class="paper-count" id="paperCount"></span>
-    </div>
-
-    <div class="paper-grid" id="paperGrid"></div>
-  </div>
-</section>
-
-<!-- ══════════════ DATASETS ══════════════ -->
-<section id="datasets">
-  <div class="container">
-    <h2 class="section-title">Datasets &amp; Code</h2>
-    <p class="section-sub">Open resources for NLOS Imaging research</p>
-    <div class="ds-grid">
-
-      <div class="ds-card">
-        <h4>LCT / f-k Confocal Dataset</h4>
-        <p>Active confocal SPAD dataset from O'Toole et al. (Nature 2018) and Lindell et al. (SIGGRAPH 2019). Includes transient measurements of multiple 3D hidden objects.</p>
-        <a href="https://github.com/computational-imaging/nlos-fk" target="_blank">↗ github.com/computational-imaging/nlos-fk</a>
-      </div>
-
-      <div class="ds-card">
-        <h4>Galindo Benchmark</h4>
-        <p>Benchmark dataset for time-resolved NLOS measurements, designed for systematic evaluation of reconstruction algorithms.</p>
-        <a href="https://doi.org/10.1364/OE.380140" target="_blank">↗ doi.org/10.1364/OE.380140</a>
-      </div>
-
-      <div class="ds-card">
-        <h4>NLOS-Track Dataset</h4>
-        <p>First large-scale dynamic passive NLOS tracking dataset. Thousands of video clips with trajectory labels for evaluating passive NLOS tracking methods. (Wang et al., CVPR 2023)</p>
-        <span style="color:var(--text-muted);font-size:.8rem;">Link via paper authors</span>
-      </div>
-
-      <div class="ds-card">
-        <h4>1.43 km NLOS Imaging Code</h4>
-        <p>Code and data for the long-range 1.43 km NLOS imaging system by Wu et al. (Nature Communications 2021).</p>
-        <a href="https://github.com/quantum-inspired-lidar/NLOS_imaging_over_1.43km" target="_blank">↗ github.com/quantum-inspired-lidar/…</a>
-      </div>
-
-      <div class="ds-card">
-        <h4>Acoustic NLOS Code</h4>
-        <p>Code for acoustic NLOS imaging using microphone arrays (Lindell et al., SIGGRAPH 2019). Uses the same f-k migration framework as optical NLOS.</p>
-        <a href="https://github.com/computational-imaging/acoustic-nlos" target="_blank">↗ github.com/computational-imaging/acoustic-nlos</a>
-      </div>
-
-      <div class="ds-card">
-        <h4>NLOS Transient Renderer</h4>
-        <p>The first dedicated NLOS transient renderer for generating realistic synthetic training data. (Royo et al., 2022)</p>
-        <span style="color:var(--text-muted);font-size:.8rem;">Link via paper authors</span>
-      </div>
-
-      <div class="ds-card">
-        <h4>Fast Differentiable Transient Renderer</h4>
-        <p>Differentiable transient renderer supporting auto-differentiation for end-to-end NLOS network training. (Plack et al., 2023)</p>
-        <span style="color:var(--text-muted);font-size:.8rem;">Link via paper authors</span>
-      </div>
-
-      <div class="ds-card">
-        <h4>NLOS-Passive Dataset</h4>
-        <p>Real passive NLOS measurement dataset captured with conventional cameras and ambient light, released alongside the optimal transport reconstruction paper (Geng et al., IEEE TIP 2022).</p>
-        <a href="https://github.com/ruixv/NLOS-OT" target="_blank">↗ github.com/ruixv/NLOS-OT</a>
-      </div>
-
-      <div class="ds-card">
-        <h4>NLOS-OT Code</h4>
-        <p>Optimal transport–based passive NLOS reconstruction code. Includes the NLOS-Passive dataset, OT solver, and evaluation scripts. (Geng et al., IEEE TIP 2022)</p>
-        <a href="https://github.com/ruixv/NLOS-OT" target="_blank">↗ github.com/ruixv/NLOS-OT</a>
-      </div>
-
-      <div class="ds-card">
-        <h4>This Survey Repository</h4>
-        <p>Comprehensive curated list of 150+ NLOS papers with categorization, timeline, and links. Contributions welcome.</p>
-        <a href="https://github.com/ruixv/NLOS_Overview" target="_blank">↗ github.com/ruixv/NLOS_Overview</a>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════ FOOTER ══════════════ -->
-<footer>
-  <p>
-    Based on: <em>"Recent Advances on Non-Line-of-Sight Imaging: Conventional Physical Models, Deep Learning, and New Scenes"</em> (2022, updated 2026)
-    &nbsp;·&nbsp; Ruixu Geng, Yang Hu, Yan Chen
-  </p>
-  <div class="footer-links">
-    <a href="https://github.com/ruixv/NLOS_Overview" target="_blank">GitHub Repository</a>
-    <a href="https://www.nature.com/articles/s42254-020-0174-8" target="_blank">Faccio et al., Nat. Rev. Phys. 2020</a>
-    <a href="#papers">Browse Papers</a>
-  </div>
-</footer>
-
-<!-- ══════════════ SCRIPTS ══════════════ -->
-<script>
-// ─── PAPER DATA ───
-const papers = [
-  // ── Active NLOS: Hardware
-  { cat:'active', title:'Recovering Three-Dimensional Shape Around a Corner using Ultrafast Time-of-Flight Imaging', authors:'Velten et al.', year:2012, venue:'Nature Comm.', venueClass:'venue-nature', url:'https://www.nature.com/articles/ncomms1747', key:'First experimental 3D NLOS (streak camera + FBP)' },
-  { cat:'active', title:'Reconstruction of Hidden 3D Scenes from Multi-return Transient Imaging', authors:'Gupta et al.', year:2012, venue:'IJCV', venueClass:'venue-other', url:'', key:'Multi-return transient NLOS model' },
-  { cat:'active', title:'Non-line-of-sight imaging using a time-gated single photon avalanche diode', authors:'Buttafava et al.', year:2015, venue:'Opt. Express', venueClass:'venue-other', url:'https://opg.optica.org/oe/fulltext.cfm?uri=oe-23-16-20997', key:'First SPAD-based NLOS imaging' },
-  { cat:'active', title:'Confocal Non-Line-of-Sight Imaging Based on the Light-Cone Transform', authors:"O'Toole et al.", year:2018, venue:'Nature', venueClass:'venue-nature', url:'https://www.nature.com/articles/s41586-018-0862-6', key:'LCT: O(N³logN) reconstruction; confocal setup' },
-  { cat:'active', title:'Non-line-of-sight imaging over 1.43 km', authors:'Wu et al.', year:2021, venue:'Nature Comm.', venueClass:'venue-nature', url:'https://www.nature.com/articles/s41467-021-25279-2', key:'Record 1.43 km long-range NLOS' },
-  { cat:'active', title:'Fast-Gated 16×16 SPAD Array for NLOS Imaging', authors:'Riccardo et al.', year:2022, venue:'Opt. Lett.', venueClass:'venue-other', url:'', key:'On-chip gating to suppress direct-bounce saturation' },
-  { cat:'active', title:'Gradient-Gated SPAD Array', authors:'Zhao et al.', year:2023, venue:'Opt. Express', venueClass:'venue-other', url:'', key:'Spatially varying gate delay for saturation suppression' },
-  { cat:'active', title:'SNSPD-Based Infrared NLOS Imaging at 1550 nm', authors:'Feng et al.', year:2023, venue:'Photon. Res.', venueClass:'venue-other', url:'', key:'NLOS at telecom wavelengths; superior jitter and efficiency' },
-  { cat:'active', title:'High-Resolution Non-Line-of-Sight Imaging with Wavefront Shaping (UNCOVER)', authors:'Cao et al.', year:2022, venue:'Nature Photonics', venueClass:'venue-nature', url:'https://www.nature.com/articles/s41566-022-01009-8', key:'~0.6 mm resolution; ~900× distance-to-resolution ratio' },
-  { cat:'active', title:'Efficient Non-Line-of-Sight Imaging from Transient Sinograms', authors:'Isogawa et al.', year:2020, venue:'ECCV', venueClass:'venue-iccv', url:'https://link.springer.com/chapter/10.1007/978-3-030-58604-1_33', key:'Circular scanning C²NLOS' },
-  { cat:'active', title:'Scannerless Real-Time Non-Line-of-Sight Imaging with a Solid-State Camera', authors:'Jin et al.', year:2020, venue:'Optica', venueClass:'venue-other', url:'', key:'32×32 SPAD array scannerless NLOS' },
-  { cat:'active', title:'Real-Time Scan-Free Non-Line-of-Sight Imaging at 19 fps', authors:'Zhang et al.', year:2024, venue:'Optica', venueClass:'venue-other', url:'', key:'Single-pixel + structured illumination; outdoor daylight' },
-  { cat:'active', title:'Diffuse Mirrors: 3D Reconstruction from Diffuse Indirect Illumination', authors:'Heide et al.', year:2014, venue:'SIGGRAPH', venueClass:'venue-siggraph', url:'https://dl.acm.org/doi/10.1145/2601097.2601205', key:'Optimization-based ToF NLOS; matrix inverse + TV' },
-  { cat:'active', title:'Occluded Imaging with Time-of-Flight Sensors', authors:'Kadambi et al.', year:2016, venue:'TOG', venueClass:'venue-siggraph', url:'https://dl.acm.org/doi/10.1145/2858965', key:'ToF camera NLOS with surface normals' },
-  { cat:'active', title:'Non-line-of-sight Imaging with Partial Occluders and Surface Normals', authors:'Heide et al.', year:2017, venue:'TOG', venueClass:'venue-siggraph', url:'https://dl.acm.org/doi/10.1145/3072959.3073599', key:'Occluder-constrained optimization' },
-  { cat:'active', title:'Theory of Fermat Paths for Non-Line-of-Sight Shape Reconstruction', authors:'Xin et al.', year:2019, venue:'CVPR', venueClass:'venue-cvpr', url:'https://openaccess.thecvf.com/content_CVPR_2019/html/Xin_Theory_of_Fermat_Paths_for_Non-Line-of-Sight_Shape_Reconstruction_CVPR_2019_paper.html', key:'Fermat paths encode surface normals; interferometer-based' },
-  { cat:'active', title:'Wave-Based Non-Line-of-Sight Imaging Using Fast f-k Migration', authors:'Lindell et al.', year:2019, venue:'SIGGRAPH', venueClass:'venue-siggraph', url:'https://dl.acm.org/doi/10.1145/3306346.3322996', key:'f-k migration; FFT + Stolt interpolation; O(N³logN)' },
-  { cat:'active', title:'Virtual Wave Optics for Non-Line-of-Sight Imaging', authors:'Liu et al.', year:2020, venue:'SIGGRAPH', venueClass:'venue-siggraph', url:'https://dl.acm.org/doi/10.1145/3386569.3392470', key:'Phasor field diffraction; non-confocal O(N³logN)' },
-  { cat:'active', title:'Volumetric Albedo from Angle-Resolved NLOS Scans', authors:'Tsai et al.', year:2019, venue:'CVPR', venueClass:'venue-cvpr', url:'https://openaccess.thecvf.com/content_CVPR_2019/html/Tsai_Volumetric_Albedo_From_Angle-Resolved_NLOS_Scans_CVPR_2019_paper.html', key:'First-return photons → surface normals' },
-  { cat:'active', title:'DLCT: Non-Line-of-Sight Surface Reconstruction Using the Directional Light-Cone Transform', authors:'Young et al.', year:2020, venue:'CVPR', venueClass:'venue-cvpr', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Young_Non-Line-of-Sight_Surface_Reconstruction_Using_the_Directional_Light-Cone_Transform_CVPR_2020_paper.html', key:'Surface + volumetric via directional LCT' },
-  { cat:'active', title:'Exploiting Occlusion in Non-Line-of-Sight Active Imaging', authors:'Thrampoulidis et al.', year:2018, venue:'IEEE SPL', venueClass:'venue-other', url:'https://ieeexplore.ieee.org/document/8421181', key:'Occlusion constraints reduce ill-posedness' },
-  { cat:'active', title:'Non-Line-of-Sight Reconstruction for Arbitrary Illumination (CC-SOCR)', authors:'Liu et al.', year:2023, venue:'2023', venueClass:'venue-other', url:'', key:'Bayesian framework; non-regular relay grids' },
-  { cat:'active', title:'Non-Planar Relay Surface Reconstruction', authors:'Gu et al.', year:2023, venue:'2023', venueClass:'venue-other', url:'', key:'FFT-based confocal NLOS for curved relay surfaces' },
-  { cat:'active', title:'Higher-Order Bounce Imaging (Virtual Mirrors)', authors:'Royo et al.', year:2023, venue:'2023', venueClass:'venue-other', url:'', key:'4th-bounce reflections expand hidden scene coverage' },
-  { cat:'active', title:'Phasor Fields under Scattering Conditions', authors:'Luesia et al.', year:2022, venue:'2022', venueClass:'venue-other', url:'', key:'Robustness analysis for contaminated relay surfaces' },
-  { cat:'active', title:'Coherent NLOS with Frequency-Comb Calibration', authors:'Huang et al.', year:2024, venue:'2024', venueClass:'venue-other', url:'', key:'NLOS under strong ambient light; NLOS vibrometry' },
-  { cat:'active', title:'Compressed Sensing for Active NLOS', authors:'Ye et al.', year:2021, venue:'Opt. Express', venueClass:'venue-other', url:'', key:'5×5 scan points → 64×64 resolution' },
-  { cat:'active', title:'First Photon Event Stamping (FPES)', authors:'Li et al.', year:2022, venue:'Opt. Lett.', venueClass:'venue-other', url:'', key:'10× fewer photons via Poisson statistics' },
-  { cat:'active', title:'Photon-Efficient NLOS Imaging', authors:'Liu et al.', year:2022, venue:'2022', venueClass:'venue-other', url:'', key:'Sub-photon-per-pixel reconstruction' },
-  { cat:'active', title:'Signal Superresolution for NLOS', authors:'Wang et al.', year:2023, venue:'2023', venueClass:'venue-other', url:'', key:'16× acquisition speedup via sparse-to-dense mapping' },
-  { cat:'active', title:'Deep Under-Scanning Measurements (TRN+VRN)', authors:'Li et al.', year:2023, venue:'2023', venueClass:'venue-other', url:'', key:'50× faster reconstruction from undersampled transients' },
-  { cat:'active', title:'Two-Step Deep Remapping for NLOS', authors:'Zhu et al.', year:2022, venue:'2022', venueClass:'venue-other', url:'', key:'Non-confocal→confocal remapping; 4× FK speedup' },
-  { cat:'active', title:'Non-Line-of-Sight Tracking of People at Long Range', authors:'Chan et al.', year:2017, venue:'Optica', venueClass:'venue-other', url:'https://opg.optica.org/optica/fulltext.cfm?uri=optica-4-2-164', key:'Long-range NLOS person tracking' },
-  { cat:'active', title:'Detection and Tracking of Moving Objects Hidden from View', authors:'Gariepy et al.', year:2016, venue:'Nature Photonics', venueClass:'venue-nature', url:'', key:'SPAD array-based NLOS tracking' },
-  { cat:'active', title:'Neural Network Identification of People Hidden from View', authors:'Caramazza et al.', year:2017, venue:'Light: Sci. Appl.', venueClass:'venue-other', url:'', key:'Single SPAD point for recognition' },
-  { cat:'active', title:'Direct Object Recognition without Line-of-Sight', authors:'Lei et al.', year:2019, venue:'Opt. Express', venueClass:'venue-other', url:'', key:'Steady-state NLOS recognition (ResNet)' },
-
-  // ── Passive NLOS
-  { cat:'passive', title:'Turning Corners into Cameras: Principles and Methods', authors:'Bouman et al.', year:2017, venue:'ICCV', venueClass:'venue-iccv', url:'https://openaccess.thecvf.com/content_iccv_2017/html/Bouman_Turning_Corners_Into_ICCV_2017_paper.html', key:'Motion-based passive NLOS; penumbra analysis' },
-  { cat:'passive', title:'Computational Periscopy with an Ordinary Digital Camera', authors:'Saunders et al.', year:2019, venue:'Nature', venueClass:'venue-nature', url:'https://www.nature.com/articles/s41586-019-0928-6', key:'Partial occluder + ordinary camera; 3D passive NLOS' },
-  { cat:'passive', title:'Computational Mirrors: Blind Inverse Light Transport by Deep Matrix Factorization', authors:'Aittala et al.', year:2019, venue:'NeurIPS', venueClass:'venue-neurips', url:'', key:'Unsupervised deep matrix factorization for passive NLOS' },
-  { cat:'passive', title:'Two-Dimensional Non-Line-of-Sight Scene Estimation', authors:'Seidel et al.', year:2020, venue:'CVPR', venueClass:'venue-cvpr', url:'', key:'Penumbra (shadow) based 2D NLOS reconstruction' },
-  { cat:'passive', title:'Snapshot Corner Camera', authors:'Seidel et al.', year:2023, venue:'2023', venueClass:'venue-other', url:'', key:'Single-frame NLOS without scanning' },
-  { cat:'passive', title:'Full-Color 3D Passive NLOS with an Ordinary Camera', authors:'Czajkowski, Murray-Bruce', year:2024, venue:'Nature Comm.', venueClass:'venue-nature', url:'', key:'3D passive NLOS; two orthogonal edges; no calibration' },
-  { cat:'passive', title:'Hyper-NLOS: Hyperspectral Passive NLOS Imaging', authors:'Chen et al.', year:2024, venue:'2024', venueClass:'venue-other', url:'', key:'Hyperspectral camera + HFN-Net fusion; band selection' },
-  { cat:'passive', title:'Rough Surfaces as NLOS Relay Surfaces', authors:'Li et al.', year:2025, venue:'2025', venueClass:'venue-other', url:'', key:'Mixed diffuse-specular relay model; expands usable surfaces' },
-  { cat:'passive', title:'Non-invasive Single-Shot Imaging Through Scattering Layers via Speckle Correlations', authors:'Katz et al.', year:2014, venue:'Nature Photonics', venueClass:'venue-nature', url:'https://www.nature.com/articles/nphoton.2014.234', key:'Optical memory effect + speckle autocorrelation' },
-  { cat:'passive', title:'Passive Sensing Around the Corner Using Spatial Coherence', authors:'Batarseh et al.', year:2018, venue:'Nature Comm.', venueClass:'venue-nature', url:'https://www.nature.com/articles/s41467-018-05985-w', key:'Spatial coherence; point source detection' },
-  { cat:'passive', title:'Multi-Modal Non-Line-of-Sight Passive Imaging', authors:'Beckus et al.', year:2019, venue:'IEEE TIP', venueClass:'venue-other', url:'', key:'Coherence + intensity fusion; multi-criteria optimization' },
-  { cat:'passive', title:'Passive Optical Time-of-Flight Non-Line-of-Sight Imaging', authors:'Boger-Lombard et al.', year:2019, venue:'Optica', venueClass:'venue-other', url:'', key:'Temporal coherence for passive depth information' },
-  { cat:'passive', title:'Polarized Non-Line-of-Sight Imaging', authors:'Tanaka et al.', year:2020, venue:'CVPR', venueClass:'venue-cvpr', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Tanaka_Polarized_Non-Line-of-Sight_Imaging_CVPR_2020_paper.html', key:'Polarizer reduces condition number of transport matrix' },
-  { cat:'passive', title:'Propagate-and-Calibrate: Real-Time Passive Non-Planar NLOS Tracking (PAC-Net)', authors:'Wang et al.', year:2023, venue:'CVPR', venueClass:'venue-cvpr', url:'https://openaccess.thecvf.com/content/CVPR2023/html/Wang_Propagate-and-Calibrate_Real-Time_Passive_Non-Planar_NLOS_Tracking_CVPR_2023_paper.html', key:'PAC-Net + NLOS-Track dataset (first large-scale passive tracking dataset)' },
-  { cat:'passive', title:'Passive Non-Line-of-Sight Imaging Using Optimal Transport', authors:'Geng, Hu et al.', year:2022, venue:'IEEE TIP', venueClass:'venue-tpami', url:'', key:'OT/Wasserstein objective; more robust to non-Gaussian noise than TV/ℓ₂ baselines' },
-  { cat:'passive', title:'Passive Non-Line-of-Sight Imaging with Light Transport Modulation', authors:'Zhang, Geng et al.', year:2025, venue:'IEEE TIP', venueClass:'venue-tpami', url:'', key:'Adaptive transport modulation; reduces condition number of passive measurement matrix' },
-  { cat:'passive', title:'Passive Non-Line-of-Sight Imaging with Parallel Encoder', authors:'Du, Geng et al.', year:2025, venue:'ICASSP', venueClass:'venue-other', url:'', key:'Parallel multi-scale encoder; improved fidelity and inference efficiency for passive NLOS' },
-
-  // ── Deep Learning
-  { cat:'dl', title:'Steady-State Non-Line-of-Sight Imaging', authors:'Chen et al.', year:2019, venue:'CVPR', venueClass:'venue-cvpr', url:'https://openaccess.thecvf.com/content_CVPR_2019/html/Chen_Steady-State_Non-Line-of-Sight_Imaging_CVPR_2019_paper.html', key:'CW laser + U-Net for 3D NLOS from steady-state' },
-  { cat:'dl', title:'Deep Non-Line-of-Sight Reconstruction', authors:'Chopite et al.', year:2020, venue:'CVPR', venueClass:'venue-cvpr', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Chopite_Deep_Non-Line-of-Sight_Reconstruction_CVPR_2020_paper.html', key:'3D U-Net for transient → depth map' },
-  { cat:'dl', title:'Learned Feature Embeddings for Non-Line-of-Sight Imaging', authors:'Chen et al.', year:2020, venue:'SIGGRAPH Asia', venueClass:'venue-siggraph', url:'https://dl.acm.org/doi/10.1145/3414685.3417825', key:'Physics-constrained feature embedding with clear physical components' },
-  { cat:'dl', title:'Non-Line-of-Sight Imaging Using Deep Learning', authors:'Yu et al.', year:2019, venue:'Opt. Express', venueClass:'venue-other', url:'', key:'U-Net for passive speckle NLOS' },
-  { cat:'dl', title:'Non-Line-of-Sight Imaging and Tracking of Any Object', authors:'Tancik et al.', year:2018, venue:'2018', venueClass:'venue-other', url:'', key:'CNN/VAE for passive NLOS; classification and tracking' },
-  { cat:'dl', title:'NLOS-R 2: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding', authors:'Wang, Geng et al.', year:2025, venue:'ICME', venueClass:'venue-other', url:'', key:'Mutual-refinement loop: reconstruction ↔ recognition; joint NLOS understanding' },
-  { cat:'dl', title:'Physics Rescue: Deep Network for High-Speed NLOS Reconstruction', authors:'Mu et al.', year:2022, venue:'TPAMI', venueClass:'venue-tpami', url:'', key:'Physics model + DL; 5 fps, 10× speedup over prior methods' },
-  { cat:'dl', title:'Untrained Deep Decoder for NLOS Reconstruction', authors:'Wu et al.', year:2022, venue:'2022', venueClass:'venue-other', url:'', key:'Deep image prior without training data' },
-  { cat:'dl', title:'Non-Line-of-Sight Imaging via Neural Transient Fields (NeTF)', authors:'Shen et al.', year:2021, venue:'TPAMI', venueClass:'venue-tpami', url:'https://ieeexplore.ieee.org/document/9645260', key:'Unsupervised MLP neural transient field; no paired training data' },
-  { cat:'dl', title:'Deep-Inverse Correlography: Towards Real-Time High-Resolution NLOS Imaging', authors:'Metzler et al.', year:2020, venue:'Optica', venueClass:'venue-other', url:'https://opg.optica.org/optica/fulltext.cfm?uri=optica-7-1-63', key:'U-Net phase recovery for speckle NLOS' },
-  { cat:'dl', title:'Learnable Physical Priors for Generalizable NLOS Reconstruction', authors:'Sun et al.', year:2025, venue:'CVPR', venueClass:'venue-cvpr', url:'', key:'Adaptive learned priors; improved generalization across SNR/scene conditions' },
-  { cat:'dl', title:'Virtual Scanning (Unsupervised from Irregular Undersampled Transients)', authors:'Cui et al.', year:2024, venue:'NeurIPS', venueClass:'venue-neurips', url:'', key:'SURE-based denoiser; no paired training data needed' },
-  { cat:'dl', title:'Enhancing Learnable NLOS Reconstruction with Fourier Attention', authors:'Yu et al.', year:2023, venue:'2023', venueClass:'venue-other', url:'', key:'Learnable inverse kernel + attention for high-frequency recovery' },
-  { cat:'dl', title:'Aperture Phasor Field Enhancement', authors:'Cho et al.', year:2024, venue:'2024', venueClass:'venue-other', url:'', key:'Learned aperture phasor field representation' },
-  { cat:'dl', title:'Domain Reduction Strategy for NLOS Reconstruction', authors:'Shim et al.', year:2024, venue:'2024', venueClass:'venue-other', url:'', key:'Focus search on likely hidden object regions; 10× compute reduction' },
-  { cat:'dl', title:'NLOST: Non-Line-of-Sight Imaging with Transformer', authors:'Li et al.', year:2023, venue:'CVPR', venueClass:'venue-cvpr', url:'', key:'First transformer for NLOS; spatial-temporal self-attention at multi-scale' },
-  { cat:'dl', title:'TransiT: Transient Imaging Transformer for Videographic NLOS Reconstruction', authors:'Li et al.', year:2025, venue:'CVPR', venueClass:'venue-cvpr', url:'', key:'10 fps NLOS video; 64×64 from 16×16 sparse transients via transfer learning' },
-  { cat:'dl', title:'ST-Mamba: Spatial-Temporal Mamba for NLOS Videography', authors:'Li et al.', year:2024, venue:'NeurIPS', venueClass:'venue-neurips', url:'', key:'First Mamba model for NLOS; phasor field wave-based loss; temporal consistency' },
-  { cat:'dl', title:'DG-NLOS: Dual-Branch Graph Neural Network for NLOS Reconstruction', authors:'Su et al.', year:2025, venue:'AAAI', venueClass:'venue-aaai', url:'', key:'First GNN for NLOS; dual-branch albedo + depth; sparse structural features' },
-  { cat:'dl', title:'Model-Guided Iterative Diffusion Sampling for NLOS Reconstruction', authors:'Su et al.', year:2024, venue:'2024', venueClass:'venue-other', url:'', key:'Diffusion model guided by NLOS physical forward model' },
-  { cat:'dl', title:'NLOS-NeuS: Non-Line-of-Sight Neural Implicit Surface', authors:'Fujimura et al.', year:2023, venue:'ICCV', venueClass:'venue-iccv', url:'', key:'SDF neural implicit surface for smooth 3D NLOS geometry' },
-  { cat:'dl', title:'Real-Time Non-Line-of-Sight Imaging of Dynamic Scenes', authors:'Ye et al.', year:2024, venue:'Nat. Comput. Sci.', venueClass:'venue-nature', url:'https://www.nature.com/articles/s43588-024-00711-5', key:'4 fps NLOS video; spectrum filtering + interleaved scanning' },
-  { cat:'dl', title:'Plug-and-Play Algorithm for Dynamic NLOS Video Reconstruction', authors:'Ye et al.', year:2024, venue:'2024', venueClass:'venue-other', url:'', key:'PnP + deep denoiser; frequency-domain physics filtering' },
-  { cat:'dl', title:'Dynamic NLOS via Single-Pixel Detection', authors:'Pei et al.', year:2021, venue:'Opt. Express', venueClass:'venue-other', url:'', key:'Dynamic NLOS imaging from single-pixel detector' },
-  { cat:'dl', title:'Optical Non-Line-of-Sight Physics-Based 3D Human Pose Estimation', authors:'Isogawa et al.', year:2020, venue:'CVPR', venueClass:'venue-cvpr', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Isogawa_Optical_Non-Line-of-Sight_Physics-Based_3D_Human_Pose_Estimation_CVPR_2020_paper.html', key:'LSTM + physics model for NLOS pose estimation' },
-
-  // ── New NLOS Scenes
-  { cat:'new', title:'Imaging Around Corners Using Transient Knowledge (Two-Bounce NLOS)', authors:'Vedaldi (Henley) et al.', year:2020, venue:'ECCV', venueClass:'venue-iccv', url:'', key:'First two-bounce NLOS; hidden object blocks light between two relay surfaces' },
-  { cat:'new', title:'Role of Transients in Two-Bounce NLOS Imaging', authors:'Somasundaram et al.', year:2023, venue:'2023', venueClass:'venue-other', url:'', key:'First systematic ToF analysis for 2B-NLOS; tradeoffs for resolution' },
-  { cat:'new', title:'Keyhole Imaging: NLOS Imaging and Tracking Along a Single Optical Path', authors:'Metzler et al.', year:2021, venue:'Science Advances', venueClass:'venue-nature', url:'https://www.science.org/doi/10.1126/sciadv.abg2187', key:'Beamsplitter confocal NLOS without scanning; EM reconstruction' },
-  { cat:'new', title:'Seeing Around Street Corners: NLOS Detection and Tracking Using Doppler Radar', authors:'Scheiner et al.', year:2020, venue:'CVPR', venueClass:'venue-cvpr', url:'https://openaccess.thecvf.com/content_CVPR_2020/html/Scheiner_Seeing_Around_Street_Corners_Non-Line-of-Sight_Detection_and_Tracking_in-the-Wild_CVPR_2020_paper.html', key:'Doppler radar NLOS for automotive vehicle detection' },
-  { cat:'new', title:'HoloRadar: Full 3D NLOS Reconstruction via mmWave Radar on a Mobile Robot', authors:'Lai et al.', year:2025, venue:'NeurIPS', venueClass:'venue-neurips', url:'', key:'Full 3D scene reconstruction with single mobile mmWave radar' },
-  { cat:'new', title:'Acoustic Non-Line-of-Sight Imaging', authors:'Lindell et al.', year:2019, venue:'SIGGRAPH', venueClass:'venue-siggraph', url:'', key:'Microphone array acoustic NLOS; same algorithms as optical' },
-  { cat:'new', title:'Ultrasound NLOS Imaging via Synthetic Aperture', authors:'—', year:2025, venue:'Commun. Physics', venueClass:'venue-other', url:'', key:'Bat-echolocation frequency; cm-scale depth resolution; 3D multi-target' },
-  { cat:'new', title:'NLOS Human Pose Estimation', authors:'Xiao et al.', year:2026, venue:'OLE', venueClass:'venue-new', url:'', key:'Joint transient + volume features; multi-resolution pipeline' },
-  { cat:'new', title:'Polarization-Based Scanning-Free Single-Pixel NLOS Imaging', authors:'Zhou et al.', year:2026, venue:'PRL', venueClass:'venue-new', url:'', key:'Polarization-encoded speckles; no scanning, no temporal resolution needed' },
-  { cat:'new', title:'Super-Field-of-View NLOS via Spatial Encoding', authors:'Li et al.', year:2026, venue:'Photon. Res.', venueClass:'venue-new', url:'', key:'Translated PSF spatial encoding; FoV beyond relay surface limits' },
-
-  // ── Datasets & Tools
-  { cat:'dataset', title:'LCT / f-k Confocal Dataset', authors:"O'Toole et al. / Lindell et al.", year:2018, venue:'Nature / SIGGRAPH', venueClass:'venue-siggraph', url:'https://github.com/computational-imaging/nlos-fk', key:'Active confocal SPAD dataset; multiple 3D hidden objects' },
-  { cat:'dataset', title:'Galindo Benchmark Dataset', authors:'Galindo et al.', year:2019, venue:'Opt. Express', venueClass:'venue-other', url:'https://doi.org/10.1364/OE.380140', key:'Benchmark for systematic evaluation of reconstruction algorithms' },
-  { cat:'dataset', title:'NLOS-Track Dataset', authors:'Wang et al.', year:2023, venue:'CVPR', venueClass:'venue-cvpr', url:'', key:'First large-scale dynamic passive NLOS tracking dataset' },
-  { cat:'dataset', title:'1.43 km NLOS Imaging Code', authors:'Wu et al.', year:2021, venue:'Nature Comm.', venueClass:'venue-nature', url:'https://github.com/quantum-inspired-lidar/NLOS_imaging_over_1.43km', key:'Code and data for long-range NLOS imaging system' },
-  { cat:'dataset', title:'NLOS Transient Renderer', authors:'Royo et al.', year:2022, venue:'2022', venueClass:'venue-other', url:'', key:'First dedicated NLOS transient renderer for synthetic training data' },
-  { cat:'dataset', title:'Fast Differentiable Transient Renderer', authors:'Plack et al.', year:2023, venue:'2023', venueClass:'venue-other', url:'', key:'Differentiable renderer; supports auto-differentiation for end-to-end training' },
-  { cat:'dataset', title:'Acoustic NLOS Code', authors:'Lindell et al.', year:2019, venue:'SIGGRAPH', venueClass:'venue-siggraph', url:'https://github.com/computational-imaging/acoustic-nlos', key:'Code for acoustic NLOS imaging using microphone arrays' },
-  { cat:'dataset', title:'NLOS-Passive Dataset', authors:'Geng et al.', year:2022, venue:'IEEE TIP', venueClass:'venue-tpami', url:'https://github.com/ruixv/NLOS-OT', key:'Real passive NLOS measurements with conventional cameras and ambient light' },
-  { cat:'dataset', title:'NLOS-OT: Optimal Transport Reconstruction Code', authors:'Geng et al.', year:2022, venue:'IEEE TIP', venueClass:'venue-tpami', url:'https://github.com/ruixv/NLOS-OT', key:'OT-based passive NLOS reconstruction; includes NLOS-Passive dataset and evaluation scripts' },
-];
-
-// ─── CHART 1: STACKED TREND ───
-const trendYears = ['2008','2010','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'];
-new Chart(document.getElementById('trendChart'), {
-  type: 'bar',
-  data: {
-    labels: trendYears,
-    datasets: [
-      { label: 'Active NLOS',   data: [1,1,2,1,2,2,3,4,7,8,9,6,8,8,6,4,1], backgroundColor: '#2563eb' },
-      { label: 'Passive NLOS',  data: [0,0,0,0,0,1,1,1,2,4,4,3,5,5,4,3,1], backgroundColor: '#0d9488' },
-      { label: 'Deep Learning', data: [0,0,0,0,0,0,0,1,1,4,6,4,5,7,7,5,2], backgroundColor: '#7c3aed' },
-      { label: 'New Scenes',    data: [0,0,0,0,0,0,0,0,1,1,2,2,3,4,4,3,2], backgroundColor: '#d97706' },
-    ]
-  },
-  options: {
-    plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 14 } } },
-    responsive: true,
-    scales: {
-      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
-      y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
+    function esc(s) {
+      return String(s || '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
     }
-  }
-});
-
-// ─── CHART 2: TOP VENUES (horizontal bar) ───
-new Chart(document.getElementById('venueChart'), {
-  type: 'bar',
-  data: {
-    labels: [
-      'Optics / Photonics Journals',
-      'CV Conferences (CVPR/ICCV/ECCV)',
-      'IEEE Transactions',
-      'Other Conferences',
-      'ACM SIGGRAPH / TOG',
-      'AI Conferences (NeurIPS/AAAI/ICML)',
-      'Nature / Science Family'
-    ],
-    datasets: [{
-      data: [28, 22, 18, 14, 9, 8, 8],
-      backgroundColor: ['#7c3aed','#2563eb','#0d9488','#10b981','#d97706','#6366f1','#f43f5e'],
-      borderRadius: 4,
-    }]
-  },
-  options: {
-    indexAxis: 'y',
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    function primaryCat(p) {
+      if (p.cat.includes('latest')) return 'latest';
+      if (p.cat.includes('passive')) return 'passive';
+      if (p.cat.includes('learning')) return 'learning';
+      if (p.cat.includes('modality')) return 'modality';
+      if (p.cat.includes('dataset')) return 'dataset';
+      return 'active';
     }
-  }
-});
-
-// ─── CHART 3: RESEARCH TASK (horizontal bar) ───
-new Chart(document.getElementById('taskChart'), {
-  type: 'bar',
-  data: {
-    labels: [
-      '3D Volume Reconstruction',
-      'Detection / Localization',
-      '2D Image Reconstruction',
-      'Object Tracking',
-      'Recognition / Classification',
-      '3D Surface Reconstruction',
-      'Human Pose Estimation'
-    ],
-    datasets: [{
-      data: [55, 28, 25, 18, 14, 10, 8],
-      backgroundColor: ['#2563eb','#0d9488','#7c3aed','#d97706','#10b981','#6366f1','#f43f5e'],
-      borderRadius: 4,
-    }]
-  },
-  options: {
-    indexAxis: 'y',
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    function cardHTML(p) {
+      const title = p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.title)}</a>` : esc(p.title);
+      const catClass = primaryCat(p);
+      return `<article class="paper-card ${catClass}">
+        <div class="paper-title">${title}</div>
+        <div class="meta"><span>${esc(p.authors)}</span><span>·</span><span>${esc(p.year)}</span><span>·</span><span class="tag">${esc(p.venue)}</span></div>
+        <div class="key">${esc(p.key)}</div>
+      </article>`;
     }
-  }
-});
-
-// ─── CHART 4: SENSOR / HARDWARE (doughnut) ───
-new Chart(document.getElementById('sensorChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Conventional Camera','SPAD / Single-Photon','Radar / RF','Streak Camera','Acoustic / Ultrasound','Interferometer','LiDAR / Other'],
-    datasets: [{
-      data: [42, 36, 14, 10, 8, 6, 5],
-      backgroundColor: ['#2563eb','#0d9488','#ef4444','#d97706','#7c3aed','#10b981','#6366f1'],
-      borderWidth: 2, borderColor: '#fff',
-    }]
-  },
-  options: {
-    plugins: {
-      legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 12, padding: 8 } }
-    },
-    cutout: '55%',
-  }
-});
-
-// ─── CHART 5: DL ARCHITECTURE (doughnut) ───
-new Chart(document.getElementById('dlChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['End-to-End CNN / U-Net','Physics-Guided Hybrid','Transformer','Neural Implicit (NeRF/NeuS)','Diffusion Model','Mamba / SSM','Graph Neural Network'],
-    datasets: [{
-      data: [18, 12, 6, 4, 4, 2, 2],
-      backgroundColor: ['#2563eb','#0d9488','#7c3aed','#d97706','#10b981','#ef4444','#6366f1'],
-      borderWidth: 2, borderColor: '#fff',
-    }]
-  },
-  options: {
-    plugins: {
-      legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 12, padding: 8 } }
-    },
-    cutout: '55%',
-  }
-});
-
-// ─── PAPER LIST ───
-let currentCat = 'all';
-
-function renderPapers(query) {
-  const q = (query || '').toLowerCase();
-  const grid = document.getElementById('paperGrid');
-  let count = 0;
-  grid.innerHTML = '';
-  papers.forEach(p => {
-    const catMatch = currentCat === 'all' || p.cat === currentCat;
-    const qMatch = !q || p.title.toLowerCase().includes(q) || p.authors.toLowerCase().includes(q) || p.venue.toLowerCase().includes(q) || p.key.toLowerCase().includes(q);
-    if (!catMatch || !qMatch) return;
-    count++;
-    const link = p.url
-      ? `<a href="${p.url}" target="_blank">${p.title}</a>`
-      : p.title;
-    grid.innerHTML += `
-      <div class="paper-card cat-${p.cat}">
-        <div class="paper-meta">
-          <div class="paper-title">${link}</div>
-          <div class="paper-info">
-            <span>${p.authors}</span>
-            <span>${p.year}</span>
-          </div>
-          <div class="paper-key">${p.key}</div>
-        </div>
-        <span class="venue-tag ${p.venueClass}">${p.venue}</span>
-      </div>`;
-  });
-  document.getElementById('paperCount').textContent = count + ' papers';
-}
-
-document.getElementById('tabBar').addEventListener('click', e => {
-  if (!e.target.classList.contains('tab-btn')) return;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  e.target.classList.add('active');
-  currentCat = e.target.dataset.cat;
-  document.getElementById('searchInput').value = '';
-  renderPapers('');
-});
-
-document.getElementById('searchInput').addEventListener('input', e => {
-  renderPapers(e.target.value);
-});
-
-renderPapers('');
-</script>
+    function render() {
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const filtered = papers.filter(p => {
+        const catOK = activeCat === 'all' || p.cat.split(/\s+/).includes(activeCat);
+        const haystack = [p.title, p.authors, p.year, p.venue, p.key, p.cat].join(' ').toLowerCase();
+        return catOK && (!q || haystack.includes(q));
+      }).sort((a, b) => b.year - a.year || a.title.localeCompare(b.title));
+      document.getElementById('paperGrid').innerHTML = filtered.map(cardHTML).join('');
+      document.getElementById('count').textContent = `${filtered.length} papers`;
+    }
+    render();
+  </script>
 </body>
 </html>
