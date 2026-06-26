@@ -71,9 +71,9 @@
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
-| 2026 | [Non-line-of-sight imaging with arbitrary relay surface geometries via 3D Gaussian Transient Rendering](https://arxiv.org/abs/2606.21270) — Wang et al. | SIGGRAPH 2026 / arXiv | Uses 3D Gaussian primitives and differentiable transient rendering; targets spatially limited, non-planar, arbitrary relay surfaces. |
-| 2026 | [Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling](https://arxiv.org/abs/2605.17865) — Somasundaram et al. | arXiv 2026 | Demonstrates plug-and-play NLOS using smartphone-grade / consumer LiDAR with motion-induced aperture sampling. |
-| 2026 | [Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals](https://arxiv.org/abs/2605.29098) — Lu et al. | CVPR 2026 / arXiv | GeRaF 2.0: neural RF geometry reconstruction that combines LoS visual priors with NLoS radar propagation. |
+| 2026 | [Non-line-of-sight imaging with arbitrary relay surface geometries via 3D Gaussian Transient Rendering](https://arxiv.org/abs/2606.21270) — Wang et al. | SIGGRAPH 2026 | Uses 3D Gaussian primitives and differentiable transient rendering; targets spatially limited, non-planar, arbitrary relay surfaces. |
+| 2026 | [Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling](https://arxiv.org/abs/2605.17865) — Somasundaram et al. | Nature 2026 | Demonstrates plug-and-play NLOS using smartphone-grade / consumer LiDAR with motion-induced aperture sampling. |
+| 2026 | [Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals](https://arxiv.org/abs/2605.29098) — Lu et al. | CVPR 2026 | GeRaF 2.0: neural RF geometry reconstruction that combines LoS visual priors with NLoS radar propagation. |
 | 2026 | [A comprehensive study of time-of-flight non-line-of-sight imaging](https://arxiv.org/abs/2603.09548) — Marco et al. | arXiv 2026 | A valuable comparative study that unifies ToF NLOS forward/inverse models and evaluates methods under common hardware constraints. |
 | 2025 | [Fast and Memory-efficient Non-line-of-sight Imaging with Quasi-Fresnel Transform](https://arxiv.org/abs/2508.02003) — Wei et al. | arXiv 2025 | Recasts hidden scenes as 2D functions and reduces runtime/memory by orders of magnitude for lightweight NLOS. |
 | 2025 | [Geometric Constrained Non-Line-of-Sight Imaging](https://arxiv.org/abs/2503.17992) — Liu et al. | arXiv 2025 | Joint albedo/surface reconstruction with normal-field regularization for higher-detail hidden geometry. |
@@ -124,7 +124,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Lai et al.: HoloRadar — full 3D NLOS radar reconstruction [NeurIPS]
    │     Wei et al.: Quasi-Fresnel Transform — lightweight 2D NLOS inversion
    │
-2026 ── Somasundaram et al.: consumer LiDAR NLOS via motion-induced sampling
+2026 ── Somasundaram et al.: consumer LiDAR NLOS via motion-induced sampling [Nature]
         Lu et al.: GeRaF 2.0 — RF/radar NLOS 3D reconstruction [CVPR]
         Wang et al.: 3D Gaussian Transient Rendering for arbitrary relay geometry [SIGGRAPH]
 ```
@@ -201,7 +201,7 @@ NLOS Imaging
 | [Diffuse Mirrors: 3D Reconstruction from Diffuse Indirect Illumination Using Inexpensive Time-of-Flight Sensors](https://dl.acm.org/doi/10.1145/2601097.2601205) — Heide et al. | SIGGRAPH 2014 | Optimization-based ToF NLOS. |
 | [Occluded Imaging with Time-of-Flight Sensors](https://dl.acm.org/doi/10.1145/2858965) — Kadambi et al. | TOG 2016 | ToF camera NLOS with surface normals. |
 | Fast Non-Line-of-Sight Imaging with Two-Step Deep Learning — Zhu et al. | AAAI 2021 | Commercial LiDAR + deep learning for NLOS. |
-| [Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling](https://arxiv.org/abs/2605.17865) — Somasundaram et al. | arXiv 2026 | Smartphone-grade / consumer LiDAR NLOS using multi-frame motion-induced aperture sampling. |
+| [Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling](https://arxiv.org/abs/2605.17865) — Somasundaram et al. | **Nature 2026** | Smartphone-grade / consumer LiDAR NLOS using multi-frame motion-induced aperture sampling. |
 
 #### Interferometer / Active Focusing
 
@@ -305,7 +305,7 @@ NLOS Imaging
 | [Passive Sensing Around the Corner Using Spatial Coherence](https://www.nature.com/articles/s41467-018-05985-w) — Batarseh et al. | Nature Comm. 2018 | Spatial coherence; point source detection. |
 | Multi-Modal Non-Line-of-Sight Passive Imaging — Beckus et al. | IEEE TIP 2019 | Coherence + intensity fusion. |
 | Passive Optical Time-of-Flight Non-Line-of-Sight Imaging — Boger-Lombard et al. | Optica 2019 | Temporal coherence for passive depth. |
-| [Polarized Non-Line-of-Sight Imaging](https://openaccess.thecvf.com/content_CVPR_2020/html/Tanaka_Polarized_Non-Line-of-Sight_Imaging_CVPR_2020_paper.html) — Tanaka et al. | CVPR 2020 | Polarizer reduces condition number. |
+| [Polarized Non-Line-of-Sight Imaging](https://openaccess.thecvf.com/content_CVPR_2020/html/Tanaka_Polarized_Non-Line_of-Sight_Imaging_CVPR_2020_paper.html) — Tanaka et al. | CVPR 2020 | Polarizer reduces condition number. |
 | Passive Non-Line-of-Sight Imaging Using Optimal Transport — Geng et al. | **IEEE TIP 2022** | OT/Wasserstein objective for robust passive NLOS. |
 | Passive Non-Line-of-Sight Imaging with Light Transport Modulation — Zhang et al. | **IEEE TIP 2025** | Adaptive transport modulation improves reconstruction stability. |
 | Passive Non-Line-of-Sight Imaging with Parallel Encoder — Du et al. | ICASSP 2025 | Parallel multi-scale encoder; improved passive NLOS fidelity and inference efficiency. |
