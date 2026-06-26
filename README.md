@@ -78,6 +78,7 @@
 | 2025 | [Fast and Memory-efficient Non-line-of-sight Imaging with Quasi-Fresnel Transform](https://arxiv.org/abs/2508.02003) — Wei et al. | arXiv 2025 | Recasts hidden scenes as 2D functions and reduces runtime/memory by orders of magnitude for lightweight NLOS. |
 | 2025 | [Geometric Constrained Non-Line-of-Sight Imaging](https://arxiv.org/abs/2503.17992) — Liu et al. | arXiv 2025 | Joint albedo/surface reconstruction with normal-field regularization for higher-detail hidden geometry. |
 | 2025 | [Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms](https://arxiv.org/abs/2501.05244) — Sultan et al. | arXiv 2025 | Uses NUFFT/SFFT to support irregular relay sampling and flexible hidden-volume sampling while retaining FFT-like scalability. |
+| 2024 | [Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy](https://arxiv.org/abs/2601.12257) — Raji, Murray-Bruce | ECCV 2024 | Extends passive shadow-based computational periscopy to 3D from a single ordinary NLOS photograph via an SNLLS model and a physics-inspired neural solver. |
 
 ---
 
@@ -117,6 +118,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Li et al.: ST-Mamba — spatial-temporal Mamba for NLOS video [NeurIPS]
    │     Cui et al.: Virtual Scanning — unsupervised irregular undersampling [NeurIPS]
    │     Czajkowski et al.: 3D passive NLOS with ordinary camera [Nature Comm.]
+   │     Raji & Murray-Bruce: SSD for 3D computational periscopy [ECCV]
    │
 2025 ── Li et al.: TransiT — transient transformer for video NLOS [CVPR]
    │     Sun et al.: learnable physical priors for generalization [CVPR]
@@ -288,6 +290,7 @@ NLOS Imaging
 | Computational Mirrors: Blind Inverse Light Transport — Aittala et al. | NeurIPS 2019 | Unsupervised deep matrix factorization. |
 | Two-Dimensional Non-Line-of-Sight Scene Estimation — Seidel et al. | CVPR 2020 | Penumbra/shadow-based 2D NLOS. |
 | Snapshot Corner Camera — Seidel et al. | 2023 | Single-frame NLOS without scanning. |
+| [Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy](https://arxiv.org/abs/2601.12257) — Raji, Murray-Bruce | **ECCV 2024** | Single ordinary NLOS photograph → 3D hidden scene; SNLLS model + physics-inspired neural solver. |
 | Full-Color 3D Passive NLOS with an Ordinary Camera — Czajkowski, Murray-Bruce | **Nature Comm. 2024** | 3D reconstruction from ordinary camera; two orthogonal edges. |
 
 ### Hyperspectral / Multispectral Passive NLOS
@@ -331,6 +334,7 @@ NLOS Imaging
 | NLOS-R 2: Alternate Reconstruction and Recognition — Wang, Geng et al. | ICME 2025 | Mutual-refinement loop: reconstruction ↔ recognition. |
 | Physics Rescue: Deep Network for High-Speed NLOS — Mu et al. | **TPAMI 2022** | Physics model + DL; 5 fps, 10× speedup. |
 | Untrained Deep Decoder for NLOS — Wu et al. | 2022 | Deep image prior without training data. |
+| [Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy](https://arxiv.org/abs/2601.12257) — Raji, Murray-Bruce | ECCV 2024 | Physics-inspired learning for passive 3D computational periscopy from ordinary shadow measurements. |
 | [Learnable Physical Priors for Generalizable NLOS Reconstruction](https://arxiv.org/abs/2409.14011) — Sun et al. | CVPR 2025 | Adaptive learned priors for cross-system and low-SNR generalization. |
 | Virtual Scanning — Cui et al. | NeurIPS 2024 | SURE-based denoiser; no paired training data. |
 | Enhancing Learnable Reconstruction with Fourier Attention — Yu et al. | 2023 | Learnable inverse kernel + attention for high-frequency recovery. |
