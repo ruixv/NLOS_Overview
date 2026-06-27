@@ -71,6 +71,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2026 | [Non-line-of-sight imaging with arbitrary relay surface geometries via 3D Gaussian Transient Rendering](https://arxiv.org/abs/2606.21270) — Wang et al. | SIGGRAPH 2026 | Uses 3D Gaussian primitives and differentiable transient rendering; targets spatially limited, non-planar, arbitrary relay surfaces. |
 | 2026 | [Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling](https://arxiv.org/abs/2605.17865) — Somasundaram et al. | Nature 2026 | Demonstrates plug-and-play NLOS using smartphone-grade / consumer LiDAR with motion-induced aperture sampling. |
 | 2026 | [Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals](https://arxiv.org/abs/2605.29098) — Lu et al. | CVPR 2026 | GeRaF 2.0: neural RF geometry reconstruction that combines LoS visual priors with NLoS radar propagation. |
+| 2026 | [NLOS-Aided Joint OTA Synchronization and Off-Grid Imaging for Distributed MIMO Systems](https://arxiv.org/abs/2603.13981) — Tong et al. | arXiv 2026 | Jointly refines over-the-air synchronization and sparse off-grid environment imaging in distributed MIMO/ISAC by exploiting reconstructed NLOS components. |
 | 2026 | [A comprehensive study of time-of-flight non-line-of-sight imaging](https://arxiv.org/abs/2603.09548) — Marco et al. | arXiv 2026 | Benchmark-style comparative study unifying ToF NLOS forward/inverse models under common hardware constraints. |
 | 2026 | [Around-the-corner Radar Sensing Using Reconfigurable Intelligent Surface](https://arxiv.org/abs/2602.11471) — Yasmeen et al. | arXiv 2026 | RIS-assisted around-corner radar sensing; steers energy into NLOS regions and recovers human micro-Doppler signatures. |
 | 2025 | [3D Reconstruction from Transient Measurements with Time-Resolved Transformer](https://arxiv.org/abs/2510.09205) — Li et al. | arXiv 2025 | TRT/TRT-NLOS spatio-temporal transformer for photon-efficient LOS/NLOS transient 3D reconstruction with code and datasets. |
@@ -141,6 +142,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
 2026 ── Somasundaram et al.: consumer LiDAR NLOS via motion-induced sampling [Nature]
         Lu et al.: GeRaF 2.0 — RF/radar NLOS 3D reconstruction [CVPR]
         Wang et al.: 3D Gaussian Transient Rendering for arbitrary relay geometry [SIGGRAPH]
+        Tong et al.: NLOS-aided OTA synchronization and off-grid imaging for distributed MIMO/ISAC
         Yasmeen et al.: RIS-assisted around-corner radar sensing
 ```
 
@@ -174,6 +176,7 @@ NLOS Imaging
     ├── Two-bounce and keyhole imaging
     ├── Consumer LiDAR / mobile NLOS
     ├── Radar / RF / mmWave NLOS
+    ├── Distributed MIMO / ISAC NLOS off-grid imaging
     ├── RIS-assisted around-corner radar
     ├── Tag-assisted mmWave NLOS localization
     ├── Acoustic / ultrasound NLOS
@@ -423,6 +426,7 @@ NLOS Imaging
 | HoloRadar: Full 3D NLOS Reconstruction via mmWave Radar on a Mobile Robot — Lai et al. | **NeurIPS 2025** | Full 3D scene reconstruction with a single mobile mmWave radar. |
 | [N2LoS: Single-Tag mmWave Backscatter for Robust Non-Line-of-Sight Localization](https://arxiv.org/abs/2505.08240) — Shi et al. | arXiv 2025 | Single-tag mmWave backscatter localization in NLOS; HFD modulation separates tag/environment reflections and FS-MUSIC resolves multipath. |
 | [Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals](https://arxiv.org/abs/2605.29098) — Lu et al. | **CVPR 2026** | GeRaF 2.0: combines LoS visual priors and NLoS RF propagation for neural geometry reconstruction. |
+| [NLOS-Aided Joint OTA Synchronization and Off-Grid Imaging for Distributed MIMO Systems](https://arxiv.org/abs/2603.13981) — Tong et al. | arXiv 2026 | Distributed MIMO/ISAC framework that alternates OG-AMP off-grid imaging with NLOS-assisted OTA phase synchronization. |
 | [Around-the-corner Radar Sensing Using Reconfigurable Intelligent Surface](https://arxiv.org/abs/2602.11471) — Yasmeen et al. | arXiv 2026 | RIS-assisted NLOS radar sensing at 5.5 GHz; improves access to non-specular around-corner regions and human micro-Doppler signatures. |
 
 ### Acoustic / Ultrasound NLOS
