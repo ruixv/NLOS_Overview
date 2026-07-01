@@ -64,7 +64,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 1 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 2 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
@@ -76,6 +76,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2026 | [A comprehensive study of time-of-flight non-line-of-sight imaging](https://arxiv.org/abs/2603.09548) — Marco et al. | arXiv 2026 | Benchmark-style comparative study unifying ToF NLOS forward/inverse models under common hardware constraints. |
 | 2026 | [Exploiting Double-Bounce Paths in Snapshot Radio SLAM: Bounds, Algorithms and Experiments](https://arxiv.org/abs/2603.02832) — Zhang et al. | arXiv 2026 | Shows that higher-order NLoS radio paths can improve snapshot mmWave SLAM and reveal landmarks hidden to single-bounce models. |
 | 2026 | [Around-the-corner Radar Sensing Using Reconfigurable Intelligent Surface](https://arxiv.org/abs/2602.11471) — Yasmeen et al. | arXiv 2026 | RIS-assisted around-corner radar sensing; steers energy into NLOS regions and recovers human micro-Doppler signatures. |
+| 2026 | [Radar Sensing using Dual-Beam Reconfigurable Intelligent Surface](https://arxiv.org/abs/2602.11473) — Yasmeen et al. | arXiv 2026 | Extends RIS-assisted around-corner radar toward practical one-bit dual-beam RIS configurations, benchmarking beam steering and radar cross-section against metal and ideal single-beam RIS baselines. |
 | 2026 | [Beyond λ/2: Can Arbitrary EMVS Arrays Achieve Unambiguous NLOS Localization?](https://arxiv.org/abs/2602.07515) — Chen et al. | arXiv 2026 | RIS-aided NLOS bistatic MIMO radar localization with EMVS polarization cues and phase-disambiguating array geometry. |
 | 2026 | [Backscatter Assisted Indoor NLOS Positioning](https://arxiv.org/abs/2606.17325) — Ruttik et al. | arXiv 2026 | Uses passive backscatter devices as virtual anchors for RF NLOS indoor positioning in corridors. |
 | 2026 | [Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy](https://arxiv.org/abs/2601.12257) — Raji, Murray-Bruce | arXiv 2026 | Extends passive shadow-based computational periscopy to 3D from a single ordinary NLOS photograph via an SNLLS model and a physics-inspired neural solver. |
