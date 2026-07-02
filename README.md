@@ -64,7 +64,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 2 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 3 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
@@ -101,9 +101,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2024 | [Iterating the Transient Light Transport Matrix for Non-Line-of-Sight Imaging](https://arxiv.org/abs/2412.10300) — Sultan et al. | arXiv 2024 | Treats a measured relay-surface TLTM as a first-order system that can be computationally focused into the hidden scene to obtain second-order transport, relighting, and dual photography. |
 | 2024 | [Enhancing Autonomous Navigation by Imaging Hidden Objects using Single-Photon LiDAR](https://arxiv.org/abs/2410.03555) — Young et al. | arXiv 2024 | Uses SPAD / single-photon LiDAR NLOS occupancy perception to guide robot navigation around occluded corners. |
 | 2024 | [Generalizable Non-Line-of-Sight Imaging with Learnable Physical Priors](https://arxiv.org/abs/2409.14011) — Sun et al. | arXiv 2024 | Learns path-compensation and adaptive phasor-field priors for cross-system and low-SNR NLOS generalization. |
+| 2024 | [Learning to Enhance Aperture Phasor Field for Non-Line-of-Sight Imaging](https://arxiv.org/abs/2407.18574) — Cho et al. | arXiv 2024 | LEAP predicts clean full-aperture phasor fields from noisy partial measurements, enabling high-quality NLOS reconstruction with $16\times$--$64\times$ fewer samples and smaller scan areas. |
 | 2024 | [Ptychographic non-line-of-sight imaging for depth-resolved visualization of hidden objects](https://arxiv.org/abs/2405.11115) — Song et al. | arXiv 2024 | Uses coded ptychography and relay-wall modulation to recover depth-resolved hidden objects and the wall modulation profile. |
 | 2024 | [Multi-View Near-field Imaging in NLOS with Non-Reconfigurable EM Skins](https://arxiv.org/abs/2401.06891) — Tornielli Bellini et al. | arXiv 2024 | Uses static passive electromagnetic-skin modules to focus radar energy into NLOS regions and synthesize multi-view near-field radar images. |
 | 2024 | [Event-enhanced Passive Non-line-of-sight imaging for moving objects with Physical embedding](https://arxiv.org/abs/2404.05977) — Wang et al. | arXiv 2024 | Uses an event camera for dynamic diffusion-spot features and a physics-embedded model for passive NLOS imaging of moving objects. |
+| 2023 | [Non-line-of-sight imaging in the presence of scattering media using phasor fields](https://arxiv.org/abs/2311.09223) — Luesia et al. | arXiv 2023 | Extends phasor-field NLOS analysis to hidden scenes submerged in scattering media, empirically testing robustness under fog/smoke-like volumetric scattering. |
 | 2023 | [Non-line-of-sight imaging with arbitrary illumination and detection pattern](https://www.nature.com/articles/s41467-023-38898-4) — Liu et al. | Nature Communications 2023 | Bayesian CC-SOCR framework for arbitrary illumination/detection patterns, irregular relay sampling, and albedo/surface-normal reconstruction. |
 | 2023 | [Towards passive non-line-of-sight acoustic localization around corners using uncontrolled random noise sources](https://www.nature.com/articles/s41598-023-31490-2) — Boger-Lombard et al. | Scientific Reports 2023 | Uses passive acoustic correlations from uncontrolled broadband noise to recover Green functions and localize hidden around-corner targets. |
 | 2023 | [Non-line-of-sight reconstruction via structure sparsity regularization](https://arxiv.org/abs/2308.02782) — Huang et al. | arXiv 2023 | DLCT-based reconstruction with nuclear-norm structure sparsity regularization for low-SNR transient data. |
@@ -134,3 +136,34 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Liu et al.: phasor field — NLOS as virtual LOS wave propagation
    │
 ```
+
+---
+
+## Taxonomy
+
+This repository groups papers by **acquisition regime**, **forward model**, **inverse algorithm**, **learning paradigm**, and **sensor modality**. The README highlights the newest additions; the website provides a searchable paper explorer and the PDF survey provides the detailed narrative.
+
+---
+
+## Citation
+
+If this repository or survey is useful for your research, please cite the original survey:
+
+```bibtex
+@article{geng2022recent,
+  title={Recent Advances on Non-Line-of-Sight Imaging: Conventional Physical Models, Deep Learning, and New Scenes},
+  author={Geng, Ruixu and Hu, Yang and Chen, Yan},
+  journal={APSIPA Transactions on Signal and Information Processing},
+  volume={11},
+  number={1},
+  pages={e13},
+  year={2022},
+  publisher={Now Publishers}
+}
+```
+
+---
+
+## Contributing
+
+Pull requests are welcome. Please include accurate metadata, a stable paper/project link, and a one-sentence explanation of why the work is relevant to NLOS imaging.
