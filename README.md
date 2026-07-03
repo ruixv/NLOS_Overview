@@ -103,6 +103,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2024 | [Generalizable Non-Line-of-Sight Imaging with Learnable Physical Priors](https://arxiv.org/abs/2409.14011) — Sun et al. | arXiv 2024 | Learns path-compensation and adaptive phasor-field priors for cross-system and low-SNR NLOS generalization. |
 | 2024 | [Learning to Enhance Aperture Phasor Field for Non-Line-of-Sight Imaging](https://arxiv.org/abs/2407.18574) — Cho et al. | arXiv 2024 | LEAP predicts clean full-aperture phasor fields from noisy partial measurements, enabling high-quality NLOS reconstruction with $16\times$--$64\times$ fewer samples and smaller scan areas. |
 | 2024 | [Ptychographic non-line-of-sight imaging for depth-resolved visualization of hidden objects](https://arxiv.org/abs/2405.11115) — Song et al. | arXiv 2024 | Uses coded ptychography and relay-wall modulation to recover depth-resolved hidden objects and the wall modulation profile. |
+| 2024 | [Passive None-line-of-sight imaging with arbitrary scene condition and detection pattern in small amount of prior data](https://arxiv.org/abs/2404.06015) — Gui et al. | arXiv 2024 | HDPS estimates passive NLOS transport/target structure from limited prior data, targeting arbitrary scene conditions and detection patterns without retraining a separate model per setup. |
 | 2024 | [Multi-View Near-field Imaging in NLOS with Non-Reconfigurable EM Skins](https://arxiv.org/abs/2401.06891) — Tornielli Bellini et al. | arXiv 2024 | Uses static passive electromagnetic-skin modules to focus radar energy into NLOS regions and synthesize multi-view near-field radar images. |
 | 2024 | [Event-enhanced Passive Non-line-of-sight imaging for moving objects with Physical embedding](https://arxiv.org/abs/2404.05977) — Wang et al. | arXiv 2024 | Uses an event camera for dynamic diffusion-spot features and a physics-embedded model for passive NLOS imaging of moving objects. |
 | 2023 | [Non-line-of-sight imaging in the presence of scattering media using phasor fields](https://arxiv.org/abs/2311.09223) — Luesia et al. | arXiv 2023 | Extends phasor-field NLOS analysis to hidden scenes submerged in scattering media, empirically testing robustness under fog/smoke-like volumetric scattering. |
@@ -158,12 +159,6 @@ If this repository or survey is useful for your research, please cite the origin
   number={1},
   pages={e13},
   year={2022},
-  publisher={Now Publishers}
+  doi={10.1561/116.00000019}
 }
 ```
-
----
-
-## Contributing
-
-Pull requests are welcome. Please include accurate metadata, a stable paper/project link, and a one-sentence explanation of why the work is relevant to NLOS imaging.
