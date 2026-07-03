@@ -64,7 +64,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 3 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 4 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
@@ -95,6 +95,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2025 | [mmMirror: Device Free mmWave Indoor NLoS Localization Using Van-Atta-Array IRS](https://arxiv.org/abs/2505.10816) — Yan et al. | arXiv 2025 | Uses a Van-Atta-array IRS with commodity FMCW radar for device-free around-corner / NLOS localization. |
 | 2025 | [N2LoS: Single-Tag mmWave Backscatter for Robust Non-Line-of-Sight Localization](https://arxiv.org/abs/2505.08240) — Shi et al. | arXiv 2025 | Tag-assisted mmWave NLOS localization using multipath, HFD modulation, and FS-MUSIC; relevant to RF NLOS sensing/localization rather than full imaging. |
 | 2025 | [Geometric Constrained Non-Line-of-Sight Imaging](https://arxiv.org/abs/2503.17992) — Liu et al. | arXiv 2025 | Joint albedo/surface reconstruction with normal-field regularization for higher-detail hidden geometry. |
+| 2025 | [Dual-branch Graph Feature Learning for NLOS Imaging](https://arxiv.org/abs/2502.19683) — Su et al. | arXiv 2025 | DG-NLOS uses graph feature learning with separate albedo and depth branches to reduce 3D-grid cost while jointly reconstructing hidden appearance and geometry. |
 | 2025 | [Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms](https://arxiv.org/abs/2501.05244) — Sultan et al. | arXiv 2025 | Uses NUFFT/SFFT to support irregular relay sampling and flexible hidden-volume sampling while retaining FFT-like scalability. |
 | 2025 | [SuperEx: Enhancing Indoor Mapping and Exploration using Non-Line-of-Sight Perception](https://arxiv.org/abs/2510.10506) — Garg, Dave | arXiv 2025 | Integrates single-photon LiDAR NLOS perception into indoor mapping and exploration through hidden-space carving. |
 | 2025 | [mitransient: Transient light transport in Mitsuba 3](https://arxiv.org/abs/2510.25660) — Royo et al. | arXiv 2025 | Differentiable transient-rendering toolkit for time-resolved simulation, NLOS scenes, polarization, and capture noise. |
