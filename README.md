@@ -117,6 +117,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2022 | [Seeing Around Obstacles with Terahertz Waves](https://arxiv.org/abs/2205.05066) — Cui, Trichopoulos | arXiv 2022 | THz / sub-THz around-obstacle imaging using lossy-mirror environmental surfaces. |
 | 2022 | [Passive Non-line-of-sight Imaging for Moving Targets with an Event Camera](https://arxiv.org/abs/2209.13300) — Wang et al. | arXiv 2022 | Introduces event-based passive NLOS for moving targets and the NLOS-ES event-camera dataset. |
 | 2021 | [Non-line-of-sight imaging with picosecond temporal resolution](https://arxiv.org/abs/2106.15798) — Wang et al. | Physical Review Letters 2021 | Up-conversion single-photon detector enables picosecond-scale timing and much finer axial NLOS resolution. |
+| 2021 | [Fast Non-line-of-sight Imaging with Two-step Deep Remapping](https://arxiv.org/abs/2101.10492) — Zhu, Cai | arXiv 2021 | Uses inexpensive commercial LiDAR and a generative two-step deep remapping strategy for fast, high-fidelity, full-color NLOS reconstruction. |
 
 ---
 
