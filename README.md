@@ -126,6 +126,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2020 | [Nonparaxial phasor-field propagation](https://arxiv.org/abs/2006.13775) — Dove, Shapiro | arXiv 2020 | Extends phasor-field propagation beyond the Fresnel/paraxial assumption using Rayleigh--Sommerfeld theory, closer to wide-angle reflective NLOS geometries. |
 | 2020 | [Paraxial phasor-field physical optics](https://arxiv.org/abs/2004.14239) — Dove, Shapiro | arXiv 2020 | Shows that ordinary lenses can focus or project phasor fields through diffusers, bridging computational virtual-wave NLOS and physical P-field optics. |
 | 2019 | [Wave-like Properties of Phasor Fields: Experimental Demonstrations](https://arxiv.org/abs/1904.01565) — Reza et al. | arXiv 2019 | Experimentally validates wave-like phasor-field behavior and introduces P-field optical elements for practical virtual-wave NLOS systems. |
+| 2019 | [Non-line-of-sight 3D imaging with a single-pixel camera](https://arxiv.org/abs/1903.04812) — Musarra et al. | arXiv 2019 | Uses a DMD-based time-resolved single-pixel camera with SPAD/PMT detection for scanning-free, full-color 3D NLOS reconstruction and sub-second Hadamard acquisition. |
 | 2019 | [Paraxial Theory of Phasor-Field Imaging](https://arxiv.org/abs/1903.02365) — Dove, Shapiro | arXiv 2019 | Provides a paraxial wave-optics and Wigner-distribution analysis of phasor-field imaging, clarifying which occluded and unoccluded geometries are supported by virtual-wave NLOS models. |
 
 ---
@@ -152,7 +153,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
 
 ## Taxonomy
 
-This repository groups papers by **acquisition regime**, **forward model**, **inverse algorithm**, **learning paradigm**, and **sensor modality**. The README highlights the newest additions; the website provides a searchable paper explorer and the PDF survey provides the detailed narrative.
+This repository groups papers by **acquisition regime**, **forward model**, **inverse algorithm**, and **sensor modality**. The README highlights the newest additions; the website provides a searchable paper explorer and the PDF survey provides the detailed narrative.
 
 ---
 
