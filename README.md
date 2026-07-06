@@ -64,7 +64,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 6 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 7 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
@@ -72,6 +72,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2026 | [Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling](https://arxiv.org/abs/2605.17865) — Somasundaram et al. | arXiv 2026 | Demonstrates plug-and-play NLOS using smartphone-grade / consumer LiDAR with motion-induced aperture sampling. |
 | 2026 | [Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals](https://arxiv.org/abs/2605.29098) — Lu et al. | arXiv 2026 | GeRaF 2.0: neural RF geometry reconstruction that combines LoS visual priors with NLoS radar propagation. |
 | 2026 | [Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware](https://arxiv.org/abs/2604.07032) — Tosi et al. | arXiv 2026 | 5G/mmWave ISAC proof-of-concept for fully NLOS intrusion detection and tracking with large-surface reflections, range-Doppler processing, and PHD filtering. |
+| 2026 | [Radar Cross Section Characterization of Quantized Reconfigurable Intelligent Surfaces](https://arxiv.org/abs/2603.27961) — Yasmeen et al. | arXiv 2026 | Complements RIS around-corner radar sensing by characterizing one-bit/quantized RIS RCS and experimentally recovering micro-Doppler signatures in non-specular or shadowed regions. |
 | 2026 | [DENALI: A Dataset Enabling Non-Line-of-Sight Spatial Reasoning with Low-Cost LiDARs](https://arxiv.org/abs/2604.16201) — Behari et al. | arXiv 2026 | Large-scale low-cost LiDAR space-time histogram dataset for data-driven NLOS spatial reasoning. |
 | 2026 | [NLOS-Aided Joint OTA Synchronization and Off-Grid Imaging for Distributed MIMO Systems](https://arxiv.org/abs/2603.13981) — Tong et al. | arXiv 2026 | Jointly refines over-the-air synchronization and sparse off-grid environment imaging in distributed MIMO/ISAC by exploiting reconstructed NLOS components. |
 | 2026 | [A comprehensive study of time-of-flight non-line-of-sight imaging](https://arxiv.org/abs/2603.09548) — Marco et al. | arXiv 2026 | Benchmark-style comparative study unifying ToF NLOS forward/inverse models under common hardware constraints. |
@@ -127,8 +128,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2020 | [Paraxial phasor-field physical optics](https://arxiv.org/abs/2004.14239) — Dove, Shapiro | arXiv 2020 | Shows that ordinary lenses can focus or project phasor fields through diffusers, bridging computational virtual-wave NLOS and physical P-field optics. |
 | 2020 | [Efficient Non-Line-of-Sight Imaging from Transient Sinograms](https://arxiv.org/abs/2008.02787) — Isogawa et al. | arXiv 2020 | Introduces circular confocal NLOS (C2NLOS) scanning and transient-sinogram reconstruction, reducing relay-wall measurements while preserving hidden-position and image recovery. |
 | 2019 | [Wave-like Properties of Phasor Fields: Experimental Demonstrations](https://arxiv.org/abs/1904.01565) — Reza et al. | arXiv 2019 | Experimentally validates wave-like phasor-field behavior and introduces P-field optical elements for practical virtual-wave NLOS systems. |
+| 2019 | [Coherent control of light for non-line-of-sight imaging](https://arxiv.org/abs/1908.04094) — Starshynov et al. | arXiv 2019 | Uses coherent phase control / wavefront shaping and the speckle memory effect to refocus light behind an obstacle, enabling sub-millimeter active NLOS imaging. |
 | 2019 | [Non-line-of-sight 3D imaging with a single-pixel camera](https://arxiv.org/abs/1903.04812) — Musarra et al. | arXiv 2019 | Uses a DMD-based time-resolved single-pixel camera with SPAD/PMT detection for scanning-free, full-color 3D NLOS reconstruction and sub-second Hadamard acquisition. |
 | 2019 | [Paraxial Theory of Phasor-Field Imaging](https://arxiv.org/abs/1903.02365) — Dove, Shapiro | arXiv 2019 | Provides a paraxial wave-optics and Wigner-distribution analysis of phasor-field imaging, clarifying which occluded and unoccluded geometries are supported by virtual-wave NLOS models. |
+| 2017 | [Non-line-of-sight Imaging with Partial Occluders and Surface Normals](https://arxiv.org/abs/1711.07134) — Heide et al. | arXiv 2017 | Introduces a factored NLOS light-transport model that accounts for partial occlusions and surface normals in time-resolved active NLOS reconstruction. |
+| 2017 | [Exploiting Occlusion in Non-Line-of-Sight Active Imaging](https://arxiv.org/abs/1711.06297) — Thrampoulidis et al. | arXiv 2017 | Shows that natural hidden-scene occluders can encode useful structure and may reduce reliance on calibrated ultrafast time-resolved hardware. |
 
 ---
 
