@@ -4,10 +4,6 @@ on:
   push:
     paths:
       - .github/workflows/nlos-literature-sync.yml
-  pull_request:
-    paths:
-      - scripts/sync_nlos_20260711.py
-      - updates/nlos-sync-trigger-20260711.md
   workflow_dispatch:
 
 permissions:
@@ -29,28 +25,14 @@ jobs:
           python-version: '3.12'
 
       - name: Apply anchor-checked literature sync
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p = Path('scripts/sync_nlos_20260711.py')
-          lines = p.read_text(encoding='utf-8').splitlines()
-          fixed = False
-          for i, line in enumerate(lines):
-              if line.startswith('tex = re.sub(r"\\\\bibliography'):
-                  lines[i] = 'tex = re.sub(r"\\\\bibliography\\{[^}]+\\}", lambda _m: r"\\bibliography{" + ",".join(bib_names) + "}", tex, count=1)'
-                  fixed = True
-          if not fixed:
-              raise SystemExit('Could not patch bibliography replacement line safely')
-          p.write_text('\n'.join(lines) + '\n', encoding='utf-8')
-          PY
-          python scripts/sync_nlos_20260711.py
+        run: python scripts/sync_nlos_20260711_run15.py
 
       - name: Install LaTeX toolchain
         run: |
           sudo apt-get update
           sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
 
-      - name: Rebuild and validate survey PDF
+      - name: Rebuild and strictly validate survey PDF
         id: build
         shell: bash
         run: |
@@ -59,29 +41,64 @@ jobs:
           latexmk -pdf -interaction=nonstopmode bare_jrnl.tex > /tmp/latexmk.log 2>&1
           latex_rc=$?
           pdf_ok=false
-          if [ -s bare_jrnl.pdf ]; then
+          validation_reason="latexmk failed"
+
+          if [ "$latex_rc" -eq 0 ] && [ -s bare_jrnl.pdf ] && [ -s bare_jrnl.bbl ]; then
             pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt 2>&1
             info_rc=$?
-            pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt > /tmp/pdftotext.log 2>&1
+            pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt > /tmp/pdftotext.log 2>&1
             text_rc=$?
-            if [ "$info_rc" -eq 0 ] && [ "$text_rc" -eq 0 ] && [ -s /tmp/bare_jrnl.txt ]; then
+
+            undefined=false
+            if grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" /tmp/latexmk.log bare_jrnl.log 2>/dev/null; then
+              undefined=true
+            fi
+            if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg 2>/dev/null; then
+              undefined=true
+            fi
+
+            integrated=false
+            if grep -Fq "X-band Radar Non-Line-of-Sight Imaging" bare_jrnl.bbl \
+              && grep -Fq "Neural Illumination Fields" bare_jrnl.bbl \
+              && grep -Fq "Recent Advances on Non-Line-of-Sight Imaging" /tmp/bare_jrnl.txt; then
+              integrated=true
+            fi
+
+            if [ "$info_rc" -eq 0 ] && [ "$text_rc" -eq 0 ] && [ -s /tmp/bare_jrnl.txt ] \
+              && [ "$undefined" = false ] && [ "$integrated" = true ]; then
               pdf_ok=true
+              validation_reason="clean build, no undefined citations, new references integrated"
+            else
+              validation_reason="PDF/reference validation failed (undefined=$undefined, integrated=$integrated, pdfinfo=$info_rc, pdftotext=$text_rc)"
             fi
           fi
+
           echo "latex_rc=$latex_rc" >> "$GITHUB_OUTPUT"
           echo "pdf_ok=$pdf_ok" >> "$GITHUB_OUTPUT"
+          echo "validation_reason=$validation_reason" >> "$GITHUB_OUTPUT"
+
           if [ "$pdf_ok" != true ]; then
             {
-              echo '# LaTeX build diagnostic (11 July 2026)'
+              echo '# LaTeX build diagnostic (11 July 2026, X-band/NIF sync)'
               echo
               echo "latexmk exit code: $latex_rc"
               echo
+              echo "validation: $validation_reason"
+              echo
               echo '```text'
-              tail -n 180 /tmp/latexmk.log 2>/dev/null || true
+              tail -n 220 /tmp/latexmk.log 2>/dev/null || true
               echo '```'
-            } > updates/2026-07-11-latex-build-diagnostic.md
+              if [ -f bare_jrnl.blg ]; then
+                echo
+                echo '## BibTeX log tail'
+                echo
+                echo '```text'
+                tail -n 160 bare_jrnl.blg || true
+                echo '```'
+              fi
+            } > updates/2026-07-11-xband-nif-build-diagnostic.md
           else
-            rm -f updates/2026-07-11-latex-build-diagnostic.md
+            rm -f updates/2026-07-11-xband-nif-build-diagnostic.md
           fi
           exit 0
 
@@ -89,27 +106,43 @@ jobs:
         env:
           PDF_OK: ${{ steps.build.outputs.pdf_ok }}
           LATEX_RC: ${{ steps.build.outputs.latex_rc }}
+          VALIDATION_REASON: ${{ steps.build.outputs.validation_reason }}
         run: |
           python - <<'PY'
           from pathlib import Path
           import os
-          p = Path('updates/2026-07-11-citation-tracing-sparse-irregular-sync.md')
+          import re
+
+          p = Path('updates/2026-07-11-xband-nif-and-bibliography-sync.md')
           text = p.read_text(encoding='utf-8')
+          text = re.sub(r'\n\*\*Build result:\*\*.*?\n(?=\n|\Z)', '\n', text, flags=re.S)
           if os.environ.get('PDF_OK') == 'true':
-              status = f"\n**Build result:** successful clean LaTeX/BibTeX rebuild; `bare_jrnl.pdf` was regenerated and validated with `pdfinfo` and `pdftotext` in CI (latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
+              status = (
+                  "\n**Build result:** successful clean LaTeX/BibTeX rebuild. "
+                  "`bare_jrnl.pdf` was regenerated; `pdfinfo`/`pdftotext` passed, "
+                  "no undefined citation/reference warnings were detected, and both new "
+                  f"bibliography records were verified in the build (latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
+              )
           else:
-              status = f"\n**Build result:** no valid regenerated PDF was produced in CI (latexmk exit code {os.environ.get('LATEX_RC', 'unknown')}). Source updates are committed and the prior PDF is left untouched; see `updates/2026-07-11-latex-build-diagnostic.md`.\n"
-          p.write_text(text + status, encoding='utf-8')
+              status = (
+                  "\n**Build result:** source synchronization succeeded, but no strictly "
+                  "validated replacement PDF was committed. The prior PDF was preserved. "
+                  f"Reason: {os.environ.get('VALIDATION_REASON', 'unknown')} "
+                  f"(latexmk exit code {os.environ.get('LATEX_RC', 'unknown')}). See "
+                  "`updates/2026-07-11-xband-nif-build-diagnostic.md`.\n"
+              )
+          p.write_text(text.rstrip() + "\n" + status, encoding='utf-8')
           PY
 
       - name: Commit synchronized artifacts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md index.html article/2active.tex article/4datadriven.tex bare_jrnl.tex \
-            egbib_20260711_updates.bib updates/2026-07-11-citation-tracing-sparse-irregular-sync.md \
-            egbib*.bib scripts/sync_nlos_20260711.py
-          git add -A updates/2026-07-11-latex-build-diagnostic.md 2>/dev/null || true
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex \
+            egbib_20260711_run15_updates.bib \
+            updates/2026-07-11-xband-nif-and-bibliography-sync.md \
+            scripts/sync_nlos_20260711_run15.py
+          git add -A updates/2026-07-11-xband-nif-build-diagnostic.md 2>/dev/null || true
           if [ "${{ steps.build.outputs.pdf_ok }}" = "true" ]; then
             git add bare_jrnl.pdf
           else
@@ -119,10 +152,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Rebuild and validate updated NLOS survey"
-            if [ "${{ github.event_name }}" = "pull_request" ]; then
-              git push origin HEAD:${{ github.head_ref }}
-            else
-              git push origin HEAD:master
-            fi
+            git commit -m "Integrate X-band radar and neural two-bounce NLOS papers"
+            git push origin HEAD:master
           fi
