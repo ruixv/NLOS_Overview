@@ -49,7 +49,28 @@ def load_entries(path: Path) -> list[dict[str, str]]:
     return database.entries
 
 
+def normalize_citation_aliases() -> list[str]:
+    """Replace an unverifiable alias with the verified Saunders Nature key.
+
+    No publication matching ``saundersMultiDepthComputationalPeriscopy2020``
+    could be verified. The surrounding survey lineage refers to Saunders et
+    al.'s field-defining ordinary-camera computational-periscopy paper, already
+    present as ``saundersComputationalPeriscopyOrdinary2019``. Reusing the
+    verified key avoids inventing a duplicate or fictitious bibliography item.
+    """
+    old = "saundersMultiDepthComputationalPeriscopy2020"
+    new = "saundersComputationalPeriscopyOrdinary2019"
+    changed: list[str] = []
+    for path in sorted(ROOT.rglob("*.tex")):
+        text = path.read_text(encoding="utf-8")
+        if old in text:
+            path.write_text(text.replace(old, new), encoding="utf-8")
+            changed.append(str(path.relative_to(ROOT)))
+    return changed
+
+
 def main() -> None:
+    alias_files = normalize_citation_aliases()
     sources = source_files()
     merged: OrderedDict[str, tuple[str, dict[str, str]]] = OrderedDict()
     replacements: list[tuple[str, str, str]] = []
@@ -62,11 +83,13 @@ def main() -> None:
             key = entry.get("ID", "").strip()
             if not key:
                 raise RuntimeError(f"Parsed entry without ID in {source.name}")
-            if key in merged:
-                previous_source = merged[key][0]
+            canonical = key.casefold()
+            entry["ID"] = key
+            if canonical in merged:
+                previous_source = merged[canonical][0]
                 replacements.append((key, previous_source, source.name))
-                del merged[key]
-            merged[key] = (source.name, entry)
+                del merged[canonical]
+            merged[canonical] = (source.name, entry)
 
     database = BibDatabase()
     database.entries = [entry for _source, entry in merged.values()]
@@ -93,15 +116,25 @@ def main() -> None:
     duplicate_lines = "\n".join(
         f"- `{key}`: `{old}` → `{new}`" for key, old, new in replacements
     ) or "- None."
+    alias_lines = "\n".join(
+        f"- `{path}`: `saundersMultiDepthComputationalPeriscopy2020` → "
+        "`saundersComputationalPeriscopyOrdinary2019`" for path in alias_files
+    ) or "- No alias occurrence remained."
     note = f"""# 11 July 2026 bibliography deduplication
 
 The survey previously passed every chronological `egbib*.bib` supplement directly to BibTeX. Several supplements intentionally repeated keys to correct venue or metadata, which caused BibTeX to stop with repeated-entry errors before producing `bare_jrnl.bbl`.
 
-This update generates `egbib_merged_20260711.bib` from {len(sources)} source files and keeps one highest-priority record for each of {len(merged)} unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. `bare_jrnl.tex` now uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from {len(sources)} source files and keeps one highest-priority record for each of {len(merged)} unique keys. Keys are compared case-insensitively because BibTeX treats case variants as duplicates. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. `bare_jrnl.tex` now uses only the consolidated bibliography.
 
 ## Duplicate keys resolved
 
 {duplicate_lines}
+
+## Citation-key correction
+
+No verifiable publication matching `saundersMultiDepthComputationalPeriscopy2020` was found. The alias was replaced with the verified key for Saunders et al., *Computational Periscopy with an Ordinary Digital Camera*, Nature 565, 472--475 (2019), DOI 10.1038/s41586-018-0868-6:
+
+{alias_lines}
 
 The CI workflow performs a clean LaTeX/BibTeX build, rejects undefined citations or repeated entries, validates the PDF with `pdfinfo` and `pdftotext`, and verifies that the newly integrated X-band radar and Neural Illumination Fields records appear in the generated bibliography.
 """
