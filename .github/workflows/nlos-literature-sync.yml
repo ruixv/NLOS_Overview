@@ -50,30 +50,55 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-bibtex-extra poppler-utils
 
-      - name: Rebuild survey PDF
+      - name: Rebuild and validate survey PDF
         id: build
-        continue-on-error: true
+        shell: bash
         run: |
-          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
-          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
-          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
-          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
-          test -s /tmp/bare_jrnl.txt
-          grep -q "Recent Advances on Non-Line-of-Sight Imaging" /tmp/bare_jrnl.txt
+          set +e
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          latexmk -pdf -interaction=nonstopmode bare_jrnl.tex > /tmp/latexmk.log 2>&1
+          latex_rc=$?
+          pdf_ok=false
+          if [ -s bare_jrnl.pdf ]; then
+            pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt 2>&1
+            info_rc=$?
+            pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt > /tmp/pdftotext.log 2>&1
+            text_rc=$?
+            if [ "$info_rc" -eq 0 ] && [ "$text_rc" -eq 0 ] && [ -s /tmp/bare_jrnl.txt ]; then
+              pdf_ok=true
+            fi
+          fi
+          echo "latex_rc=$latex_rc" >> "$GITHUB_OUTPUT"
+          echo "pdf_ok=$pdf_ok" >> "$GITHUB_OUTPUT"
+          if [ "$pdf_ok" != true ]; then
+            {
+              echo '# LaTeX build diagnostic (11 July 2026)'
+              echo
+              echo "latexmk exit code: $latex_rc"
+              echo
+              echo '```text'
+              tail -n 180 /tmp/latexmk.log 2>/dev/null || true
+              echo '```'
+            } > updates/2026-07-11-latex-build-diagnostic.md
+          else
+            rm -f updates/2026-07-11-latex-build-diagnostic.md
+          fi
+          exit 0
 
       - name: Record build status
         env:
-          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          PDF_OK: ${{ steps.build.outputs.pdf_ok }}
+          LATEX_RC: ${{ steps.build.outputs.latex_rc }}
         run: |
           python - <<'PY'
           from pathlib import Path
           import os
           p = Path('updates/2026-07-11-citation-tracing-sparse-irregular-sync.md')
           text = p.read_text(encoding='utf-8')
-          if os.environ['BUILD_OUTCOME'] == 'success':
-              status = '\n**Build result:** successful clean LaTeX/BibTeX rebuild; `bare_jrnl.pdf` regenerated and text-validated in CI.\n'
+          if os.environ.get('PDF_OK') == 'true':
+              status = f"\n**Build result:** successful clean LaTeX/BibTeX rebuild; `bare_jrnl.pdf` was regenerated and validated with `pdfinfo` and `pdftotext` in CI (latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
           else:
-              status = '\n**Build result:** LaTeX/BibTeX compilation failed in CI. Source updates are committed, but the pre-existing `bare_jrnl.pdf` is intentionally not staged as an updated binary. Inspect the workflow log before rebuilding locally.\n'
+              status = f"\n**Build result:** no valid regenerated PDF was produced in CI (latexmk exit code {os.environ.get('LATEX_RC', 'unknown')}). Source updates are committed and the prior PDF is left untouched; see `updates/2026-07-11-latex-build-diagnostic.md`.\n"
           p.write_text(text + status, encoding='utf-8')
           PY
 
@@ -84,7 +109,8 @@ jobs:
           git add README.md index.html article/2active.tex article/4datadriven.tex bare_jrnl.tex \
             egbib_20260711_updates.bib updates/2026-07-11-citation-tracing-sparse-irregular-sync.md \
             egbib*.bib scripts/sync_nlos_20260711.py
-          if [ "${{ steps.build.outcome }}" = "success" ]; then
+          git add -A updates/2026-07-11-latex-build-diagnostic.md 2>/dev/null || true
+          if [ "${{ steps.build.outputs.pdf_ok }}" = "true" ]; then
             git add bare_jrnl.pdf
           else
             git restore --staged bare_jrnl.pdf 2>/dev/null || true
@@ -93,7 +119,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Sync citation-traced NLOS papers and rebuild survey"
+            git commit -m "Rebuild and validate updated NLOS survey"
             if [ "${{ github.event_name }}" = "pull_request" ]; then
               git push origin HEAD:${{ github.head_ref }}
             else
