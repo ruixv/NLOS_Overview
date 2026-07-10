@@ -27,6 +27,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install bibliography parser
+        run: python -m pip install bibtexparser==1.4.3
+
       - name: Apply anchor-checked literature sync
         run: |
           python scripts/sync_nlos_20260711_run15.py
