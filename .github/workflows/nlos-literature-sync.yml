@@ -28,7 +28,9 @@ jobs:
           python-version: '3.12'
 
       - name: Apply anchor-checked literature sync
-        run: python scripts/sync_nlos_20260711_run15.py
+        run: |
+          python scripts/sync_nlos_20260711_run15.py
+          python scripts/merge_nlos_bibliography.py
 
       - name: Install LaTeX toolchain
         run: |
@@ -82,7 +84,7 @@ jobs:
 
           if [ "$pdf_ok" != true ]; then
             {
-              echo '# LaTeX build diagnostic (11 July 2026, X-band/NIF sync)'
+              echo '# LaTeX build diagnostic (11 July 2026, merged bibliography)'
               echo
               echo "latexmk exit code: $latex_rc"
               echo
@@ -121,16 +123,17 @@ jobs:
           text = re.sub(r'\n\*\*Build result:\*\*.*?\n(?=\n|\Z)', '\n', text, flags=re.S)
           if os.environ.get('PDF_OK') == 'true':
               status = (
-                  "\n**Build result:** successful clean LaTeX/BibTeX rebuild. "
-                  "`bare_jrnl.pdf` was regenerated; `pdfinfo`/`pdftotext` passed, "
-                  "no undefined citation/reference warnings were detected, and both new "
-                  f"bibliography records were verified in the build (latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
+                  "\n**Build result:** successful clean LaTeX/BibTeX rebuild from the "
+                  "duplicate-free consolidated bibliography. `bare_jrnl.pdf` was regenerated; "
+                  "`pdfinfo`/`pdftotext` passed, no undefined citation/reference warnings or "
+                  "repeated BibTeX keys were detected, and both newly integrated records were "
+                  f"verified in the build (latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
               )
           else:
               status = (
-                  "\n**Build result:** source synchronization succeeded, but no strictly "
-                  "validated replacement PDF was committed. The prior PDF was preserved. "
-                  f"Reason: {os.environ.get('VALIDATION_REASON', 'unknown')} "
+                  "\n**Build result:** source synchronization and bibliography consolidation "
+                  "succeeded, but no strictly validated replacement PDF was committed. The prior "
+                  f"PDF was preserved. Reason: {os.environ.get('VALIDATION_REASON', 'unknown')} "
                   f"(latexmk exit code {os.environ.get('LATEX_RC', 'unknown')}). See "
                   "`updates/2026-07-11-xband-nif-build-diagnostic.md`.\n"
               )
@@ -142,9 +145,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add README.md index.html article/5newscenes.tex bare_jrnl.tex \
-            egbib_20260711_run15_updates.bib \
+            egbib_20260711_run15_updates.bib egbib_merged_20260711.bib \
             updates/2026-07-11-xband-nif-and-bibliography-sync.md \
-            scripts/sync_nlos_20260711_run15.py
+            updates/2026-07-11-bibliography-deduplication.md \
+            scripts/sync_nlos_20260711_run15.py scripts/merge_nlos_bibliography.py \
+            .github/workflows/nlos-literature-sync.yml
           git add -A updates/2026-07-11-xband-nif-build-diagnostic.md 2>/dev/null || true
           if [ "${{ steps.build.outputs.pdf_ok }}" = "true" ]; then
             git add bare_jrnl.pdf
@@ -155,7 +160,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Integrate X-band radar and neural two-bounce NLOS papers"
+            git commit -m "Deduplicate bibliography and rebuild NLOS survey"
             if [ "${{ github.event_name }}" = "pull_request" ]; then
               git push origin HEAD:${{ github.head_ref }}
             else
