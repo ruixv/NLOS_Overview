@@ -19,4 +19,4 @@ The public surfaces were corrected from arXiv-only labels to verified final venu
 
 The accompanying GitHub Actions run attempts a clean LaTeX/BibTeX rebuild. The workflow appends the final success/failure status below before committing. If compilation fails, source changes are still committed and the old PDF is deliberately left untouched.
 
-**Build result:** no valid regenerated PDF was produced in CI (latexmk exit code 12). Source updates are committed and the prior PDF is left untouched; see `updates/2026-07-11-latex-build-diagnostic.md`.
+**Build result:** successful clean LaTeX/BibTeX rebuild; `bare_jrnl.pdf` was regenerated and validated with `pdfinfo` and `pdftotext` in CI (latexmk exit code 0).
