@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - .github/workflows/nlos-literature-sync.yml
+  pull_request:
+    paths:
+      - scripts/sync_nlos_20260711.py
   workflow_dispatch:
 
 permissions:
