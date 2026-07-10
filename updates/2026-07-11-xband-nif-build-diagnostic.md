@@ -1,10 +1,57 @@
-# LaTeX build diagnostic (11 July 2026, X-band/NIF sync)
+# LaTeX build diagnostic (11 July 2026, merged bibliography)
 
 latexmk exit code: 12
 
 validation: latexmk failed
 
 ```text
+
+
+LaTeX Warning: Citation `cuiVirtualScanning2024' on page 25 undefined on input 
+line 9.
+
+
+LaTeX Warning: Citation `wuUntrainedDecoder2022' on page 25 undefined on input 
+line 9.
+
+
+LaTeX Warning: Citation `royoNLOSTransientRendering2022' on page 25 undefined o
+n input line 12.
+
+
+LaTeX Warning: Citation `plackFastDifferentiable2023' on page 25 undefined on i
+nput line 12.
+
+
+LaTeX Warning: Citation `wangPropagateCalibrate2023' on page 25 undefined on in
+put line 12.
+
+
+LaTeX Warning: Citation `sultanOptimizedSamplingNLOS2025' on page 25 undefined 
+on input line 12.
+
+
+LaTeX Warning: Citation `liuArbitraryPatternNLOS2023' on page 25 undefined on i
+nput line 12.
+
+
+LaTeX Warning: Citation `liuFewShotSSCR2022' on page 25 undefined on input line
+ 12.
+
+
+LaTeX Warning: Citation `choLEAP2024' on page 25 undefined on input line 12.
+
+
+LaTeX Warning: Citation `songPtychographicNLOS2024' on page 25 undefined on inp
+ut line 12.
+
+
+LaTeX Warning: Citation `sultanIteratingTLTM2024' on page 25 undefined on input
+ line 12.
+
+
+LaTeX Warning: Citation `marcoComprehensiveToFNLOS2026' on page 25 undefined on
+ input line 12.
 
 [25]
 
@@ -117,19 +164,7 @@ Latexmk: Examining 'bare_jrnl.log'
 Latexmk: References changed.
 Latexmk: Log file says output to 'bare_jrnl.pdf'
 Latexmk: Found bibliography file(s):
-  ./egbib.bib
-  ./egbib_20260701_updates.bib
-  ./egbib_20260702_updates.bib
-  ./egbib_20260703_updates.bib
-  ./egbib_20260704_updates.bib
-  ./egbib_20260705_updates.bib
-  ./egbib_20260706_updates.bib
-  ./egbib_20260707_updates.bib
-  ./egbib_20260708_updates.bib
-  ./egbib_20260709_updates.bib
-  ./egbib_20260711_run15_updates.bib
-  ./egbib_20260711_updates.bib
-  ./egbib_2026_updates.bib
+  ./egbib_merged_20260711.bib
 Latexmk: applying rule 'bibtex bare_jrnl'...
 Rule 'bibtex bare_jrnl':  Reasons for rerun
 Category 'other':
@@ -145,55 +180,20 @@ Running 'bibtex  "bare_jrnl.aux"'
 This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
 The top-level auxiliary file: bare_jrnl.aux
 The style file: IEEEtran.bst
-Database file #1: egbib.bib
-Database file #2: egbib_20260701_updates.bib
-Repeated entry---line 25 of file egbib_20260701_updates.bib
- : @misc{sunGeneralizable2025
- :                           ,
-I'm skipping whatever remains of this entry
-Database file #3: egbib_20260702_updates.bib
-Repeated entry---line 16 of file egbib_20260702_updates.bib
- : @article{caohighresolutionnlos2022
- :                                   ,
-I'm skipping whatever remains of this entry
-Database file #4: egbib_20260703_updates.bib
-Repeated entry---line 34 of file egbib_20260703_updates.bib
+Database file #1: egbib_merged_20260711.bib
+Repeated entry---line 3755 of file egbib_merged_20260711.bib
  : @misc{zhuFastNonlineofsightImaging2021a
  :                                        ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 43 of file egbib_20260703_updates.bib
- : @misc{fujimuraNLOSNeuS2023
- :                           ,
-I'm skipping whatever remains of this entry
-Repeated entry---line 61 of file egbib_20260703_updates.bib
- : @misc{suDGNLOS2025
- :                   ,
-I'm skipping whatever remains of this entry
-Database file #5: egbib_20260704_updates.bib
-Database file #6: egbib_20260705_updates.bib
-Repeated entry---line 7 of file egbib_20260705_updates.bib
+Repeated entry---line 3845 of file egbib_merged_20260711.bib
  : @misc{musarraNonlineofsight3DImaging2019
  :                                         ,
 I'm skipping whatever remains of this entry
-Database file #7: egbib_20260706_updates.bib
-Database file #8: egbib_20260707_updates.bib
-Repeated entry---line 7 of file egbib_20260707_updates.bib
+Repeated entry---line 3899 of file egbib_merged_20260711.bib
  : @misc{leiDirectObjectRecognition2019
  :                                     ,
 I'm skipping whatever remains of this entry
-Database file #9: egbib_20260708_updates.bib
-Database file #10: egbib_20260709_updates.bib
-Database file #11: egbib_20260711_updates.bib
-Database file #12: egbib_20260711_run15_updates.bib
-Database file #13: egbib_2026_updates.bib
-Repeated entry---line 135 of file egbib_2026_updates.bib
- : @inproceedings{liTransiT2025
- :                             ,
-I'm skipping whatever remains of this entry
-Repeated entry---line 164 of file egbib_2026_updates.bib
- : @misc{somasundaramRoleTransients2023
- :                                     ,
-I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "saundersMultiDepthComputationalPeriscopy2020"
 -- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
@@ -202,7 +202,7 @@ Warning--empty year in isogawaEfficientNonLineofSightImaging
 Warning--empty year in scheinerseeingstreetcornersa
 
 Done.
-(There were 9 error messages)
+(There were 3 error messages)
 Latexmk: ====Undefined refs and citations with line #s in .tex file:
   Citation `otooleConfocalNonlineofsightImaging2018' on page 1 undefined on input line 10
   Citation `liuVirtualWaveOptics2018' on page 1 undefined on input line 10
@@ -240,55 +240,20 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated field_info (elt_size=4) to 13970 items from 5000.
-Database file #1: egbib.bib
-Database file #2: egbib_20260701_updates.bib
-Repeated entry---line 25 of file egbib_20260701_updates.bib
- : @misc{sunGeneralizable2025
- :                           ,
-I'm skipping whatever remains of this entry
-Database file #3: egbib_20260702_updates.bib
-Repeated entry---line 16 of file egbib_20260702_updates.bib
- : @article{caohighresolutionnlos2022
- :                                   ,
-I'm skipping whatever remains of this entry
-Database file #4: egbib_20260703_updates.bib
-Repeated entry---line 34 of file egbib_20260703_updates.bib
+Database file #1: egbib_merged_20260711.bib
+Repeated entry---line 3755 of file egbib_merged_20260711.bib
  : @misc{zhuFastNonlineofsightImaging2021a
  :                                        ,
 I'm skipping whatever remains of this entry
-Repeated entry---line 43 of file egbib_20260703_updates.bib
- : @misc{fujimuraNLOSNeuS2023
- :                           ,
-I'm skipping whatever remains of this entry
-Repeated entry---line 61 of file egbib_20260703_updates.bib
- : @misc{suDGNLOS2025
- :                   ,
-I'm skipping whatever remains of this entry
-Database file #5: egbib_20260704_updates.bib
-Database file #6: egbib_20260705_updates.bib
-Repeated entry---line 7 of file egbib_20260705_updates.bib
+Repeated entry---line 3845 of file egbib_merged_20260711.bib
  : @misc{musarraNonlineofsight3DImaging2019
  :                                         ,
 I'm skipping whatever remains of this entry
-Database file #7: egbib_20260706_updates.bib
-Database file #8: egbib_20260707_updates.bib
-Repeated entry---line 7 of file egbib_20260707_updates.bib
+Repeated entry---line 3899 of file egbib_merged_20260711.bib
  : @misc{leiDirectObjectRecognition2019
  :                                     ,
 I'm skipping whatever remains of this entry
-Database file #9: egbib_20260708_updates.bib
-Database file #10: egbib_20260709_updates.bib
-Database file #11: egbib_20260711_updates.bib
-Database file #12: egbib_20260711_run15_updates.bib
-Database file #13: egbib_2026_updates.bib
-Repeated entry---line 135 of file egbib_2026_updates.bib
- : @inproceedings{liTransiT2025
- :                             ,
-I'm skipping whatever remains of this entry
-Repeated entry---line 164 of file egbib_2026_updates.bib
- : @misc{somasundaramRoleTransients2023
- :                                     ,
-I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "saundersMultiDepthComputationalPeriscopy2020"
 -- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
@@ -297,46 +262,46 @@ Warning--empty year in isogawaEfficientNonLineofSightImaging
 Warning--empty year in scheinerseeingstreetcornersa
 
 Done.
-You've used 195 entries,
+You've used 194 entries,
             4087 wiz_defined-function locations,
-            1963 strings with 55230 characters,
-and the built_in function-call counts, 160668 in all, are:
-= -- 12693
-> -- 4879
-< -- 1137
-+ -- 2635
-- -- 1067
-* -- 8126
-:= -- 23255
-add.period$ -- 404
-call.type$ -- 195
-change.case$ -- 210
-chr.to.int$ -- 2463
-cite$ -- 198
-duplicate$ -- 11652
-empty$ -- 12515
-format.name$ -- 1160
-if$ -- 37498
+            1962 strings with 54940 characters,
+and the built_in function-call counts, 159541 in all, are:
+= -- 12618
+> -- 4865
+< -- 1125
++ -- 2625
+- -- 1066
+* -- 8078
+:= -- 23137
+add.period$ -- 402
+call.type$ -- 194
+change.case$ -- 209
+chr.to.int$ -- 2433
+cite$ -- 197
+duplicate$ -- 11558
+empty$ -- 12360
+format.name$ -- 1158
+if$ -- 37193
 int.to.chr$ -- 0
-int.to.str$ -- 195
-missing$ -- 2268
-newline$ -- 686
-num.names$ -- 195
-pop$ -- 5457
+int.to.str$ -- 194
+missing$ -- 2259
+newline$ -- 693
+num.names$ -- 194
+pop$ -- 5450
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 2
-skip$ -- 12175
+skip$ -- 12068
 stack$ -- 0
-substring$ -- 6586
-swap$ -- 9673
-text.length$ -- 316
+substring$ -- 6515
+swap$ -- 9612
+text.length$ -- 314
 text.prefix$ -- 0
 top$ -- 5
-type$ -- 195
+type$ -- 194
 warning$ -- 3
-while$ -- 613
-width$ -- 198
-write$ -- 2013
-(There were 9 error messages)
+while$ -- 608
+width$ -- 197
+write$ -- 2014
+(There were 3 error messages)
 ```

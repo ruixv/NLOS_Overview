@@ -17,4 +17,4 @@ Fresh keyword search and forward-citation tracing from core optical NLOS, phasor
 
 The GitHub Actions workflow performs a clean LaTeX/BibTeX rebuild, checks for undefined citations/references, validates the resulting PDF with `pdfinfo` and `pdftotext`, and confirms that both newly integrated paper titles appear in the generated survey text. The workflow records the final result below.
 
-**Build result:** source synchronization succeeded, but no strictly validated replacement PDF was committed. The prior PDF was preserved. Reason: latexmk failed (latexmk exit code 12). See `updates/2026-07-11-xband-nif-build-diagnostic.md`.
+**Build result:** source synchronization and bibliography consolidation succeeded, but no strictly validated replacement PDF was committed. The prior PDF was preserved. Reason: latexmk failed (latexmk exit code 12). See `updates/2026-07-11-xband-nif-build-diagnostic.md`.
