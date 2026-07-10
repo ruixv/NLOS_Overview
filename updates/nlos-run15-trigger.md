@@ -1,1 +1,1 @@
-Retrigger the final case-normalized, duplicate-free NLOS survey rebuild after removing the unverifiable passive citation.
+Trigger the final case-normalized, duplicate-free NLOS survey rebuild in a containerized TeX Live environment.
