@@ -1,1 +1,1 @@
-Retrigger the case-normalized bibliography merge, citation-alias correction, and strict NLOS survey rebuild on 11 July 2026.
+Retrigger final normalized PDF-text validation for the duplicate-free NLOS survey build on 11 July 2026.
