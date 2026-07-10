@@ -2,7 +2,7 @@
 
 latexmk exit code: 0
 
-validation: PDF/reference validation failed (undefined=true, integrated=false, pdfinfo=0, pdftotext=0)
+validation: PDF/reference validation failed (undefined=true, integrated=true, pdfinfo=0, pdftotext=0)
 
 ```text
 Underfull \hbox (badness 2744) in paragraph at lines 15--16
