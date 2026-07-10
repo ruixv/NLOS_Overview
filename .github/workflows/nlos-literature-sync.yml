@@ -48,7 +48,7 @@ jobs:
       - name: Install LaTeX toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-bibtex-extra poppler-utils
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
 
       - name: Rebuild and validate survey PDF
         id: build
