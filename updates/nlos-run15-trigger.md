@@ -1,1 +1,1 @@
-Retrigger final normalized PDF-text validation for the duplicate-free NLOS survey build on 11 July 2026.
+Run the final strict bibliography and normalized PDF-text validation after the validation-rule correction.
