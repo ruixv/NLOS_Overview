@@ -1,0 +1,94 @@
+name: NLOS literature sync and survey build
+
+on:
+  push:
+    paths:
+      - .github/workflows/nlos-literature-sync.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply anchor-checked literature sync
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/sync_nlos_20260711.py')
+          lines = p.read_text(encoding='utf-8').splitlines()
+          fixed = False
+          for i, line in enumerate(lines):
+              if line.startswith('tex = re.sub(r"\\\\bibliography'):
+                  lines[i] = 'tex = re.sub(r"\\\\bibliography\\{[^}]+\\}", lambda _m: r"\\bibliography{" + ",".join(bib_names) + "}", tex, count=1)'
+                  fixed = True
+          if not fixed:
+              raise SystemExit('Could not patch bibliography replacement line safely')
+          p.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+          PY
+          python scripts/sync_nlos_20260711.py
+
+      - name: Install LaTeX toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-bibtex-extra poppler-utils
+
+      - name: Rebuild survey PDF
+        id: build
+        continue-on-error: true
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
+          grep -q "Recent Advances on Non-Line-of-Sight Imaging" /tmp/bare_jrnl.txt
+
+      - name: Record build status
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          p = Path('updates/2026-07-11-citation-tracing-sparse-irregular-sync.md')
+          text = p.read_text(encoding='utf-8')
+          if os.environ['BUILD_OUTCOME'] == 'success':
+              status = '\n**Build result:** successful clean LaTeX/BibTeX rebuild; `bare_jrnl.pdf` regenerated and text-validated in CI.\n'
+          else:
+              status = '\n**Build result:** LaTeX/BibTeX compilation failed in CI. Source updates are committed, but the pre-existing `bare_jrnl.pdf` is intentionally not staged as an updated binary. Inspect the workflow log before rebuilding locally.\n'
+          p.write_text(text + status, encoding='utf-8')
+          PY
+
+      - name: Commit synchronized artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex article/4datadriven.tex bare_jrnl.tex \
+            egbib_20260711_updates.bib updates/2026-07-11-citation-tracing-sparse-irregular-sync.md \
+            egbib*.bib scripts/sync_nlos_20260711.py
+          if [ "${{ steps.build.outcome }}" = "success" ]; then
+            git add bare_jrnl.pdf
+          else
+            git restore --staged bare_jrnl.pdf 2>/dev/null || true
+            git checkout -- bare_jrnl.pdf 2>/dev/null || true
+          fi
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Sync citation-traced NLOS papers and rebuild survey"
+            git push origin HEAD:master
+          fi
