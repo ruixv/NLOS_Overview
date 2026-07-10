@@ -1,1 +1,1 @@
-Trigger the duplicate-free bibliography merge and strict NLOS survey rebuild on 11 July 2026.
+Trigger the final case-normalized, duplicate-free bibliography merge and strict NLOS survey rebuild on 11 July 2026.
