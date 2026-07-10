@@ -8,7 +8,7 @@ This update generates `egbib_merged_20260711.bib` from 13 source files and keeps
 - Case-insensitive duplicate replacements: 9
 - Citation-key case normalizations: 85
 - Ambiguous citation spellings: 0
-- Truly missing citation keys: 1
+- Truly missing citation keys: 0
 
 ## Duplicate records resolved
 
@@ -116,6 +116,6 @@ This update generates `egbib_merged_20260711.bib` from 13 source files and keeps
 
 ## Truly missing citation keys and source locations
 
-- `saundersMultiDepthComputationalPeriscopy2020` — `article/1introduction.tex:15`
+- None.
 
 The CI workflow performs a clean LaTeX/BibTeX build, rejects undefined citations or repeated entries, validates the PDF with `pdfinfo` and `pdftotext`, and verifies that the newly integrated X-band radar and Neural Illumination Fields records appear in the generated bibliography.
