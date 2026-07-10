@@ -253,7 +253,7 @@ replace_bib_entry("Non-line-of-sight Neural Implicit Surface", lambda k: f"""@in
 # Include every supplemental bibliography in the survey build.
 tex = read("bare_jrnl.tex")
 bib_names = [p.stem for p in sorted(ROOT.glob("egbib*.bib"))]
-tex = re.sub(r"\\bibliography\{[^}]+\}", "\\bibliography{" + ",".join(bib_names) + "}", tex, count=1)
+tex = re.sub(r"\\bibliography\{[^}]+\}", lambda _m: r"\bibliography{" + ",".join(bib_names) + "}", tex, count=1)
 write("bare_jrnl.tex", tex)
 
 

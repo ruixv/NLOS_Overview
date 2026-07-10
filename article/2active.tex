@@ -306,6 +306,10 @@ Therefore, NLOS recognition is typically  based on data-driven methods (see Sec.
 
 
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Challenges and Prospects}
+\vspace{0.8mm}
+\noindent \textbf{Irregular, aperture-limited, and under-scanned relay measurements.}
+Recent work increasingly relaxes the dense planar-wall assumption. DO-NLOS~\cite{miaoUnderScanning2025} combines convolution approximation and optimization for strongly under-scanned measurements; sub-pixel resolving modulation~\cite{zhangSubpixelModulation2025} extracts spatial detail beyond the native relay sampling grid; and CUDA-accelerated reconstruction on irregular relay surfaces~\cite{sunCUDAIrregular2026} makes geometry-aware filtered backprojection practical on modern GPUs. These developments complement self-supervised Virtual Scanning and diffusion-based transient completion by improving the physical solver and acquisition model rather than relying only on learned interpolation.
+
 \subsection{Challenges and Prospects} \label{sec:activeChallenge}
 Despite considerable progress in recent years, active NLOS imaging still faces many challenges, including ill-posedness with low SNR, limited resolution, and long data acquisition time. 
 

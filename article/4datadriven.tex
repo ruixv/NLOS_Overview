@@ -95,6 +95,10 @@ Ye~\etal~introduced a plug-and-play (PnP) framework for dynamic NLOS video recon
 Cui~\etal~proposed Virtual Scanning~\cite{cuiVirtualScanning2024}, an unsupervised framework for NLOS imaging from irregularly undersampled transients (IUT) that does not require paired training data. A virtual scanning process enables the network to learn within both the range and null spaces of the measurement operator, combined with a physics-guided SURE-based denoiser for robustness to noise. This method achieves higher fidelity and orders-of-magnitude faster inference than existing iterative solutions.
 
 \vspace{0.8mm}
+\noindent \textbf{Aperture-limited diffusion and physics-guided high-speed reconstruction.}
+TransDiff~\cite{cuiTransDiffTIP2025} extends unsupervised transient completion to aperture-limited relay surfaces using a latent diffusion prior constrained by the measured transients. In parallel, Physics to the Rescue~\cite{muPhysicsRescueTPAMI2025} embeds wave-propagation and volume-rendering priors into a neural reconstruction pipeline, improving robustness when high-speed acquisition requires approximate light-transport models. Together, these methods mark a shift from purely data-driven inversion toward learned solvers whose latent completion is explicitly checked against transient physics.
+
+\vspace{0.8mm}
 \noindent \textbf{Untrained network priors.}
 Wu~\etal~demonstrated that an untrained deep decoder network can serve as an effective image prior for NLOS reconstruction without any training data~\cite{wuUntrainedDecoder2022}, leveraging the deep image prior inherent in the network architecture to regularize the ill-posed NLOS inverse problem, offering flexibility for novel experimental configurations where training data is unavailable.
 
