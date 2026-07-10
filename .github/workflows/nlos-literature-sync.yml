@@ -30,10 +30,11 @@ jobs:
       - name: Install bibliography parser
         run: python -m pip install bibtexparser==1.4.3
 
-      - name: Apply anchor-checked literature sync
+      - name: Apply anchor-checked literature sync and citation-key audit
         run: |
           python scripts/sync_nlos_20260711_run15.py
           python scripts/merge_nlos_bibliography.py
+          grep -E "Case-insensitive duplicate replacements|Citation-key case normalizations|Truly missing citation keys" updates/2026-07-11-bibliography-deduplication.md
 
       - name: Install LaTeX toolchain
         run: |
@@ -64,6 +65,9 @@ jobs:
             if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg 2>/dev/null; then
               undefined=true
             fi
+            if grep -Eq "Truly missing citation keys: [1-9]" updates/2026-07-11-bibliography-deduplication.md; then
+              undefined=true
+            fi
 
             integrated=false
             if grep -Fq "X-band Radar Non-Line-of-Sight Imaging" bare_jrnl.bbl \
@@ -87,7 +91,7 @@ jobs:
 
           if [ "$pdf_ok" != true ]; then
             {
-              echo '# LaTeX build diagnostic (11 July 2026, merged bibliography)'
+              echo '# LaTeX build diagnostic (11 July 2026, case-normalized merged bibliography)'
               echo
               echo "latexmk exit code: $latex_rc"
               echo
@@ -127,16 +131,17 @@ jobs:
           if os.environ.get('PDF_OK') == 'true':
               status = (
                   "\n**Build result:** successful clean LaTeX/BibTeX rebuild from the "
-                  "duplicate-free consolidated bibliography. `bare_jrnl.pdf` was regenerated; "
-                  "`pdfinfo`/`pdftotext` passed, no undefined citation/reference warnings or "
-                  "repeated BibTeX keys were detected, and both newly integrated records were "
-                  f"verified in the build (latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
+                  "case-normalized, duplicate-free consolidated bibliography. `bare_jrnl.pdf` "
+                  "was regenerated; `pdfinfo`/`pdftotext` passed, no undefined citation/reference "
+                  "warnings or repeated BibTeX keys were detected, and both newly integrated "
+                  f"records were verified in the build (latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
               )
           else:
               status = (
-                  "\n**Build result:** source synchronization and bibliography consolidation "
-                  "succeeded, but no strictly validated replacement PDF was committed. The prior "
-                  f"PDF was preserved. Reason: {os.environ.get('VALIDATION_REASON', 'unknown')} "
+                  "\n**Build result:** source synchronization and citation-key-normalized "
+                  "bibliography consolidation succeeded, but no strictly validated replacement "
+                  "PDF was committed. The prior PDF was preserved. "
+                  f"Reason: {os.environ.get('VALIDATION_REASON', 'unknown')} "
                   f"(latexmk exit code {os.environ.get('LATEX_RC', 'unknown')}). See "
                   "`updates/2026-07-11-xband-nif-build-diagnostic.md`.\n"
               )
@@ -163,7 +168,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Deduplicate bibliography and rebuild NLOS survey"
+            git commit -m "Normalize bibliography keys and rebuild NLOS survey"
             if [ "${{ github.event_name }}" = "pull_request" ]; then
               git push origin HEAD:${{ github.head_ref }}
             else
