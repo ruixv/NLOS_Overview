@@ -1,6 +1,6 @@
 name: Synchronize real-time dynamic NLOS milestone
 
-# Trigger revision 2: canonicalize the existing survey citation key.
+# Trigger revision 3: rerun after concurrent survey validation completed.
 on:
   push:
     paths:
