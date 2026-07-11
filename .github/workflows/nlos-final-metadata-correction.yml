@@ -1,4 +1,5 @@
 name: Correct Nam et al. final metadata and rebuild survey
+# Trigger after the correction workflow was added to the default branch.
 
 on:
   push:
