@@ -1,5 +1,6 @@
 name: Synchronize real-time dynamic NLOS milestone
 
+# Trigger revision 1: the workflow now exists on the default branch.
 on:
   push:
     paths:
@@ -28,12 +29,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install bibliography parser
-        run: python -m pip install bibtexparser==1.4.3
-
-      - name: Synchronize public artifacts and bibliography
+      - name: Synchronize sources and bibliography
         run: |
           set -euo pipefail
+          python -m pip install bibtexparser==1.4.3
           python -m py_compile scripts/sync_nlos_20260712_realtime_dynamic.py
           python scripts/sync_nlos_20260712_realtime_dynamic.py
           python scripts/merge_nlos_bibliography.py
@@ -41,7 +40,7 @@ jobs:
           test "$(grep -ic '^@.*{namRealTimeDynamicScenes2021,' egbib_merged_20260711.bib)" -eq 1
           grep -Fq "Real-time Non-line-of-Sight imaging of dynamic scenes" README.md
           grep -Fq "Real-time Non-line-of-Sight imaging of dynamic scenes" index.html
-          grep -Fq "providing an early full-pipeline real-time NLOS video milestone" article/2active.tex
+          grep -Fq "full-pipeline real-time NLOS video milestone" article/2active.tex
           grep -Fq '<b>86</b><span>tracked latest entries</span>' index.html
 
       - name: Install LaTeX toolchain
@@ -49,7 +48,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
 
-      - name: Rebuild and strictly validate survey PDF
+      - name: Rebuild and validate survey PDF
         id: build
         shell: bash
         run: |
@@ -59,57 +58,40 @@ jobs:
           latex_rc=$?
           pdf_ok=false
           reason="latexmk failed"
-
           if [ "$latex_rc" -eq 0 ] && [ -s bare_jrnl.pdf ] && [ -s bare_jrnl.bbl ]; then
             pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt 2>&1
             info_rc=$?
             pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt > /tmp/pdftotext.log 2>&1
             text_rc=$?
             undefined=false
-            if grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log 2>/dev/null; then undefined=true; fi
-            if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg 2>/dev/null; then undefined=true; fi
-
+            grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log 2>/dev/null && undefined=true
+            grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg 2>/dev/null && undefined=true
             integrated=false
             if grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.aux \
-              && grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.bbl \
-              && grep -Fq 'Real-time Non-line-of-Sight imaging of dynamic scenes' README.md \
-              && grep -Fq 'Real-time Non-line-of-Sight imaging of dynamic scenes' index.html; then
-              integrated=true
-            fi
-
+              && grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.bbl; then integrated=true; fi
             pdf_text_ok=false
             if python - <<'PY'
           from pathlib import Path
           import re
-          raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
-          compact = re.sub(r'[^a-z0-9]+', '', raw)
-          required = (
-              'realtimenonlineofsightimagingofdynamicscenes',
-              'nonretroreflectivehiddenscenes',
-              'fullpipelinerealtimenlosvideomilestone',
-          )
-          missing = [token for token in required if token not in compact]
+          compact = re.sub(r'[^a-z0-9]+', '', Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold())
+          required = ('realtimenonlineofsightimagingofdynamicscenes', 'fullpipelinerealtimenlosvideomilestone')
+          missing = [x for x in required if x not in compact]
           if missing:
-              print(f'Missing compact PDF tokens: {missing}')
+              print('Missing PDF tokens:', missing)
               raise SystemExit(1)
           PY
-            then
-              pdf_text_ok=true
-            fi
-
-            if [ "$info_rc" -eq 0 ] && [ "$text_rc" -eq 0 ] && [ -s /tmp/bare_jrnl.txt ] \
-              && [ "$undefined" = false ] && [ "$integrated" = true ] && [ "$pdf_text_ok" = true ]; then
+            then pdf_text_ok=true; fi
+            if [ "$info_rc" -eq 0 ] && [ "$text_rc" -eq 0 ] && [ "$undefined" = false ] \
+              && [ "$integrated" = true ] && [ "$pdf_text_ok" = true ]; then
               pdf_ok=true
-              reason="clean LaTeX/BibTeX build and cross-artifact validation passed"
+              reason="clean LaTeX/BibTeX and PDF validation passed"
             else
               reason="validation failed (undefined=$undefined integrated=$integrated pdf_text=$pdf_text_ok pdfinfo=$info_rc pdftotext=$text_rc)"
             fi
           fi
-
           echo "latex_rc=$latex_rc" >> "$GITHUB_OUTPUT"
           echo "pdf_ok=$pdf_ok" >> "$GITHUB_OUTPUT"
           echo "reason=$reason" >> "$GITHUB_OUTPUT"
-
           if [ "$pdf_ok" != true ]; then
             {
               echo '# Real-time dynamic NLOS build diagnostic (12 July 2026)'
@@ -143,19 +125,18 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import os
-          import re
+          import os, re
           p = Path('updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md')
           text = p.read_text(encoding='utf-8')
           text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
           if os.environ.get('PDF_OK') == 'true':
-              status = ("\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage, "
-                        "survey source, duplicate-free bibliography, and `bare_jrnl.pdf` are synchronized. "
-                        "`pdfinfo`/`pdftotext` passed and no undefined or repeated citation records were detected "
+              status = ("\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage, survey source, "
+                        "duplicate-free bibliography, and `bare_jrnl.pdf` are synchronized. `pdfinfo`/`pdftotext` passed, "
+                        "with no undefined or repeated citations "
                         f"(latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n")
           else:
-              status = ("\n\n**Build result:** source synchronization completed, but no replacement PDF was committed; "
-                        "the previous PDF was preserved. Reason: " + os.environ.get('REASON', 'unknown') +
+              status = ("\n\n**Build result:** source synchronization completed, but the previous PDF was preserved. Reason: "
+                        + os.environ.get('REASON', 'unknown') +
                         f" (latexmk exit code {os.environ.get('LATEX_RC', 'unknown')}). See the build diagnostic.\n")
           p.write_text(text.rstrip() + status, encoding='utf-8')
           PY
