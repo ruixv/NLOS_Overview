@@ -36,8 +36,12 @@ jobs:
         run: |
           python scripts/sync_nlos_20260711_run16.py
           python scripts/sync_nlos_20260711_run17.py
+          python scripts/sync_nlos_20260712_feature_visibility.py
           python scripts/merge_nlos_bibliography.py
+          python scripts/sync_nlos_20260712_feature_visibility.py
           grep -E "Case-insensitive duplicate replacements|Citation-key case normalizations|Truly missing citation keys" updates/2026-07-11-bibliography-deduplication.md
+          grep -q "Truly missing citation keys: 0" updates/2026-07-11-bibliography-deduplication.md
+          test "$(grep -ic '^@.*{liuAnalysisFeatureVisibility2019,' egbib_merged_20260711.bib)" -eq 1
 
       - name: Install LaTeX toolchain
         run: |
@@ -78,16 +82,35 @@ jobs:
               && grep -Fq 'liuFewShotSSCR2022' bare_jrnl.bbl \
               && grep -Fq 'Virtual light-transport analysis' article/2active.tex \
               && grep -Fq 'marcoVirtualLightTransport2021' bare_jrnl.aux \
-              && grep -Fq 'marcoVirtualLightTransport2021' bare_jrnl.bbl; then
+              && grep -Fq 'marcoVirtualLightTransport2021' bare_jrnl.bbl \
+              && grep -Fq 'Visibility limits and recoverability' article/2active.tex \
+              && grep -Fq 'liuAnalysisFeatureVisibility2019' bare_jrnl.aux \
+              && grep -Fq 'liuAnalysisFeatureVisibility2019' bare_jrnl.bbl \
+              && grep -Fq 'Analysis of Feature Visibility in Non-Line-of-Sight Measurements' README.md \
+              && grep -Fq 'Analysis of Feature Visibility in Non-Line-of-Sight Measurements' index.html; then
               integrated=true
             fi
 
+            pdf_text_ok=false
+            if python - <<'PY'
+          from pathlib import Path
+          text = " ".join(Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').split()).casefold()
+          required = (
+              'analysis of feature visibility in non-line-of-sight measurements',
+              'visibility limits and recoverability',
+          )
+          raise SystemExit(0 if all(token in text for token in required) else 1)
+          PY
+            then
+              pdf_text_ok=true
+            fi
+
             if [ "$info_rc" -eq 0 ] && [ "$text_rc" -eq 0 ] && [ -s /tmp/bare_jrnl.txt ] \
-              && [ "$undefined" = false ] && [ "$integrated" = true ]; then
+              && [ "$undefined" = false ] && [ "$integrated" = true ] && [ "$pdf_text_ok" = true ]; then
               pdf_ok=true
-              validation_reason="clean LaTeX/BibTeX build; SSCR and virtual light-transport sources, citations, and compiled bibliography keys verified"
+              validation_reason="clean LaTeX/BibTeX build; SSCR, virtual light transport, and feature visibility verified across public artifacts and PDF"
             else
-              validation_reason="PDF/reference validation failed (undefined=$undefined, integrated=$integrated, pdfinfo=$info_rc, pdftotext=$text_rc)"
+              validation_reason="PDF/reference validation failed (undefined=$undefined, integrated=$integrated, pdf_text=$pdf_text_ok, pdfinfo=$info_rc, pdftotext=$text_rc)"
             fi
           fi
 
@@ -97,7 +120,7 @@ jobs:
 
           if [ "$pdf_ok" != true ]; then
             {
-              echo '# Virtual light transport matrix LaTeX build diagnostic (11 July 2026)'
+              echo '# Feature-visibility LaTeX build diagnostic (12 July 2026)'
               echo
               echo "latexmk exit code: $latex_rc"
               echo
@@ -114,9 +137,9 @@ jobs:
                 tail -n 160 bare_jrnl.blg || true
                 echo '```'
               fi
-            } > updates/2026-07-11-vltm-build-diagnostic.md
+            } > updates/2026-07-12-feature-visibility-build-diagnostic.md
           else
-            rm -f updates/2026-07-11-vltm-build-diagnostic.md
+            rm -f updates/2026-07-12-feature-visibility-build-diagnostic.md
           fi
           exit 0
 
@@ -131,16 +154,16 @@ jobs:
           import os
           import re
 
-          p = Path('updates/2026-07-11-virtual-light-transport-matrix-citation-tracing-update.md')
+          p = Path('updates/2026-07-12-feature-visibility-citation-tracing-update.md')
           text = p.read_text(encoding='utf-8')
           text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
           if os.environ.get('PDF_OK') == 'true':
               status = (
                   "\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage, "
-                  "survey source, duplicate-free merged bibliography, and `bare_jrnl.pdf` are now "
+                  "survey source, canonical duplicate-free bibliography, and `bare_jrnl.pdf` are now "
                   "synchronized. `pdfinfo`/`pdftotext` passed, no undefined or repeated citation "
-                  "records were detected, and the virtual light-transport source, citation key, and "
-                  "compiled bibliography record were verified "
+                  "records were detected, and the feature-visibility paragraph, canonical citation "
+                  "key, full reference title, homepage object, and README row were verified "
                   f"(latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
               )
           else:
@@ -149,7 +172,7 @@ jobs:
                   "validated replacement PDF was committed; the previous PDF was preserved. "
                   f"Reason: {os.environ.get('VALIDATION_REASON', 'unknown')} "
                   f"(latexmk exit code {os.environ.get('LATEX_RC', 'unknown')}). See "
-                  "`updates/2026-07-11-vltm-build-diagnostic.md`.\n"
+                  "`updates/2026-07-12-feature-visibility-build-diagnostic.md`.\n"
               )
           p.write_text(text.rstrip() + status, encoding='utf-8')
           PY
@@ -163,10 +186,12 @@ jobs:
             egbib_merged_20260711.bib \
             updates/2026-07-11-sscr-survey-consistency-gap.md \
             updates/2026-07-11-virtual-light-transport-matrix-citation-tracing-update.md \
+            updates/2026-07-12-feature-visibility-citation-tracing-update.md \
             updates/2026-07-11-bibliography-deduplication.md \
             scripts/sync_nlos_20260711_run16.py scripts/sync_nlos_20260711_run17.py \
+            scripts/sync_nlos_20260712_feature_visibility.py \
             .github/workflows/nlos-sscr-sync.yml
-          git add -A updates/2026-07-11-vltm-build-diagnostic.md 2>/dev/null || true
+          git add -A updates/2026-07-12-feature-visibility-build-diagnostic.md 2>/dev/null || true
           if [ "${{ steps.build.outputs.pdf_ok }}" = "true" ]; then
             git add bare_jrnl.pdf
           else
@@ -176,6 +201,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Validate virtual NLOS light transport survey update"
+            git commit -m "Integrate NLOS feature visibility and rebuild survey"
             git push origin HEAD:master
           fi
