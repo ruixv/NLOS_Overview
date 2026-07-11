@@ -94,12 +94,17 @@ jobs:
             pdf_text_ok=false
             if python - <<'PY'
           from pathlib import Path
-          text = " ".join(Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').split()).casefold()
+          import re
+          raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
+          compact = re.sub(r'[^a-z0-9]+', '', raw)
           required = (
-              'analysis of feature visibility in non-line-of-sight measurements',
-              'visibility limits and recoverability',
+              'analysisoffeaturevisibilityinnonlineofsightmeasurements',
+              'visibilitylimitsandrecoverability',
           )
-          raise SystemExit(0 if all(token in text for token in required) else 1)
+          missing = [token for token in required if token not in compact]
+          if missing:
+              print(f"Missing compact PDF tokens: {missing}")
+              raise SystemExit(1)
           PY
             then
               pdf_text_ok=true
@@ -201,6 +206,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Integrate NLOS feature visibility and rebuild survey"
+            git commit -m "Validate NLOS feature visibility survey update"
             git push origin HEAD:master
           fi
