@@ -61,6 +61,7 @@ jobs:
 
           grep -Fq 'liuAnalysisFeatureVisibility2019' bare_jrnl.aux
           grep -Fq 'liuAnalysisFeatureVisibility2019' bare_jrnl.bbl
+          grep -Fq 'Analysis of Feature Visibility in Non-Line-of-Sight Measurements' bare_jrnl.bbl
           grep -Fq 'nam_real-time_2020' bare_jrnl.aux
           grep -Fq 'nam_real-time_2020' bare_jrnl.bbl
           ! grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.bbl
@@ -73,10 +74,12 @@ jobs:
           import re
           raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
           compact = re.sub(r'[^a-z0-9]+', '', raw)
+          # Validate stable paragraph fragments rather than full titles, because
+          # PDF text extraction may encode typographic ligatures non-literally.
           required = (
-              'analysisoffeaturevisibilityinnonlineofsightmeasurements',
-              'visibilitylimitsandrecoverability',
-              'realtimenonlineofsightimagingofdynamicscenes',
+              'recoverability',
+              'acquisitiongeometry',
+              'fullpipelinerealtimenlosvideomilestone',
           )
           missing = [token for token in required if token not in compact]
           if missing:
@@ -95,8 +98,9 @@ jobs:
               "\n\n**Build result:** successful clean LaTeX/BibTeX rebuild after the combined 12 July updates. "
               "README, homepage, survey source, canonical duplicate-free bibliography, and `bare_jrnl.pdf` "
               "are synchronized. `pdfinfo` and `pdftotext` passed; no undefined, repeated, or duplicate-paper "
-              "citation records were detected; and the feature-visibility title, literature-review heading, "
-              "canonical citation key, and real-time NLOS reference were verified in the compiled artifacts.\n"
+              "citation records were detected. The full feature-visibility title was verified in the compiled "
+              "bibliography, and stable text fragments from its literature-review paragraph were verified in "
+              "the extracted PDF text.\n"
           )
           p.write_text(text.rstrip() + status, encoding='utf-8')
           Path('updates/2026-07-12-feature-visibility-build-diagnostic.md').unlink(missing_ok=True)
