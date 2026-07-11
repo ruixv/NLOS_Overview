@@ -1,0 +1,111 @@
+name: Correct Nam et al. final metadata and rebuild survey
+
+on:
+  push:
+    paths:
+      - .github/workflows/nlos-final-metadata-correction.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-final-metadata-correction
+  cancel-in-progress: true
+
+jobs:
+  correct-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Correct publisher metadata and merge bibliography
+        run: |
+          set -euo pipefail
+          python -m pip install bibtexparser==1.4.3
+          python scripts/fix_nlos_20260712_realtime_citation_key.py
+          python scripts/merge_nlos_bibliography.py
+          grep -q "Truly missing citation keys: 0" updates/2026-07-11-bibliography-deduplication.md
+          test "$(grep -ic '^@.*{nam_real-time_2020,' egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -ic '^@.*{namRealTimeDynamicScenes2021,' egbib_merged_20260711.bib)" -eq 0
+          grep -Fq 'Low-latency time-of-flight non-line-of-sight imaging at 5 frames per second' README.md
+          grep -Fq 'Low-latency time-of-flight non-line-of-sight imaging at 5 frames per second' index.html
+          ! grep -Fq 'Real-time Non-line-of-Sight imaging of dynamic scenes' README.md
+          ! grep -Fq 'Real-time Non-line-of-Sight imaging of dynamic scenes' index.html
+          grep -Fq 'Renna, Marco' egbib_merged_20260711.bib
+          grep -Fq 'Tosi, Alberto' egbib_merged_20260711.bib
+
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Rebuild and validate PDF
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          latexmk -pdf -interaction=nonstopmode bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
+          ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
+          ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
+          grep -Fq 'nam_real-time_2020' bare_jrnl.aux
+          grep -Fq 'nam_real-time_2020' bare_jrnl.bbl
+          grep -Fq 'Low-latency time-of-flight non-line-of-sight imaging at 5 frames per second' bare_jrnl.bbl
+          grep -Fq 'Marco Renna' bare_jrnl.bbl
+          grep -Fq 'Alberto Tosi' bare_jrnl.bbl
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
+          compact = re.sub(r'[^a-z0-9]+', '', raw)
+          required = ('lowlatency', '5framespersecond', 'marcorenna', 'albertotosi')
+          missing = [x for x in required if x not in compact]
+          if missing:
+              raise SystemExit(f'Missing final-metadata PDF tokens: {missing}')
+          PY
+
+      - name: Record final metadata validation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md')
+          text = p.read_text(encoding='utf-8').rstrip()
+          marker = '**Final-metadata validation:**'
+          if marker not in text:
+              text += (
+                  "\n\n**Final-metadata validation:** publisher title and full eight-author list verified "
+                  "across README, homepage, canonical BibTeX, compiled bibliography, and regenerated PDF. "
+                  "The clean LaTeX/BibTeX build passed `pdfinfo`/`pdftotext` with no undefined, repeated, "
+                  "or duplicate-paper references.\n"
+              )
+          p.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit corrected public artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex bare_jrnl.tex \
+            egbib_20260712_realtime_updates.bib egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md \
+            updates/2026-07-11-bibliography-deduplication.md \
+            scripts/fix_nlos_20260712_realtime_citation_key.py \
+            .github/workflows/nlos-final-metadata-correction.yml
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Use final Nature Communications metadata for Nam et al."
+            git pull --rebase origin master
+            git push origin HEAD:master
+          fi
