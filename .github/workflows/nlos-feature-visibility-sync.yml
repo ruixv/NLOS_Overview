@@ -1,0 +1,92 @@
+name: Integrate NLOS feature visibility and rebuild survey
+
+on:
+  push:
+    paths:
+      - .github/workflows/nlos-feature-visibility-sync.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install bibliography parser
+        run: python -m pip install bibtexparser==1.4.3
+
+      - name: Synchronize public artifacts and audit bibliography
+        run: |
+          python scripts/sync_nlos_20260712_feature_visibility.py
+          python scripts/merge_nlos_bibliography.py
+          python scripts/sync_nlos_20260712_feature_visibility.py
+          grep -E "Case-insensitive duplicate replacements|Citation-key case normalizations|Truly missing citation keys" updates/2026-07-11-bibliography-deduplication.md
+          grep -q "Truly missing citation keys: 0" updates/2026-07-11-bibliography-deduplication.md
+          test "$(grep -ic '^@.*{liuAnalysisFeatureVisibility2019,' egbib_merged_20260711.bib)" -eq 1
+
+      - name: Install LaTeX toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Rebuild and strictly validate survey PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          latexmk -pdf -interaction=nonstopmode bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf > /tmp/pdfinfo-feature-visibility.txt
+          pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl-feature-visibility.txt
+          test -s /tmp/bare_jrnl-feature-visibility.txt
+
+          if grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log; then
+            echo "Undefined LaTeX citation/reference detected" >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo "Missing or repeated BibTeX record detected" >&2
+            exit 1
+          fi
+
+          python - <<'PY'
+          from pathlib import Path
+          text = " ".join(Path('/tmp/bare_jrnl-feature-visibility.txt').read_text(encoding='utf-8', errors='ignore').split()).casefold()
+          required = (
+              'analysis of feature visibility in non-line-of-sight measurements',
+              'visibility limits and recoverability',
+          )
+          missing = [token for token in required if token not in text]
+          if missing:
+              raise SystemExit(f"Missing required PDF text: {missing}")
+          PY
+
+      - name: Commit synchronized artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex bare_jrnl.tex \
+            egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-07-12-feature-visibility-citation-tracing-update.md \
+            updates/2026-07-11-bibliography-deduplication.md \
+            scripts/sync_nlos_20260712_feature_visibility.py \
+            .github/workflows/nlos-feature-visibility-sync.yml
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Integrate NLOS feature-visibility milestone and rebuild survey"
+            git push origin HEAD:master
+          fi
