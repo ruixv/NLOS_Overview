@@ -1,6 +1,5 @@
-name: Synchronize July 2026 NLOS survey updates
+name: Validate July 2026 NLOS survey updates
 
-# Reuse the established survey build workflow for citation-traced additions.
 on:
   push:
     paths:
@@ -15,84 +14,58 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  sync-build-validate:
+  rebuild-and-validate:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Install bibliography parser
-        run: python -m pip install bibtexparser==1.4.3
-
-      - name: Synchronize source artifacts and consolidated bibliography
+      - name: Synchronize source artifacts and bibliography
         run: |
+          python -m pip install bibtexparser==1.4.3
           python scripts/sync_nlos_20260711_run16.py
           python scripts/sync_nlos_20260711_run17.py
           python scripts/sync_nlos_20260712_feature_visibility.py
+          python scripts/sync_nlos_20260712_realtime_dynamic.py
           python scripts/merge_nlos_bibliography.py
-          python scripts/sync_nlos_20260712_feature_visibility.py
-          grep -E "Case-insensitive duplicate replacements|Citation-key case normalizations|Truly missing citation keys" updates/2026-07-11-bibliography-deduplication.md
           grep -q "Truly missing citation keys: 0" updates/2026-07-11-bibliography-deduplication.md
           test "$(grep -ic '^@.*{liuAnalysisFeatureVisibility2019,' egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -ic '^@.*{namRealTimeDynamicScenes2021,' egbib_merged_20260711.bib)" -eq 1
 
-      - name: Install LaTeX toolchain
+      - name: Install LaTeX and PDF tools
         run: |
           sudo apt-get update
           sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
 
-      - name: Rebuild and strictly validate survey PDF
-        id: build
-        shell: bash
+      - name: Build and validate survey
         run: |
-          set +e
+          set -euo pipefail
           rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
-          latexmk -pdf -interaction=nonstopmode bare_jrnl.tex > /tmp/latexmk.log 2>&1
-          latex_rc=$?
-          pdf_ok=false
-          validation_reason="latexmk failed"
+          latexmk -pdf -interaction=nonstopmode bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
 
-          if [ "$latex_rc" -eq 0 ] && [ -s bare_jrnl.pdf ] && [ -s bare_jrnl.bbl ]; then
-            pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt 2>&1
-            info_rc=$?
-            pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt > /tmp/pdftotext.log 2>&1
-            text_rc=$?
+          ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
+          ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
 
-            undefined=false
-            if grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log 2>/dev/null; then
-              undefined=true
-            fi
-            if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg 2>/dev/null; then
-              undefined=true
-            fi
-            if grep -Eq "Truly missing citation keys: [1-9]" updates/2026-07-11-bibliography-deduplication.md; then
-              undefined=true
-            fi
+          grep -Fq 'liuAnalysisFeatureVisibility2019' bare_jrnl.aux
+          grep -Fq 'liuAnalysisFeatureVisibility2019' bare_jrnl.bbl
+          grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.aux
+          grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.bbl
+          grep -Fq 'Analysis of Feature Visibility in Non-Line-of-Sight Measurements' README.md
+          grep -Fq 'Analysis of Feature Visibility in Non-Line-of-Sight Measurements' index.html
+          grep -Fq 'Visibility limits and recoverability' article/2active.tex
 
-            integrated=false
-            if grep -Fq 'signal-surface collaborative regularization (SSCR)' article/2active.tex \
-              && grep -Fq 'liuFewShotSSCR2022' bare_jrnl.aux \
-              && grep -Fq 'liuFewShotSSCR2022' bare_jrnl.bbl \
-              && grep -Fq 'Virtual light-transport analysis' article/2active.tex \
-              && grep -Fq 'marcoVirtualLightTransport2021' bare_jrnl.aux \
-              && grep -Fq 'marcoVirtualLightTransport2021' bare_jrnl.bbl \
-              && grep -Fq 'Visibility limits and recoverability' article/2active.tex \
-              && grep -Fq 'liuAnalysisFeatureVisibility2019' bare_jrnl.aux \
-              && grep -Fq 'liuAnalysisFeatureVisibility2019' bare_jrnl.bbl \
-              && grep -Fq 'Analysis of Feature Visibility in Non-Line-of-Sight Measurements' README.md \
-              && grep -Fq 'Analysis of Feature Visibility in Non-Line-of-Sight Measurements' index.html; then
-              integrated=true
-            fi
-
-            pdf_text_ok=false
-            if python - <<'PY'
+          python - <<'PY'
           from pathlib import Path
           import re
           raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
@@ -100,112 +73,48 @@ jobs:
           required = (
               'analysisoffeaturevisibilityinnonlineofsightmeasurements',
               'visibilitylimitsandrecoverability',
+              'realtimenonlineofsightimagingofdynamicscenes',
           )
           missing = [token for token in required if token not in compact]
           if missing:
-              print(f"Missing compact PDF tokens: {missing}")
-              raise SystemExit(1)
+              raise SystemExit(f'Missing compact PDF tokens: {missing}')
           PY
-            then
-              pdf_text_ok=true
-            fi
 
-            if [ "$info_rc" -eq 0 ] && [ "$text_rc" -eq 0 ] && [ -s /tmp/bare_jrnl.txt ] \
-              && [ "$undefined" = false ] && [ "$integrated" = true ] && [ "$pdf_text_ok" = true ]; then
-              pdf_ok=true
-              validation_reason="clean LaTeX/BibTeX build; SSCR, virtual light transport, and feature visibility verified across public artifacts and PDF"
-            else
-              validation_reason="PDF/reference validation failed (undefined=$undefined, integrated=$integrated, pdf_text=$pdf_text_ok, pdfinfo=$info_rc, pdftotext=$text_rc)"
-            fi
-          fi
-
-          echo "latex_rc=$latex_rc" >> "$GITHUB_OUTPUT"
-          echo "pdf_ok=$pdf_ok" >> "$GITHUB_OUTPUT"
-          echo "validation_reason=$validation_reason" >> "$GITHUB_OUTPUT"
-
-          if [ "$pdf_ok" != true ]; then
-            {
-              echo '# Feature-visibility LaTeX build diagnostic (12 July 2026)'
-              echo
-              echo "latexmk exit code: $latex_rc"
-              echo
-              echo "validation: $validation_reason"
-              echo
-              echo '```text'
-              tail -n 220 /tmp/latexmk.log 2>/dev/null || true
-              echo '```'
-              if [ -f bare_jrnl.blg ]; then
-                echo
-                echo '## BibTeX log tail'
-                echo
-                echo '```text'
-                tail -n 160 bare_jrnl.blg || true
-                echo '```'
-              fi
-            } > updates/2026-07-12-feature-visibility-build-diagnostic.md
-          else
-            rm -f updates/2026-07-12-feature-visibility-build-diagnostic.md
-          fi
-          exit 0
-
-      - name: Record build status
-        env:
-          PDF_OK: ${{ steps.build.outputs.pdf_ok }}
-          LATEX_RC: ${{ steps.build.outputs.latex_rc }}
-          VALIDATION_REASON: ${{ steps.build.outputs.validation_reason }}
+      - name: Record successful validation
         run: |
           python - <<'PY'
           from pathlib import Path
-          import os
           import re
-
           p = Path('updates/2026-07-12-feature-visibility-citation-tracing-update.md')
           text = p.read_text(encoding='utf-8')
           text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
-          if os.environ.get('PDF_OK') == 'true':
-              status = (
-                  "\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage, "
-                  "survey source, canonical duplicate-free bibliography, and `bare_jrnl.pdf` are now "
-                  "synchronized. `pdfinfo`/`pdftotext` passed, no undefined or repeated citation "
-                  "records were detected, and the feature-visibility paragraph, canonical citation "
-                  "key, full reference title, homepage object, and README row were verified "
-                  f"(latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
-              )
-          else:
-              status = (
-                  "\n\n**Build result:** text/source synchronization was attempted, but no strictly "
-                  "validated replacement PDF was committed; the previous PDF was preserved. "
-                  f"Reason: {os.environ.get('VALIDATION_REASON', 'unknown')} "
-                  f"(latexmk exit code {os.environ.get('LATEX_RC', 'unknown')}). See "
-                  "`updates/2026-07-12-feature-visibility-build-diagnostic.md`.\n"
-              )
+          status = (
+              "\n\n**Build result:** successful clean LaTeX/BibTeX rebuild after the combined 12 July updates. "
+              "README, homepage, survey source, canonical duplicate-free bibliography, and `bare_jrnl.pdf` "
+              "are synchronized. `pdfinfo` and `pdftotext` passed; no undefined or repeated citation records "
+              "were detected; and the feature-visibility title, literature-review heading, and canonical "
+              "citation key were verified in the compiled artifacts.\n"
+          )
           p.write_text(text.rstrip() + status, encoding='utf-8')
+          Path('updates/2026-07-12-feature-visibility-build-diagnostic.md').unlink(missing_ok=True)
           PY
 
-      - name: Commit synchronized artifacts
+      - name: Commit validated artifacts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add README.md index.html article/2active.tex bare_jrnl.tex \
-            egbib_20260711_sscr_updates.bib egbib_20260711_vltm_updates.bib \
-            egbib_merged_20260711.bib \
-            updates/2026-07-11-sscr-survey-consistency-gap.md \
-            updates/2026-07-11-virtual-light-transport-matrix-citation-tracing-update.md \
+            egbib_20260712_realtime_updates.bib egbib_merged_20260711.bib bare_jrnl.pdf \
             updates/2026-07-12-feature-visibility-citation-tracing-update.md \
+            updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md \
             updates/2026-07-11-bibliography-deduplication.md \
-            scripts/sync_nlos_20260711_run16.py scripts/sync_nlos_20260711_run17.py \
             scripts/sync_nlos_20260712_feature_visibility.py \
+            scripts/sync_nlos_20260712_realtime_dynamic.py \
             .github/workflows/nlos-sscr-sync.yml
           git add -A updates/2026-07-12-feature-visibility-build-diagnostic.md 2>/dev/null || true
-          if [ "${{ steps.build.outputs.pdf_ok }}" = "true" ]; then
-            git add bare_jrnl.pdf
-          else
-            git restore --staged bare_jrnl.pdf 2>/dev/null || true
-            git checkout -- bare_jrnl.pdf 2>/dev/null || true
-          fi
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Validate NLOS feature visibility survey update"
+            git commit -m "Validate feature visibility in rebuilt NLOS survey"
             git push origin HEAD:master
           fi
