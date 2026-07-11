@@ -1,4 +1,5 @@
 name: Integrate NLOS feature visibility and rebuild survey
+# Triggered after the synchronization script and canonical citation audit were finalized.
 
 on:
   push:
