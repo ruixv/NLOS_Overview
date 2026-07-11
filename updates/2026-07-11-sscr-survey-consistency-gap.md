@@ -16,9 +16,8 @@ The tracing pass did expose one survey-source consistency gap for a directly rel
 - `README.md` and `index.html` already contained the verified paper entry.
 - `article/2active.tex` now integrates SSCR directly after CC-SOCR in the arbitrary-relay/sparse-measurement discussion.
 - `egbib_20260711_sscr_updates.bib` contains the verified citation key `liuFewShotSSCR2022`.
-- `scripts/merge_nlos_bibliography.py` regenerated `egbib_merged_20260711.bib` from all `egbib*.bib` sources; the audit reports zero truly missing citation keys.
-- `bare_jrnl.tex` uses the consolidated bibliography.
+- `scripts/merge_nlos_bibliography.py` regenerates `egbib_merged_20260711.bib` from all `egbib*.bib` sources before the survey build.
 
 ## PDF status
 
-**Build result:** successful clean LaTeX/BibTeX rebuild. The workflow regenerated and committed `bare_jrnl.pdf` after the SSCR prose and verified BibTeX record had been integrated. `pdfinfo` and `pdftotext` passed, the LaTeX log contained no undefined citations or references, and BibTeX reported no missing or repeated records. The replacement PDF was committed in `1eff6528d145cce00f469a5a230f079757bc772a`.
+The GitHub Actions workflow performs a clean LaTeX/BibTeX rebuild, rejects undefined or repeated citation records, validates the PDF with `pdfinfo` and `pdftotext`, and confirms that the SSCR title is present in the generated survey. The workflow records the final build result below.
