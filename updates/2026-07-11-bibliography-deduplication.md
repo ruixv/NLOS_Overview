@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 13 source files and keeps one highest-priority record for each of 346 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 14 source files and keeps one highest-priority record for each of 346 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 355
-- Case-insensitive duplicate replacements: 9
+- Parsed source records: 356
+- Case-insensitive duplicate replacements: 10
 - Citation-key case normalizations: 85
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -21,6 +21,7 @@ This update generates `egbib_merged_20260711.bib` from 13 source files and keeps
 - `suDGNLOS2025` / `suDGNLOS2025`: `egbib.bib` → `egbib_20260703_updates.bib`
 - `musarranonlineofsight3dimaging2019` / `musarraNonlineofsight3DImaging2019`: `egbib.bib` → `egbib_20260705_updates.bib`
 - `leidirectobjectrecognition2019` / `leiDirectObjectRecognition2019`: `egbib.bib` → `egbib_20260707_updates.bib`
+- `liuFewShotSSCR2022` / `liuFewShotSSCR2022`: `egbib_2026_updates.bib` → `egbib_20260711_sscr_updates.bib`
 
 ## Citation-key spellings normalized
 
