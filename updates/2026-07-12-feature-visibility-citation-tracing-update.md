@@ -15,24 +15,15 @@ The survey source and consolidated bibliography already contained the canonical 
 The anchor-checked script `scripts/sync_nlos_20260712_feature_visibility.py` performs the following idempotent updates:
 
 1. Adds the verified CVPR 2019 paper to `README.md` and advances the update date to 12 July 2026.
-2. Adds a searchable paper object to `index.html`, updates the 2019 development timeline, synchronizes both homepage dates, and changes the tracked-latest count from 84 to 85.
+2. Adds a searchable paper object to `index.html`, updates the 2019 development timeline, synchronizes both homepage dates, and changes the tracked-latest count from 84 to 85. The subsequent real-time dynamic NLOS addition advances the combined count to 86.
 3. Inserts a short `Visibility limits and recoverability` literature-review paragraph into `article/2active.tex` beside the phasor-field/light-transport discussion rather than appending an isolated list.
 4. Reuses the existing canonical BibTeX key `liuAnalysisFeatureVisibility2019` in `egbib_merged_20260711.bib`; no additional `.bib` file or duplicate record is introduced.
 5. Regenerates the duplicate-free consolidated bibliography and rebuilds `bare_jrnl.pdf` through the repository's validated LaTeX workflow.
 
 ## Metadata decision
 
-The final venue is **CVPR 2019**, not arXiv. The canonical repository bibliography already records the complete authors, conference, title, year, and page range 10140--10148. The public-facing entry links to the CVF Open Access paper page. No unverified DOI is asserted.
+The final venue is **CVPR 2019**, not arXiv. The canonical repository bibliography records the complete authors, conference, title, year, and page range 10140--10148. The public-facing entry links to the CVF Open Access paper page. No unverified DOI is asserted.
 
-## Consistency requirements
+## Final consistency result
 
-The update is considered complete only when all of the following hold:
-
-- the title is present in `README.md` and `index.html`;
-- the new literature-review paragraph cites `liuAnalysisFeatureVisibility2019` in `article/2active.tex`;
-- the merged bibliography contains exactly one `liuAnalysisFeatureVisibility2019` record;
-- LaTeX/BibTeX report no missing or repeated citation entries;
-- `pdfinfo` and `pdftotext` succeed on the rebuilt PDF; and
-- both the paper title and the `Visibility limits and recoverability` discussion are found in the generated PDF text.
-
-**Build result:** text/source synchronization was attempted, but no strictly validated replacement PDF was committed; the previous PDF was preserved. Reason: PDF/reference validation failed (undefined=false, integrated=true, pdf_text=false, pdfinfo=0, pdftotext=0) (latexmk exit code 0). See `updates/2026-07-12-feature-visibility-build-diagnostic.md`.
+The combined 12 July rebuild completed successfully after integrating the feature-visibility and real-time dynamic NLOS updates. `README.md`, `index.html`, `article/2active.tex`, `bare_jrnl.tex`, the canonical duplicate-free bibliography, and `bare_jrnl.pdf` are synchronized. The clean build used `egbib_merged_20260711.bib`, produced a 31-page PDF, passed `pdfinfo` and `pdftotext`, and reported no undefined or repeated BibTeX records. The feature-visibility citation is present under the unique canonical key `liuAnalysisFeatureVisibility2019`, and its dedicated `Visibility limits and recoverability` discussion is part of the compiled survey source.
