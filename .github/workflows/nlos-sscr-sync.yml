@@ -1,6 +1,6 @@
 name: Integrate SSCR and rebuild NLOS survey
 
-# Triggered after the workflow file was present on the default branch.
+# Normalize PDF line-break hyphenation before checking the integrated SSCR title.
 on:
   push:
     paths:
@@ -70,10 +70,13 @@ jobs:
             integrated=false
             if python - <<'PY'
           from pathlib import Path
-          text = " ".join(Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').split()).casefold()
+          import re
+          raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
+          text = re.sub(r'-\s+', '', raw)
+          text = ' '.join(text.split())
           required = (
               'few-shot non-line-of-sight imaging with signal-surface collaborative regularization',
-              'signal-surface collaborative regularization',
+              'mixed-dimensional physical priors',
           )
           raise SystemExit(0 if all(token in text for token in required) else 1)
           PY
