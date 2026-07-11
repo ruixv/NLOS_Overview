@@ -6,7 +6,6 @@ has changed, avoiding blind replacement of the hand-maintained README, homepage,
 and LaTeX survey source.
 """
 from pathlib import Path
-import re
 
 ROOT = Path(__file__).resolve().parents[1]
 TITLE = "Virtual Light Transport Matrices for Non-Line-Of-Sight Imaging"
@@ -64,7 +63,8 @@ def patch_index() -> None:
         '<div class="tl"><div class="year">2021</div><div class="tl-body"><strong>Kilometer range, '
         'neural fields, commercial LiDAR, picosecond timing, and self-calibration</strong><p>Long-range '
         'NLOS, NeTF, PRL picosecond-resolution up-conversion detection, calibration-aware ToF '
-        'reconstruction, and two-step LiDAR deep remapping expanded scale and acquisition regimes.'</n        'p></div></div>'
+        'reconstruction, and two-step LiDAR deep remapping expanded scale and acquisition regimes.'
+        '</p></div></div>'
     )
     timeline_new = (
         '<div class="tl"><div class="year">2021</div><div class="tl-body"><strong>Kilometer range, '
