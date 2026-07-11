@@ -2,9 +2,9 @@
 
 ## Citation-tracing result
 
-A forward/reference-tracing pass through recent ToF NLOS comparative literature surfaced **Real-time Non-line-of-Sight imaging of dynamic scenes** by Nam et al. The paper was already cited in legacy survey tables but was missing from the README and homepage and did not have an explicit literature-review sentence describing its system-level contribution.
+A forward/reference-tracing pass through recent ToF NLOS comparative literature surfaced **Low-latency time-of-flight non-line-of-sight imaging at 5 frames per second** by Nam et al. The paper was already cited in legacy survey tables but was missing from the README and homepage and did not have an explicit literature-review sentence describing its system-level contribution.
 
-The final publication is **Nature Communications 12, 6526 (2021)**, DOI `10.1038/s41467-021-26721-x`; it is therefore labeled by the journal rather than by its 2020 arXiv preprint.
+The final publication is **Low-latency time-of-flight non-line-of-sight imaging at 5 frames per second**, Nature Communications 12, 6526 (2021), DOI `10.1038/s41467-021-26721-x`. The repository therefore uses the publisher title, full eight-author list, and journal venue rather than the shorter 2020 arXiv metadata.
 
 ## Why it belongs
 
