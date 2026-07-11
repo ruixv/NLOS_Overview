@@ -64,7 +64,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 11 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 12 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
@@ -144,6 +144,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2020 | [Nonparaxial phasor-field propagation](https://arxiv.org/abs/2006.13775) — Dove, Shapiro | arXiv 2020 | Extends phasor-field propagation beyond the Fresnel/paraxial assumption using Rayleigh--Sommerfeld theory, closer to wide-angle reflective NLOS geometries. |
 | 2020 | [Paraxial phasor-field physical optics](https://arxiv.org/abs/2004.14239) — Dove, Shapiro | arXiv 2020 | Shows that ordinary lenses can focus or project phasor fields through diffusers, bridging computational virtual-wave NLOS and physical P-field optics. |
 | 2020 | [Efficient Non-Line-of-Sight Imaging from Transient Sinograms](https://arxiv.org/abs/2008.02787) — Isogawa et al. | arXiv 2020 | Introduces circular confocal NLOS (C2NLOS) scanning and transient-sinogram reconstruction, reducing relay-wall measurements while preserving hidden-position and image recovery. |
+| 2019 | [Analysis of Feature Visibility in Non-Line-of-Sight Measurements](https://openaccess.thecvf.com/content_CVPR_2019/html/Liu_Analysis_of_Feature_Visibility_in_Non-Line-of-Sight_Measurements_CVPR_2019_paper.html) — Liu, Bauer, Velten | CVPR 2019 | Systematically analyzes which hidden-scene features are recoverable from transient NLOS measurements, clarifying orientation-, aperture-, and capture-geometry-dependent visibility limits that later reconstruction methods must respect. |
 | 2019 | [Keyhole Imaging: Non-Line-of-Sight Imaging and Tracking of Moving Objects Along a Single Optical Path](https://arxiv.org/abs/1912.06727) — Metzler et al. | IEEE TCI 2021 | Introduces single-optical-path active NLOS imaging/tracking; uses hidden-object motion and EM/unknown-view tomography to recover shape and trajectory when only keyhole-like access is available. |
 | 2019 | [Wave-like Properties of Phasor Fields: Experimental Demonstrations](https://arxiv.org/abs/1904.01565) — Reza et al. | arXiv 2019 | Experimentally validates wave-like phasor-field behavior and introduces P-field optical elements for practical virtual-wave NLOS systems. |
 | 2019 | [Coherent control of light for non-line-of-sight imaging](https://arxiv.org/abs/1908.04094) — Starshynov et al. | arXiv 2019 | Uses coherent phase control / wavefront shaping and the speckle memory effect to refocus light behind an obstacle, enabling sub-millimeter active NLOS imaging. |

@@ -258,6 +258,10 @@ Different from other methods, phasor field methods~\cite{liuPhasorFieldDiffracti
 \noindent \textbf{Virtual light-transport analysis.}
 Marco~\etal~extended phasor-field virtual wave optics beyond hidden-geometry reconstruction by constructing computational projector--camera pairs and estimating a virtual light transport matrix of the hidden scene~\cite{marcoVirtualLightTransport2021}. Probing this matrix enables virtual relighting and separates direct, first-order indirect, and higher-order indirect illumination in cluttered NLOS scenes, showing that transient NLOS measurements can support light-transport analysis as well as geometric imaging.
 
+\vspace{0.8mm}
+\noindent \textbf{Visibility limits and recoverability.}
+Beyond developing faster inverses, Liu~\etal~analyzed which hidden-scene features are physically visible in transient NLOS measurements~\cite{liuAnalysisFeatureVisibility2019}. Their study connects recoverability to surface orientation, finite relay-wall aperture, and acquisition geometry, explaining why some surfaces remain weak or absent even under accurate reconstruction. This visibility perspective established an important limit-aware complement to LCT, $f$--$k$ migration, and phasor-field propagation, and motivates later methods that explicitly model normals, occlusion, and adaptive capture.
+
 The wave-based approaches have two attractive advantages: (1) It is more robust to the material of the relay surface; (2) It can easily combine NLOS imaging with other related fields, such as LOS imaging and seismic imaging. These advantages, as well as the phase acquisition problem in wave-based approaches, are explained in detail in Faccio \etal's review\cite{faccioNonlineofsightImaging2020}.
 
 \vspace{0.8mm}

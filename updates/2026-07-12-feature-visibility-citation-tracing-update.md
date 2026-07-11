@@ -34,3 +34,5 @@ The update is considered complete only when all of the following hold:
 - LaTeX/BibTeX report no missing or repeated citation entries;
 - `pdfinfo` and `pdftotext` succeed on the rebuilt PDF; and
 - both the paper title and the `Visibility limits and recoverability` discussion are found in the generated PDF text.
+
+**Build result:** text/source synchronization was attempted, but no strictly validated replacement PDF was committed; the previous PDF was preserved. Reason: PDF/reference validation failed (undefined=false, integrated=true, pdf_text=false, pdfinfo=0, pdftotext=0) (latexmk exit code 0). See `updates/2026-07-12-feature-visibility-build-diagnostic.md`.
