@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: nlos-survey-sync
+  group: nlos-feature-visibility-validation
   cancel-in-progress: true
 
 jobs:
@@ -33,10 +33,12 @@ jobs:
           python scripts/sync_nlos_20260711_run17.py
           python scripts/sync_nlos_20260712_feature_visibility.py
           python scripts/sync_nlos_20260712_realtime_dynamic.py
+          python scripts/fix_nlos_20260712_realtime_citation_key.py
           python scripts/merge_nlos_bibliography.py
           grep -q "Truly missing citation keys: 0" updates/2026-07-11-bibliography-deduplication.md
           test "$(grep -ic '^@.*{liuAnalysisFeatureVisibility2019,' egbib_merged_20260711.bib)" -eq 1
-          test "$(grep -ic '^@.*{namRealTimeDynamicScenes2021,' egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -ic '^@.*{nam_real-time_2020,' egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -ic '^@.*{namRealTimeDynamicScenes2021,' egbib_merged_20260711.bib)" -eq 0
 
       - name: Install LaTeX and PDF tools
         run: |
@@ -59,8 +61,9 @@ jobs:
 
           grep -Fq 'liuAnalysisFeatureVisibility2019' bare_jrnl.aux
           grep -Fq 'liuAnalysisFeatureVisibility2019' bare_jrnl.bbl
-          grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.aux
-          grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.bbl
+          grep -Fq 'nam_real-time_2020' bare_jrnl.aux
+          grep -Fq 'nam_real-time_2020' bare_jrnl.bbl
+          ! grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.bbl
           grep -Fq 'Analysis of Feature Visibility in Non-Line-of-Sight Measurements' README.md
           grep -Fq 'Analysis of Feature Visibility in Non-Line-of-Sight Measurements' index.html
           grep -Fq 'Visibility limits and recoverability' article/2active.tex
@@ -91,9 +94,9 @@ jobs:
           status = (
               "\n\n**Build result:** successful clean LaTeX/BibTeX rebuild after the combined 12 July updates. "
               "README, homepage, survey source, canonical duplicate-free bibliography, and `bare_jrnl.pdf` "
-              "are synchronized. `pdfinfo` and `pdftotext` passed; no undefined or repeated citation records "
-              "were detected; and the feature-visibility title, literature-review heading, and canonical "
-              "citation key were verified in the compiled artifacts.\n"
+              "are synchronized. `pdfinfo` and `pdftotext` passed; no undefined, repeated, or duplicate-paper "
+              "citation records were detected; and the feature-visibility title, literature-review heading, "
+              "canonical citation key, and real-time NLOS reference were verified in the compiled artifacts.\n"
           )
           p.write_text(text.rstrip() + status, encoding='utf-8')
           Path('updates/2026-07-12-feature-visibility-build-diagnostic.md').unlink(missing_ok=True)
@@ -110,6 +113,7 @@ jobs:
             updates/2026-07-11-bibliography-deduplication.md \
             scripts/sync_nlos_20260712_feature_visibility.py \
             scripts/sync_nlos_20260712_realtime_dynamic.py \
+            scripts/fix_nlos_20260712_realtime_citation_key.py \
             .github/workflows/nlos-sscr-sync.yml
           git add -A updates/2026-07-12-feature-visibility-build-diagnostic.md 2>/dev/null || true
           if git diff --cached --quiet; then
