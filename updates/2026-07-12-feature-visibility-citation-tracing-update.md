@@ -24,6 +24,8 @@ The anchor-checked script `scripts/sync_nlos_20260712_feature_visibility.py` per
 
 The final venue is **CVPR 2019**, not arXiv. The canonical repository bibliography records the complete authors, conference, title, year, and page range 10140--10148. The public-facing entry links to the CVF Open Access paper page. No unverified DOI is asserted.
 
-## Final consistency result
+## Validation result and later exception
 
-The combined 12 July rebuild completed successfully after integrating the feature-visibility and real-time dynamic NLOS updates. `README.md`, `index.html`, `article/2active.tex`, `bare_jrnl.tex`, the canonical duplicate-free bibliography, and `bare_jrnl.pdf` are synchronized. The clean build used `egbib_merged_20260711.bib`, produced a 31-page PDF, passed `pdfinfo` and `pdftotext`, and reported no undefined or repeated BibTeX records. The feature-visibility citation is present under the unique canonical key `liuAnalysisFeatureVisibility2019`, and its dedicated `Visibility limits and recoverability` discussion is part of the compiled survey source.
+The feature-visibility integration itself completed successfully: the clean LaTeX/BibTeX build used `egbib_merged_20260711.bib`, produced a 31-page PDF, passed `pdfinfo` and `pdftotext`, and reported no undefined or repeated BibTeX records. The feature-visibility citation is present under the unique canonical key `liuAnalysisFeatureVisibility2019`, and its dedicated `Visibility limits and recoverability` discussion is part of the compiled survey.
+
+A later metadata audit corrected the separate Nam et al. real-time NLOS reference from its preprint title/six-author record to the final Nature Communications title and complete eight-author list. That correction affects the bibliography text in the binary and therefore creates a new pending PDF rebuild, documented explicitly in `updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md`. The feature-visibility content remains validated, but full cross-artifact consistency should be claimed only after the later binary rebuild is committed.
