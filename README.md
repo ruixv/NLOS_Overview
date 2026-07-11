@@ -135,6 +135,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2022 | [Cramer-Rao Lower Bound Optimization for Hidden Moving Target Sensing via Multi-IRS-Aided Radar](https://arxiv.org/abs/2210.05812) — Esmaeilbeig et al. | arXiv 2022 | Early multi-IRS hidden moving-target sensing work that optimizes Doppler-aware IRS phase shifts via CRLB-guided design. |
 | 2022 | [Seeing Around Obstacles with Terahertz Waves](https://arxiv.org/abs/2205.05066) — Cui, Trichopoulos | arXiv 2022 | THz / sub-THz around-obstacle imaging using lossy-mirror environmental surfaces. |
 | 2022 | [Passive Non-line-of-sight Imaging for Moving Targets with an Event Camera](https://arxiv.org/abs/2209.13300) — Wang et al. | arXiv 2022 | Introduces event-based passive NLOS for moving targets and the NLOS-ES event-camera dataset. |
+| 2021 | [Real-time Non-line-of-Sight imaging of dynamic scenes](https://doi.org/10.1038/s41467-021-26721-x) — Nam et al. | Nature Communications 2021 | Combines two gated $16\times1$ SPAD arrays (28 active pixels), sparse relay-wall scanning, virtual-aperture remapping, and fast phasor-field propagation to acquire and reconstruct diffuse, non-retroreflective hidden scenes at 5 fps with about 1 s latency. |
 | 2021 | [Virtual Light Transport Matrices for Non-Line-Of-Sight Imaging](https://arxiv.org/abs/2103.12622) — Marco et al. | arXiv 2021 | Extends phasor-field virtual wave optics from hidden-geometry reconstruction to hidden-scene light-transport analysis, creating virtual projector-camera pairs for relighting and separation of direct, first-order indirect, and higher-order indirect components. |
 | 2021 | [Automatic calibration of time of flight based non-line-of-sight reconstruction](https://arxiv.org/abs/2105.10603) — Sadhu et al. | arXiv 2021 | Makes ToF NLOS reconstruction robust to relay-wall illumination/detection miscalibration by jointly optimizing hidden albedo and virtual scan positions in a differentiable forward model. |
 | 2021 | [Non-line-of-sight imaging with picosecond temporal resolution](https://arxiv.org/abs/2106.15798) — Wang et al. | Physical Review Letters 2021 | Up-conversion single-photon detector enables picosecond-scale timing and much finer axial NLOS resolution. |
@@ -171,6 +172,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
 2018 ── O'Toole et al.: confocal NLOS + LCT — real-time O(N³logN) [Nature]
    │     Liu et al.: phasor field — NLOS as virtual LOS wave propagation
+   │
+2021 ── Nam et al.: real-time diffuse-object NLOS video at 5 fps [Nature Comm.]
    │
 ```
 
