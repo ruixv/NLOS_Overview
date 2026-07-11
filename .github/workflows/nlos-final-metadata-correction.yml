@@ -63,14 +63,19 @@ jobs:
           grep -Fq 'nam_real-time_2020' bare_jrnl.aux
           grep -Fq 'nam_real-time_2020' bare_jrnl.bbl
           grep -Fq 'Low-latency time-of-flight non-line-of-sight imaging at 5 frames per second' bare_jrnl.bbl
-          grep -Fq 'Marco Renna' bare_jrnl.bbl
-          grep -Fq 'Alberto Tosi' bare_jrnl.bbl
+          # IEEEtran abbreviates given names in the compiled bibliography, so
+          # verify the complete publisher author list in the merged BibTeX and
+          # verify stable title/system tokens in extracted PDF text.
           python - <<'PY'
           from pathlib import Path
           import re
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          for token in ('Renna, Marco', 'Tosi, Alberto'):
+              if token not in bib:
+                  raise SystemExit(f'Missing full-author token in merged bibliography: {token}')
           raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
           compact = re.sub(r'[^a-z0-9]+', '', raw)
-          required = ('lowlatency', '5framespersecond', 'marcorenna', 'albertotosi')
+          required = ('lowlatency', '5framespersecond', '28activepixels')
           missing = [x for x in required if x not in compact]
           if missing:
               raise SystemExit(f'Missing final-metadata PDF tokens: {missing}')
