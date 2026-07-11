@@ -254,6 +254,10 @@ With $t=0$, the functions $\Phi$ and $\Psi$ in Eq.~\ref{eqwave_3} are related by
 Besides, Liu~ \etal~\cite{liuPhasorFieldDiffraction2020,liuVirtualWaveOptics2018}~and Reza~\etal~\cite{rezaPhasorFieldWaves2019}~introduced virtual wave phasor to NLOS imaging. Based on the phasor field, NLOS imaging can be transformed into a LOS optical imaging problem and then solved by the existing algorithm in diffraction imaging. 
 Different from other methods, phasor field methods~\cite{liuPhasorFieldDiffraction2020,liuVirtualWaveOptics2018} transform the relay wall into a virtual aperture (or lens of any LOS system). The reconstruction is the diffraction integral of the wavefront of the virtual aperture, which is equivalent to the forward propagation process of the measurement data. Therefore, phasor field methods~\cite{liuPhasorFieldDiffraction2020,liuVirtualWaveOptics2018} do not need to reverse the forward process like inverse methods~\cite{otooleConfocalNonlineofsightImaging2018,veltenRecoveringThreedimensionalShape2012} -- they can directly complete the reconstruction through wavefront propagation.
 
+\vspace{0.8mm}
+\noindent \textbf{Virtual light-transport analysis.}
+Marco~\etal~extended phasor-field virtual wave optics beyond hidden-geometry reconstruction by constructing computational projector--camera pairs and estimating a virtual light transport matrix of the hidden scene~\cite{marcoVirtualLightTransport2021}. Probing this matrix enables virtual relighting and separates direct, first-order indirect, and higher-order indirect illumination in cluttered NLOS scenes, showing that transient NLOS measurements can support light-transport analysis as well as geometric imaging.
+
 The wave-based approaches have two attractive advantages: (1) It is more robust to the material of the relay surface; (2) It can easily combine NLOS imaging with other related fields, such as LOS imaging and seismic imaging. These advantages, as well as the phase acquisition problem in wave-based approaches, are explained in detail in Faccio \etal's review\cite{faccioNonlineofsightImaging2020}.
 
 \vspace{0.8mm}
