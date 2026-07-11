@@ -32,4 +32,4 @@ The paper is semantically placed in the wave-based / phasor-field part of the ac
 5. Add `marcoVirtualLightTransport2021` to a dated BibTeX supplement and rebuild the duplicate-free merged bibliography.
 6. Clean-build and validate `bare_jrnl.pdf`, checking the generated PDF text for both the survey paragraph and the complete paper title.
 
-**Build result:** text/source synchronization was attempted, but no strictly validated replacement PDF was committed; the previous PDF was preserved. Reason: PDF/reference validation failed (undefined=false, integrated=false, pdfinfo=0, pdftotext=0) (latexmk exit code 0). See `updates/2026-07-11-vltm-build-diagnostic.md`.
+**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage, survey source, duplicate-free merged bibliography, and `bare_jrnl.pdf` are now synchronized. `pdfinfo`/`pdftotext` passed, no undefined or repeated citation records were detected, and the virtual light-transport source, citation key, and compiled bibliography record were verified (latexmk exit code 0).
