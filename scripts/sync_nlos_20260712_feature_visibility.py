@@ -2,14 +2,17 @@
 """Synchronize the CVPR 2019 NLOS feature-visibility milestone.
 
 The script is idempotent and checks stable anchors before modifying the manually
-maintained README, homepage, and survey source.
+maintained README, homepage, and survey source. The paper already has the
+canonical citation key ``liuAnalysisFeatureVisibility2019`` in the consolidated
+survey bibliography, so this update reuses that record rather than adding a
+duplicate BibTeX entry.
 """
 from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
 TITLE = "Analysis of Feature Visibility in Non-Line-of-Sight Measurements"
-CITE_KEY = "liuFeatureVisibility2019"
+CITE_KEY = "liuAnalysisFeatureVisibility2019"
 
 
 def read(path: str) -> str:
@@ -50,6 +53,7 @@ def patch_index() -> None:
     path = "index.html"
     text = read(path)
     text = text.replace("Updated 11 July 2026", "Updated 12 July 2026", 1)
+    text = text.replace("Last updated: 11 July 2026", "Last updated: 12 July 2026", 1)
     if TITLE in text:
         write(path, text)
         return
@@ -79,15 +83,14 @@ def patch_index() -> None:
 def patch_survey() -> None:
     path = "article/2active.tex"
     text = read(path)
-    if CITE_KEY in text:
+    heading = "\\noindent \\textbf{Visibility limits and recoverability.}"
+    if heading in text:
         return
-    anchor = (
-        "support light-transport analysis as well as geometric imaging.\n\n"
-    )
+    anchor = "support light-transport analysis as well as geometric imaging.\n\n"
     paragraph = (
         "\\vspace{0.8mm}\n"
         "\\noindent \\textbf{Visibility limits and recoverability.}\n"
-        "Beyond developing faster inverses, Liu~\\etal~analyzed which hidden-scene features are physically visible in transient NLOS measurements~\\cite{liuFeatureVisibility2019}. Their study connects recoverability to surface orientation, finite relay-wall aperture, and acquisition geometry, explaining why some surfaces remain weak or absent even under accurate reconstruction. This visibility perspective established an important limit-aware complement to LCT, $f$--$k$ migration, and phasor-field propagation, and motivates later methods that explicitly model normals, occlusion, and adaptive capture.\n\n"
+        "Beyond developing faster inverses, Liu~\\etal~analyzed which hidden-scene features are physically visible in transient NLOS measurements~\\cite{liuAnalysisFeatureVisibility2019}. Their study connects recoverability to surface orientation, finite relay-wall aperture, and acquisition geometry, explaining why some surfaces remain weak or absent even under accurate reconstruction. This visibility perspective established an important limit-aware complement to LCT, $f$--$k$ migration, and phasor-field propagation, and motivates later methods that explicitly model normals, occlusion, and adaptive capture.\n\n"
     )
     text = replace_once(text, anchor, anchor + paragraph, "survey visibility insertion")
     write(path, text)
@@ -97,15 +100,20 @@ def verify() -> None:
     checks = {
         "README.md": TITLE,
         "index.html": TITLE,
-        "article/2active.tex": CITE_KEY,
-        "egbib_20260712_feature_visibility_updates.bib": CITE_KEY,
+        "article/2active.tex": "\\noindent \\textbf{Visibility limits and recoverability.}",
+        "egbib_merged_20260711.bib": "@inproceedings{liuAnalysisFeatureVisibility2019,",
     }
     for path, token in checks.items():
         if token not in read(path):
             raise RuntimeError(f"Verification failed: {token!r} absent from {path}")
+    merged = read("egbib_merged_20260711.bib")
+    if merged.count("{liuAnalysisFeatureVisibility2019,") != 1:
+        raise RuntimeError("Canonical feature-visibility BibTeX record is not unique")
     index = read("index.html")
     if '<div class="stat"><b>85</b><span>tracked latest entries</span></div>' not in index:
         raise RuntimeError("Homepage latest count was not updated to 85")
+    if "Updated 12 July 2026" not in index or "Last updated: 12 July 2026" not in index:
+        raise RuntimeError("Homepage dates were not synchronized")
 
 
 if __name__ == "__main__":
