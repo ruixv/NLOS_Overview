@@ -1,6 +1,6 @@
 name: Synchronize real-time dynamic NLOS milestone
 
-# Final publisher-metadata validation.
+# Commit corrected public metadata first, then rebuild and validate the PDF.
 on:
   push:
     paths:
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: nlos-final-nam-metadata
+  group: nlos-final-nam-metadata-v2
   cancel-in-progress: true
 
 jobs:
@@ -29,12 +29,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Synchronize sources and canonical bibliography
+      - name: Correct public metadata and canonical bibliography
         run: |
           set -euo pipefail
           python -m pip install bibtexparser==1.4.3
-          python -m py_compile scripts/sync_nlos_20260712_realtime_dynamic.py scripts/fix_nlos_20260712_realtime_citation_key.py
-          python scripts/sync_nlos_20260712_realtime_dynamic.py
+          python -m py_compile scripts/fix_nlos_20260712_realtime_citation_key.py
           python scripts/fix_nlos_20260712_realtime_citation_key.py
           python scripts/merge_nlos_bibliography.py
           grep -q "Truly missing citation keys: 0" updates/2026-07-11-bibliography-deduplication.md
@@ -48,6 +47,22 @@ jobs:
           grep -Fq 'Tosi, Alberto' egbib_merged_20260711.bib
           grep -Fq '\cite{nam_real-time_2020}' article/2active.tex
           grep -Fq '<b>86</b><span>tracked latest entries</span>' index.html
+
+      - name: Commit corrected text artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex bare_jrnl.tex \
+            egbib_20260712_realtime_updates.bib egbib_merged_20260711.bib \
+            updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md \
+            updates/2026-07-11-bibliography-deduplication.md \
+            scripts/fix_nlos_20260712_realtime_citation_key.py \
+            .github/workflows/nlos-realtime-dynamic-sync.yml
+          if ! git diff --cached --quiet; then
+            git commit -m "Use final Nature Communications metadata for Nam et al."
+            git pull --rebase origin master
+            git push origin HEAD:master
+          fi
 
       - name: Install LaTeX toolchain
         run: |
@@ -81,7 +96,7 @@ jobs:
               raise SystemExit(f'Missing normalized PDF tokens: {missing}')
           PY
 
-      - name: Record successful validation
+      - name: Record successful PDF validation
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -97,25 +112,15 @@ jobs:
               "repeated, or duplicate-paper BibTeX records were detected.\n"
           )
           p.write_text(text.rstrip() + status, encoding='utf-8')
-          Path('updates/2026-07-12-realtime-dynamic-nlos-build-diagnostic.md').unlink(missing_ok=True)
           PY
 
-      - name: Commit synchronized artifacts and regenerated PDF
+      - name: Commit regenerated PDF and validation note
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md index.html article/2active.tex bare_jrnl.tex bare_jrnl.pdf \
-            egbib_20260712_realtime_updates.bib egbib_merged_20260711.bib \
-            updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md \
-            updates/2026-07-11-bibliography-deduplication.md \
-            scripts/sync_nlos_20260712_realtime_dynamic.py \
-            scripts/fix_nlos_20260712_realtime_citation_key.py \
-            .github/workflows/nlos-realtime-dynamic-sync.yml
-          git add -A updates/2026-07-12-realtime-dynamic-nlos-build-diagnostic.md 2>/dev/null || true
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Use final Nature Communications metadata for Nam et al."
+          git add bare_jrnl.pdf updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md
+          if ! git diff --cached --quiet; then
+            git commit -m "Rebuild NLOS survey with final Nam et al. metadata"
             git pull --rebase origin master
             git push origin HEAD:master
           fi
