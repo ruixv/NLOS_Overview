@@ -1,6 +1,6 @@
-name: Integrate SSCR and rebuild NLOS survey
+name: Synchronize July 2026 NLOS survey updates
 
-# Validate SSCR through the compiled auxiliary and bibliography records.
+# Reuse the established survey build workflow for citation-traced additions.
 on:
   push:
     paths:
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: nlos-sscr-sync
+  group: nlos-survey-sync
   cancel-in-progress: true
 
 jobs:
@@ -32,9 +32,10 @@ jobs:
       - name: Install bibliography parser
         run: python -m pip install bibtexparser==1.4.3
 
-      - name: Integrate SSCR and rebuild consolidated bibliography
+      - name: Synchronize source artifacts and consolidated bibliography
         run: |
           python scripts/sync_nlos_20260711_run16.py
+          python scripts/sync_nlos_20260711_run17.py
           python scripts/merge_nlos_bibliography.py
           grep -E "Case-insensitive duplicate replacements|Citation-key case normalizations|Truly missing citation keys" updates/2026-07-11-bibliography-deduplication.md
 
@@ -74,14 +75,17 @@ jobs:
             integrated=false
             if grep -Fq 'signal-surface collaborative regularization (SSCR)' article/2active.tex \
               && grep -Fq 'liuFewShotSSCR2022' bare_jrnl.aux \
-              && grep -Fq 'Few-shot Non-line-of-sight Imaging with Signal-surface Collaborative Regularization' bare_jrnl.bbl; then
+              && grep -Fq 'Few-shot Non-line-of-sight Imaging with Signal-surface Collaborative Regularization' bare_jrnl.bbl \
+              && grep -Fq 'Virtual light-transport analysis' article/2active.tex \
+              && grep -Fq 'marcoVirtualLightTransport2021' bare_jrnl.aux \
+              && grep -Fq 'Virtual Light Transport Matrices for Non-Line-Of-Sight Imaging' bare_jrnl.bbl; then
               integrated=true
             fi
 
             if [ "$info_rc" -eq 0 ] && [ "$text_rc" -eq 0 ] && [ -s /tmp/bare_jrnl.txt ] \
               && [ "$undefined" = false ] && [ "$integrated" = true ]; then
               pdf_ok=true
-              validation_reason="clean LaTeX/BibTeX build; SSCR source, citation, and compiled bibliography verified"
+              validation_reason="clean LaTeX/BibTeX build; SSCR and virtual light-transport sources, citations, and bibliography records verified"
             else
               validation_reason="PDF/reference validation failed (undefined=$undefined, integrated=$integrated, pdfinfo=$info_rc, pdftotext=$text_rc)"
             fi
@@ -93,7 +97,7 @@ jobs:
 
           if [ "$pdf_ok" != true ]; then
             {
-              echo '# SSCR LaTeX build diagnostic (11 July 2026)'
+              echo '# Virtual light transport matrix LaTeX build diagnostic (11 July 2026)'
               echo
               echo "latexmk exit code: $latex_rc"
               echo
@@ -110,9 +114,9 @@ jobs:
                 tail -n 160 bare_jrnl.blg || true
                 echo '```'
               fi
-            } > updates/2026-07-11-sscr-build-diagnostic.md
+            } > updates/2026-07-11-vltm-build-diagnostic.md
           else
-            rm -f updates/2026-07-11-sscr-build-diagnostic.md
+            rm -f updates/2026-07-11-vltm-build-diagnostic.md
           fi
           exit 0
 
@@ -127,39 +131,42 @@ jobs:
           import os
           import re
 
-          p = Path('updates/2026-07-11-sscr-survey-consistency-gap.md')
+          p = Path('updates/2026-07-11-virtual-light-transport-matrix-citation-tracing-update.md')
           text = p.read_text(encoding='utf-8')
-          text = re.sub(r'\n\*\*Build result:\*\*.*?\n(?=\n|\Z)', '\n', text, flags=re.S)
+          text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
           if os.environ.get('PDF_OK') == 'true':
               status = (
-                  "\n**Build result:** successful clean LaTeX/BibTeX rebuild. "
-                  "`article/2active.tex`, the duplicate-free consolidated bibliography, and "
-                  "`bare_jrnl.pdf` are now synchronized. `pdfinfo`/`pdftotext` passed, no "
-                  "undefined or repeated citation records were detected, and the SSCR source, "
-                  "citation key, and compiled bibliography record were verified "
+                  "\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage, "
+                  "survey source, duplicate-free merged bibliography, and `bare_jrnl.pdf` are now "
+                  "synchronized. `pdfinfo`/`pdftotext` passed, no undefined or repeated citation "
+                  "records were detected, and the virtual light-transport source, citation key, and "
+                  "compiled bibliography record were verified "
                   f"(latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
               )
           else:
               status = (
-                  "\n**Build result:** the SSCR source and bibliography integration was applied, "
-                  "but no strictly validated replacement PDF was committed. The prior PDF was "
-                  "preserved. "
+                  "\n\n**Build result:** text/source synchronization was attempted, but no strictly "
+                  "validated replacement PDF was committed; the previous PDF was preserved. "
                   f"Reason: {os.environ.get('VALIDATION_REASON', 'unknown')} "
                   f"(latexmk exit code {os.environ.get('LATEX_RC', 'unknown')}). See "
-                  "`updates/2026-07-11-sscr-build-diagnostic.md`.\n"
+                  "`updates/2026-07-11-vltm-build-diagnostic.md`.\n"
               )
-          p.write_text(text.rstrip() + "\n" + status, encoding='utf-8')
+          p.write_text(text.rstrip() + status, encoding='utf-8')
           PY
 
       - name: Commit synchronized artifacts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add article/2active.tex bare_jrnl.tex egbib_20260711_sscr_updates.bib \
-            egbib_merged_20260711.bib updates/2026-07-11-sscr-survey-consistency-gap.md \
+          git add README.md index.html article/2active.tex bare_jrnl.tex \
+            egbib_20260711_sscr_updates.bib egbib_20260711_vltm_updates.bib \
+            egbib_merged_20260711.bib \
+            updates/2026-07-11-sscr-survey-consistency-gap.md \
+            updates/2026-07-11-virtual-light-transport-matrix-citation-tracing-update.md \
             updates/2026-07-11-bibliography-deduplication.md \
-            scripts/sync_nlos_20260711_run16.py .github/workflows/nlos-sscr-sync.yml
-          git add -A updates/2026-07-11-sscr-build-diagnostic.md 2>/dev/null || true
+            scripts/sync_nlos_20260711_run16.py scripts/sync_nlos_20260711_run17.py \
+            .github/workflows/nlos-sscr-sync.yml
+          git add -A updates/2026-07-11-vltm-build-diagnostic.md 2>/dev/null || true
           if [ "${{ steps.build.outputs.pdf_ok }}" = "true" ]; then
             git add bare_jrnl.pdf
           else
@@ -169,6 +176,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Integrate SSCR into survey and rebuild PDF"
+            git commit -m "Integrate virtual NLOS light transport and rebuild survey"
             git push origin HEAD:master
           fi
