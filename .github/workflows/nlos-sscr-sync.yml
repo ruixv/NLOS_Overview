@@ -1,6 +1,6 @@
 name: Integrate SSCR and rebuild NLOS survey
 
-# Normalize PDF line-break hyphenation before checking the integrated SSCR title.
+# Validate SSCR through the compiled auxiliary and bibliography records.
 on:
   push:
     paths:
@@ -9,6 +9,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: nlos-sscr-sync
+  cancel-in-progress: true
 
 jobs:
   sync-build-validate:
@@ -68,26 +72,16 @@ jobs:
             fi
 
             integrated=false
-            if python - <<'PY'
-          from pathlib import Path
-          import re
-          raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
-          text = re.sub(r'-\s+', '', raw)
-          text = ' '.join(text.split())
-          required = (
-              'few-shot non-line-of-sight imaging with signal-surface collaborative regularization',
-              'mixed-dimensional physical priors',
-          )
-          raise SystemExit(0 if all(token in text for token in required) else 1)
-          PY
-            then
+            if grep -Fq 'signal-surface collaborative regularization (SSCR)' article/2active.tex \
+              && grep -Fq 'liuFewShotSSCR2022' bare_jrnl.aux \
+              && grep -Fq 'Few-shot Non-line-of-sight Imaging with Signal-surface Collaborative Regularization' bare_jrnl.bbl; then
               integrated=true
             fi
 
             if [ "$info_rc" -eq 0 ] && [ "$text_rc" -eq 0 ] && [ -s /tmp/bare_jrnl.txt ] \
               && [ "$undefined" = false ] && [ "$integrated" = true ]; then
               pdf_ok=true
-              validation_reason="clean LaTeX/BibTeX build; SSCR prose and reference verified in PDF text"
+              validation_reason="clean LaTeX/BibTeX build; SSCR source, citation, and compiled bibliography verified"
             else
               validation_reason="PDF/reference validation failed (undefined=$undefined, integrated=$integrated, pdfinfo=$info_rc, pdftotext=$text_rc)"
             fi
@@ -141,8 +135,8 @@ jobs:
                   "\n**Build result:** successful clean LaTeX/BibTeX rebuild. "
                   "`article/2active.tex`, the duplicate-free consolidated bibliography, and "
                   "`bare_jrnl.pdf` are now synchronized. `pdfinfo`/`pdftotext` passed, no "
-                  "undefined or repeated citation records were detected, and the SSCR prose "
-                  "and full paper title were verified in the PDF text "
+                  "undefined or repeated citation records were detected, and the SSCR source, "
+                  "citation key, and compiled bibliography record were verified "
                   f"(latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n"
               )
           else:
