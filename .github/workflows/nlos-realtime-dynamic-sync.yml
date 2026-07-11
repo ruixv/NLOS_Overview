@@ -1,6 +1,6 @@
 name: Synchronize real-time dynamic NLOS milestone
 
-# Trigger revision 4: validate normalized title text plus canonical BibTeX identity.
+# Final publisher-metadata validation.
 on:
   push:
     paths:
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: nlos-survey-sync
+  group: nlos-final-nam-metadata
   cancel-in-progress: true
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python and synchronize artifacts
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -40,8 +40,12 @@ jobs:
           grep -q "Truly missing citation keys: 0" updates/2026-07-11-bibliography-deduplication.md
           test "$(grep -ic '^@.*{nam_real-time_2020,' egbib_merged_20260711.bib)" -eq 1
           test "$(grep -ic '^@.*{namRealTimeDynamicScenes2021,' egbib_merged_20260711.bib)" -eq 0
-          grep -Fq "Real-time Non-line-of-Sight imaging of dynamic scenes" README.md
-          grep -Fq "Real-time Non-line-of-Sight imaging of dynamic scenes" index.html
+          grep -Fq "Low-latency time-of-flight non-line-of-sight imaging at 5 frames per second" README.md
+          grep -Fq "Low-latency time-of-flight non-line-of-sight imaging at 5 frames per second" index.html
+          ! grep -Fq "Real-time Non-line-of-Sight imaging of dynamic scenes" README.md
+          ! grep -Fq "Real-time Non-line-of-Sight imaging of dynamic scenes" index.html
+          grep -Fq 'Renna, Marco' egbib_merged_20260711.bib
+          grep -Fq 'Tosi, Alberto' egbib_merged_20260711.bib
           grep -Fq '\cite{nam_real-time_2020}' article/2active.tex
           grep -Fq '<b>86</b><span>tracked latest entries</span>' index.html
 
@@ -59,19 +63,22 @@ jobs:
           test -s bare_jrnl.bbl
           pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt
           pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
           ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
           ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
           grep -Fq 'nam_real-time_2020' bare_jrnl.aux
           grep -Fq 'nam_real-time_2020' bare_jrnl.bbl
           ! grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.bbl
+          grep -Fq 'Low-latency time-of-flight non-line-of-sight imaging at 5 frames per second' bare_jrnl.bbl
           python - <<'PY'
           from pathlib import Path
           import re
           raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
           compact = re.sub(r'[^a-z0-9]+', '', raw)
-          token = 'realtimenonlineofsightimagingofdynamicscenes'
-          if token not in compact:
-              raise SystemExit(f'Missing normalized PDF title token: {token}')
+          required = ('lowlatency', '5framespersecond', '28activepixels')
+          missing = [token for token in required if token not in compact]
+          if missing:
+              raise SystemExit(f'Missing normalized PDF tokens: {missing}')
           PY
 
       - name: Record successful validation
@@ -82,10 +89,13 @@ jobs:
           p = Path('updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md')
           text = p.read_text(encoding='utf-8')
           text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
-          status = ("\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage, survey source, "
-                    "canonical duplicate-free bibliography, and `bare_jrnl.pdf` are synchronized. The existing citation key "
-                    "`nam_real-time_2020` is used exactly once for this paper; `pdfinfo`/`pdftotext` passed and no undefined "
-                    "or repeated BibTeX records were detected.\n")
+          text = re.sub(r'\n\*\*Final-metadata validation:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
+          status = (
+              "\n\n**Build result:** successful clean LaTeX/BibTeX rebuild using the final Nature Communications "
+              "title and complete eight-author metadata. README, homepage, survey source, canonical duplicate-free "
+              "bibliography, and `bare_jrnl.pdf` are synchronized. `pdfinfo`/`pdftotext` passed and no undefined, "
+              "repeated, or duplicate-paper BibTeX records were detected.\n"
+          )
           p.write_text(text.rstrip() + status, encoding='utf-8')
           Path('updates/2026-07-12-realtime-dynamic-nlos-build-diagnostic.md').unlink(missing_ok=True)
           PY
@@ -105,6 +115,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Validate canonical real-time NLOS citation and regenerate survey PDF"
+            git commit -m "Use final Nature Communications metadata for Nam et al."
+            git pull --rebase origin master
             git push origin HEAD:master
           fi
