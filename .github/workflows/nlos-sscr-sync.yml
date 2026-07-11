@@ -75,10 +75,10 @@ jobs:
             integrated=false
             if grep -Fq 'signal-surface collaborative regularization (SSCR)' article/2active.tex \
               && grep -Fq 'liuFewShotSSCR2022' bare_jrnl.aux \
-              && grep -Fq 'Few-shot Non-line-of-sight Imaging with Signal-surface Collaborative Regularization' bare_jrnl.bbl \
+              && grep -Fiq 'few-shot non-line-of-sight imaging with signal-surface collaborative regularization' bare_jrnl.bbl \
               && grep -Fq 'Virtual light-transport analysis' article/2active.tex \
               && grep -Fq 'marcoVirtualLightTransport2021' bare_jrnl.aux \
-              && grep -Fq 'Virtual Light Transport Matrices for Non-Line-Of-Sight Imaging' bare_jrnl.bbl; then
+              && grep -Fiq 'virtual light transport matrices for non-line-of-sight imaging' bare_jrnl.bbl; then
               integrated=true
             fi
 
@@ -176,6 +176,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Integrate virtual NLOS light transport and rebuild survey"
+            git commit -m "Validate virtual NLOS light transport survey update"
             git push origin HEAD:master
           fi
