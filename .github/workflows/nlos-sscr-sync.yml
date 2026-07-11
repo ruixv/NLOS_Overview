@@ -1,4 +1,5 @@
 name: Validate July 2026 NLOS survey updates
+# Final validation retry after the canonical bibliography rebuild settled.
 
 on:
   push:
@@ -74,8 +75,6 @@ jobs:
           import re
           raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
           compact = re.sub(r'[^a-z0-9]+', '', raw)
-          # Validate stable paragraph fragments rather than full titles, because
-          # PDF text extraction may encode typographic ligatures non-literally.
           required = (
               'recoverability',
               'acquisitiongeometry',
@@ -124,5 +123,6 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "Validate feature visibility in rebuilt NLOS survey"
+            git pull --rebase origin master
             git push origin HEAD:master
           fi
