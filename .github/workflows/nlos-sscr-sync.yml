@@ -1,5 +1,6 @@
 name: Integrate SSCR and rebuild NLOS survey
 
+# Triggered after the workflow file was present on the default branch.
 on:
   push:
     paths:
