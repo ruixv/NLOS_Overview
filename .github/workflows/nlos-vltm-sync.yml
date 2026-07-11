@@ -174,3 +174,5 @@ jobs:
             git commit -m "Integrate virtual NLOS light transport and rebuild survey"
             git push origin HEAD:master
           fi
+
+# Touch marker: second push enables the path-trigger after initial workflow creation.
