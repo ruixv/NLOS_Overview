@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Synchronize the citation-traced real-time dynamic NLOS milestone.
-
-The paper was already cited in the legacy survey tables, but it was absent from
-README.md and the website and lacked an explicit survey narrative.  This script
-uses exact, fail-closed anchors so the automation cannot silently corrupt the
-large hand-maintained files.
-"""
+"""Synchronize the citation-traced real-time dynamic NLOS milestone."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -32,8 +26,7 @@ def replace_once(text: str, old: str, new: str, label: str) -> str:
 
 
 def sync_readme() -> None:
-    path = "README.md"
-    text = read(path)
+    text = read("README.md")
     row = (
         f"| 2021 | [{TITLE}]({DOI}) — Nam et al. | Nature Communications 2021 | "
         "Combines two gated $16\\times1$ SPAD arrays (28 active pixels), sparse relay-wall "
@@ -64,12 +57,11 @@ def sync_readme() -> None:
             "```"
         )
         text = replace_once(text, old, new, "README milestone")
-    write(path, text)
+    write("README.md", text)
 
 
 def sync_index() -> None:
-    path = "index.html"
-    text = read(path)
+    text = read("index.html")
     if TITLE not in text:
         anchor = '      {cat:"latest modality learning",title:"X-band Radar Non-Line-of-Sight Imaging"'
         obj = (
@@ -84,38 +76,35 @@ def sync_index() -> None:
             raise RuntimeError("Homepage paper-array insertion anchor not found")
         text = text[:pos] + obj + text[pos:]
 
-    if '<b>85</b><span>tracked latest entries</span>' in text:
-        text = text.replace(
-            '<b>85</b><span>tracked latest entries</span>',
-            '<b>86</b><span>tracked latest entries</span>',
-            1,
-        )
-    elif '<b>86</b><span>tracked latest entries</span>' not in text:
+    old_count = '<b>85</b><span>tracked latest entries</span>'
+    new_count = '<b>86</b><span>tracked latest entries</span>'
+    if old_count in text:
+        text = text.replace(old_count, new_count, 1)
+    elif new_count not in text:
         raise RuntimeError("Homepage latest-count anchor is neither 85 nor 86")
 
-    old = (
+    old_timeline = (
         '<div class="tl"><div class="year">2021</div><div class="tl-body"><strong>'
-        'Kilometer range, neural fields, virtual transport matrices, commercial LiDAR, picosecond timing, and self-calibration'</n        'strong><p>Long-range NLOS, NeTF, phasor-field virtual projector-camera systems for hidden light-transport analysis, '
+        'Kilometer range, neural fields, virtual transport matrices, commercial LiDAR, picosecond timing, and self-calibration'
+        '</strong><p>Long-range NLOS, NeTF, phasor-field virtual projector-camera systems for hidden light-transport analysis, '
         'PRL picosecond-resolution up-conversion detection, calibration-aware ToF reconstruction, and two-step LiDAR deep remapping '
         'expanded scale and acquisition regimes.</p></div></div>'
     )
-    # Constructed separately to avoid accidental HTML escaping in the source string.
-    old = old.replace("'strong>", "</strong>")
-    new = (
+    new_timeline = (
         '<div class="tl"><div class="year">2021</div><div class="tl-body"><strong>'
-        'Real-time diffuse NLOS video, kilometer range, neural fields, virtual transport matrices, commercial LiDAR, picosecond timing, and self-calibration'</n        'strong><p>Nam et al. demonstrated a full 5 fps capture-and-reconstruction pipeline for diffuse, non-retroreflective hidden scenes; '
+        'Real-time diffuse NLOS video, kilometer range, neural fields, virtual transport matrices, commercial LiDAR, picosecond timing, and self-calibration'
+        '</strong><p>Nam et al. demonstrated a full 5 fps capture-and-reconstruction pipeline for diffuse, non-retroreflective hidden scenes; '
         'long-range NLOS, NeTF, phasor-field virtual projector-camera systems for hidden light-transport analysis, PRL picosecond-resolution '
-        'up-conversion detection, calibration-aware ToF reconstruction, and two-step LiDAR deep remapping further expanded scale and acquisition regimes.'</n        'p></div></div>'
+        'up-conversion detection, calibration-aware ToF reconstruction, and two-step LiDAR deep remapping further expanded scale and acquisition regimes.'
+        '</p></div></div>'
     )
-    new = new.replace("'strong>", "</strong>").replace("'p>", "</p>")
     if "Real-time diffuse NLOS video, kilometer range" not in text:
-        text = replace_once(text, old, new, "homepage 2021 timeline")
-    write(path, text)
+        text = replace_once(text, old_timeline, new_timeline, "homepage 2021 timeline")
+    write("index.html", text)
 
 
 def sync_survey() -> None:
-    path = "article/2active.tex"
-    text = read(path)
+    text = read("article/2active.tex")
     marker = "providing an early full-pipeline real-time NLOS video milestone"
     if marker not in text:
         anchor = (
@@ -132,38 +121,34 @@ def sync_survey() -> None:
             "full-pipeline real-time NLOS video milestone."
         )
         text = replace_once(text, anchor, anchor + addition, "survey dynamic-video paragraph")
-    write(path, text)
+    write("article/2active.tex", text)
 
 
 def sync_bibliography() -> None:
-    bib = ROOT / "egbib_20260712_realtime_updates.bib"
-    bib.write_text(
-        """% Citation-traced real-time dynamic NLOS milestone (12 July 2026).\n\n"
-        "@article{namRealTimeDynamicScenes2021,\n"
-        "  author = {Nam, Ji Hyun and Brandt, Eric and Bauer, Sebastian and Liu, Xiaochun and Sifakis, Eftychios and Velten, Andreas},\n"
-        "  title = {Real-time Non-line-of-Sight imaging of dynamic scenes},\n"
-        "  journal = {Nature Communications},\n"
-        "  volume = {12},\n"
-        "  pages = {6526},\n"
-        "  year = {2021},\n"
-        "  doi = {10.1038/s41467-021-26721-x},\n"
-        "  url = {https://doi.org/10.1038/s41467-021-26721-x}\n"
-        "}\n"
-        """,
-        encoding="utf-8",
-    )
+    content = """% Citation-traced real-time dynamic NLOS milestone (12 July 2026).
+
+@article{namRealTimeDynamicScenes2021,
+  author = {Nam, Ji Hyun and Brandt, Eric and Bauer, Sebastian and Liu, Xiaochun and Sifakis, Eftychios and Velten, Andreas},
+  title = {Real-time Non-line-of-Sight imaging of dynamic scenes},
+  journal = {Nature Communications},
+  volume = {12},
+  pages = {6526},
+  year = {2021},
+  doi = {10.1038/s41467-021-26721-x},
+  url = {https://doi.org/10.1038/s41467-021-26721-x}
+}
+"""
+    (ROOT / "egbib_20260712_realtime_updates.bib").write_text(content, encoding="utf-8")
 
 
 def sync_note() -> None:
-    note = ROOT / "updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md"
-    note.write_text(
-        f"""# 12 July 2026 real-time dynamic NLOS citation-tracing update
+    content = f"""# 12 July 2026 real-time dynamic NLOS citation-tracing update
 
 ## Citation-tracing result
 
-A forward/reference-tracing pass through the recent ToF NLOS comparative literature surfaced **{TITLE}** by Nam et al. The paper was already cited in legacy survey tables but was missing from the README and homepage and did not have an explicit literature-review sentence describing its system-level contribution.
+A forward/reference-tracing pass through recent ToF NLOS comparative literature surfaced **{TITLE}** by Nam et al. The paper was already cited in legacy survey tables but was missing from the README and homepage and did not have an explicit literature-review sentence describing its system-level contribution.
 
-The final publication is **Nature Communications 12, 6526 (2021)**, DOI `10.1038/s41467-021-26721-x`; it must therefore be labeled by the journal rather than by its 2020 arXiv preprint.
+The final publication is **Nature Communications 12, 6526 (2021)**, DOI `10.1038/s41467-021-26721-x`; it is therefore labeled by the journal rather than by its 2020 arXiv preprint.
 
 ## Why it belongs
 
@@ -171,15 +156,14 @@ The work combines two gated $16\\times1$ SPAD arrays (28 active pixels), sparse 
 
 ## Synchronized artifacts
 
-- `README.md`: added the final-venue paper row and a 2021 milestone-timeline node.
-- `index.html`: added a searchable/latest paper object, updated the 2021 trajectory, and changed the latest-entry count from 85 to 86.
-- `article/2active.tex`: inserted the contribution in the SPAD-array / dynamic-video discussion.
-- `egbib_20260712_realtime_updates.bib`: added publisher-verified metadata under `{KEY}`.
+- `README.md`: final-venue paper row and a 2021 milestone-timeline node.
+- `index.html`: searchable/latest paper object, updated 2021 trajectory, and latest-entry count 85 to 86.
+- `article/2active.tex`: contribution inserted in the SPAD-array / dynamic-video discussion.
+- `egbib_20260712_realtime_updates.bib`: publisher-verified metadata under `{KEY}`.
 - `egbib_merged_20260711.bib`: regenerated by the duplicate-free bibliography merger.
 - `bare_jrnl.pdf`: rebuilt only after strict LaTeX/BibTeX, PDF-text, and cross-artifact validation.
-""",
-        encoding="utf-8",
-    )
+"""
+    (ROOT / "updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md").write_text(content, encoding="utf-8")
 
 
 def main() -> None:
