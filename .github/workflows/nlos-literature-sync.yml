@@ -1,6 +1,6 @@
 name: NLOS literature sync and survey build
 
-# Final rebuild after correcting the remaining unverifiable citation alias.
+# Rebuild after integrating the verified SSCR survey citation and prose.
 on:
   push:
     paths:
