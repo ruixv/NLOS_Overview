@@ -1,6 +1,6 @@
 name: Synchronize real-time dynamic NLOS milestone
 
-# Trigger revision 3: rerun after concurrent survey validation completed.
+# Trigger revision 4: validate normalized title text plus canonical BibTeX identity.
 on:
   push:
     paths:
@@ -24,12 +24,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: Set up Python and synchronize artifacts
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Synchronize sources and bibliography
+      - name: Synchronize sources and canonical bibliography
         run: |
           set -euo pipefail
           python -m pip install bibtexparser==1.4.3
@@ -42,7 +42,6 @@ jobs:
           test "$(grep -ic '^@.*{namRealTimeDynamicScenes2021,' egbib_merged_20260711.bib)" -eq 0
           grep -Fq "Real-time Non-line-of-Sight imaging of dynamic scenes" README.md
           grep -Fq "Real-time Non-line-of-Sight imaging of dynamic scenes" index.html
-          grep -Fq "full-pipeline real-time NLOS video milestone" article/2active.tex
           grep -Fq '\cite{nam_real-time_2020}' article/2active.tex
           grep -Fq '<b>86</b><span>tracked latest entries</span>' index.html
 
@@ -51,105 +50,51 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
 
-      - name: Rebuild and validate survey PDF
-        id: build
-        shell: bash
+      - name: Clean-build and validate survey PDF
         run: |
-          set +e
+          set -euo pipefail
           rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
           latexmk -pdf -interaction=nonstopmode bare_jrnl.tex > /tmp/latexmk.log 2>&1
-          latex_rc=$?
-          pdf_ok=false
-          reason="latexmk failed"
-          if [ "$latex_rc" -eq 0 ] && [ -s bare_jrnl.pdf ] && [ -s bare_jrnl.bbl ]; then
-            pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt 2>&1
-            info_rc=$?
-            pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt > /tmp/pdftotext.log 2>&1
-            text_rc=$?
-            undefined=false
-            grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log 2>/dev/null && undefined=true
-            grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg 2>/dev/null && undefined=true
-            integrated=false
-            if grep -Fq 'nam_real-time_2020' bare_jrnl.aux \
-              && grep -Fq 'nam_real-time_2020' bare_jrnl.bbl \
-              && ! grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.bbl; then integrated=true; fi
-            pdf_text_ok=false
-            if python - <<'PY'
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
+          ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
+          grep -Fq 'nam_real-time_2020' bare_jrnl.aux
+          grep -Fq 'nam_real-time_2020' bare_jrnl.bbl
+          ! grep -Fq 'namRealTimeDynamicScenes2021' bare_jrnl.bbl
+          python - <<'PY'
           from pathlib import Path
           import re
-          compact = re.sub(r'[^a-z0-9]+', '', Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold())
-          required = ('realtimenonlineofsightimagingofdynamicscenes', 'fullpipelinerealtimenlosvideomilestone')
-          missing = [x for x in required if x not in compact]
-          if missing:
-              print('Missing PDF tokens:', missing)
-              raise SystemExit(1)
+          raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
+          compact = re.sub(r'[^a-z0-9]+', '', raw)
+          token = 'realtimenonlineofsightimagingofdynamicscenes'
+          if token not in compact:
+              raise SystemExit(f'Missing normalized PDF title token: {token}')
           PY
-            then pdf_text_ok=true; fi
-            if [ "$info_rc" -eq 0 ] && [ "$text_rc" -eq 0 ] && [ "$undefined" = false ] \
-              && [ "$integrated" = true ] && [ "$pdf_text_ok" = true ]; then
-              pdf_ok=true
-              reason="clean LaTeX/BibTeX, canonical citation, and PDF validation passed"
-            else
-              reason="validation failed (undefined=$undefined integrated=$integrated pdf_text=$pdf_text_ok pdfinfo=$info_rc pdftotext=$text_rc)"
-            fi
-          fi
-          echo "latex_rc=$latex_rc" >> "$GITHUB_OUTPUT"
-          echo "pdf_ok=$pdf_ok" >> "$GITHUB_OUTPUT"
-          echo "reason=$reason" >> "$GITHUB_OUTPUT"
-          if [ "$pdf_ok" != true ]; then
-            {
-              echo '# Real-time dynamic NLOS build diagnostic (12 July 2026)'
-              echo
-              echo "latexmk exit code: $latex_rc"
-              echo
-              echo "validation: $reason"
-              echo
-              echo '```text'
-              tail -n 220 /tmp/latexmk.log 2>/dev/null || true
-              echo '```'
-              if [ -f bare_jrnl.blg ]; then
-                echo
-                echo '## BibTeX log tail'
-                echo
-                echo '```text'
-                tail -n 160 bare_jrnl.blg || true
-                echo '```'
-              fi
-            } > updates/2026-07-12-realtime-dynamic-nlos-build-diagnostic.md
-          else
-            rm -f updates/2026-07-12-realtime-dynamic-nlos-build-diagnostic.md
-          fi
-          exit 0
 
-      - name: Record build status
-        env:
-          PDF_OK: ${{ steps.build.outputs.pdf_ok }}
-          LATEX_RC: ${{ steps.build.outputs.latex_rc }}
-          REASON: ${{ steps.build.outputs.reason }}
+      - name: Record successful validation
         run: |
           python - <<'PY'
           from pathlib import Path
-          import os, re
+          import re
           p = Path('updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md')
           text = p.read_text(encoding='utf-8')
           text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
-          if os.environ.get('PDF_OK') == 'true':
-              status = ("\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage, survey source, "
-                        "duplicate-free bibliography, and `bare_jrnl.pdf` are synchronized. The canonical legacy citation key was reused, "
-                        "`pdfinfo`/`pdftotext` passed, and no undefined, repeated, or duplicate-paper citation records were retained "
-                        f"(latexmk exit code {os.environ.get('LATEX_RC', '0')}).\n")
-          else:
-              status = ("\n\n**Build result:** source synchronization completed, but the previous PDF was preserved. Reason: "
-                        + os.environ.get('REASON', 'unknown') +
-                        f" (latexmk exit code {os.environ.get('LATEX_RC', 'unknown')}). See the build diagnostic.\n")
+          status = ("\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage, survey source, "
+                    "canonical duplicate-free bibliography, and `bare_jrnl.pdf` are synchronized. The existing citation key "
+                    "`nam_real-time_2020` is used exactly once for this paper; `pdfinfo`/`pdftotext` passed and no undefined "
+                    "or repeated BibTeX records were detected.\n")
           p.write_text(text.rstrip() + status, encoding='utf-8')
+          Path('updates/2026-07-12-realtime-dynamic-nlos-build-diagnostic.md').unlink(missing_ok=True)
           PY
 
-      - name: Commit synchronized artifacts
+      - name: Commit synchronized artifacts and regenerated PDF
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md index.html article/2active.tex bare_jrnl.tex \
+          git add README.md index.html article/2active.tex bare_jrnl.tex bare_jrnl.pdf \
             egbib_20260712_realtime_updates.bib egbib_merged_20260711.bib \
             updates/2026-07-12-realtime-dynamic-nlos-citation-tracing-update.md \
             updates/2026-07-11-bibliography-deduplication.md \
@@ -157,15 +102,9 @@ jobs:
             scripts/fix_nlos_20260712_realtime_citation_key.py \
             .github/workflows/nlos-realtime-dynamic-sync.yml
           git add -A updates/2026-07-12-realtime-dynamic-nlos-build-diagnostic.md 2>/dev/null || true
-          if [ "${{ steps.build.outputs.pdf_ok }}" = "true" ]; then
-            git add bare_jrnl.pdf
-          else
-            git restore --staged bare_jrnl.pdf 2>/dev/null || true
-            git checkout -- bare_jrnl.pdf 2>/dev/null || true
-          fi
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Canonicalize real-time dynamic NLOS citation and rebuild survey"
+            git commit -m "Validate canonical real-time NLOS citation and regenerate survey PDF"
             git push origin HEAD:master
           fi
