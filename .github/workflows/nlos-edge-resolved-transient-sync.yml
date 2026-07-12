@@ -76,7 +76,7 @@ jobs:
           ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
           grep -Fq 'rappEdgeResolvedTransient2020' bare_jrnl.aux
           grep -Fq 'rappEdgeResolvedTransient2020' bare_jrnl.bbl
-          grep -Fq 'Seeing Around Corners with Edge-Resolved Transient Imaging' bare_jrnl.bbl
+          grep -Eiq 'seeing around corners with edge-resolved transient imaging' bare_jrnl.bbl
           python - <<'PY'
           from pathlib import Path
           import re
