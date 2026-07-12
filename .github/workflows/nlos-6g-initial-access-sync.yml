@@ -1,3 +1,4 @@
+# Triggered via a merged pull request after all synchronization prerequisites were committed.
 name: Synchronize 6G initial-access NLOS imaging update
 
 on:
