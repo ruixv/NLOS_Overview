@@ -1,0 +1,147 @@
+name: Synchronize 6G initial-access NLOS imaging update
+
+on:
+  push:
+    paths:
+      - .github/workflows/nlos-6g-initial-access-sync.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-6g-initial-access-sync
+  cancel-in-progress: true
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Synchronize text artifacts and bibliography
+        run: |
+          set -euo pipefail
+          python -m pip install bibtexparser==1.4.3
+          python -m py_compile scripts/sync_nlos_20260712_initial_access.py scripts/merge_nlos_bibliography.py
+          python scripts/sync_nlos_20260712_initial_access.py
+          python scripts/merge_nlos_bibliography.py
+
+      - name: Verify synchronized sources
+        run: |
+          set -euo pipefail
+          grep -Fq "Enabling NLOS Imaging Capabilities at the Initial Access of 6G Base Stations" README.md
+          grep -Fq "Enabling NLOS Imaging Capabilities at the Initial Access of 6G Base Stations" index.html
+          grep -Fq '<b>89</b><span>tracked latest entries</span>' index.html
+          grep -Fq 'reflector-assisted base-station initial-access imaging' index.html
+          grep -Fq '\cite{tornielliInitialAccessNLOS2025}' article/5newscenes.tex
+          grep -Fq 'standard-aware 6G ISAC deployment' article/5newscenes.tex
+          test "$(grep -ic '^@.*{tornielliInitialAccessNLOS2025,' egbib_merged_20260711.bib)" -eq 1
+          grep -Fq '2511.15416' egbib_merged_20260711.bib
+          grep -Fq 'Truly missing citation keys: 0' updates/2026-07-11-bibliography-deduplication.md
+
+      - name: Install LaTeX toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean-build survey PDF
+        id: build
+        shell: bash
+        run: |
+          set +e
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex > /tmp/latexmk.log 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          if [ "$status" -ne 0 ]; then
+            tail -n 180 /tmp/latexmk.log > /tmp/latex-tail.txt
+          fi
+          exit 0
+
+      - name: Record build failure and preserve source update
+        if: steps.build.outputs.status != '0'
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('updates/2026-07-12-6g-initial-access-nlos-imaging-update.md')
+          text = p.read_text(encoding='utf-8')
+          text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
+          log = Path('/tmp/latex-tail.txt').read_text(encoding='utf-8', errors='replace')
+          status = "\n\n**Build result:** LaTeX rebuild failed. The synchronized text and bibliography sources are retained, but `bare_jrnl.pdf` has not been claimed as updated. Final log excerpt:\n\n```text\n" + log[-14000:] + "\n```\n"
+          p.write_text(text.rstrip() + status, encoding='utf-8')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex \
+            egbib_20260712_initial_access_updates.bib egbib_merged_20260711.bib \
+            updates/2026-07-11-bibliography-deduplication.md \
+            updates/2026-07-12-6g-initial-access-nlos-imaging-update.md \
+            scripts/sync_nlos_20260712_initial_access.py
+          git commit -m "Integrate 6G initial-access NLOS imaging sources" || true
+          git pull --rebase origin master
+          git push origin HEAD:master
+          exit 1
+
+      - name: Validate rebuilt PDF
+        if: steps.build.outputs.status == '0'
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
+          ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
+          ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
+          grep -Fq 'tornielliInitialAccessNLOS2025' bare_jrnl.aux
+          grep -Fq 'tornielliInitialAccessNLOS2025' bare_jrnl.bbl
+          grep -Eiq 'enabling.*nlos.*imaging.*initial access.*6g.*base stations' bare_jrnl.bbl
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
+          compact = re.sub(r'[^a-z0-9]+', '', raw)
+          required = ('initialaccess', 'modularreflector', 'torniellibellini', '6gisac')
+          missing = [token for token in required if token not in compact]
+          if missing:
+              raise SystemExit(f'Missing normalized PDF tokens: {missing}')
+          PY
+
+      - name: Record successful validation and commit synchronized artifacts
+        if: steps.build.outputs.status == '0'
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('updates/2026-07-12-6g-initial-access-nlos-imaging-update.md')
+          text = p.read_text(encoding='utf-8')
+          text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
+          status = (
+              "\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage paper explorer, "
+              "2025 timeline, radar/RF survey narrative, canonical BibTeX record, duplicate-free merged bibliography, "
+              "and `bare_jrnl.pdf` consistently include the arXiv 2025 6G initial-access NLOS imaging work. "
+              "`pdfinfo` and `pdftotext` validation passed; no undefined citations, missing BibTeX records, or repeated entries were detected.\n"
+          )
+          p.write_text(text.rstrip() + status, encoding='utf-8')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf \
+            egbib_20260712_initial_access_updates.bib egbib_merged_20260711.bib \
+            updates/2026-07-11-bibliography-deduplication.md \
+            updates/2026-07-12-6g-initial-access-nlos-imaging-update.md \
+            scripts/sync_nlos_20260712_initial_access.py
+          if ! git diff --cached --quiet; then
+            git commit -m "Integrate 6G initial-access NLOS imaging and rebuild survey"
+            git pull --rebase origin master
+            git push origin HEAD:master
+          fi
