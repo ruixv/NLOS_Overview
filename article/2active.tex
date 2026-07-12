@@ -277,7 +277,7 @@ Moving from arbitrary relay sampling toward extreme measurement sparsity, Liu~\e
 
 \vspace{0.8mm}
 \noindent \textbf{Higher-Order Bounce Imaging.}
-Standard NLOS methods consider exactly three-bounce light (relay wall $\to$ hidden object $\to$ relay wall). Royo~\etal~extended the imaging model to exploit fourth-bounce reflections caused by vertical specular surfaces (``virtual mirrors'') inside the hidden scene, allowing NLOS systems to observe parts of the scene that are completely invisible to three-bounce methods~\cite{royoVirtualMirrors2023}. This work demonstrates that leveraging higher-order light interactions can significantly increase the completeness of hidden scene reconstruction.
+Standard transient NLOS reconstruction usually truncates transport at the third bounce, which limits visibility for unfavorably oriented surfaces and confines most systems to a single corner. Royo~\etal~showed that planar diffuse surfaces behave specularly at the computational wavelengths of the phasor-field domain and can therefore act as ``virtual mirrors''~\cite{royoVirtualMirrors2023}. By propagating measured transients to these surfaces and constructing secondary virtual apertures, their method recovers limited-visibility geometry and objects hidden behind a second corner without requiring physical specular reflectors. This result shifts higher-order light transport from a discarded nuisance to an additional imaging resource.
 
 \vspace{0.8mm}
 \noindent \textbf{Phasor Fields under Scattering Conditions.}

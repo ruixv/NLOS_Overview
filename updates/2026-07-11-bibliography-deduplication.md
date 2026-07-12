@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 17 source files and keeps one highest-priority record for each of 348 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 18 source files and keeps one highest-priority record for each of 348 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 359
-- Case-insensitive duplicate replacements: 11
+- Parsed source records: 360
+- Case-insensitive duplicate replacements: 12
 - Citation-key case normalizations: 85
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -23,6 +23,7 @@ This update generates `egbib_merged_20260711.bib` from 17 source files and keeps
 - `leidirectobjectrecognition2019` / `leiDirectObjectRecognition2019`: `egbib.bib` → `egbib_20260707_updates.bib`
 - `liuFewShotSSCR2022` / `liuFewShotSSCR2022`: `egbib_2026_updates.bib` → `egbib_20260711_sscr_updates.bib`
 - `nam_real-time_2020` / `nam_real-time_2020`: `egbib.bib` → `egbib_20260712_realtime_updates.bib`
+- `royoVirtualMirrors2023` / `royoVirtualMirrors2023`: `egbib.bib` → `egbib_20260712_virtual_mirrors_updates.bib`
 
 ## Citation-key spellings normalized
 
