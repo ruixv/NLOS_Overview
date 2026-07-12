@@ -1,14 +1,16 @@
-# Triggered after all source prerequisites were committed.
 name: Synchronize 6G initial-access NLOS imaging update
 
 on:
   push:
     paths:
       - .github/workflows/nlos-6g-initial-access-sync.yml
+  issues:
+    types: [opened]
   workflow_dispatch:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: nlos-6g-initial-access-sync
@@ -16,6 +18,7 @@ concurrency:
 
 jobs:
   sync-build-validate:
+    if: github.event_name != 'issues' || github.event.issue.title == '[automation] Run 6G initial-access NLOS sync'
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
