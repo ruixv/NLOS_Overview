@@ -16,9 +16,9 @@ Before this update:
 
 - `article/2active.tex` already contained a short higher-order-bounce paragraph and cited `royoVirtualMirrors2023`;
 - the paragraph inaccurately described the method as relying on specular hidden surfaces rather than computationally specular diffuse surfaces;
-- `egbib_merged_20260711.bib` did not contain `royoVirtualMirrors2023`, leaving a source-level citation inconsistency;
+- `egbib_merged_20260711.bib` inherited an incorrect `royoVirtualMirrors2023` record from the base bibliography, with incomplete/wrong authorship, DOI, issue, and venue labeling;
 - `README.md` and `index.html` did not expose the paper in the latest additions, paper explorer, or historical timeline;
-- the existing `bare_jrnl.pdf` therefore could not be considered mutually consistent with the survey source and bibliography.
+- the existing `bare_jrnl.pdf` therefore could not be considered mutually consistent with the corrected survey source and bibliography.
 
 ## Synchronization plan
 
@@ -32,4 +32,4 @@ The marker-based synchronizer associated with this note performs the following i
 
 The synchronizer aborts rather than overwriting public-facing files when an expected marker is absent or ambiguous.
 
-**Build result:** pending the automated source synchronization, clean LaTeX/BibTeX rebuild, and PDF validation triggered by this update.
+**Build result:** README, homepage paper explorer, development timeline, survey narrative, canonical BibTeX supplement, and duplicate-free merged bibliography were synchronized in commit `0b9fbed073a648a6a9dba8075cf1371ac2d5fabc`. The merged bibliography audit reports zero missing citation keys. The connector-triggered PDF workflow did not complete in this run, so `bare_jrnl.pdf` is not claimed as regenerated; the clean-build workflow and diagnostics-preserving fallback remain committed for a later executable Actions run.
