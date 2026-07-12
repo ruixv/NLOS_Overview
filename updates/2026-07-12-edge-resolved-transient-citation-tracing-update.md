@@ -28,4 +28,4 @@ The update synchronizes the paper across:
 
 The synchronization script is marker-based and idempotent; it aborts rather than overwriting a large public-facing file when an expected insertion marker is missing or ambiguous.
 
-**Build result:** pending the automated clean LaTeX/BibTeX synchronization and PDF validation triggered by this update.
+**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage paper explorer, development timeline, survey narrative, duplicate-free merged bibliography, and `bare_jrnl.pdf` now consistently include the final Nature Communications record for edge-resolved transient imaging. `pdfinfo` and `pdftotext` validation passed; no undefined citations, missing BibTeX records, or repeated entries were detected.
