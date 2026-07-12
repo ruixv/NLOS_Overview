@@ -1,0 +1,125 @@
+name: Synchronize Virtual Mirrors higher-order NLOS update
+
+on:
+  push:
+    paths:
+      - .github/workflows/nlos-virtual-mirrors-sync.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-virtual-mirrors-sync
+  cancel-in-progress: true
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Synchronize text artifacts and bibliography
+        run: |
+          set -euo pipefail
+          python -m pip install bibtexparser==1.4.3
+          python -m py_compile scripts/sync_nlos_20260712_virtual_mirrors.py scripts/merge_nlos_bibliography.py
+          python scripts/sync_nlos_20260712_virtual_mirrors.py
+          python scripts/merge_nlos_bibliography.py
+          grep -Fq "Virtual Mirrors: Non-Line-of-Sight Imaging Beyond the Third Bounce" README.md
+          grep -Fq "Virtual Mirrors: Non-Line-of-Sight Imaging Beyond the Third Bounce" index.html
+          grep -Fq '<b>88</b><span>tracked latest entries</span>' index.html
+          grep -Fq 'Virtual Mirrors turned higher-order phasor transport' index.html
+          grep -Fq 'This result shifts higher-order light transport' article/2active.tex
+          grep -Fq '\cite{royoVirtualMirrors2023}' article/2active.tex
+          test "$(grep -ic '^@.*{royoVirtualMirrors2023,' egbib_merged_20260711.bib)" -eq 1
+          grep -Fq '10.1145/3592429' egbib_merged_20260711.bib
+          grep -Fq 'Truly missing citation keys: 0' updates/2026-07-11-bibliography-deduplication.md
+
+      - name: Commit synchronized source artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex bare_jrnl.tex \
+            egbib_20260712_virtual_mirrors_updates.bib egbib_merged_20260711.bib \
+            updates/2026-07-11-bibliography-deduplication.md \
+            updates/2026-07-12-virtual-mirrors-citation-tracing-update.md \
+            scripts/sync_nlos_20260712_virtual_mirrors.py \
+            .github/workflows/nlos-virtual-mirrors-sync.yml
+          if ! git diff --cached --quiet; then
+            git commit -m "Integrate higher-order Virtual Mirrors NLOS milestone"
+            git pull --rebase origin master
+            git push origin HEAD:master
+          fi
+
+      - name: Install LaTeX toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean-build and validate survey PDF
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex > /tmp/latexmk.log 2>&1
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
+          ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
+          ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
+          grep -Fq 'royoVirtualMirrors2023' bare_jrnl.aux
+          grep -Fq 'royoVirtualMirrors2023' bare_jrnl.bbl
+          grep -Fq 'Virtual Mirrors' bare_jrnl.bbl
+          grep -Fq '10.1145/3592429' bare_jrnl.bbl
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
+          compact = re.sub(r'[^a-z0-9]+', '', raw)
+          required = (
+              'virtualmirrorsnonlineofsightimagingbeyondthethirdbounce',
+              'secondaryvirtualapertures',
+              'secondcorner',
+              'royo',
+          )
+          missing = [token for token in required if token not in compact]
+          if missing:
+              raise SystemExit(f'Missing normalized PDF tokens: {missing}')
+          PY
+
+      - name: Record successful validation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('updates/2026-07-12-virtual-mirrors-citation-tracing-update.md')
+          text = p.read_text(encoding='utf-8')
+          text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
+          status = (
+              "\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage paper explorer, "
+              "development timeline, corrected survey narrative, duplicate-free merged bibliography, and `bare_jrnl.pdf` "
+              "now consistently include the final ACM TOG / SIGGRAPH 2023 Virtual Mirrors record. `pdfinfo` and "
+              "`pdftotext` validation passed; no undefined citations, missing BibTeX records, or repeated entries were detected.\n"
+          )
+          p.write_text(text.rstrip() + status, encoding='utf-8')
+          PY
+
+      - name: Commit regenerated PDF and validation note
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bare_jrnl.pdf updates/2026-07-12-virtual-mirrors-citation-tracing-update.md
+          if ! git diff --cached --quiet; then
+            git commit -m "Rebuild survey with higher-order Virtual Mirrors NLOS imaging"
+            git pull --rebase origin master
+            git push origin HEAD:master
+          fi
