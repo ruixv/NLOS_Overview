@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2020 | [Seeing Around Corners with Edge-Resolved Transient Imaging](https://doi.org/10.1038/s41467-020-19727-4) — Rapp et al. | Nature Communications 2020 | Combines a vertical edge occluder with pulsed SPAD transients: differencing adjacent photon-arrival histograms isolates angular wedges and enables 2.5D room-scale reconstruction over a 180° field of view from only 45 illumination positions. |
 | 2026 | [X-band Radar Non-Line-of-Sight Imaging](https://openaccess.thecvf.com/content/CVPR2026/html/Du_X-band_Radar_Non-Line-of-Sight_Imaging_CVPR_2026_paper.html) — Du et al. | CVPR 2026 | Introduces a learned, geometry-aware X-band radar NLOS reconstruction system; converts normally diffuse optical transport into predominantly specular long-wavelength transport and experimentally reconstructs hidden objects at ranges up to 40 m. |
 | 2026 | [Neural illumination fields: High-fidelity and ambient-robust stereo reconstruction for two-bounce non-line-of-sight imaging](https://doi.org/10.1016/j.optlaseng.2025.109514) — Zhang et al. | Optics and Lasers in Engineering 2026 | Uses a self-supervised continuous neural illumination field and differentiable intensity rendering for two-bounce NLOS reconstruction without binary shadow segmentation, reaching centimeter-scale detail in large hidden spaces under low-contrast and ambient-light interference. |
 | 2026 | [CUDA-accelerated non-line-of-sight imaging with irregular relay surfaces](https://doi.org/10.1016/j.optlaseng.2025.109591) — Sun et al. | Optics and Lasers in Engineering 2026 | GPU-accelerated filtered backprojection for measurements acquired on irregular, non-planar relay surfaces, reducing the practical cost of geometry-aware active NLOS reconstruction. |
@@ -172,6 +173,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
 2018 ── O'Toole et al.: confocal NLOS + LCT — real-time O(N³logN) [Nature]
    │     Liu et al.: phasor field — NLOS as virtual LOS wave propagation
+   │
+2020 ── Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
    │
 2021 ── Nam et al.: real-time diffuse-object NLOS video at 5 fps [Nature Comm.]
    │
