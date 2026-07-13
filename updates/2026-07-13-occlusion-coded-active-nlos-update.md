@@ -10,14 +10,14 @@ Two works meet the inclusion threshold:
 
 2. **Revealing hidden scenes by photon-efficient occlusion-based opportunistic active imaging** — Feihu Xu, Gal Shulkind, Christos Thrampoulidis, Jeffrey H. Shapiro, Antonio Torralba, Franco N. C. Wong, and Gregory W. Wornell, *Optics Express* 26(8), 9945–9961 (2018), DOI: 10.1364/OE.26.009945. This is the experimental continuation of the theory paper rather than an incidental citation: it uses a physical three-bounce forward model, known natural occlusion, background-light terms, and a binomial single-photon likelihood to reconstruct meter-scale hidden-surface reflectivity from integrated, non-time-resolved SPAD measurements. The paper reports requiring about sixteen times fewer detected photons than the preceding Gaussian-noise treatment.
 
-The repository previously cited the theory key inside `article/2active.tex`, but did not surface it in README/homepage and did not include the experimental Optics Express paper. This update therefore repairs a historical-development and survey-consistency gap rather than inflating the collection with a loosely adjacent paper.
+The repository previously cited the theory key inside `article/2active.tex` and included it in the homepage core-paper explorer, but did not surface it in README/latest additions or explain the theory-to-experiment trajectory. The experimental Optics Express paper was absent throughout. This update therefore repairs a historical-development and survey-consistency gap rather than inflating the collection with loosely adjacent papers.
 
 ## Intended synchronized changes
 
 The marker-based script `scripts/sync_nlos_20260713_occlusion.py` performs the following idempotent edits and aborts if expected hand-maintained markers are absent or ambiguous:
 
 - add both papers to `README.md` with verified venue/status, links, and concise contribution summaries;
-- add both searchable objects to `index.html`, update the tracked-latest count from 92 to 94, and refine the 2017–2018 timeline from occlusion theory to photon-efficient room-scale validation;
+- preserve the existing searchable theory object, add the missing 2018 experiment to `index.html`, update the tracked-latest count from 92 to 93, and refine the 2017–2018 timeline from occlusion theory to photon-efficient room-scale validation;
 - separate occlusion-coded integrated-photon sensing from the generic pulsed-SPAD/ToF row in the active-system table;
 - expand the semantically appropriate `Occlusion-based active NLOS imaging model` discussion in `article/2active.tex` with the theory-to-experiment trajectory;
 - add canonical BibTeX records in `egbib_20260713_occlusion_updates.bib`, letting the deterministic bibliography merge override stale metadata for the existing theory key and introduce the final Optics Express record;
@@ -28,7 +28,7 @@ The marker-based script `scripts/sync_nlos_20260713_occlusion.py` performs the f
 The publication workflow must verify all of the following before writing regenerated artifacts to `master`:
 
 - each title occurs exactly once in README and homepage data;
-- the homepage tracked-latest count is 94 and the 2017/2018 timeline changes are present;
+- the homepage tracked-latest count is 93 and the 2017/2018 timeline changes are present;
 - both canonical citation keys occur in `article/2active.tex`, the merged bibliography, LaTeX auxiliary file, and generated bibliography;
 - the bibliography audit reports zero truly missing citation keys;
 - a clean `latexmk` build succeeds without undefined citations or repeated/missing BibTeX entries;
