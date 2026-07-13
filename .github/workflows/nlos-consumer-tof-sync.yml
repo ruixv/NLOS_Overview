@@ -1,6 +1,9 @@
-name: Synchronize commodity iToF and compact TCSPC NLOS update
+name: Synchronize pending NLOS updates and passive polarization milestone
 
 on:
+  push:
+    paths:
+      - '.github/workflows/nlos-consumer-tof-sync.yml'
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
@@ -15,7 +18,7 @@ concurrency:
 jobs:
   sync-build-validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,9 +35,11 @@ jobs:
           python -m py_compile \
             scripts/sync_nlos_20260712_initial_access.py \
             scripts/sync_nlos_20260713_consumer_tof.py \
+            scripts/sync_nlos_20260713_passive_polarization.py \
             scripts/merge_nlos_bibliography.py
           python scripts/sync_nlos_20260712_initial_access.py
           python scripts/sync_nlos_20260713_consumer_tof.py
+          python scripts/sync_nlos_20260713_passive_polarization.py
           python scripts/merge_nlos_bibliography.py
 
       - name: Verify synchronized sources
@@ -43,22 +48,24 @@ jobs:
           grep -Fq "Enabling NLOS Imaging Capabilities at the Initial Access of 6G Base Stations" README.md
           grep -Fq "NIGHT -- Non-Line-of-Sight Imaging from Indirect Time of Flight Data" README.md
           grep -Fq "Miniaturized time-correlated single-photon counting module" README.md
+          grep -Fq "Enhancing Passive Non-Line-of-Sight Imaging Using Polarization Cues" README.md
           grep -Fq "**Update run: 13 July 2026.**" README.md
-          grep -Fq "NIGHT -- Non-Line-of-Sight Imaging from Indirect Time of Flight Data" index.html
-          grep -Fq "Miniaturized time-correlated single-photon counting module" index.html
-          grep -Fq '<b>91</b><span>tracked latest entries</span>' index.html
-          grep -Fq 'commodity iToF, compact TCSPC' index.html
+          grep -Fq "Enhancing Passive Non-Line-of-Sight Imaging Using Polarization Cues" index.html
+          grep -Fq '<b>92</b><span>tracked latest entries</span>' index.html
+          grep -Fq 'polarization-conditioned passive light transport' index.html
           grep -Fq 'Updated 13 July 2026' index.html
           grep -Fq '\cite{tornielliInitialAccessNLOS2025}' article/5newscenes.tex
           grep -Fq '\cite{caligiuriNIGHT2024}' article/2active.tex
           grep -Fq '\cite{wuMiniaturizedTCSPC2024}' article/2active.tex
-          grep -Fq 'commodity indirect-ToF hardware' article/2active.tex
-          grep -Fq 'Miniaturized TCSPC electronics' article/2active.tex
-          test "$(grep -ic '^@.*{tornielliInitialAccessNLOS2025,' egbib_merged_20260711.bib)" -eq 1
-          test "$(grep -ic '^@.*{caligiuriNIGHT2024,' egbib_merged_20260711.bib)" -eq 1
-          test "$(grep -ic '^@.*{wuMiniaturizedTCSPC2024,' egbib_merged_20260711.bib)" -eq 1
+          grep -Fq '\cite{tanakaPolarizedNonLineofSightImaging2020}' article/3passive.tex
+          grep -Fq 'Polarization-conditioned passive transport.' article/3passive.tex
+          for key in tornielliInitialAccessNLOS2025 caligiuriNIGHT2024 wuMiniaturizedTCSPC2024 tanakaPolarizedNonLineofSightImaging2020; do
+            test "$(grep -ic "^@.*{${key}," egbib_merged_20260711.bib)" -eq 1
+          done
           grep -Fq '10.1063/5.0193824' egbib_merged_20260711.bib
           grep -Fq '2403.19376' egbib_merged_20260711.bib
+          grep -Fq '1911.12906' egbib_merged_20260711.bib
+          grep -Fq '10.48550/arXiv.1911.12906' egbib_merged_20260711.bib
           grep -Fq 'Truly missing citation keys: 0' updates/2026-07-11-bibliography-deduplication.md
 
       - name: Install LaTeX and rendering toolchain
@@ -86,7 +93,7 @@ jobs:
           status=$?
           echo "status=$status" >> "$GITHUB_OUTPUT"
           if [ "$status" -ne 0 ]; then
-            tail -n 220 /tmp/latexmk.log > /tmp/latex-tail.txt
+            tail -n 240 /tmp/latexmk.log > /tmp/latex-tail.txt
           fi
           exit 0
 
@@ -96,22 +103,25 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-          p = Path('updates/2026-07-13-consumer-tof-and-tcspc-update.md')
+          p = Path('updates/2026-07-13-passive-polarization-nlos-update.md')
           text = p.read_text(encoding='utf-8')
           text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
           log = Path('/tmp/latex-tail.txt').read_text(encoding='utf-8', errors='replace')
-          status = "\n\n**Build result:** LaTeX rebuild failed. The synchronized README, homepage, survey, and bibliography sources are retained, but `bare_jrnl.pdf` has not been claimed as updated. Final log excerpt:\n\n```text\n" + log[-16000:] + "\n```\n"
+          status = "\n\n**Build result:** LaTeX rebuild failed. The synchronized text sources and bibliography are retained, but `bare_jrnl.pdf` has not been claimed as updated. Final log excerpt:\n\n```text\n" + log[-16000:] + "\n```\n"
           p.write_text(text.rstrip() + status, encoding='utf-8')
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md index.html article/2active.tex article/5newscenes.tex bare_jrnl.tex \
+          git add README.md index.html article/2active.tex article/3passive.tex article/5newscenes.tex bare_jrnl.tex \
             egbib_20260712_initial_access_updates.bib egbib_20260713_consumer_tof_updates.bib \
-            egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md \
+            egbib_20260713_polarization_updates.bib egbib_merged_20260711.bib \
+            updates/2026-07-11-bibliography-deduplication.md \
             updates/2026-07-12-6g-initial-access-nlos-imaging-update.md \
             updates/2026-07-13-consumer-tof-and-tcspc-update.md \
-            scripts/sync_nlos_20260712_initial_access.py scripts/sync_nlos_20260713_consumer_tof.py
-          git commit -m "Integrate commodity ToF and compact TCSPC NLOS sources" || true
+            updates/2026-07-13-passive-polarization-nlos-update.md \
+            scripts/sync_nlos_20260712_initial_access.py scripts/sync_nlos_20260713_consumer_tof.py \
+            scripts/sync_nlos_20260713_passive_polarization.py
+          git commit -m "Integrate pending NLOS sources and passive polarization milestone" || true
           git pull --rebase origin master
           git push origin HEAD:master
           exit 1
@@ -133,7 +143,7 @@ jobs:
           test "$after_pages" -ge "$before_pages"
           ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
           ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
-          for key in tornielliInitialAccessNLOS2025 caligiuriNIGHT2024 wuMiniaturizedTCSPC2024; do
+          for key in tornielliInitialAccessNLOS2025 caligiuriNIGHT2024 wuMiniaturizedTCSPC2024 tanakaPolarizedNonLineofSightImaging2020; do
             grep -Fq "$key" bare_jrnl.aux
             grep -Fq "$key" bare_jrnl.bbl
           done
@@ -146,6 +156,8 @@ jobs:
               'initialaccess', 'modularreflector', 'torniellibellini',
               'indirecttof', 'virtualmirror', 'caligiuri',
               'miniaturizedtcspc', '274ps', 'reviewofscientificinstruments',
+              'polarizationconditionedpassivetransport', 'polarizationaxisrotation',
+              'enhancingpassivenonlineofsightimagingusingpolarizationcues',
           )
           missing = [token for token in required if token not in compact]
           if missing:
@@ -158,33 +170,33 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import re
-          p = Path('updates/2026-07-13-consumer-tof-and-tcspc-update.md')
+          p = Path('updates/2026-07-13-passive-polarization-nlos-update.md')
           text = p.read_text(encoding='utf-8')
           text = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', text, flags=re.S)
           status = (
               "\n\n**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage paper explorer, "
-              "2024/2025 timelines, active-hardware and radar/RF survey narratives, canonical BibTeX records, "
-              "duplicate-free merged bibliography, and `bare_jrnl.pdf` consistently include NIGHT, the compact "
-              "TCSPC module, and the pending 6G initial-access NLOS work. Previous and regenerated PDFs were rendered "
-              "to PNG pages; `pdfinfo` and `pdftotext` checks passed, and no undefined citations, missing BibTeX "
-              "records, or repeated entries were detected.\n"
+              "2019 timeline, passive-survey narrative, canonical BibTeX metadata, duplicate-free merged bibliography, "
+              "and `bare_jrnl.pdf` consistently include the passive polarization work. The same run also completed the "
+              "pending 6G initial-access, commodity-iToF, and compact-TCSPC integrations. Previous and regenerated PDFs "
+              "were rendered to PNG pages; `pdfinfo` and `pdftotext` checks passed, with no undefined citations, missing "
+              "BibTeX records, or repeated entries.\n"
           )
           p.write_text(text.rstrip() + status, encoding='utf-8')
-          q = Path('updates/2026-07-12-6g-initial-access-nlos-imaging-update.md')
-          qtext = q.read_text(encoding='utf-8')
-          qtext = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', qtext, flags=re.S)
-          qstatus = (
-              "\n\n**Build result:** successful source synchronization and clean survey rebuild in the 13 July "
-              "commodity-ToF integration run. README, homepage, timeline, radar/RF survey narrative, canonical "
-              "BibTeX record, merged bibliography, and `bare_jrnl.pdf` now consistently include the 6G "
-              "initial-access NLOS imaging work.\n"
-          )
-          q.write_text(qtext.rstrip() + qstatus, encoding='utf-8')
+          for name, message in (
+              ('updates/2026-07-13-consumer-tof-and-tcspc-update.md',
+               'Successful source synchronization and clean survey rebuild in the 13 July passive-polarization integration run. README, homepage, timelines, survey narrative, canonical BibTeX records, merged bibliography, and `bare_jrnl.pdf` now consistently include NIGHT and the compact TCSPC module.'),
+              ('updates/2026-07-12-6g-initial-access-nlos-imaging-update.md',
+               'Successful source synchronization and clean survey rebuild in the 13 July passive-polarization integration run. README, homepage, timeline, radar/RF survey narrative, canonical BibTeX record, merged bibliography, and `bare_jrnl.pdf` now consistently include the 6G initial-access NLOS imaging work.'),
+          ):
+              q = Path(name)
+              qtext = q.read_text(encoding='utf-8')
+              qtext = re.sub(r'\n\*\*Build result:\*\*.*?(?=\n\n|\Z)', '', qtext, flags=re.S)
+              q.write_text(qtext.rstrip() + '\n\n**Build result:** ' + message + '\n', encoding='utf-8')
           PY
           rm .github/workflows/nlos-consumer-tof-sync.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Integrate commodity ToF and compact TCSPC NLOS papers"
+          git commit -m "Integrate passive polarization and pending NLOS updates"
           git pull --rebase origin master
           git push origin HEAD:master
