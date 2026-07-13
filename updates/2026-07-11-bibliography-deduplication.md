@@ -2,11 +2,11 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 21 source files and keeps one highest-priority record for each of 351 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 22 source files and keeps one highest-priority record for each of 352 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 364
-- Case-insensitive duplicate replacements: 13
-- Citation-key case normalizations: 84
+- Parsed source records: 366
+- Case-insensitive duplicate replacements: 14
+- Citation-key case normalizations: 83
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
 
@@ -24,6 +24,7 @@ This update generates `egbib_merged_20260711.bib` from 21 source files and keeps
 - `liuFewShotSSCR2022` / `liuFewShotSSCR2022`: `egbib_2026_updates.bib` → `egbib_20260711_sscr_updates.bib`
 - `nam_real-time_2020` / `nam_real-time_2020`: `egbib.bib` → `egbib_20260712_realtime_updates.bib`
 - `royoVirtualMirrors2023` / `royoVirtualMirrors2023`: `egbib.bib` → `egbib_20260712_virtual_mirrors_updates.bib`
+- `thrampoulidisexploitingocclusionnonlineofsight2018` / `thrampoulidisExploitingOcclusionNonLineofSight2018`: `egbib.bib` → `egbib_20260713_occlusion_updates.bib`
 - `tanakapolarizednonlineofsightimaging2020` / `tanakaPolarizedNonLineofSightImaging2020`: `egbib.bib` → `egbib_20260713_polarization_updates.bib`
 
 ## Citation-key spellings normalized
@@ -97,7 +98,6 @@ This update generates `egbib_merged_20260711.bib` from 21 source files and keeps
 - `saunderscomputationalperiscopyordinary2019` → `saundersComputationalPeriscopyOrdinary2019`
 - `seideltwodimensionalnonlineofsightscene2020` → `seidelTwoDimensionalNonLineofSightScene2020`
 - `smithtrackingmultipleobjects2018a` → `smithTrackingMultipleObjects2018a`
-- `thrampoulidisexploitingocclusionnonlineofsight2018` → `thrampoulidisExploitingOcclusionNonLineofSight2018`
 - `torralbaaccidentalpinholepinspeck2012` → `torralbaAccidentalPinholePinspeck2012`
 - `tsaigeometryfirstreturningphotons2017` → `tsaiGeometryFirstreturningPhotons2017`
 - `tsaivolumetricalbedosurface2019` → `tsaiVolumetricAlbedoSurface2019`

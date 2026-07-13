@@ -35,4 +35,4 @@ The publication workflow must verify all of the following before writing regener
 - `pdfinfo`, text extraction, and page rendering succeed on the regenerated PDF;
 - extracted PDF text includes the occlusion-coded theory/experiment narrative and both bibliography records.
 
-**Build result:** pending the pull-request validation and clean survey rebuild. No regenerated PDF is claimed until those checks pass.
+**Build result:** successful marker-based synchronization and clean LaTeX/BibTeX rebuild. README, homepage paper explorer, 2017–2018 timeline, active-system table, occlusion-model survey narrative, canonical BibTeX metadata, duplicate-free merged bibliography, and `bare_jrnl.pdf` consistently include the occlusion-coding theory and its photon-efficient Optics Express validation. PDF metadata, text extraction, page rendering, citation, missing-key, and duplicate-entry checks passed.
