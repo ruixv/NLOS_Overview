@@ -40,4 +40,4 @@ After a successful validated build, the following keys must each appear exactly 
 - `wuMiniaturizedTCSPC2024`
 - `tornielliInitialAccessNLOS2025` (pending source-level update from the previous run)
 
-**Build result:** source metadata, the safe synchronizer, this update note, and the one-shot scheduled build workflow were committed. Public-facing files and `bare_jrnl.pdf` are not claimed as updated until the workflow completes its validation and commits the generated artifacts.
+**Build result:** successful source synchronization and clean survey rebuild. README, homepage, timelines, survey narrative, canonical BibTeX records, merged bibliography, and `bare_jrnl.pdf` now consistently include NIGHT and the compact TCSPC module.

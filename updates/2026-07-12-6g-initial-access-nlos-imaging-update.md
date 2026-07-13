@@ -53,4 +53,4 @@ Tornielli Bellini~\etal~push reflector-assisted RF NLOS imaging toward communica
 
 Source: https://arxiv.org/abs/2511.15416
 
-**Build result:** the canonical BibTeX record, exact marker-based synchronizer, workflow definition, and this patch note were committed. `README.md`, `index.html`, `article/5newscenes.tex`, the merged bibliography, and `bare_jrnl.pdf` were not claimed as updated because the connector-triggered workflow did not start; replacing those large files without executing and validating the synchronizer would risk truncation or inconsistency.
+**Build result:** successful source synchronization and clean survey rebuild. README, homepage, timeline, radar/RF survey narrative, canonical BibTeX record, merged bibliography, and `bare_jrnl.pdf` now consistently include the 6G initial-access NLOS imaging work.

@@ -39,4 +39,4 @@ The validation workflow runs the pending 6G initial-access and commodity-ToF syn
 - no undefined citations, missing BibTeX records, or repeated entries;
 - the polarization discussion and canonical bibliography record in the rebuilt `bare_jrnl.pdf`.
 
-**Build result:** pending the one-shot GitHub Actions synchronization and clean PDF rebuild. Until the workflow commits a successful result, this note does not claim that README, homepage, merged bibliography, or `bare_jrnl.pdf` have already changed.
+**Build result:** successful clean LaTeX/BibTeX rebuild. README, homepage paper explorer, 2019 timeline, passive-survey narrative, canonical BibTeX metadata, duplicate-free merged bibliography, and `bare_jrnl.pdf` consistently include the passive polarization work. The same run completed the pending 6G initial-access, commodity-iToF, and compact-TCSPC integrations. PDF text extraction, page rendering, citation, and duplicate-entry checks passed.
