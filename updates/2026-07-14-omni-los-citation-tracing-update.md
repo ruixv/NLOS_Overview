@@ -22,7 +22,7 @@ The marker-based synchronizer updates the following artifacts without blind whol
    - adds a searchable `latest active learning` paper object;
    - changes the tracked-latest count from 94 to 95;
    - expands the 2023 timeline with joint LOS/NLOS holistic reconstruction;
-   - updates the homepage date to 14 July 2026.
+   - updates both the homepage header and footer dates to 14 July 2026.
 3. `article/2active.tex`
    - inserts a literature-review paragraph after NLOS-NeuS and before diffusion reconstruction, explaining how Omni-LOS unifies LOS and NLOS transient rendering in one neural level-set model.
 4. `egbib_20260714_omnilos_updates.bib`
@@ -32,3 +32,5 @@ The marker-based synchronizer updates the following artifacts without blind whol
    - CI performs a clean LaTeX/BibTeX build and verifies the new citation in the source, `.aux`, `.bbl`, extracted PDF text, and rendered PDF pages.
 
 **Build result:** successful marker-based synchronization and clean LaTeX/BibTeX rebuild. README, homepage paper explorer, 2023 timeline, neural-representation survey narrative, canonical BibTeX metadata, duplicate-free merged bibliography, and `bare_jrnl.pdf` consistently include Omni-LOS. PDF metadata, text extraction, before/after page rendering, citation, missing-key, and duplicate-entry checks passed.
+
+**Footer consistency follow-up:** staged for validation so the homepage header and footer use the same 14 July 2026 date.
