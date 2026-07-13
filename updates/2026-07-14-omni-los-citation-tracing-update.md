@@ -35,4 +35,4 @@ The marker-based synchronizer updates the following artifacts without blind whol
 
 A pull-request-based validation rerun was staged after extending the synchronizer to cover the homepage footer date.
 
-**Footer consistency follow-up:** staged for validation so the homepage header and footer use the same 14 July 2026 date.
+**Footer consistency follow-up:** homepage header and footer both show 14 July 2026; the clean survey rebuild and citation/PDF checks passed.
