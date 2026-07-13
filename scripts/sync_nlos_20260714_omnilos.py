@@ -47,6 +47,7 @@ def update_index() -> None:
     path = ROOT / "index.html"
     text = path.read_text(encoding="utf-8")
     text = text.replace("Updated 13 July 2026 · 190+ papers", "Updated 14 July 2026 · 190+ papers", 1)
+    text = text.replace("Last updated: 13 July 2026", "Last updated: 14 July 2026", 1)
     text = replace_once(
         text,
         '<div class="stat"><b>94</b><span>tracked latest entries</span></div>',
