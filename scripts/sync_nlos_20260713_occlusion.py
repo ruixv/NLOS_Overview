@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Synchronize two missing occlusion-coded active NLOS milestones.
+"""Synchronize two incompletely covered occlusion-coded active NLOS milestones.
 
 The edits are marker-based and idempotent. The script aborts instead of
 blindly rewriting large hand-maintained files when an expected marker is
@@ -71,33 +71,26 @@ def update_homepage() -> None:
         '      {cat:"latest active",title:"Seeing Around Corners with Edge-Resolved Transient Imaging",'
         'authors:"Rapp et al.",year:2020,'
     )
-    objects = ""
-    if THEORY_TITLE not in text:
-        objects += (
-            '      {cat:"latest active occlusion",title:"Exploiting Occlusion in Non-Line-of-Sight Active Imaging",'
-            'authors:"Thrampoulidis et al.",year:2017,venue:"arXiv 2017",url:"https://arxiv.org/abs/1711.06297",'
-            'key:"Natural hidden-scene occluders act as spatial codes that improve the conditioning of active NLOS '
-            'light transport and can remove the need for ultrafast time-resolved measurements."},\n'
-        )
     if EXPERIMENT_TITLE not in text:
-        objects += (
+        obj = (
             '      {cat:"latest active occlusion hardware",title:"Revealing hidden scenes by photon-efficient '
             'occlusion-based opportunistic active imaging",authors:"Xu et al.",year:2018,venue:"Optics Express 2018",'
             'url:"https://doi.org/10.1364/OE.26.009945",key:"A binomial single-photon model and natural occluder '
             'recover meter-scale hidden reflectivity from non-time-resolved three-bounce counts with roughly 16× '
             'fewer detected photons than the prior Gaussian treatment."},\n'
         )
-    if objects:
-        text = replace_once(text, marker, objects + marker, "homepage edge-resolved paper object")
+        text = replace_once(text, marker, obj + marker, "homepage edge-resolved paper object")
 
+    # The 2017 theory paper was already present in the searchable core-paper list,
+    # so only the newly missing 2018 experiment increases the tracked-latest count.
     count_re = re.compile(r'<b>(\d+)</b><span>tracked latest entries</span>')
     matches = count_re.findall(text)
     if len(matches) != 1:
         raise RuntimeError(f"Expected one homepage tracked-entry count, found {len(matches)}")
     current = int(matches[0])
-    if current not in (92, 93, 94):
+    if current not in (92, 93):
         raise RuntimeError(f"Unexpected homepage count {current}")
-    text = count_re.sub('<b>94</b><span>tracked latest entries</span>', text, count=1)
+    text = count_re.sub('<b>93</b><span>tracked latest entries</span>', text, count=1)
 
     old_2017 = (
         '      <div class="tl"><div class="year">2017</div><div class="tl-body"><strong>Occlusion-aware active '
@@ -130,8 +123,8 @@ def update_homepage() -> None:
     for title in (THEORY_TITLE, EXPERIMENT_TITLE):
         if text.count(title) != 1:
             raise RuntimeError(f"Homepage should contain one {title!r} object, found {text.count(title)}")
-    if '<b>94</b><span>tracked latest entries</span>' not in text:
-        raise RuntimeError("Homepage tracked-entry count did not update to 94")
+    if '<b>93</b><span>tracked latest entries</span>' not in text:
+        raise RuntimeError("Homepage tracked-entry count did not update to 93")
     write("index.html", text)
 
 
@@ -163,10 +156,8 @@ Xu~\etal~translated this principle into a photon-efficient room-scale experiment
         text = replace_once(text, old_paragraph, new_paragraph, "occlusion-model paragraph")
 
     for key in (THEORY_KEY, EXPERIMENT_KEY):
-        if text.count(f"\\cite{{{key}}}") < 1 and key not in table_row:
+        if key not in text:
             raise RuntimeError(f"Survey did not cite {key}")
-    if EXPERIMENT_KEY not in text or THEORY_KEY not in text:
-        raise RuntimeError("Survey occlusion citations are incomplete")
     write("article/2active.tex", text)
 
 
