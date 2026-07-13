@@ -1,0 +1,120 @@
+name: Synchronize Omni-LOS footer and validate survey
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-omnilos-footer-sync
+  cancel-in-progress: false
+
+jobs:
+  sync-build-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Synchronize artifacts and bibliography
+        run: |
+          set -euo pipefail
+          python -m pip install bibtexparser==1.4.3
+          python -m py_compile scripts/sync_nlos_20260714_omnilos.py scripts/merge_nlos_bibliography.py
+          python scripts/sync_nlos_20260714_omnilos.py
+          python scripts/sync_nlos_20260714_omnilos.py
+          python scripts/merge_nlos_bibliography.py
+
+          grep -Fq '**Update run: 14 July 2026.**' README.md
+          grep -Fq 'Updated 14 July 2026 · 190+ papers' index.html
+          grep -Fq 'Last updated: 14 July 2026' index.html
+          grep -Fq '<b>95</b><span>tracked latest entries</span>' index.html
+          grep -Fq 'Omni-Line-of-Sight Imaging for Holistic Shape Reconstruction' README.md
+          grep -Fq 'Omni-Line-of-Sight Imaging for Holistic Shape Reconstruction' index.html
+          grep -Fq 'huangOmniLOS2023' article/2active.tex
+          grep -Fq 'huangOmniLOS2023' egbib_merged_20260711.bib
+          grep -Fq 'Truly missing citation keys: 0' updates/2026-07-11-bibliography-deduplication.md
+
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Render previous PDF
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          cp bare_jrnl.pdf /tmp/bare_jrnl-before.pdf
+          mkdir -p /tmp/render-before
+          pdftoppm -png -r 100 /tmp/bare_jrnl-before.pdf /tmp/render-before/page >/dev/null 2>&1
+          test "$(find /tmp/render-before -name 'page-*.png' -type f | wc -l)" -gt 0
+
+      - name: Clean-build survey PDF
+        id: build
+        shell: bash
+        run: |
+          set +e
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex > /tmp/latexmk.log 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          if [ -f bare_jrnl.log ]; then cp bare_jrnl.log /tmp/bare_jrnl-build.log; fi
+          if [ -f bare_jrnl.blg ]; then cp bare_jrnl.blg /tmp/bare_jrnl-build.blg; fi
+          exit 0
+
+      - name: Fail when clean build fails
+        if: steps.build.outputs.status != '0'
+        run: |
+          tail -n 240 /tmp/latexmk.log
+          exit 1
+
+      - name: Validate rebuilt PDF
+        if: steps.build.outputs.status == '0'
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf > /tmp/pdfinfo-after.txt
+          pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
+          mkdir -p /tmp/render-after
+          pdftoppm -png -r 100 bare_jrnl.pdf /tmp/render-after/page >/dev/null 2>&1
+          before_pages=$(find /tmp/render-before -name 'page-*.png' -type f | wc -l)
+          after_pages=$(find /tmp/render-after -name 'page-*.png' -type f | wc -l)
+          test "$before_pages" -gt 0
+          test "$after_pages" -gt 0
+          test "$after_pages" -ge "$before_pages"
+          ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
+          ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
+          grep -Fq 'huangOmniLOS2023' bare_jrnl.aux
+          grep -Fq 'huangOmniLOS2023' bare_jrnl.bbl
+          grep -Eiq 'Omni-Line-of-Sight|Omni-LOS|holistic shape reconstruction' /tmp/bare_jrnl.txt
+
+      - name: Publish validated footer synchronization
+        if: steps.build.outputs.status == '0'
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('updates/2026-07-14-omni-los-citation-tracing-update.md')
+          text = p.read_text(encoding='utf-8')
+          marker = '**Footer consistency follow-up:** homepage header and footer both show 14 July 2026; the clean survey rebuild and citation/PDF checks passed.'
+          if marker not in text:
+              text = text.rstrip() + '\n\n' + marker + '\n'
+          p.write_text(text, encoding='utf-8')
+          PY
+
+          rm -f .github/workflows/nlos-omnilos-footer-sync.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Synchronize Omni-LOS homepage footer and rebuild survey"
+          git push origin HEAD:master
