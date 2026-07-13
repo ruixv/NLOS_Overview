@@ -145,7 +145,7 @@ jobs:
           required = (
               'initialaccess', 'modularreflector', 'torniellibellini',
               'indirecttof', 'virtualmirror', 'caligiuri',
-              'miniaturizedtcspc', '27.4ps', 'reviewofscientificinstruments',
+              'miniaturizedtcspc', '274ps', 'reviewofscientificinstruments',
           )
           missing = [token for token in required if token not in compact]
           if missing:
