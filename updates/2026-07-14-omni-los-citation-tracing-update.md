@@ -33,4 +33,6 @@ The marker-based synchronizer updates the following artifacts without blind whol
 
 **Build result:** successful marker-based synchronization and clean LaTeX/BibTeX rebuild. README, homepage paper explorer, 2023 timeline, neural-representation survey narrative, canonical BibTeX metadata, duplicate-free merged bibliography, and `bare_jrnl.pdf` consistently include Omni-LOS. PDF metadata, text extraction, before/after page rendering, citation, missing-key, and duplicate-entry checks passed.
 
+A pull-request-based validation rerun was staged after extending the synchronizer to cover the homepage footer date.
+
 **Footer consistency follow-up:** staged for validation so the homepage header and footer use the same 14 July 2026 date.
