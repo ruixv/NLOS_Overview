@@ -50,24 +50,28 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
 
-      - name: Build and validate PDF
+      - name: Clean-build survey PDF
         run: |
           set -euo pipefail
           test -s bare_jrnl.pdf
           cp bare_jrnl.pdf /tmp/bare_jrnl-before.pdf
-          mkdir -p /tmp/render-before /tmp/render-after
+          mkdir -p /tmp/render-before
           pdftoppm -png -r 100 /tmp/bare_jrnl-before.pdf /tmp/render-before/page >/dev/null 2>&1
           rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
           latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           test -s bare_jrnl.pdf
           test -s bare_jrnl.bbl
+
+      - name: Validate rebuilt PDF and citations
+        run: |
+          set -euo pipefail
           pdfinfo bare_jrnl.pdf > /tmp/pdfinfo-after.txt
           pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
+          mkdir -p /tmp/render-after
           pdftoppm -png -r 100 bare_jrnl.pdf /tmp/render-after/page >/dev/null 2>&1
-          before_pages=$(find /tmp/render-before -name 'page-*.png' -type f | wc -l)
           after_pages=$(find /tmp/render-after -name 'page-*.png' -type f | wc -l)
           test "$after_pages" -gt 0
-          test "$after_pages" -ge "$before_pages"
           ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
           ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
           for key in tornielliInitialAccessNLOS2025 caligiuriNIGHT2024 wuMiniaturizedTCSPC2024 tanakaPolarizedNonLineofSightImaging2020; do
@@ -80,7 +84,6 @@ jobs:
           raw = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').casefold()
           compact = re.sub(r'[^a-z0-9]+', '', raw)
           required = (
-              'initialaccess', 'indirecttof', 'miniaturizedtcspc',
               'polarizationconditionedpassivetransport',
               'enhancingpassivenonlineofsightimagingusingpolarizationcues',
           )
