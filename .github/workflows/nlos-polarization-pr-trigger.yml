@@ -51,20 +51,52 @@ jobs:
           sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
 
       - name: Clean-build survey PDF
+        id: build
+        shell: bash
         run: |
-          set -euo pipefail
+          set +e
           test -s bare_jrnl.pdf
           cp bare_jrnl.pdf /tmp/bare_jrnl-before.pdf
           mkdir -p /tmp/render-before
           pdftoppm -png -r 100 /tmp/bare_jrnl-before.pdf /tmp/render-before/page >/dev/null 2>&1
           rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
-          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
-          test -s bare_jrnl.pdf
-          test -s bare_jrnl.bbl
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex > /tmp/latexmk.log 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          cp /tmp/latexmk.log /tmp/latexmk-full.log
+          if [ -f bare_jrnl.log ]; then cp bare_jrnl.log /tmp/bare_jrnl-build.log; fi
+          if [ -f bare_jrnl.blg ]; then cp bare_jrnl.blg /tmp/bare_jrnl-build.blg; fi
+          exit 0
+
+      - name: Upload build diagnostics
+        if: steps.build.outputs.status != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nlos-latex-diagnostics
+          path: |
+            /tmp/latexmk-full.log
+            /tmp/bare_jrnl-build.log
+            /tmp/bare_jrnl-build.blg
+            bare_jrnl.tex
+            article/2active.tex
+            article/3passive.tex
+            article/5newscenes.tex
+            egbib_merged_20260711.bib
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Fail when clean build fails
+        if: steps.build.outputs.status != '0'
+        run: |
+          tail -n 240 /tmp/latexmk-full.log
+          exit 1
 
       - name: Validate rebuilt PDF and citations
+        if: steps.build.outputs.status == '0'
         run: |
           set -euo pipefail
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
           pdfinfo bare_jrnl.pdf > /tmp/pdfinfo-after.txt
           pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
           test -s /tmp/bare_jrnl.txt
@@ -93,6 +125,7 @@ jobs:
           PY
 
       - name: Record success and publish artifacts
+        if: steps.build.outputs.status == '0'
         run: |
           python - <<'PY'
           from pathlib import Path
