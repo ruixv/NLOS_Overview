@@ -106,8 +106,11 @@ jobs:
           test "$(find /tmp/render-after -name 'page-*.png' -type f | wc -l)" -gt 0
           ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
           ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
-          grep -Fq 'tanakaPolarizedNonLineofSightImaging2020' bare_jrnl.aux
-          grep -Eiq 'Polarization.*passive transport' /tmp/bare_jrnl.txt
+          for key in tornielliInitialAccessNLOS2025 caligiuriNIGHT2024 wuMiniaturizedTCSPC2024 tanakaPolarizedNonLineofSightImaging2020; do
+            grep -Fq "$key" bare_jrnl.aux
+            grep -Fq "$key" bare_jrnl.bbl
+          done
+          grep -Eiq 'Tornielli|Caligiuri|Wu, J|Tanaka' /tmp/bare_jrnl.txt
 
       - name: Record success and publish artifacts
         if: steps.build.outputs.status == '0'
