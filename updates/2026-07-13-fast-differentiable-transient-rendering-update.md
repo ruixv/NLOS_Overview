@@ -31,4 +31,4 @@ The marker-based synchronizer updates the following artifacts consistently:
 
 The workflow performs an idempotent synchronization, duplicate-free bibliography merge, clean LaTeX/BibTeX build, citation-key audit, PDF metadata and text extraction, and page rendering. It rejects undefined citations, missing bibliography records, repeated BibTeX entries, a stale homepage count, or a PDF that does not contain the new WACV paper.
 
-**Build result:** pending CI execution.
+**Build result:** successful marker-based synchronization and clean LaTeX/BibTeX rebuild. README, homepage paper explorer, 2023 timeline, inverse-rendering survey narrative, canonical BibTeX metadata, duplicate-free merged bibliography, and `bare_jrnl.pdf` consistently include the WACV 2023 paper. PDF metadata, text extraction, before/after page rendering, citation, missing-key, and duplicate-entry checks passed.
