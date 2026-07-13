@@ -314,6 +314,10 @@ Li~\etal~proposed NLOST, the first transformer-based network for NLOS reconstruc
 Fujimura~\etal~proposed NLOS-NeuS, extending neural transient fields to neural implicit surfaces with a signed distance function (SDF) representation~\cite{fujimuraNLOSNeuS2023}. By incorporating SDF constraints derived from first-returning photon geometry, NLOS-NeuS enables smooth yet detailed 3D surface reconstruction in NLOS scenes, overcoming the voxel resolution limitation of volumetric methods. This represents the first neural implicit surface approach with volume rendering for NLOS scenes.
 
 \vspace{0.8mm}
+\noindent \textbf{Joint LOS/NLOS holistic shape reconstruction.}
+Huang~\etal~introduced Omni-LOS, which combines direct LOS transients and diffuse-wall NLOS transients in a unified neural level-set representation~\cite{huangOmniLOS2023}. The method derives differentiable rendering models for straight LOS rays and spherical NLOS wavefronts, jointly optimizing visible front surfaces and self-occluded back geometry from a fixed scan position. With nearby walls acting as diffuse virtual mirrors and a SPAD--laser prototype, Omni-LOS recovers near-$360^\circ$ object shape without a surrounding camera or mirror rig, extending neural transient imaging from hidden-scene reconstruction toward holistic single-position 3D scanning.
+
+\vspace{0.8mm}
 \noindent \textbf{Diffusion model-based reconstruction.}
 Su~\etal~proposed a model-guided iterative diffusion sampling framework for NLOS reconstruction~\cite{suModelGuidedDiffusion2024}. Starting from the back-projection result, the diffusion model iteratively refines the reconstruction while respecting the NLOS physical forward model as a consistency constraint. This approach achieves physically consistent reconstructions with high visual quality, benefiting from the strong generative prior of diffusion models while avoiding hallucination artifacts.
 

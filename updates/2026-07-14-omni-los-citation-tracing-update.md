@@ -31,4 +31,4 @@ The marker-based synchronizer updates the following artifacts without blind whol
    - `scripts/merge_nlos_bibliography.py` regenerates the duplicate-free bibliography and preserves the survey's consolidated bibliography command;
    - CI performs a clean LaTeX/BibTeX build and verifies the new citation in the source, `.aux`, `.bbl`, extracted PDF text, and rendered PDF pages.
 
-**Build result:** pending CI execution.
+**Build result:** successful marker-based synchronization and clean LaTeX/BibTeX rebuild. README, homepage paper explorer, 2023 timeline, neural-representation survey narrative, canonical BibTeX metadata, duplicate-free merged bibliography, and `bare_jrnl.pdf` consistently include Omni-LOS. PDF metadata, text extraction, before/after page rendering, citation, missing-key, and duplicate-entry checks passed.

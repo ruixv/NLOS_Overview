@@ -64,12 +64,13 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 13 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 14 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
 | 2023 | [Virtual Mirrors: Non-Line-of-Sight Imaging Beyond the Third Bounce](https://doi.org/10.1145/3592429) — Royo et al. | ACM TOG / SIGGRAPH 2023 | Treats planar diffuse hidden surfaces as computational phasor-domain ‘virtual mirrors’, builds secondary virtual apertures from higher-order bounces, and reconstructs limited-visibility geometry and objects hidden behind a second corner without requiring physical specular reflectors. |
 | 2023 | [Fast Differentiable Transient Rendering for Non-Line-of-Sight Reconstruction](https://openaccess.thecvf.com/content/WACV2023/html/Plack_Fast_Differentiable_Transient_Rendering_for_Non-Line-of-Sight_Reconstruction_WACV_2023_paper.html) — Plack et al. | WACV 2023 | Introduces a fast differentiable transient renderer that reduces analysis-by-synthesis NLOS inverse-rendering runtimes from hours to minutes on consumer hardware, improves optimization stability, and enables self-supervised transient reconstruction. |
+| 2023 | [Omni-Line-of-Sight Imaging for Holistic Shape Reconstruction](https://arxiv.org/abs/2304.10780) — Huang et al. | arXiv 2023 | Unifies straight-ray LOS and spherical-wavefront NLOS transient rendering in a neural level-set model, using nearby diffuse walls as virtual mirrors to recover near-360° object geometry from one fixed scan position; validated with a SPAD/laser prototype. |
 | 2018 | [Revealing hidden scenes by photon-efficient occlusion-based opportunistic active imaging](https://doi.org/10.1364/OE.26.009945) — Xu et al. | Optics Express 2018 | Converts the occlusion-coding theory into a photon-efficient room-scale system: a binomial single-photon forward model reconstructs hidden reflectivity from non-time-resolved three-bounce counts and needs about 16× fewer detected photons than the earlier Gaussian model. |
 | 2019 | [Enhancing Passive Non-Line-of-Sight Imaging Using Polarization Cues](https://arxiv.org/abs/1911.12906) — Tanaka, Mukaigawa, Kadambi | arXiv 2019 | Adds a camera-mounted polarizer to passive NLOS capture: polarization-axis rotation makes oblique indirect paths more discriminative, improves the conditioning of the light-transport inverse problem, and enhances hidden-image recovery both with and without occluders. |
 | 2020 | [Seeing Around Corners with Edge-Resolved Transient Imaging](https://doi.org/10.1038/s41467-020-19727-4) — Rapp et al. | Nature Communications 2020 | Combines a vertical edge occluder with pulsed SPAD transients: differencing adjacent photon-arrival histograms isolates angular wedges and enables 2.5D room-scale reconstruction over a 180° field of view from only 45 illumination positions. |
@@ -186,6 +187,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
 2021 ── Nam et al.: real-time diffuse-object NLOS video at 5 fps [Nature Comm.]
    │
 2023 ── Plack et al.: fast differentiable transient rendering — NLOS inverse rendering in minutes [WACV]
+   │     Huang et al.: Omni-LOS — joint LOS/NLOS neural transients for near-360° single-position shape [arXiv]
    │     Royo et al.: virtual mirrors — higher-order phasor transport and two-corner NLOS [SIGGRAPH / TOG]
    │
 ```
