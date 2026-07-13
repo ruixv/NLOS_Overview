@@ -31,6 +31,6 @@ The marker-based synchronizer updates the following artifacts without blind whol
    - `scripts/merge_nlos_bibliography.py` regenerates the duplicate-free bibliography and preserves the survey's consolidated bibliography command;
    - CI performs a clean LaTeX/BibTeX build and verifies the new citation in the source, `.aux`, `.bbl`, extracted PDF text, and rendered PDF pages.
 
-The validation workflow was staged on pull request #17 and retriggered after the workflow file was present on the branch.
+The validation workflow was staged on pull request #17. After the workflow definition was installed on the default branch, the pull-request branch was updated again to trigger the full synchronization and clean-build path.
 
 **Build result:** pending CI execution.
