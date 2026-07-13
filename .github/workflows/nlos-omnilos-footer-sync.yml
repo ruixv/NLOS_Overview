@@ -3,6 +3,8 @@ name: Synchronize Omni-LOS footer and validate survey
 on:
   push:
     branches: [master]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
@@ -13,11 +15,13 @@ concurrency:
 
 jobs:
   sync-build-publish:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
@@ -106,9 +110,11 @@ jobs:
           from pathlib import Path
           p = Path('updates/2026-07-14-omni-los-citation-tracing-update.md')
           text = p.read_text(encoding='utf-8')
-          marker = '**Footer consistency follow-up:** homepage header and footer both show 14 July 2026; the clean survey rebuild and citation/PDF checks passed.'
-          if marker not in text:
-              text = text.rstrip() + '\n\n' + marker + '\n'
+          staged = '**Footer consistency follow-up:** staged for validation so the homepage header and footer use the same 14 July 2026 date.'
+          done = '**Footer consistency follow-up:** homepage header and footer both show 14 July 2026; the clean survey rebuild and citation/PDF checks passed.'
+          text = text.replace(staged, done)
+          if done not in text:
+              text = text.rstrip() + '\n\n' + done + '\n'
           p.write_text(text, encoding='utf-8')
           PY
 
@@ -117,4 +123,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Synchronize Omni-LOS homepage footer and rebuild survey"
+          git fetch origin master
+          git rebase origin/master
           git push origin HEAD:master
