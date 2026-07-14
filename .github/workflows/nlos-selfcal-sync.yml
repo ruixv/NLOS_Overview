@@ -5,21 +5,25 @@ on:
     branches: [master]
     paths:
       - '.github/workflows/nlos-selfcal-sync.yml'
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
 
 concurrency:
-  group: nlos-selfcal-sync
+  group: nlos-selfcal-sync-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: false
 
 jobs:
   sync-build-publish:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
@@ -116,6 +120,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Integrate self-calibrating NLOS inverse rendering"
-          git fetch origin master
-          git rebase origin/master
-          git push origin HEAD:master
+          branch="${GITHUB_HEAD_REF:-master}"
+          git fetch origin "$branch"
+          git rebase "origin/$branch"
+          git push origin HEAD:"$branch"
