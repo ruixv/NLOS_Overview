@@ -29,24 +29,49 @@ jobs:
           python-version: '3.12'
 
       - name: Synchronize artifacts and bibliography
+        id: sync
+        shell: bash
+        run: |
+          set +e
+          {
+            set -euo pipefail
+            python -m pip install bibtexparser==1.4.3
+            python -m py_compile scripts/sync_nlos_20260714_geometric_constraints.py scripts/merge_nlos_bibliography.py
+            python scripts/sync_nlos_20260714_geometric_constraints.py
+            python scripts/sync_nlos_20260714_geometric_constraints.py
+            python scripts/merge_nlos_bibliography.py
+
+            grep -Fq 'Geometric Constrained Non-Line-of-Sight Imaging' README.md
+            grep -Fq '| arXiv 2025 | Jointly reconstructs volumetric albedo' README.md
+            grep -Fq 'geometric constraints on hidden surface normals for fast sparse-transient reconstruction' README.md
+            grep -Fq 'Geometric Constrained Non-Line-of-Sight Imaging' index.html
+            grep -Fq '<b>97</b><span>tracked latest entries</span>' index.html
+            grep -Fq 'shape-operator regularization for hidden surface normals' index.html
+            grep -Fq 'Geometric constraints on hidden surface normals' article/2active.tex
+            test "$(grep -Fo 'liuGeometricConstrainedNLOS2025' article/2active.tex | wc -l)" -eq 2
+            grep -Fq 'liuGeometricConstrainedNLOS2025' egbib_merged_20260711.bib
+            grep -Fq 'Truly missing citation keys: 0' updates/2026-07-11-bibliography-deduplication.md
+          } > /tmp/geometric-sync.log 2>&1
+          status=$?
+          cat /tmp/geometric-sync.log
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          if [ "$status" -ne 0 ]; then
+            cp /tmp/geometric-sync.log updates/2026-07-14-geometric-constraints-ci-debug.log
+          fi
+          exit 0
+
+      - name: Publish synchronization diagnostics on failure
+        if: steps.sync.outputs.status != '0'
         run: |
           set -euo pipefail
-          python -m pip install bibtexparser==1.4.3
-          python -m py_compile scripts/sync_nlos_20260714_geometric_constraints.py scripts/merge_nlos_bibliography.py
-          python scripts/sync_nlos_20260714_geometric_constraints.py
-          python scripts/sync_nlos_20260714_geometric_constraints.py
-          python scripts/merge_nlos_bibliography.py
-
-          grep -Fq 'Geometric Constrained Non-Line-of-Sight Imaging' README.md
-          grep -Fq '| arXiv 2025 | Jointly reconstructs volumetric albedo' README.md
-          grep -Fq 'geometric constraints on hidden surface normals for fast sparse-transient reconstruction' README.md
-          grep -Fq 'Geometric Constrained Non-Line-of-Sight Imaging' index.html
-          grep -Fq '<b>97</b><span>tracked latest entries</span>' index.html
-          grep -Fq 'shape-operator regularization for hidden surface normals' index.html
-          grep -Fq 'Geometric constraints on hidden surface normals' article/2active.tex
-          test "$(grep -Fo 'liuGeometricConstrainedNLOS2025' article/2active.tex | wc -l)" -eq 2
-          grep -Fq 'liuGeometricConstrainedNLOS2025' egbib_merged_20260711.bib
-          grep -Fq 'Truly missing citation keys: 0' updates/2026-07-11-bibliography-deduplication.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add updates/2026-07-14-geometric-constraints-ci-debug.log
+          if ! git diff --cached --quiet; then
+            git commit -m "Record geometric NLOS synchronization diagnostics"
+            git push origin HEAD:${GITHUB_HEAD_REF}
+          fi
+          exit 1
 
       - name: Install LaTeX and PDF tools
         run: |
@@ -121,6 +146,7 @@ jobs:
 
           rm -f .github/workflows/nlos-geometric-constraints-sync.yml
           rm -f updates/.geometric-constraints-pr-trigger
+          rm -f updates/2026-07-14-geometric-constraints-ci-debug.log
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
