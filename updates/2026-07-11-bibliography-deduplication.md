@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 27 source files and keeps one highest-priority record for each of 356 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 28 source files and keeps one highest-priority record for each of 356 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 371
-- Case-insensitive duplicate replacements: 15
+- Parsed source records: 372
+- Case-insensitive duplicate replacements: 16
 - Citation-key case normalizations: 83
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -27,6 +27,7 @@ This update generates `egbib_merged_20260711.bib` from 27 source files and keeps
 - `thrampoulidisexploitingocclusionnonlineofsight2018` / `thrampoulidisExploitingOcclusionNonLineofSight2018`: `egbib.bib` → `egbib_20260713_occlusion_updates.bib`
 - `tanakapolarizednonlineofsightimaging2020` / `tanakaPolarizedNonLineofSightImaging2020`: `egbib.bib` → `egbib_20260713_polarization_updates.bib`
 - `isogawaTransientSinograms2020` / `isogawaTransientSinograms2020`: `egbib_20260705_updates.bib` → `egbib_20260714_c2nlos_updates.bib`
+- `grauOcclusionFields2022` / `grauOcclusionFields2022`: `egbib_20260703_updates.bib` → `egbib_20260714_occlusion_fields_updates.bib`
 
 ## Citation-key spellings normalized
 
