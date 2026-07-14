@@ -38,13 +38,11 @@ README_MILESTONE_NEW = (
     "   │"
 )
 
-INDEX_STAT_OLD = '<b>96</b><span>tracked latest entries</span>'
-INDEX_STAT_NEW = '<b>97</b><span>tracked latest entries</span>'
-INDEX_OBJECT_ANCHOR = (
-    '{cat:"latest dataset active",title:"Fast Non-Line-of-Sight Transient Data Simulation and an Open Benchmark Dataset",'
-    'authors:"Shi et al.",year:2025,venue:"arXiv 2025",url:"https://arxiv.org/abs/2506.03747",'
-    'key:"A configurable FFT/LCT simulator generates noisy transient volumes from depth and albedo maps, '
-    'releases seven ShapeNet-category datasets, and benchmarks LCT, phasor-field, f-k, and backprojection baselines."},'
+INDEX_STAT = '<b>96</b><span>tracked latest entries</span>'
+INDEX_EXISTING_OBJECT = (
+    '{cat:"latest active",title:"Geometric Constrained Non-Line-of-Sight Imaging",authors:"Liu et al.",'
+    'year:2025,venue:"arXiv 2025",url:"https://arxiv.org/abs/2503.17992",'
+    'key:"Joint albedo/surface reconstruction with normal-field geometric regularization."},'
 )
 INDEX_OBJECT = (
     '{cat:"latest active",title:"Geometric Constrained Non-Line-of-Sight Imaging",authors:"Liu et al.",'
@@ -106,11 +104,10 @@ def update_readme() -> None:
 def update_index() -> None:
     path = ROOT / "index.html"
     text = path.read_text(encoding="utf-8")
-    if TITLE not in text:
-        text = replace_exactly_once(text, INDEX_STAT_OLD, INDEX_STAT_NEW, "homepage count")
-        text = replace_exactly_once(text, INDEX_OBJECT_ANCHOR, INDEX_OBJECT_ANCHOR + "\n      " + INDEX_OBJECT, "homepage paper object")
-    elif INDEX_STAT_NEW not in text:
-        raise RuntimeError("Paper exists in homepage but tracked-entry count is not 97")
+    if INDEX_OBJECT not in text:
+        text = replace_exactly_once(text, INDEX_EXISTING_OBJECT, INDEX_OBJECT, "homepage existing paper object")
+    if INDEX_STAT not in text:
+        raise RuntimeError("The existing homepage paper entry must keep the tracked-entry count at 96")
     if "shape-operator regularization for hidden surface normals" not in text:
         text = replace_exactly_once(text, INDEX_TIMELINE_OLD, INDEX_TIMELINE_NEW, "homepage 2025 timeline")
     path.write_text(text, encoding="utf-8")
