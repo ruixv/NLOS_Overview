@@ -1,6 +1,6 @@
 # 15 July 2026 self-calibrating NLOS inverse-rendering consistency update
 
-**Build status:** staged for safe GitHub Actions synchronization and clean LaTeX/BibTeX/PDF validation.
+**Build status:** README, homepage/paper explorer, survey source, merged bibliography, and regenerated PDF are mutually consistent; clean build, citation, bibliography, text-extraction, and page-render checks passed.
 
 ## Search and citation-tracing result
 
