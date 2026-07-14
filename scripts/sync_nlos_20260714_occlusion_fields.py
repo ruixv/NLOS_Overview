@@ -12,6 +12,12 @@ ROOT = Path(__file__).resolve().parents[1]
 TITLE = "Occlusion Fields: An Implicit Representation for Non-Line-of-Sight Surface Reconstruction"
 KEY = "grauOcclusionFields2022"
 
+README_EXISTING_ROW = (
+    "| 2022 | [Occlusion Fields: An Implicit Representation for Non-Line-of-Sight Surface Reconstruction]"
+    "(https://arxiv.org/abs/2203.08657) — Grau et al. | arXiv 2022 | Uses an implicit surface representation "
+    "to reason about NLOS recoverability and self-occlusion, recovering adaptively tessellated hidden surfaces "
+    "beyond conservative Fermat-path visibility criteria. |"
+)
 README_ROW = (
     "| 2022 | [Occlusion Fields: An Implicit Representation for Non-Line-of-Sight Surface Reconstruction]"
     "(https://arxiv.org/abs/2203.08657) — Grau et al. | arXiv 2022 | "
@@ -80,8 +86,14 @@ def replace_exactly_once(text: str, old: str, new: str, label: str) -> str:
 def update_readme() -> None:
     path = ROOT / "README.md"
     text = path.read_text(encoding="utf-8")
-    if README_ROW not in text:
+    if README_ROW in text and README_EXISTING_ROW in text:
+        text = replace_exactly_once(text, README_EXISTING_ROW + "\n", "", "duplicate terse README row")
+    elif README_EXISTING_ROW in text:
+        text = replace_exactly_once(text, README_EXISTING_ROW, README_ROW, "existing README paper row")
+    elif README_ROW not in text:
         text = replace_exactly_once(text, README_ANCHOR, README_ROW + "\n" + README_ANCHOR, "README paper row")
+    if text.count(README_ROW) != 1 or README_EXISTING_ROW in text:
+        raise RuntimeError("README must contain exactly one enriched Occlusion Fields paper row")
     if "Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes" not in text:
         text = replace_exactly_once(text, README_MILESTONE_OLD, README_MILESTONE_NEW, "README milestone")
     path.write_text(text, encoding="utf-8")
@@ -92,6 +104,8 @@ def update_index() -> None:
     text = path.read_text(encoding="utf-8")
     if INDEX_OBJECT not in text:
         text = replace_exactly_once(text, INDEX_EXISTING_OBJECT, INDEX_OBJECT, "homepage paper object")
+    if text.count(TITLE) != 1:
+        raise RuntimeError(f"Homepage must contain exactly one Occlusion Fields paper object, found {text.count(TITLE)}")
     if INDEX_STAT not in text:
         raise RuntimeError("Occlusion Fields already exists on the homepage, so the tracked-entry count must remain 96")
     if INDEX_TIMELINE_MARKER not in text:
@@ -115,7 +129,7 @@ def main() -> None:
     update_readme()
     update_index()
     update_survey()
-    print("Occlusion Fields artifacts are synchronized.")
+    print("Occlusion Fields artifacts are synchronized without duplicate public entries.")
 
 
 if __name__ == "__main__":
