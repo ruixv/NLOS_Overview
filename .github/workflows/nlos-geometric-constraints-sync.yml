@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          {
+          (
             set -euo pipefail
             python -m pip install bibtexparser==1.4.3
             python -m py_compile scripts/sync_nlos_20260714_geometric_constraints.py scripts/merge_nlos_bibliography.py
@@ -51,7 +51,7 @@ jobs:
             test "$(grep -Fo 'liuGeometricConstrainedNLOS2025' article/2active.tex | wc -l)" -eq 2
             grep -Fq 'liuGeometricConstrainedNLOS2025' egbib_merged_20260711.bib
             grep -Fq 'Truly missing citation keys: 0' updates/2026-07-11-bibliography-deduplication.md
-          } > /tmp/geometric-sync.log 2>&1
+          ) > /tmp/geometric-sync.log 2>&1
           status=$?
           cat /tmp/geometric-sync.log
           echo "status=$status" >> "$GITHUB_OUTPUT"
