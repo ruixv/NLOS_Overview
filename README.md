@@ -142,6 +142,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2022 | [Differentiable Transient Rendering](https://arxiv.org/abs/2206.06193) — Yi et al. | ACM TOG 2021 | Provides a differentiable transient path-integral framework that supports NLOS tracking with non-planar relay walls and two-corner NLOS settings, underpinning later inverse-rendering NLOS work. |
 | 2022 | [Occlusion Fields: An Implicit Representation for Non-Line-of-Sight Surface Reconstruction](https://arxiv.org/abs/2203.08657) — Grau et al. | arXiv 2022 | Uses an implicit surface representation to reason about NLOS recoverability and self-occlusion, recovering adaptively tessellated hidden surfaces beyond conservative Fermat-path visibility criteria. |
 | 2022 | [High-resolution non-line-of-sight imaging employing active focusing](https://www.nature.com/articles/s41566-022-01009-8) — Cao et al. | Nature Photonics 2022 | Uses wavefront shaping / active focusing to push optical NLOS toward sub-millimeter hidden-target resolution. |
+| 2022 | [Occlusion Fields: An Implicit Representation for Non-Line-of-Sight Surface Reconstruction](https://arxiv.org/abs/2203.08657) — Grau et al. | arXiv 2022 | Represents a hidden surface as the decision boundary between relay-wall-visible and target-occluded 3D space; the learned implicit field yields adaptive meshes, recovers geometry beyond conservative Fermat-path visibility, and remains robust to substantial self-occlusion. |
 | 2022 | [Few-shot Non-line-of-sight Imaging with Signal-surface Collaborative Regularization](https://arxiv.org/abs/2211.15367) — Liu et al. | arXiv 2022 | Extends sparse active NLOS reconstruction with mixed-dimensional priors over measured signals, virtual confocal signals, and hidden surfaces; demonstrates few-shot recovery from very coarse confocal grids. |
 | 2022 | [Cramer-Rao Lower Bound Optimization for Hidden Moving Target Sensing via Multi-IRS-Aided Radar](https://arxiv.org/abs/2210.05812) — Esmaeilbeig et al. | arXiv 2022 | Early multi-IRS hidden moving-target sensing work that optimizes Doppler-aware IRS phase shifts via CRLB-guided design. |
 | 2022 | [Seeing Around Obstacles with Terahertz Waves](https://arxiv.org/abs/2205.05066) — Cui, Trichopoulos | arXiv 2022 | THz / sub-THz around-obstacle imaging using lossy-mirror environmental surfaces. |
@@ -188,6 +189,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
    │
 2021 ── Nam et al.: real-time diffuse-object NLOS video at 5 fps [Nature Comm.]
+   │
+2022 ── Grau et al.: Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes [arXiv]
    │
 2023 ── Plack et al.: fast differentiable transient rendering — NLOS inverse rendering in minutes [WACV]
    │     Huang et al.: Omni-LOS — joint LOS/NLOS neural transients for near-360° single-position shape [arXiv]
