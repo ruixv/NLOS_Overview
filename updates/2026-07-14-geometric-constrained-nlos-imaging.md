@@ -1,6 +1,6 @@
 # 14 July 2026 — geometric-constrained NLOS surface reconstruction
 
-**Build status:** staged for safe GitHub Actions synchronization and clean LaTeX/BibTeX/PDF validation.
+**Build status:** README, homepage/timeline, survey source, merged bibliography, and regenerated PDF were synchronized; clean build and citation/PDF checks passed.
 
 ## Search and citation-tracing result
 
