@@ -18,4 +18,4 @@
 4. **Bibliography**: merge `egbib_20260714_simbenchmark_updates.bib` into the consolidated bibliography using `scripts/merge_nlos_bibliography.py`.
 5. **PDF**: perform a clean LaTeX/BibTeX rebuild, reject undefined citations or repeated BibTeX entries, validate the PDF with `pdfinfo` and `pdftotext`, and render every page before and after the build.
 
-**Build status:** staged for safe GitHub Actions synchronization and clean LaTeX/BibTeX/PDF validation.
+**Build status:** README, homepage/timeline, survey source, merged bibliography, and regenerated PDF were synchronized; clean build and citation/PDF checks passed.

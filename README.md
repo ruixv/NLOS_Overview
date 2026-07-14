@@ -77,6 +77,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2026 | [X-band Radar Non-Line-of-Sight Imaging](https://openaccess.thecvf.com/content/CVPR2026/html/Du_X-band_Radar_Non-Line-of-Sight_Imaging_CVPR_2026_paper.html) — Du et al. | CVPR 2026 | Introduces a learned, geometry-aware X-band radar NLOS reconstruction system; converts normally diffuse optical transport into predominantly specular long-wavelength transport and experimentally reconstructs hidden objects at ranges up to 40 m. |
 | 2026 | [Neural illumination fields: High-fidelity and ambient-robust stereo reconstruction for two-bounce non-line-of-sight imaging](https://doi.org/10.1016/j.optlaseng.2025.109514) — Zhang et al. | Optics and Lasers in Engineering 2026 | Uses a self-supervised continuous neural illumination field and differentiable intensity rendering for two-bounce NLOS reconstruction without binary shadow segmentation, reaching centimeter-scale detail in large hidden spaces under low-contrast and ambient-light interference. |
 | 2026 | [CUDA-accelerated non-line-of-sight imaging with irregular relay surfaces](https://doi.org/10.1016/j.optlaseng.2025.109591) — Sun et al. | Optics and Lasers in Engineering 2026 | GPU-accelerated filtered backprojection for measurements acquired on irregular, non-planar relay surfaces, reducing the practical cost of geometry-aware active NLOS reconstruction. |
+| 2025 | [Fast Non-Line-of-Sight Transient Data Simulation and an Open Benchmark Dataset](https://arxiv.org/abs/2506.03747) — Shi et al. | arXiv 2025 | Provides a configurable FFT/LCT-based transient simulator from depth and optional albedo maps, models detector jitter and Poisson noise, releases seven ShapeNet-category datasets, and benchmarks LCT, phasor-field, f-k, and backprojection reconstruction baselines. |
 | 2025 | [TransDiff: Unsupervised Non-Line-of-Sight Imaging with Aperture-Limited Relay Surfaces](https://doi.org/10.1109/TIP.2025.3637694) — Cui et al. | IEEE TIP 2025 | Uses latent diffusion and unsupervised measurement consistency to synthesize/recover dense transient information from aperture-limited relay measurements. |
 | 2025 | [Under-scanning non-line-of-sight imaging based on convolution approximation and optimization](https://doi.org/10.1063/5.0266391) — Miao et al. | APL Photonics 2025 | DO-NLOS combines a convolution approximation with optimization to reconstruct hidden scenes from strongly under-scanned transient measurements. |
 | 2025 | [Physics to the Rescue: Deep Non-line-of-sight Reconstruction for High-speed Imaging](https://doi.org/10.1109/TPAMI.2022.3203383) — Mu et al. | IEEE TPAMI 2025 | Embeds wave-propagation and volume-rendering priors in a neural model for robust high-speed NLOS reconstruction from approximate real-time capture models. |
@@ -190,6 +191,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
 2023 ── Plack et al.: fast differentiable transient rendering — NLOS inverse rendering in minutes [WACV]
    │     Huang et al.: Omni-LOS — joint LOS/NLOS neural transients for near-360° single-position shape [arXiv]
    │     Royo et al.: virtual mirrors — higher-order phasor transport and two-corner NLOS [SIGGRAPH / TOG]
+   │
+2025 ── Shi et al.: fast configurable transient simulation and an open NLOS benchmark [arXiv]
    │
 ```
 
