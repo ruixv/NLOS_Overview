@@ -45,7 +45,7 @@ jobs:
             grep -Fq '| arXiv 2025 | Jointly reconstructs volumetric albedo' README.md
             grep -Fq 'geometric constraints on hidden surface normals for fast sparse-transient reconstruction' README.md
             grep -Fq 'Geometric Constrained Non-Line-of-Sight Imaging' index.html
-            grep -Fq '<b>97</b><span>tracked latest entries</span>' index.html
+            grep -Fq '<b>96</b><span>tracked latest entries</span>' index.html
             grep -Fq 'shape-operator regularization for hidden surface normals' index.html
             grep -Fq 'Geometric constraints on hidden surface normals' article/2active.tex
             test "$(grep -Fo 'liuGeometricConstrainedNLOS2025' article/2active.tex | wc -l)" -eq 2
