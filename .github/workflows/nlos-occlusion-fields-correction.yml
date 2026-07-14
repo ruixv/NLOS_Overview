@@ -1,0 +1,116 @@
+name: Correct NLOS Occlusion Fields Consistency
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-occlusion-fields-correction
+  cancel-in-progress: false
+
+jobs:
+  correct-build-publish:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Correct and audit synchronized artifacts
+        run: |
+          set -euo pipefail
+          python -m pip install bibtexparser==1.4.3
+          python -m py_compile scripts/sync_nlos_20260714_occlusion_fields.py scripts/merge_nlos_bibliography.py
+          python scripts/sync_nlos_20260714_occlusion_fields.py
+          sha256sum README.md index.html article/2active.tex > /tmp/before-second.sha
+          python scripts/sync_nlos_20260714_occlusion_fields.py
+          sha256sum README.md index.html article/2active.tex > /tmp/after-second.sha
+          diff -u /tmp/before-second.sha /tmp/after-second.sha
+          python scripts/merge_nlos_bibliography.py
+
+          test "$(grep -Fc 'https://arxiv.org/abs/2203.08657) — Grau et al. | arXiv 2022 |' README.md)" -eq 1
+          grep -Fq 'Represents a hidden surface as the decision boundary between relay-wall-visible and target-occluded 3D space' README.md
+          ! grep -Fq 'Uses an implicit surface representation to reason about NLOS recoverability' README.md
+          grep -Fq 'Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes' README.md
+          test "$(grep -Fo 'title:\"Occlusion Fields: An Implicit Representation for Non-Line-of-Sight Surface Reconstruction\"' index.html | wc -l)" -eq 1
+          grep -Fq '<b>96</b><span>tracked latest entries</span>' index.html
+          grep -Fq 'recover beyond conservative Fermat-path visibility' index.html
+          grep -Fq 'Implicit occlusion fields beyond Fermat-visible surfaces' article/2active.tex
+          test "$(grep -Fo 'grauOcclusionFields2022' article/2active.tex | wc -l)" -eq 2
+          grep -Fq 'grauOcclusionFields2022' egbib_merged_20260711.bib
+          grep -Fq 'Truly missing citation keys: 0' updates/2026-07-11-bibliography-deduplication.md
+
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Preserve previous PDF rendering
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          cp bare_jrnl.pdf /tmp/bare_jrnl-before.pdf
+          mkdir -p /tmp/render-before
+          pdftoppm -png -r 100 /tmp/bare_jrnl-before.pdf /tmp/render-before/page >/dev/null 2>&1
+          test "$(find /tmp/render-before -name 'page-*.png' -type f | wc -l)" -gt 0
+
+      - name: Clean-build survey PDF
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate corrected PDF and bibliography
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf > /tmp/pdfinfo-after.txt
+          pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
+          mkdir -p /tmp/render-after
+          pdftoppm -png -r 100 bare_jrnl.pdf /tmp/render-after/page >/dev/null 2>&1
+          before_pages=$(find /tmp/render-before -name 'page-*.png' -type f | wc -l)
+          after_pages=$(find /tmp/render-after -name 'page-*.png' -type f | wc -l)
+          test "$after_pages" -ge "$before_pages"
+          ! grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log
+          ! grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg
+          grep -Fq 'grauOcclusionFields2022' bare_jrnl.aux
+          grep -Fq 'grauOcclusionFields2022' bare_jrnl.bbl
+          grep -Eiq 'Implicit occlusion fields beyond Fermat-visible surfaces|decision boundary between points.*visible.*occluded|adaptive.*mesh' /tmp/bare_jrnl.txt
+
+      - name: Publish corrected synchronization
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('updates/2026-07-14-occlusion-fields-consistency.md')
+          text = p.read_text(encoding='utf-8')
+          staged = '**Build status:** the survey integration and PDF rebuild passed; a final duplicate-row correction for README.md is staged for clean validation.'
+          done = '**Build status:** README, homepage/paper explorer, survey source, merged bibliography, and regenerated PDF are mutually consistent; the duplicate README row was removed and all clean-build, citation, bibliography, and PDF checks passed.'
+          text = text.replace(staged, done)
+          if done not in text:
+              text = text.rstrip() + '\n\n' + done + '\n'
+          p.write_text(text, encoding='utf-8')
+          PY
+
+          rm -f .github/workflows/nlos-occlusion-fields-correction.yml
+          rm -f updates/.occlusion-fields-correction-trigger
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Remove duplicate Occlusion Fields README entry"
+          branch="${GITHUB_HEAD_REF}"
+          git fetch origin "$branch"
+          git rebase "origin/$branch"
+          git push origin HEAD:"$branch"
