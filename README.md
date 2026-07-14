@@ -64,7 +64,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 14 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 15 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
@@ -132,7 +132,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2024 | [Passive None-line-of-sight imaging with arbitrary scene condition and detection pattern in small amount of prior data](https://arxiv.org/abs/2404.06015) — Gui et al. | arXiv 2024 | HDPS estimates passive NLOS transport/target structure from limited prior data, targeting arbitrary scene conditions and detection patterns without retraining a separate model per setup. |
 | 2024 | [Multi-View Near-field Imaging in NLOS with Non-Reconfigurable EM Skins](https://arxiv.org/abs/2401.06891) — Tornielli Bellini et al. | arXiv 2024 | Uses static passive electromagnetic-skin modules to focus radar energy into NLOS regions and synthesize multi-view near-field radar images. |
 | 2024 | [Event-enhanced Passive Non-line-of-sight imaging for moving objects with Physical embedding](https://arxiv.org/abs/2404.05977) — Wang et al. | arXiv 2024 | Uses an event camera for dynamic diffusion-spot features and a physics-embedded model for passive NLOS imaging of moving objects. |
-| 2023 | [Self-Calibrating, Fully Differentiable NLOS Inverse Rendering](https://arxiv.org/abs/2309.12047) — Choi et al. | SIGGRAPH Asia 2023 | Couples diffraction-based volumetric NLOS reconstruction with differentiable transient rendering and self-calibrates imaging parameters directly from measured transients. |
+| 2023 | [Self-Calibrating, Fully Differentiable NLOS Inverse Rendering](https://doi.org/10.1145/3610548.3618140) — Choi et al. | ACM TOG / SIGGRAPH Asia 2023 | Combines phasor-field volumetric reconstruction with differentiable path-space transient rendering, jointly optimizing virtual-illumination filters, laser–sensor temporal response, hidden geometry, normals, and albedo directly from measured transients for noise-robust self-calibrated reconstruction. |
 | 2023 | [Non-line-of-sight imaging in the presence of scattering media using phasor fields](https://arxiv.org/abs/2311.09223) — Luesia et al. | arXiv 2023 | Extends phasor-field NLOS analysis to hidden scenes submerged in scattering media, empirically testing robustness under fog/smoke-like volumetric scattering. |
 | 2023 | [Non-line-of-sight imaging with arbitrary illumination and detection pattern](https://www.nature.com/articles/s41467-023-38898-4) — Liu et al. | Nature Communications 2023 | Bayesian CC-SOCR framework for arbitrary illumination/detection patterns, irregular relay sampling, and albedo/surface-normal reconstruction. |
 | 2023 | [NLOS-NeuS: Non-line-of-sight Neural Implicit Surface](https://arxiv.org/abs/2303.12280) — Fujimura et al. | ICCV 2023 | Extends Neural Transient Fields to SDF-based neural implicit surfaces for smooth, high-detail hidden-surface reconstruction with first-returning-photon constraints. |
@@ -192,6 +192,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
 2022 ── Grau et al.: Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes [arXiv]
    │
 2023 ── Plack et al.: fast differentiable transient rendering — NLOS inverse rendering in minutes [WACV]
+   │     Choi et al.: self-calibrating differentiable NLOS inverse rendering — jointly optimizes imaging and scene parameters [SIGGRAPH Asia / TOG]
    │     Huang et al.: Omni-LOS — joint LOS/NLOS neural transients for near-360° single-position shape [arXiv]
    │     Royo et al.: virtual mirrors — higher-order phasor transport and two-corner NLOS [SIGGRAPH / TOG]
    │
