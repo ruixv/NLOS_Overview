@@ -1,6 +1,6 @@
 # 14 July 2026 Occlusion Fields consistency update
 
-**Build status:** the survey integration and PDF rebuild passed; a final duplicate-row correction for README.md is staged for clean validation.
+**Build status:** README, homepage/paper explorer, survey source, merged bibliography, and regenerated PDF are mutually consistent; the duplicate README row was removed and all clean-build, citation, bibliography, and PDF checks passed.
 
 ## Search and citation-tracing result
 
