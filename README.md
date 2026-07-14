@@ -153,7 +153,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2020 | [Phasor field waves: A statistical treatment for the case of a partially coherent optical carrier](https://arxiv.org/abs/2006.02600) — Reza et al. | arXiv 2020 | Quantifies spurious phasor-field signals caused by partial optical coherence, linking aperture roughness, coherence, and P-field signal-to-noise limits. |
 | 2020 | [Nonparaxial phasor-field propagation](https://arxiv.org/abs/2006.13775) — Dove, Shapiro | arXiv 2020 | Extends phasor-field propagation beyond the Fresnel/paraxial assumption using Rayleigh--Sommerfeld theory, closer to wide-angle reflective NLOS geometries. |
 | 2020 | [Paraxial phasor-field physical optics](https://arxiv.org/abs/2004.14239) — Dove, Shapiro | arXiv 2020 | Shows that ordinary lenses can focus or project phasor fields through diffusers, bridging computational virtual-wave NLOS and physical P-field optics. |
-| 2020 | [Efficient Non-Line-of-Sight Imaging from Transient Sinograms](https://arxiv.org/abs/2008.02787) — Isogawa et al. | arXiv 2020 | Introduces circular confocal NLOS (C2NLOS) scanning and transient-sinogram reconstruction, reducing relay-wall measurements while preserving hidden-position and image recovery. |
+| 2020 | [Efficient Non-Line-of-Sight Imaging from Transient Sinograms](https://marikoisogawa.github.io/project/c2nlos) — Isogawa et al. | ECCV 2020 | Introduces circular confocal NLOS (C2NLOS) acquisition: a one-dimensional circular relay-wall scan produces transient sinograms whose sinusoid parameters encode hidden 3D positions, enabling Hough-, inverse-Radon-, and linear-inversion reconstructions with about an order of magnitude fewer measurements than dense raster scans. |
 | 2019 | [Analysis of Feature Visibility in Non-Line-of-Sight Measurements](https://openaccess.thecvf.com/content_CVPR_2019/html/Liu_Analysis_of_Feature_Visibility_in_Non-Line-of-Sight_Measurements_CVPR_2019_paper.html) — Liu, Bauer, Velten | CVPR 2019 | Systematically analyzes which hidden-scene features are recoverable from transient NLOS measurements, clarifying orientation-, aperture-, and capture-geometry-dependent visibility limits that later reconstruction methods must respect. |
 | 2019 | [Keyhole Imaging: Non-Line-of-Sight Imaging and Tracking of Moving Objects Along a Single Optical Path](https://arxiv.org/abs/1912.06727) — Metzler et al. | IEEE TCI 2021 | Introduces single-optical-path active NLOS imaging/tracking; uses hidden-object motion and EM/unknown-view tomography to recover shape and trajectory when only keyhole-like access is available. |
 | 2019 | [Wave-like Properties of Phasor Fields: Experimental Demonstrations](https://arxiv.org/abs/1904.01565) — Reza et al. | arXiv 2019 | Experimentally validates wave-like phasor-field behavior and introduces P-field optical elements for practical virtual-wave NLOS systems. |
@@ -182,7 +182,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
 2018 ── O'Toole et al.: confocal NLOS + LCT — real-time O(N³logN) [Nature]
    │     Liu et al.: phasor field — NLOS as virtual LOS wave propagation
    │
-2020 ── Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
+2020 ── Isogawa et al.: C2NLOS transient sinograms — 1D circular confocal scanning with far fewer measurements [ECCV]
+   │     Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
    │
 2021 ── Nam et al.: real-time diffuse-object NLOS video at 5 fps [Nature Comm.]
    │

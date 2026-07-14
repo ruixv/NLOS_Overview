@@ -27,4 +27,4 @@ The marker-based synchronizer updates the following artifacts without blind whol
 5. `egbib_merged_20260711.bib` and `bare_jrnl.tex`: regenerated through the repository's duplicate-aware bibliography merger.
 6. `bare_jrnl.pdf`: rebuilt only after clean LaTeX/BibTeX, citation, bibliography, text-extraction, and page-rendering checks pass.
 
-**Build status:** staged for safe GitHub Actions synchronization and clean LaTeX/BibTeX/PDF validation.
+**Build status:** README, homepage/timeline, survey source, merged bibliography, and regenerated PDF were synchronized; clean build and citation/PDF checks passed.
