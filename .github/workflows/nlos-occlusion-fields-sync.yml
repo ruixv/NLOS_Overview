@@ -3,6 +3,8 @@ name: Synchronize NLOS Occlusion Fields
 on:
   push:
     branches: [master]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
@@ -13,11 +15,13 @@ concurrency:
 
 jobs:
   sync-build-publish:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
@@ -98,16 +102,16 @@ jobs:
           text = text.replace(staged, done)
           if done not in text:
               text = text.rstrip() + '\n\n' + done + '\n'
-          heading = '## Synchronized changes'
-          text = text.replace(heading, heading, 1)
           p.write_text(text, encoding='utf-8')
           PY
 
           rm -f .github/workflows/nlos-occlusion-fields-sync.yml
+          rm -f updates/.occlusion-fields-pr-trigger
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Integrate Occlusion Fields implicit NLOS surfaces"
-          git fetch origin master
-          git rebase origin/master
-          git push origin HEAD:master
+          branch="${GITHUB_HEAD_REF:-master}"
+          git fetch origin "$branch"
+          git rebase "origin/$branch"
+          git push origin HEAD:"$branch"
