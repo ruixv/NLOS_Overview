@@ -60,18 +60,17 @@ jobs:
           fi
           exit 0
 
-      - name: Publish synchronization diagnostics on failure
+      - name: Upload synchronization diagnostics
         if: steps.sync.outputs.status != '0'
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add updates/2026-07-14-geometric-constraints-ci-debug.log
-          if ! git diff --cached --quiet; then
-            git commit -m "Record geometric NLOS synchronization diagnostics"
-            git push origin HEAD:${GITHUB_HEAD_REF}
-          fi
-          exit 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: geometric-constraints-sync-diagnostics
+          path: updates/2026-07-14-geometric-constraints-ci-debug.log
+          if-no-files-found: error
+
+      - name: Stop after synchronization failure
+        if: steps.sync.outputs.status != '0'
+        run: exit 1
 
       - name: Install LaTeX and PDF tools
         run: |
