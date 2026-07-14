@@ -42,7 +42,7 @@ jobs:
           grep -Fq 'Represents a hidden surface as the decision boundary between relay-wall-visible and target-occluded 3D space' README.md
           ! grep -Fq 'Uses an implicit surface representation to reason about NLOS recoverability' README.md
           grep -Fq 'Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes' README.md
-          test "$(grep -Fo 'title:\"Occlusion Fields: An Implicit Representation for Non-Line-of-Sight Surface Reconstruction\"' index.html | wc -l)" -eq 1
+          test "$(grep -Fo 'title:"Occlusion Fields: An Implicit Representation for Non-Line-of-Sight Surface Reconstruction"' index.html | wc -l)" -eq 1
           grep -Fq '<b>96</b><span>tracked latest entries</span>' index.html
           grep -Fq 'recover beyond conservative Fermat-path visibility' index.html
           grep -Fq 'Implicit occlusion fields beyond Fermat-visible surfaces' article/2active.tex
