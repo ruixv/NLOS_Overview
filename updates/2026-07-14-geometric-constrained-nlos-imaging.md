@@ -20,4 +20,4 @@ This is a direct NLOS reconstruction contribution rather than a paper that merel
 4. **Bibliography** — add canonical key `liuGeometricConstrainedNLOS2025` in `egbib_20260714_geometric_constraints_updates.bib`, then regenerate the duplicate-free consolidated bibliography.
 5. **bare_jrnl.pdf** — perform a clean LaTeX/BibTeX rebuild and validate the resulting binary by metadata inspection, text extraction, page rendering, citation-key checks, and missing/duplicate bibliography audits.
 
-The synchronization script is marker-based and idempotent. It aborts when an expected insertion anchor is missing or duplicated rather than replacing large files blindly.
+The synchronization script is marker-based and idempotent. It aborts when an expected insertion anchor is missing or duplicated rather than replacing large files blindly. The validation workflow is enabled on `master` and records completion only after the clean PDF build and consistency checks pass.
