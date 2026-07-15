@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2023 | [Fast Non-Line-of-Sight Imaging with Non-Planar Relay Surfaces](https://doi.org/10.1109/ICCP56744.2023.10233262) — Gu et al. | IEEE ICCP 2023 | Extends Rayleigh--Sommerfeld / phasor-field reconstruction to non-planar relay surfaces through two-stage wave propagation with a planar proxy, preserving fast wave-based inversion when the visible relay geometry is curved or irregular. |
 | 2023 | [Non-Line-of-Sight Imaging With Signal Superresolution Network](https://openaccess.thecvf.com/content/CVPR2023/html/Wang_Non-Line-of-Sight_Imaging_With_Signal_Superresolution_Network_CVPR_2023_paper.html) — Wang et al. | CVPR 2023 | Learns a plug-and-play transient superresolution operator that recovers dense measurement grids from sparse confocal or non-confocal scans, cutting acquisition time by 16× while retaining comparable reconstruction quality. |
 | 2023 | [Virtual Mirrors: Non-Line-of-Sight Imaging Beyond the Third Bounce](https://doi.org/10.1145/3592429) — Royo et al. | ACM TOG / SIGGRAPH 2023 | Treats planar diffuse hidden surfaces as computational phasor-domain ‘virtual mirrors’, builds secondary virtual apertures from higher-order bounces, and reconstructs limited-visibility geometry and objects hidden behind a second corner without requiring physical specular reflectors. |
 | 2023 | [Fast Differentiable Transient Rendering for Non-Line-of-Sight Reconstruction](https://openaccess.thecvf.com/content/WACV2023/html/Plack_Fast_Differentiable_Transient_Rendering_for_Non-Line-of-Sight_Reconstruction_WACV_2023_paper.html) — Plack et al. | WACV 2023 | Introduces a fast differentiable transient renderer that reduces analysis-by-synthesis NLOS inverse-rendering runtimes from hours to minutes on consumer hardware, improves optimization stability, and enables self-supervised transient reconstruction. |
@@ -194,6 +195,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
 2023 ── Wang et al.: Signal Superresolution Network — plug-and-play 16× sparse-scan acceleration [CVPR]
    │     Liu et al.: SSCR — mixed-dimensional regularization from 5×5 confocal measurements [CVPR]
+   │     Gu et al.: 3D RSD — fast two-stage wave propagation for non-planar relay surfaces [ICCP]
    │     Plack et al.: fast differentiable transient rendering — NLOS inverse rendering in minutes [WACV]
    │     Choi et al.: self-calibrating differentiable NLOS inverse rendering — jointly optimizes imaging and scene parameters [SIGGRAPH Asia / TOG]
    │     Huang et al.: Omni-LOS — joint LOS/NLOS neural transients for near-360° single-position shape [arXiv]
