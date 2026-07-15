@@ -22,3 +22,5 @@ The current README, homepage paper explorer, development timeline, survey source
 ## Validation policy
 
 The workflow rejects undefined citations, missing or repeated BibTeX entries, an empty PDF, a missing compiled bibliography record, duplicate homepage entries, or a failure to extract the new survey paragraph from the rebuilt PDF. The generated PDF is committed only after all checks pass.
+
+A pull-request validation pass is used to execute the synchronization, clean LaTeX/BibTeX rebuild, and cross-artifact consistency audit before merging the generated sources and PDF.
