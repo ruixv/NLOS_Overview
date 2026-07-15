@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2019 | [Beyond Volumetric Albedo -- A Surface Optimization Framework for Non-Line-of-Sight Imaging](https://openaccess.thecvf.com/content_CVPR_2019/html/Tsai_Beyond_Volumetric_Albedo_--_A_Surface_Optimization_Framework_for_Non-Line-Of-Sight_CVPR_2019_paper.html) — Tsai, Sankaranarayanan, Gkioulekas | CVPR 2019 | Moves active transient NLOS beyond voxelized albedo by directly optimizing a hidden surface and reflectance. Its differentiable radiometric renderer supplies geometry- and reflectance-aware gradients, while stochastic optimization and geometry processing recover substantially finer surfaces than prior volumetric methods. |
 | 2020 | [Non-Line-of-Sight Reconstruction Using Efficient Transient Rendering](https://doi.org/10.1145/3368314) — Iseringhausen, Hullin | ACM TOG 2020 | Establishes a physically grounded analysis-by-synthesis route for active transient NLOS: a custom millisecond three-bounce renderer, implicit level-set surface geometry, BRDF and visibility terms, and global optimization recover detailed hidden surfaces under noise and non-diffuse reflectance, forming a direct precursor to differentiable, neural-field, and Gaussian transient rendering. |
 | 2021 | [Towards Non-Line-of-Sight Photography](https://arxiv.org/abs/2109.07783) — Peng et al. | arXiv 2021 | Reframes active transient NLOS as direct image synthesis: a data-driven model maps measured transients to a high-resolution 2D photograph from the relay-wall viewpoint, bypassing an explicit intermediate 3D reconstruction and emphasizing hidden appearance and texture rather than geometry alone. |
 | 2023 | [Fast Non-Line-of-Sight Imaging with Non-Planar Relay Surfaces](https://doi.org/10.1109/ICCP56744.2023.10233262) — Gu et al. | IEEE ICCP 2023 | Extends Rayleigh--Sommerfeld / phasor-field reconstruction to non-planar relay surfaces through two-stage wave propagation with a planar proxy, preserving fast wave-based inversion when the visible relay geometry is curved or irregular. |
@@ -187,6 +188,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
 2018 ── O'Toole et al.: confocal NLOS + LCT — real-time O(N³logN) [Nature]
    │     Liu et al.: phasor field — NLOS as virtual LOS wave propagation
+   │
+2019 ── Tsai et al.: Beyond Volumetric Albedo — direct hidden-surface and reflectance optimization [CVPR]
    │
 2020 ── Iseringhausen & Hullin: physically based transient analysis-by-synthesis — surface-, BRDF-, and visibility-aware NLOS inverse rendering [ACM TOG]
    │     Isogawa et al.: C2NLOS transient sinograms — 1D circular confocal scanning with far fewer measurements [ECCV]
