@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2021 | [Towards Non-Line-of-Sight Photography](https://arxiv.org/abs/2109.07783) — Peng et al. | arXiv 2021 | Reframes active transient NLOS as direct image synthesis: a data-driven model maps measured transients to a high-resolution 2D photograph from the relay-wall viewpoint, bypassing an explicit intermediate 3D reconstruction and emphasizing hidden appearance and texture rather than geometry alone. |
 | 2023 | [Fast Non-Line-of-Sight Imaging with Non-Planar Relay Surfaces](https://doi.org/10.1109/ICCP56744.2023.10233262) — Gu et al. | IEEE ICCP 2023 | Extends Rayleigh--Sommerfeld / phasor-field reconstruction to non-planar relay surfaces through two-stage wave propagation with a planar proxy, preserving fast wave-based inversion when the visible relay geometry is curved or irregular. |
 | 2023 | [Non-Line-of-Sight Imaging With Signal Superresolution Network](https://openaccess.thecvf.com/content/CVPR2023/html/Wang_Non-Line-of-Sight_Imaging_With_Signal_Superresolution_Network_CVPR_2023_paper.html) — Wang et al. | CVPR 2023 | Learns a plug-and-play transient superresolution operator that recovers dense measurement grids from sparse confocal or non-confocal scans, cutting acquisition time by 16× while retaining comparable reconstruction quality. |
 | 2023 | [Virtual Mirrors: Non-Line-of-Sight Imaging Beyond the Third Bounce](https://doi.org/10.1145/3592429) — Royo et al. | ACM TOG / SIGGRAPH 2023 | Treats planar diffuse hidden surfaces as computational phasor-domain ‘virtual mirrors’, builds secondary virtual apertures from higher-order bounces, and reconstructs limited-visibility geometry and objects hidden behind a second corner without requiring physical specular reflectors. |
@@ -190,6 +191,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
    │
 2021 ── Nam et al.: real-time diffuse-object NLOS video at 5 fps [Nature Comm.]
+   │     Peng et al.: NLOS photography — direct high-resolution hidden-view image synthesis from transients [arXiv]
    │
 2022 ── Grau et al.: Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes [arXiv]
    │
