@@ -64,7 +64,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 15 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 16 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
@@ -210,6 +210,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
 2025 ── Shi et al.: fast configurable transient simulation and an open NLOS benchmark [arXiv]
    │     Liu et al.: geometric constraints on hidden surface normals for fast sparse-transient reconstruction [arXiv]
+   │     Sultan et al.: optimized NUFFT/SFFT sampling — irregular relay scans and flexible hidden-volume grids at FFT-like cost [arXiv]
    │
 ```
 
