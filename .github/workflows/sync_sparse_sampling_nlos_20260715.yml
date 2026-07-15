@@ -1,0 +1,82 @@
+name: Sync sparse-sampling NLOS update
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - egbib_20260715_sparse_sampling_updates.bib
+      - scripts/sync_nlos_20260715_sparse_sampling.py
+      - .github/workflows/sync_sparse_sampling_nlos_20260715.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Synchronize public sources
+        run: python scripts/sync_nlos_20260715_sparse_sampling.py
+
+      - name: Merge and audit bibliography
+        run: |
+          python -m pip install --disable-pip-version-check bibtexparser==1.4.3
+          python scripts/merge_nlos_bibliography.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean-build survey PDF
+        run: |
+          latexmk -C bare_jrnl.tex
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate citations, bibliography, and PDF
+        run: |
+          test -s bare_jrnl.pdf
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext bare_jrnl.pdf bare_jrnl.txt
+          grep -F "Signal Superresolution Network" bare_jrnl.txt
+          grep -F "Signal-Surface Collaborative Regularization" bare_jrnl.txt
+          if grep -E "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+            echo "Undefined citations or references detected" >&2
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
+          for key in (
+              "wangSignalSuperresolution2023",
+              "liuFewShotSSCR2022",
+              "liDeepUnderscanning2023",
+          ):
+              marker = "{" + key + ","
+              if marker not in bib:
+                  raise SystemExit(f"missing bibliography key: {key}")
+          print("All sparse-sampling bibliography keys are present.")
+          PY
+          rm bare_jrnl.txt
+
+      - name: Commit synchronized sources and generated PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-15-sparse-sampling-citation-tracing.md
+          if git diff --cached --quiet; then
+            echo "Repository already synchronized."
+            exit 0
+          fi
+          git commit -m "Integrate CVPR sparse-sampling NLOS milestones"
+          git push
