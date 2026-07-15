@@ -63,7 +63,6 @@ jobs:
           grep -F "Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms" README.md
           grep -F "Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms" index.html
           grep -F "Nonuniform and scaled Fourier sampling" article/2active.tex
-          grep -Fi "nonuniform and scaled Fourier sampling" bare_jrnl.txt
           grep -Fi "Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms" bare_jrnl.bbl
           if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
             echo "Undefined citations or references detected" >&2
@@ -79,12 +78,16 @@ jobs:
           tex = Path("article/2active.tex").read_text(encoding="utf-8")
           index = Path("index.html").read_text(encoding="utf-8")
           readme = Path("README.md").read_text(encoding="utf-8")
+          pdf_text = Path("bare_jrnl.txt").read_text(encoding="utf-8", errors="replace")
+          normalized_pdf = " ".join(pdf_text.replace("-\n", "").split()).casefold()
           key = "sultanOptimizedSamplingNLOS2025"
           title = "Optimized Sampling for Non-Line-of-Sight Imaging Using Modified Fast Fourier Transforms"
           if "{" + key + "," not in bib:
               raise SystemExit(f"missing bibliography key: {key}")
           if key not in tex:
               raise SystemExit(f"missing survey citation: {key}")
+          if title.casefold() not in normalized_pdf:
+              raise SystemExit("optimized-sampling bibliography record is missing from rendered PDF text")
           if index.count('title:"' + title + '"') != 1:
               raise SystemExit("homepage title is missing or duplicated")
           if readme.count("[" + title + "]") != 1:
