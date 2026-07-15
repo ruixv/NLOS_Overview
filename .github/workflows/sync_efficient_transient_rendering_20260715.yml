@@ -1,0 +1,101 @@
+name: Sync efficient transient rendering update
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - egbib_20260715_efficient_transient_rendering_updates.bib
+      - scripts/sync_nlos_20260715_efficient_transient_rendering.py
+      - updates/2026-07-15-efficient-transient-rendering-citation-tracing.md
+      - .github/workflows/sync_efficient_transient_rendering_20260715.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out writable PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Synchronize public sources
+        run: python scripts/sync_nlos_20260715_efficient_transient_rendering.py
+
+      - name: Merge and audit bibliography
+        run: |
+          python -m pip install --disable-pip-version-check bibtexparser==1.4.3
+          python scripts/merge_nlos_bibliography.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean-build survey PDF
+        run: |
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate sources, bibliography, and PDF
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          grep -F "Non-Line-of-Sight Reconstruction Using Efficient Transient Rendering" README.md
+          grep -F "Non-Line-of-Sight Reconstruction Using Efficient Transient Rendering" index.html
+          grep -F "Physically based transient analysis-by-synthesis" article/2active.tex
+          grep -Fi "physically based transient analysis-by-synthesis" bare_jrnl.txt
+          grep -Fi "non-line-of-sight reconstruction using efficient transient rendering" bare_jrnl.bbl
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+            echo "Undefined citations or references detected" >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo "Missing or repeated BibTeX entries detected" >&2
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
+          tex = Path("article/2active.tex").read_text(encoding="utf-8")
+          index = Path("index.html").read_text(encoding="utf-8")
+          readme = Path("README.md").read_text(encoding="utf-8")
+          key = "iseringhausen:2018"
+          title = "Non-Line-of-Sight Reconstruction Using Efficient Transient Rendering"
+          if "{" + key + "," not in bib:
+              raise SystemExit(f"missing bibliography key: {key}")
+          if "10.1145/3368314" not in bib:
+              raise SystemExit("missing verified DOI")
+          if "\\cite{" + key + "}" not in tex and ("," + key + "}") not in tex:
+              raise SystemExit(f"missing survey citation: {key}")
+          if index.count('title:"' + title + '"') != 1:
+              raise SystemExit("homepage title is missing or duplicated")
+          if readme.count("[" + title + "]") != 1:
+              raise SystemExit("README title is missing or duplicated")
+          if '<div class="stat"><b>100</b><span>tracked latest entries</span></div>' not in index:
+              raise SystemExit("homepage tracked count was not incremented to 100")
+          print("Efficient transient rendering update is mutually consistent.")
+          PY
+          rm bare_jrnl.txt
+
+      - name: Commit synchronized sources and generated PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md egbib_20260715_efficient_transient_rendering_updates.bib updates/2026-07-15-efficient-transient-rendering-citation-tracing.md
+          if git diff --cached --quiet; then
+            echo "Repository already synchronized."
+            exit 0
+          fi
+          git commit -m "Integrate efficient transient rendering milestone"
+          git push origin HEAD:${{ github.head_ref }}
