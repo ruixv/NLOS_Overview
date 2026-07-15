@@ -7,6 +7,13 @@ on:
       - egbib_20260715_sparse_sampling_updates.bib
       - scripts/sync_nlos_20260715_sparse_sampling.py
       - .github/workflows/sync_sparse_sampling_nlos_20260715.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - egbib_20260715_sparse_sampling_updates.bib
+      - scripts/sync_nlos_20260715_sparse_sampling.py
+      - updates/2026-07-15-sparse-sampling-citation-tracing.md
+      - .github/workflows/sync_sparse_sampling_nlos_20260715.yml
 
 permissions:
   contents: write
@@ -14,11 +21,14 @@ permissions:
 jobs:
   sync-build-validate:
     runs-on: ubuntu-latest
+    env:
+      TARGET_BRANCH: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
     steps:
-      - name: Check out repository
+      - name: Check out writable branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ env.TARGET_BRANCH }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -36,22 +46,27 @@ jobs:
       - name: Install LaTeX and PDF validation tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers texlive-bibtex-extra poppler-utils
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
 
       - name: Clean-build survey PDF
         run: |
-          latexmk -C bare_jrnl.tex
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
           latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
 
       - name: Validate citations, bibliography, and PDF
         run: |
           test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
           pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
-          pdftotext bare_jrnl.pdf bare_jrnl.txt
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
           grep -F "Signal Superresolution Network" bare_jrnl.txt
           grep -F "Signal-Surface Collaborative Regularization" bare_jrnl.txt
-          if grep -E "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
             echo "Undefined citations or references detected" >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo "Missing or repeated BibTeX entries detected" >&2
             exit 1
           fi
           python - <<'PY'
@@ -79,4 +94,6 @@ jobs:
             exit 0
           fi
           git commit -m "Integrate CVPR sparse-sampling NLOS milestones"
-          git push
+          git fetch origin "$TARGET_BRANCH"
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin HEAD:"$TARGET_BRANCH"
