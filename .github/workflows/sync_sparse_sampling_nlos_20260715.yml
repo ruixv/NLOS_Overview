@@ -59,9 +59,9 @@ jobs:
           test -s bare_jrnl.bbl
           pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
-          grep -F "Signal Superresolution Network" bare_jrnl.txt
-          grep -F "Signal-Surface Collaborative Regularization" bare_jrnl.txt
-          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+          grep -Eiq "signal superresolution network" bare_jrnl.txt
+          grep -Eiq "signal.surface collaborative regularization" bare_jrnl.txt
+          if grep -Eiq "Citation .* undefined|There were undefined references|undefined citations" bare_jrnl.log; then
             echo "Undefined citations or references detected" >&2
             exit 1
           fi
@@ -72,6 +72,8 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
+          aux = Path("bare_jrnl.aux").read_text(encoding="utf-8", errors="replace")
+          bbl = Path("bare_jrnl.bbl").read_text(encoding="utf-8", errors="replace")
           for key in (
               "wangSignalSuperresolution2023",
               "liuFewShotSSCR2022",
@@ -80,7 +82,11 @@ jobs:
               marker = "{" + key + ","
               if marker not in bib:
                   raise SystemExit(f"missing bibliography key: {key}")
-          print("All sparse-sampling bibliography keys are present.")
+              if key not in aux:
+                  raise SystemExit(f"citation key absent from aux: {key}")
+              if key not in bbl:
+                  raise SystemExit(f"citation key absent from bbl: {key}")
+          print("All sparse-sampling citation and bibliography keys are present.")
           PY
           rm bare_jrnl.txt
 
