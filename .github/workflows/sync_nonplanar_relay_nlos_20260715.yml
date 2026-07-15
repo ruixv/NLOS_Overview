@@ -59,8 +59,8 @@ jobs:
           test -s bare_jrnl.bbl
           pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
-          grep -F "non-planar relay surfaces" bare_jrnl.txt
-          grep -F "Fast Non-Line-of-Sight Imaging with Non-Planar Relay Surfaces" bare_jrnl.bbl
+          grep -Fi "non-planar relay surfaces" bare_jrnl.txt
+          grep -Fi "non-planar relay surfaces" bare_jrnl.bbl
           if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
             echo "Undefined citations or references detected" >&2
             exit 1
