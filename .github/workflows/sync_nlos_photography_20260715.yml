@@ -63,8 +63,8 @@ jobs:
           grep -F "Towards Non-Line-of-Sight Photography" README.md
           grep -F "Towards Non-Line-of-Sight Photography" index.html
           grep -F "Direct NLOS photography" article/4datadriven.tex
-          grep -F "Direct NLOS photography" bare_jrnl.txt
-          grep -F "Towards Non-Line-of-Sight Photography" bare_jrnl.bbl
+          grep -Fi "direct nlos photography" bare_jrnl.txt
+          grep -Fi "towards non-line-of-sight photography" bare_jrnl.bbl
           if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
             echo "Undefined citations or references detected" >&2
             exit 1
