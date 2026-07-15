@@ -2,11 +2,11 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 33 source files and keeps one highest-priority record for each of 359 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 34 source files and keeps one highest-priority record for each of 359 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 379
-- Case-insensitive duplicate replacements: 20
-- Citation-key case normalizations: 83
+- Parsed source records: 380
+- Case-insensitive duplicate replacements: 21
+- Citation-key case normalizations: 82
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
 
@@ -32,6 +32,7 @@ This update generates `egbib_merged_20260711.bib` from 33 source files and keeps
 - `wangSignalSuperresolution2023` / `wangSignalSuperresolution2023`: `egbib.bib` → `egbib_20260715_sparse_sampling_updates.bib`
 - `liuFewShotSSCR2022` / `liuFewShotSSCR2022`: `egbib_20260711_sscr_updates.bib` → `egbib_20260715_sparse_sampling_updates.bib`
 - `liDeepUnderscanning2023` / `liDeepUnderscanning2023`: `egbib.bib` → `egbib_20260715_sparse_sampling_updates.bib`
+- `tsaivolumetricalbedosurface2019` / `tsaiVolumetricAlbedoSurface2019`: `egbib.bib` → `egbib_20260715_tsai_surface_updates.bib`
 
 ## Citation-key spellings normalized
 
@@ -106,7 +107,6 @@ This update generates `egbib_merged_20260711.bib` from 33 source files and keeps
 - `smithtrackingmultipleobjects2018a` → `smithTrackingMultipleObjects2018a`
 - `torralbaaccidentalpinholepinspeck2012` → `torralbaAccidentalPinholePinspeck2012`
 - `tsaigeometryfirstreturningphotons2017` → `tsaiGeometryFirstreturningPhotons2017`
-- `tsaivolumetricalbedosurface2019` → `tsaiVolumetricAlbedoSurface2019`
 - `veeraraghavandappledphotographymask2007` → `veeraraghavanDappledPhotographyMask2007`
 - `veltenrecoveringthreedimensionalshape2012` → `veltenRecoveringThreedimensionalShape2012`
 - `willomitzer:18` → `Willomitzer:18`
