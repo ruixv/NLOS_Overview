@@ -26,3 +26,5 @@ The LaTeX survey already cited the key `chen_learned_2020` in the active-SPAD ta
 ## Validation requirements
 
 The workflow must fail on undefined citations, missing or repeated BibTeX entries, duplicate README/homepage records, missing generated bibliography text, missing survey narrative in the regenerated PDF, or an incorrect homepage count. It must also render every PDF page to ensure the generated binary is readable.
+
+A pull-request validation pass is used as an independent check before final integration.
