@@ -2,6 +2,13 @@ name: Sync fast back-projection NLOS update
 
 on:
   push:
+    branches: [master, automation/fast-backprojection-nlos-20260716]
+    paths:
+      - egbib_20260716_fast_backprojection_updates.bib
+      - scripts/sync_nlos_20260716_fast_backprojection.py
+      - updates/2026-07-16-fast-backprojection-citation-tracing.md
+      - .github/workflows/sync_nlos_fast_backprojection_20260716.yml
+  pull_request:
     branches: [master]
     paths:
       - egbib_20260716_fast_backprojection_updates.bib
@@ -16,12 +23,14 @@ permissions:
 jobs:
   sync-build-validate:
     runs-on: ubuntu-latest
+    env:
+      TARGET_BRANCH: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
     steps:
       - name: Check out writable branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: master
+          ref: ${{ env.TARGET_BRANCH }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -140,6 +149,6 @@ jobs:
             exit 0
           fi
           git commit -m "Integrate fast GPU back-projection NLOS milestone"
-          git fetch origin master
-          git rebase origin/master
-          git push origin HEAD:master
+          git fetch origin "$TARGET_BRANCH"
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin HEAD:"$TARGET_BRANCH"
