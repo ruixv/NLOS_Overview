@@ -71,12 +71,17 @@ jobs:
 
       - name: Validate public source synchronization
         run: |
-          grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" README.md
-          grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" index.html
+          test "$(grep -Fxc '| 2024 | [Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency](https://doi.org/10.52202/079017-4016) — Li et al. | NeurIPS 2024 | Introduces ST-Mamba, a spatial--temporal state-space architecture for dynamic active NLOS reconstruction; interleaved Mamba blocks model long transient/video dependencies efficiently, while a phasor-field wave-domain loss enforces measurement physics and improves temporal consistency under noise. |' README.md)" -eq 1
+          test "$(grep -Fo 'title:\"Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency\"' index.html | wc -l)" -eq 1
           grep -F "State-space model (Mamba) for video NLOS" article/4datadriven.tex
-          grep -F "liMambaTemporalConsistency2024" article/2active.tex
-          grep -F "liMambaTemporalConsistency2024" egbib_merged_20260711.bib
+          test "$(grep -Fo 'liMambaTemporalConsistency2024' article/4datadriven.tex | wc -l)" -eq 1
+          test "$(grep -Fo 'liMambaTemporalConsistency2024' article/2active.tex | wc -l)" -eq 1
+          grep -F "@inproceedings{liMambaTemporalConsistency2024," egbib_merged_20260711.bib
           grep -F '<div class="stat"><b>105</b><span>tracked latest entries</span></div>' index.html
+          grep -F "NeurIPS 2024" README.md
+          grep -F "NeurIPS 2024" index.html
+          grep -F "16 July 2026" README.md
+          grep -F "16 July 2026" index.html
 
       - name: Validate citation resolution
         run: |
@@ -89,34 +94,6 @@ jobs:
             exit 1
           fi
           grep -Fi "mamba enforced temporal consistency" bare_jrnl.bbl
-
-      - name: Validate cross-file uniqueness
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
-          active = Path("article/2active.tex").read_text(encoding="utf-8")
-          learning = Path("article/4datadriven.tex").read_text(encoding="utf-8")
-          index = Path("index.html").read_text(encoding="utf-8")
-          readme = Path("README.md").read_text(encoding="utf-8")
-          key = "liMambaTemporalConsistency2024"
-          title = "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency"
-          checks = {
-              "bibliography key": ("{" + key + "," in bib),
-              "active-table citation": (active.count(key) == 1),
-              "survey citation": (learning.count(key) == 1),
-              "homepage entry": (index.count('title:"' + title + '"') == 1),
-              "README entry": (readme.count("[" + title + "]") == 1),
-              "homepage count": ('<div class="stat"><b>105</b><span>tracked latest entries</span></div>' in index),
-              "final venue": ("NeurIPS 2024" in readme and "NeurIPS 2024" in index),
-              "public dates": ("16 July 2026" in readme and "16 July 2026" in index),
-          }
-          failed = [name for name, ok in checks.items() if not ok]
-          if failed:
-              raise SystemExit("failed consistency checks: " + ", ".join(failed))
-          print("NeurIPS ST-Mamba NLOS update is mutually consistent.")
-          PY
           rm bare_jrnl.txt
 
       - name: Commit synchronized sources and generated PDF
