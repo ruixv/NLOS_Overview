@@ -21,3 +21,5 @@ The LaTeX survey already contained a semantically placed ST-Mamba literature-rev
 - Validate unique cross-file presence, final-venue metadata, citation resolution, PDF text extraction, and page rendering.
 
 No paper newer than the 5 July 2026 NIR raster-scanning preprint was added in this run; the substantive update is the verified NeurIPS 2024 citation-tracing and consistency repair above.
+
+The automation branch is used only to run the repository's writable pull-request validation and PDF-rebuild workflow before merging the synchronized artifacts.
