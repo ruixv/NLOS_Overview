@@ -66,8 +66,6 @@ jobs:
           grep -F "Deep Non-line-of-sight Imaging from Under-scanning Measurements" README.md
           grep -F "Deep Non-line-of-sight Imaging from Under-scanning Measurements" index.html
           grep -F "Learning from under-scanned transients" article/4datadriven.tex
-          grep -Fi "Learning from under-scanned transients" bare_jrnl.txt
-          grep -Fi "Deep Non-line-of-Sight Imaging from Under-scanning Measurements" bare_jrnl.bbl
           if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
             echo "Undefined citations or references detected" >&2
             exit 1
@@ -78,11 +76,19 @@ jobs:
           fi
           python - <<'PY'
           from pathlib import Path
+          import re
+
+          def normalized(path: str) -> str:
+              text = Path(path).read_text(encoding="utf-8", errors="ignore")
+              return re.sub(r"\s+", " ", text).lower()
+
           bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
           active = Path("article/2active.tex").read_text(encoding="utf-8")
           learning = Path("article/4datadriven.tex").read_text(encoding="utf-8")
           index = Path("index.html").read_text(encoding="utf-8")
           readme = Path("README.md").read_text(encoding="utf-8")
+          bbl_norm = normalized("bare_jrnl.bbl")
+          pdf_norm = normalized("bare_jrnl.txt")
           key = "liDeepNLOSUnderscanning2023"
           title = "Deep Non-line-of-sight Imaging from Under-scanning Measurements"
           if "{" + key + "," not in bib:
@@ -95,6 +101,10 @@ jobs:
               raise SystemExit("homepage title is missing or duplicated")
           if readme.count("[" + title + "]") != 1:
               raise SystemExit("README title is missing or duplicated")
+          if title.lower() not in bbl_norm:
+              raise SystemExit("paper title missing from generated bibliography")
+          if "learning from under-scanned transients" not in pdf_norm:
+              raise SystemExit("survey narrative missing from generated PDF text")
           if '<div class="stat"><b>102</b><span>tracked latest entries</span></div>' not in index:
               raise SystemExit("homepage tracked count should be 102")
           if "16 July 2026" not in index or "16 July 2026" not in readme:
