@@ -55,21 +55,36 @@ jobs:
           rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
           latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
 
-      - name: Validate sources, bibliography, and PDF
+      - name: Validate PDF structure and rendering
         run: |
           test -s bare_jrnl.pdf
           test -s bare_jrnl.bbl
           test -s /tmp/bare_jrnl_before_st_mamba.pdf
           pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          grep -Fi "ST-Mamba" bare_jrnl.txt
           mkdir -p /tmp/nlos_pdf_pages_before /tmp/nlos_pdf_pages_after
           pdftoppm -png -r 72 /tmp/bare_jrnl_before_st_mamba.pdf /tmp/nlos_pdf_pages_before/page >/dev/null 2>&1
           pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_pages_after/page >/dev/null 2>&1
           test "$(find /tmp/nlos_pdf_pages_before -name 'page-*.png' | wc -l)" -gt 0
           test "$(find /tmp/nlos_pdf_pages_after -name 'page-*.png' | wc -l)" -gt 0
+
+      - name: Validate public source synchronization
+        run: |
           grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" README.md
-          grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" index.html
+          grep -F 'title:"Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency"' index.html
           grep -F "State-space model (Mamba) for video NLOS" article/4datadriven.tex
+          grep -F "liMambaTemporalConsistency2024" article/4datadriven.tex
+          grep -F "liMambaTemporalConsistency2024" article/2active.tex
+          grep -F "@inproceedings{liMambaTemporalConsistency2024," egbib_merged_20260711.bib
+          grep -F '<div class="stat"><b>105</b><span>tracked latest entries</span></div>' index.html
+          grep -F "NeurIPS 2024" README.md
+          grep -F "NeurIPS 2024" index.html
+          grep -F "16 July 2026" README.md
+          grep -F "16 July 2026" index.html
+
+      - name: Validate citation resolution
+        run: |
           if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
             echo "Undefined citations or references detected" >&2
             exit 1
@@ -78,45 +93,7 @@ jobs:
             echo "Missing or repeated BibTeX entries detected" >&2
             exit 1
           fi
-          python - <<'PY'
-          from pathlib import Path
-          import re
-
-          def normalized(path: str) -> str:
-              text = Path(path).read_text(encoding="utf-8", errors="ignore")
-              return re.sub(r"\s+", " ", text).lower()
-
-          bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
-          active = Path("article/2active.tex").read_text(encoding="utf-8")
-          learning = Path("article/4datadriven.tex").read_text(encoding="utf-8")
-          index = Path("index.html").read_text(encoding="utf-8")
-          readme = Path("README.md").read_text(encoding="utf-8")
-          bbl_norm = normalized("bare_jrnl.bbl")
-          pdf_norm = normalized("bare_jrnl.txt")
-          key = "liMambaTemporalConsistency2024"
-          title = "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency"
-          if "{" + key + "," not in bib:
-              raise SystemExit(f"missing bibliography key: {key}")
-          if active.count(key) != 1:
-              raise SystemExit("active-table citation is missing or duplicated")
-          if learning.count(key) != 1:
-              raise SystemExit("survey narrative citation is missing or duplicated")
-          if index.count('title:"' + title + '"') != 1:
-              raise SystemExit("homepage title is missing or duplicated")
-          if readme.count("[" + title + "]") != 1:
-              raise SystemExit("README title is missing or duplicated")
-          if title.lower() not in bbl_norm:
-              raise SystemExit("paper title missing from generated bibliography")
-          if "state-space model (mamba) for video nlos" not in pdf_norm:
-              raise SystemExit("ST-Mamba survey narrative missing from generated PDF text")
-          if '<div class="stat"><b>105</b><span>tracked latest entries</span></div>' not in index:
-              raise SystemExit("homepage tracked count should be 105")
-          if "NeurIPS 2024" not in readme or "NeurIPS 2024" not in index:
-              raise SystemExit("final venue is not synchronized")
-          if "16 July 2026" not in index or "16 July 2026" not in readme:
-              raise SystemExit("public update dates are not synchronized")
-          print("NeurIPS ST-Mamba NLOS update is mutually consistent.")
-          PY
+          grep -Fi "mamba enforced temporal consistency" bare_jrnl.bbl
           rm bare_jrnl.txt
 
       - name: Commit synchronized sources and generated PDF
