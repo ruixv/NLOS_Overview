@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2023 | [Deep Non-line-of-sight Imaging from Under-scanning Measurements](https://proceedings.neurips.cc/paper_files/paper/2023/hash/b91cc0a242e6518ee731f74e82b2eebd-Abstract-Conference.html) — Li et al. | NeurIPS 2023 | Introduces the first deep-learning pipeline designed specifically for under-scanned active confocal transients: a transient-recovery network restores a dense measurement grid and a physics-aware volume-reconstruction network recovers hidden 3D geometry; it remains effective at 8×8 scans and reports 50× faster inference than the iterative baseline. |
 | 2019 | [Beyond Volumetric Albedo -- A Surface Optimization Framework for Non-Line-of-Sight Imaging](https://openaccess.thecvf.com/content_CVPR_2019/html/Tsai_Beyond_Volumetric_Albedo_--_A_Surface_Optimization_Framework_for_Non-Line-Of-Sight_CVPR_2019_paper.html) — Tsai, Sankaranarayanan, Gkioulekas | CVPR 2019 | Moves active transient NLOS beyond voxelized albedo by directly optimizing a hidden surface and reflectance. Its differentiable radiometric renderer supplies geometry- and reflectance-aware gradients, while stochastic optimization and geometry processing recover substantially finer surfaces than prior volumetric methods. |
 | 2020 | [Non-Line-of-Sight Reconstruction Using Efficient Transient Rendering](https://doi.org/10.1145/3368314) — Iseringhausen, Hullin | ACM TOG 2020 | Establishes a physically grounded analysis-by-synthesis route for active transient NLOS: a custom millisecond three-bounce renderer, implicit level-set surface geometry, BRDF and visibility terms, and global optimization recover detailed hidden surfaces under noise and non-diffuse reflectance, forming a direct precursor to differentiable, neural-field, and Gaussian transient rendering. |
 | 2021 | [Towards Non-Line-of-Sight Photography](https://arxiv.org/abs/2109.07783) — Peng et al. | arXiv 2021 | Reframes active transient NLOS as direct image synthesis: a data-driven model maps measured transients to a high-resolution 2D photograph from the relay-wall viewpoint, bypassing an explicit intermediate 3D reconstruction and emphasizing hidden appearance and texture rather than geometry alone. |
@@ -202,6 +203,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
 2023 ── Wang et al.: Signal Superresolution Network — plug-and-play 16× sparse-scan acceleration [CVPR]
    │     Liu et al.: SSCR — mixed-dimensional regularization from 5×5 confocal measurements [CVPR]
+   │     Li et al.: deep under-scanning reconstruction — learned transient recovery plus physics-aware volumetric inversion from grids as sparse as 8×8 [NeurIPS]
    │     Gu et al.: 3D RSD — fast two-stage wave propagation for non-planar relay surfaces [ICCP]
    │     Plack et al.: fast differentiable transient rendering — NLOS inverse rendering in minutes [WACV]
    │     Choi et al.: self-calibrating differentiable NLOS inverse rendering — jointly optimizes imaging and scene parameters [SIGGRAPH Asia / TOG]
