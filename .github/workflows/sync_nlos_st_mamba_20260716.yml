@@ -1,0 +1,134 @@
+name: Sync NeurIPS ST-Mamba NLOS update
+
+on:
+  push:
+    branches: [master, automation/st-mamba-nlos-20260716]
+    paths:
+      - egbib_20260716_st_mamba_updates.bib
+      - scripts/sync_nlos_20260716_st_mamba.py
+      - updates/2026-07-16-st-mamba-citation-tracing.md
+      - .github/workflows/sync_nlos_st_mamba_20260716.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - egbib_20260716_st_mamba_updates.bib
+      - scripts/sync_nlos_20260716_st_mamba.py
+      - updates/2026-07-16-st-mamba-citation-tracing.md
+      - .github/workflows/sync_nlos_st_mamba_20260716.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    env:
+      TARGET_BRANCH: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+    steps:
+      - name: Check out writable branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ env.TARGET_BRANCH }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Synchronize public sources
+        run: python scripts/sync_nlos_20260716_st_mamba.py
+
+      - name: Merge and audit bibliography
+        run: |
+          python -m pip install --disable-pip-version-check bibtexparser==1.4.3
+          python scripts/merge_nlos_bibliography.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean-build survey PDF
+        run: |
+          cp bare_jrnl.pdf /tmp/bare_jrnl_before_st_mamba.pdf
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate sources, bibliography, and PDF
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          test -s /tmp/bare_jrnl_before_st_mamba.pdf
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          mkdir -p /tmp/nlos_pdf_pages_before /tmp/nlos_pdf_pages_after
+          pdftoppm -png -r 72 /tmp/bare_jrnl_before_st_mamba.pdf /tmp/nlos_pdf_pages_before/page >/dev/null 2>&1
+          pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_pages_after/page >/dev/null 2>&1
+          test "$(find /tmp/nlos_pdf_pages_before -name 'page-*.png' | wc -l)" -gt 0
+          test "$(find /tmp/nlos_pdf_pages_after -name 'page-*.png' | wc -l)" -gt 0
+          grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" README.md
+          grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" index.html
+          grep -F "State-space model (Mamba) for video NLOS" article/4datadriven.tex
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+            echo "Undefined citations or references detected" >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo "Missing or repeated BibTeX entries detected" >&2
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def normalized(path: str) -> str:
+              text = Path(path).read_text(encoding="utf-8", errors="ignore")
+              return re.sub(r"\s+", " ", text).lower()
+
+          bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
+          active = Path("article/2active.tex").read_text(encoding="utf-8")
+          learning = Path("article/4datadriven.tex").read_text(encoding="utf-8")
+          index = Path("index.html").read_text(encoding="utf-8")
+          readme = Path("README.md").read_text(encoding="utf-8")
+          bbl_norm = normalized("bare_jrnl.bbl")
+          pdf_norm = normalized("bare_jrnl.txt")
+          key = "liMambaTemporalConsistency2024"
+          title = "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency"
+          if "{" + key + "," not in bib:
+              raise SystemExit(f"missing bibliography key: {key}")
+          if active.count(key) != 1:
+              raise SystemExit("active-table citation is missing or duplicated")
+          if learning.count(key) != 1:
+              raise SystemExit("survey narrative citation is missing or duplicated")
+          if index.count('title:"' + title + '"') != 1:
+              raise SystemExit("homepage title is missing or duplicated")
+          if readme.count("[" + title + "]") != 1:
+              raise SystemExit("README title is missing or duplicated")
+          if title.lower() not in bbl_norm:
+              raise SystemExit("paper title missing from generated bibliography")
+          if "state-space model (mamba) for video nlos" not in pdf_norm:
+              raise SystemExit("ST-Mamba survey narrative missing from generated PDF text")
+          if '<div class="stat"><b>105</b><span>tracked latest entries</span></div>' not in index:
+              raise SystemExit("homepage tracked count should be 105")
+          if "NeurIPS 2024" not in readme or "NeurIPS 2024" not in index:
+              raise SystemExit("final venue is not synchronized")
+          if "16 July 2026" not in index or "16 July 2026" not in readme:
+              raise SystemExit("public update dates are not synchronized")
+          print("NeurIPS ST-Mamba NLOS update is mutually consistent.")
+          PY
+          rm bare_jrnl.txt
+
+      - name: Commit synchronized sources and generated PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex article/4datadriven.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-16-st-mamba-citation-tracing.md
+          if git diff --cached --quiet; then
+            echo "Repository already synchronized."
+            exit 0
+          fi
+          git commit -m "Integrate NeurIPS ST-Mamba dynamic NLOS milestone"
+          git fetch origin "$TARGET_BRANCH"
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin HEAD:"$TARGET_BRANCH"
