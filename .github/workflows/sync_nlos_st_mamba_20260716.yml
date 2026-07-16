@@ -55,7 +55,7 @@ jobs:
           rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
           latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
 
-      - name: Validate sources, bibliography, and PDF
+      - name: Validate PDF structure and rendering
         run: |
           test -s bare_jrnl.pdf
           test -s bare_jrnl.bbl
@@ -67,11 +67,18 @@ jobs:
           pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_pages_after/page >/dev/null 2>&1
           test "$(find /tmp/nlos_pdf_pages_before -name 'page-*.png' | wc -l)" -gt 0
           test "$(find /tmp/nlos_pdf_pages_after -name 'page-*.png' | wc -l)" -gt 0
+
+      - name: Validate public source synchronization
+        run: |
           grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" README.md
           grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" index.html
           grep -F "State-space model (Mamba) for video NLOS" article/4datadriven.tex
+          grep -F "liMambaTemporalConsistency2024" article/2active.tex
           grep -F "liMambaTemporalConsistency2024" egbib_merged_20260711.bib
-          grep -F "liMambaTemporalConsistency2024" bare_jrnl.bbl
+          grep -F '<div class="stat"><b>105</b><span>tracked latest entries</span></div>' index.html
+
+      - name: Validate citation resolution
+        run: |
           if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
             echo "Undefined citations or references detected" >&2
             exit 1
@@ -80,13 +87,16 @@ jobs:
             echo "Missing or repeated BibTeX entries detected" >&2
             exit 1
           fi
+          grep -Fi "mamba enforced temporal consistency" bare_jrnl.bbl
+
+      - name: Validate cross-file uniqueness and PDF text
+        run: |
           python - <<'PY'
           from pathlib import Path
           import re
 
           def normalized(path: str) -> str:
-              text = Path(path).read_text(encoding="utf-8", errors="ignore")
-              return re.sub(r"\s+", " ", text).lower()
+              return re.sub(r"\s+", " ", Path(path).read_text(encoding="utf-8", errors="ignore")).lower()
 
           bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
           active = Path("article/2active.tex").read_text(encoding="utf-8")
@@ -96,24 +106,20 @@ jobs:
           pdf_norm = normalized("bare_jrnl.txt")
           key = "liMambaTemporalConsistency2024"
           title = "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency"
-          if "{" + key + "," not in bib:
-              raise SystemExit(f"missing bibliography key: {key}")
-          if active.count(key) != 1:
-              raise SystemExit("active-table citation is missing or duplicated")
-          if learning.count(key) != 1:
-              raise SystemExit("survey narrative citation is missing or duplicated")
-          if index.count('title:"' + title + '"') != 1:
-              raise SystemExit("homepage title is missing or duplicated")
-          if readme.count("[" + title + "]") != 1:
-              raise SystemExit("README title is missing or duplicated")
-          if "st-mamba" not in pdf_norm or "temporal consistency" not in pdf_norm:
-              raise SystemExit("ST-Mamba survey narrative missing from generated PDF text")
-          if '<div class="stat"><b>105</b><span>tracked latest entries</span></div>' not in index:
-              raise SystemExit("homepage tracked count should be 105")
-          if "NeurIPS 2024" not in readme or "NeurIPS 2024" not in index:
-              raise SystemExit("final venue is not synchronized")
-          if "16 July 2026" not in index or "16 July 2026" not in readme:
-              raise SystemExit("public update dates are not synchronized")
+          checks = {
+              "bibliography key": ("{" + key + "," in bib),
+              "active-table citation": (active.count(key) == 1),
+              "survey citation": (learning.count(key) == 1),
+              "homepage entry": (index.count('title:"' + title + '"') == 1),
+              "README entry": (readme.count("[" + title + "]") == 1),
+              "homepage count": ('<div class="stat"><b>105</b><span>tracked latest entries</span></div>' in index),
+              "final venue": ("NeurIPS 2024" in readme and "NeurIPS 2024" in index),
+              "public dates": ("16 July 2026" in readme and "16 July 2026" in index),
+              "PDF narrative": ("st-mamba" in pdf_norm and "temporal consistency" in pdf_norm),
+          }
+          failed = [name for name, ok in checks.items() if not ok]
+          if failed:
+              raise SystemExit("failed consistency checks: " + ", ".join(failed))
           print("NeurIPS ST-Mamba NLOS update is mutually consistent.")
           PY
           rm bare_jrnl.txt
