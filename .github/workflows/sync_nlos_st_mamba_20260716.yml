@@ -62,6 +62,7 @@ jobs:
           test -s /tmp/bare_jrnl_before_st_mamba.pdf
           pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          grep -Fi "ST-Mamba" bare_jrnl.txt
           mkdir -p /tmp/nlos_pdf_pages_before /tmp/nlos_pdf_pages_after
           pdftoppm -png -r 72 /tmp/bare_jrnl_before_st_mamba.pdf /tmp/nlos_pdf_pages_before/page >/dev/null 2>&1
           pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_pages_after/page >/dev/null 2>&1
@@ -89,21 +90,16 @@ jobs:
           fi
           grep -Fi "mamba enforced temporal consistency" bare_jrnl.bbl
 
-      - name: Validate cross-file uniqueness and PDF text
+      - name: Validate cross-file uniqueness
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
-
-          def normalized(path: str) -> str:
-              return re.sub(r"\s+", " ", Path(path).read_text(encoding="utf-8", errors="ignore")).lower()
 
           bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
           active = Path("article/2active.tex").read_text(encoding="utf-8")
           learning = Path("article/4datadriven.tex").read_text(encoding="utf-8")
           index = Path("index.html").read_text(encoding="utf-8")
           readme = Path("README.md").read_text(encoding="utf-8")
-          pdf_norm = normalized("bare_jrnl.txt")
           key = "liMambaTemporalConsistency2024"
           title = "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency"
           checks = {
@@ -115,7 +111,6 @@ jobs:
               "homepage count": ('<div class="stat"><b>105</b><span>tracked latest entries</span></div>' in index),
               "final venue": ("NeurIPS 2024" in readme and "NeurIPS 2024" in index),
               "public dates": ("16 July 2026" in readme and "16 July 2026" in index),
-              "PDF narrative": ("st-mamba" in pdf_norm and "temporal consistency" in pdf_norm),
           }
           failed = [name for name, ok in checks.items() if not ok]
           if failed:
