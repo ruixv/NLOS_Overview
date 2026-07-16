@@ -2,6 +2,13 @@ name: Sync NeurIPS under-scanning NLOS update
 
 on:
   push:
+    branches: [master, automation/deep-underscanning-nlos-20260716]
+    paths:
+      - egbib_20260716_deep_underscanning_updates.bib
+      - scripts/sync_nlos_20260716_deep_underscanning.py
+      - updates/2026-07-16-deep-underscanning-citation-tracing.md
+      - .github/workflows/sync_nlos_deep_underscanning_20260716.yml
+  pull_request:
     branches: [master]
     paths:
       - egbib_20260716_deep_underscanning_updates.bib
@@ -15,12 +22,14 @@ permissions:
 jobs:
   sync-build-validate:
     runs-on: ubuntu-latest
+    env:
+      TARGET_BRANCH: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
     steps:
       - name: Check out writable branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: master
+          ref: ${{ env.TARGET_BRANCH }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -104,6 +113,6 @@ jobs:
             exit 0
           fi
           git commit -m "Integrate NeurIPS under-scanning NLOS milestone"
-          git fetch origin master
-          git rebase origin/master
-          git push origin HEAD:master
+          git fetch origin "$TARGET_BRANCH"
+          git rebase "origin/$TARGET_BRANCH"
+          git push origin HEAD:"$TARGET_BRANCH"
