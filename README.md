@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2024 | [Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency](https://doi.org/10.52202/079017-4016) — Li et al. | NeurIPS 2024 | Introduces ST-Mamba, a spatial--temporal state-space architecture for dynamic active NLOS reconstruction; interleaved Mamba blocks model long transient/video dependencies efficiently, while a phasor-field wave-domain loss enforces measurement physics and improves temporal consistency under noise. |
 | 2023 | [Enhancing Non-Line-of-Sight Imaging via Learnable Inverse Kernel and Attention Mechanisms](https://openaccess.thecvf.com/content/ICCV2023/papers/Yu_Enhancing_Non-line-of-sight_Imaging_via_Learnable_Inverse_Kernel_and_Attention_Mechanisms_ICCV_2023_paper.pdf) — Yu et al. | ICCV 2023 | Introduces a system-aware learned inverse kernel tailored to transient NLOS point-spread functions, together with attention mechanisms that refine hidden intensity and depth reconstruction; it forms a direct learned-physics bridge between shared feature embeddings and later transformer/generalizable-prior models. |
 | 2020 | [Learned Feature Embeddings for Non-Line-of-Sight Imaging and Recognition](https://doi.org/10.1145/3414685.3417825) — Chen et al. | ACM TOG / SIGGRAPH Asia 2020 | Introduces a physics-structured learned embedding that maps transient measurements into a shared hidden-scene representation for high-resolution reconstruction, classification, and 2.5D detection; differentiable propagation, visibility, rendering, and depth modules enable synthetic-to-real generalization on measured NLOS scenes. |
 | 2023 | [Deep Non-line-of-sight Imaging from Under-scanning Measurements](https://proceedings.neurips.cc/paper_files/paper/2023/hash/b91cc0a242e6518ee731f74e82b2eebd-Abstract-Conference.html) — Li et al. | NeurIPS 2023 | Introduces the first deep-learning pipeline designed specifically for under-scanned active confocal transients: a transient-recovery network restores a dense measurement grid and a physics-aware volume-reconstruction network recovers hidden 3D geometry; it remains effective at 8×8 scans and reports 50× faster inference than the iterative baseline. |
@@ -213,6 +214,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Choi et al.: self-calibrating differentiable NLOS inverse rendering — jointly optimizes imaging and scene parameters [SIGGRAPH Asia / TOG]
    │     Huang et al.: Omni-LOS — joint LOS/NLOS neural transients for near-360° single-position shape [arXiv]
    │     Royo et al.: virtual mirrors — higher-order phasor transport and two-corner NLOS [SIGGRAPH / TOG]
+   │
+2024 ── Li et al.: ST-Mamba — state-space temporal modeling and phasor-domain wave supervision for consistent dynamic NLOS video [NeurIPS]
    │
 2025 ── Shi et al.: fast configurable transient simulation and an open NLOS benchmark [arXiv]
    │     Liu et al.: geometric constraints on hidden surface normals for fast sparse-transient reconstruction [arXiv]
