@@ -1,0 +1,109 @@
+name: Sync NeurIPS under-scanning NLOS update
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - egbib_20260716_deep_underscanning_updates.bib
+      - scripts/sync_nlos_20260716_deep_underscanning.py
+      - updates/2026-07-16-deep-underscanning-citation-tracing.md
+      - .github/workflows/sync_nlos_deep_underscanning_20260716.yml
+
+permissions:
+  contents: write
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out writable branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Synchronize public sources
+        run: python scripts/sync_nlos_20260716_deep_underscanning.py
+
+      - name: Merge and audit bibliography
+        run: |
+          python -m pip install --disable-pip-version-check bibtexparser==1.4.3
+          python scripts/merge_nlos_bibliography.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean-build survey PDF
+        run: |
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate sources, bibliography, and PDF
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          mkdir -p /tmp/nlos_pdf_pages
+          pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_pages/page >/dev/null 2>&1
+          test "$(find /tmp/nlos_pdf_pages -name 'page-*.png' | wc -l)" -gt 0
+          grep -F "Deep Non-line-of-sight Imaging from Under-scanning Measurements" README.md
+          grep -F "Deep Non-line-of-sight Imaging from Under-scanning Measurements" index.html
+          grep -F "Learning from under-scanned transients" article/4datadriven.tex
+          grep -Fi "Learning from under-scanned transients" bare_jrnl.txt
+          grep -Fi "Deep Non-line-of-Sight Imaging from Under-scanning Measurements" bare_jrnl.bbl
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+            echo "Undefined citations or references detected" >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo "Missing or repeated BibTeX entries detected" >&2
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
+          active = Path("article/2active.tex").read_text(encoding="utf-8")
+          learning = Path("article/4datadriven.tex").read_text(encoding="utf-8")
+          index = Path("index.html").read_text(encoding="utf-8")
+          readme = Path("README.md").read_text(encoding="utf-8")
+          key = "liDeepNLOSUnderscanning2023"
+          title = "Deep Non-line-of-sight Imaging from Under-scanning Measurements"
+          if "{" + key + "," not in bib:
+              raise SystemExit(f"missing bibliography key: {key}")
+          if active.count(key) != 1:
+              raise SystemExit("active-table citation is missing or duplicated")
+          if learning.count(key) != 1:
+              raise SystemExit("survey narrative citation is missing or duplicated")
+          if index.count('title:"' + title + '"') != 1:
+              raise SystemExit("homepage title is missing or duplicated")
+          if readme.count("[" + title + "]") != 1:
+              raise SystemExit("README title is missing or duplicated")
+          if '<div class="stat"><b>102</b><span>tracked latest entries</span></div>' not in index:
+              raise SystemExit("homepage tracked count should be 102")
+          if "16 July 2026" not in index or "16 July 2026" not in readme:
+              raise SystemExit("public update dates are not synchronized")
+          print("NeurIPS under-scanning update is mutually consistent.")
+          PY
+          rm bare_jrnl.txt
+
+      - name: Commit synchronized sources and generated PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex article/4datadriven.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-16-deep-underscanning-citation-tracing.md
+          if git diff --cached --quiet; then
+            echo "Repository already synchronized."
+            exit 0
+          fi
+          git commit -m "Integrate NeurIPS under-scanning NLOS milestone"
+          git fetch origin master
+          git rebase origin/master
+          git push origin HEAD:master
