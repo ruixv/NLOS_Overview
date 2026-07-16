@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2017 | [Fast Back-Projection for Non-Line of Sight Reconstruction](https://doi.org/10.1364/OE.25.011574) — Arellano, Gutierrez, Jarabo | Optics Express 2017 | Recasts classical transient back-projection as GPU voxelization of the ellipsoidal space--time manifolds induced by three-bounce measurements, reducing redundant voxel-wise evaluation and delivering up to three orders of magnitude faster reconstruction with negligible quality loss. |
 | 2024 | [Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency](https://doi.org/10.52202/079017-4016) — Li et al. | NeurIPS 2024 | Introduces ST-Mamba, a spatial--temporal state-space architecture for dynamic active NLOS reconstruction; interleaved Mamba blocks model long transient/video dependencies efficiently, while a phasor-field wave-domain loss enforces measurement physics and improves temporal consistency under noise. |
 | 2023 | [Enhancing Non-Line-of-Sight Imaging via Learnable Inverse Kernel and Attention Mechanisms](https://openaccess.thecvf.com/content/ICCV2023/papers/Yu_Enhancing_Non-line-of-sight_Imaging_via_Learnable_Inverse_Kernel_and_Attention_Mechanisms_ICCV_2023_paper.pdf) — Yu et al. | ICCV 2023 | Introduces a system-aware learned inverse kernel tailored to transient NLOS point-spread functions, together with attention mechanisms that refine hidden intensity and depth reconstruction; it forms a direct learned-physics bridge between shared feature embeddings and later transformer/generalizable-prior models. |
 | 2020 | [Learned Feature Embeddings for Non-Line-of-Sight Imaging and Recognition](https://doi.org/10.1145/3414685.3417825) — Chen et al. | ACM TOG / SIGGRAPH Asia 2020 | Introduces a physics-structured learned embedding that maps transient measurements into a shared hidden-scene representation for high-resolution reconstruction, classification, and 2.5D detection; differentiable propagation, visibility, rendering, and depth modules enable synthetic-to-real generalization on measured NLOS scenes. |
@@ -189,6 +190,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
 2014 ── Heide et al.: Diffuse Mirrors — ToF camera + optimization [SIGGRAPH]
    │
 2015 ── Buttafava et al.: SPAD-based NLOS — more accessible hardware
+   │
+2017 ── Arellano et al.: fast GPU back-projection — ellipsoidal space-time manifold voxelization brings classic transient reconstruction from hours toward seconds [Optics Express]
    │
 2018 ── O'Toole et al.: confocal NLOS + LCT — real-time O(N³logN) [Nature]
    │     Liu et al.: phasor field — NLOS as virtual LOS wave propagation
