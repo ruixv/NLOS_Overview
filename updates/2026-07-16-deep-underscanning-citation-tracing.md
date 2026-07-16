@@ -26,3 +26,5 @@ Exact-title and proceedings-hash searches against the repository found no existi
 - `bare_jrnl.pdf`: clean-build after source synchronization and validate that the title, narrative, and citation appear in the generated survey.
 
 The accompanying marker-based synchronizer and GitHub Actions workflow refuse ambiguous anchors, audit duplicate/missing BibTeX entries, check cross-file uniqueness, and commit the rebuilt PDF only after validation succeeds.
+
+This branch triggers the complete source synchronization, bibliography audit, clean LaTeX build, PDF rendering check, and cross-file consistency test before merge.
