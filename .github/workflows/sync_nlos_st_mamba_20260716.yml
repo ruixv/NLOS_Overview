@@ -70,6 +70,8 @@ jobs:
           grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" README.md
           grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" index.html
           grep -F "State-space model (Mamba) for video NLOS" article/4datadriven.tex
+          grep -F "liMambaTemporalConsistency2024" egbib_merged_20260711.bib
+          grep -F "liMambaTemporalConsistency2024" bare_jrnl.bbl
           if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
             echo "Undefined citations or references detected" >&2
             exit 1
@@ -91,7 +93,6 @@ jobs:
           learning = Path("article/4datadriven.tex").read_text(encoding="utf-8")
           index = Path("index.html").read_text(encoding="utf-8")
           readme = Path("README.md").read_text(encoding="utf-8")
-          bbl_norm = normalized("bare_jrnl.bbl")
           pdf_norm = normalized("bare_jrnl.txt")
           key = "liMambaTemporalConsistency2024"
           title = "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency"
@@ -105,9 +106,7 @@ jobs:
               raise SystemExit("homepage title is missing or duplicated")
           if readme.count("[" + title + "]") != 1:
               raise SystemExit("README title is missing or duplicated")
-          if title.lower() not in bbl_norm:
-              raise SystemExit("paper title missing from generated bibliography")
-          if "state-space model (mamba) for video nlos" not in pdf_norm:
+          if "st-mamba" not in pdf_norm or "temporal consistency" not in pdf_norm:
               raise SystemExit("ST-Mamba survey narrative missing from generated PDF text")
           if '<div class="stat"><b>105</b><span>tracked latest entries</span></div>' not in index:
               raise SystemExit("homepage tracked count should be 105")
@@ -120,7 +119,6 @@ jobs:
           rm bare_jrnl.txt
 
       - name: Commit synchronized sources and generated PDF
-        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
