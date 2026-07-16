@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 36 source files and keeps one highest-priority record for each of 360 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 37 source files and keeps one highest-priority record for each of 360 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 382
-- Case-insensitive duplicate replacements: 22
+- Parsed source records: 383
+- Case-insensitive duplicate replacements: 23
 - Citation-key case normalizations: 82
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -33,6 +33,7 @@ This update generates `egbib_merged_20260711.bib` from 36 source files and keeps
 - `liuFewShotSSCR2022` / `liuFewShotSSCR2022`: `egbib_20260711_sscr_updates.bib` → `egbib_20260715_sparse_sampling_updates.bib`
 - `liDeepUnderscanning2023` / `liDeepUnderscanning2023`: `egbib.bib` → `egbib_20260715_sparse_sampling_updates.bib`
 - `tsaivolumetricalbedosurface2019` / `tsaiVolumetricAlbedoSurface2019`: `egbib.bib` → `egbib_20260715_tsai_surface_updates.bib`
+- `chen_learned_2020` / `chen_learned_2020`: `egbib.bib` → `egbib_20260716_learned_feature_embeddings_updates.bib`
 - `sultanOptimizedSamplingNLOS2025` / `sultanOptimizedSamplingNLOS2025`: `egbib_2026_updates.bib` → `egbib_20260716_optimized_sampling_updates.bib`
 
 ## Citation-key spellings normalized
