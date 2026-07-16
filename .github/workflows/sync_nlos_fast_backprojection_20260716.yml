@@ -1,0 +1,145 @@
+name: Sync fast back-projection NLOS update
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - egbib_20260716_fast_backprojection_updates.bib
+      - scripts/sync_nlos_20260716_fast_backprojection.py
+      - updates/2026-07-16-fast-backprojection-citation-tracing.md
+      - .github/workflows/sync_nlos_fast_backprojection_20260716.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out writable branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Complete pending ST-Mamba synchronization
+        run: python scripts/sync_nlos_20260716_st_mamba.py
+
+      - name: Synchronize fast back-projection milestone
+        run: python scripts/sync_nlos_20260716_fast_backprojection.py
+
+      - name: Merge and audit bibliography
+        run: |
+          python -m pip install --disable-pip-version-check bibtexparser==1.4.3
+          python scripts/merge_nlos_bibliography.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean-build survey PDF
+        run: |
+          cp bare_jrnl.pdf /tmp/bare_jrnl_before_fast_backprojection.pdf
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate public artifacts, bibliography, and PDF
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          test -s /tmp/bare_jrnl_before_fast_backprojection.pdf
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          mkdir -p /tmp/nlos_pdf_pages_before /tmp/nlos_pdf_pages_after
+          pdftoppm -png -r 72 /tmp/bare_jrnl_before_fast_backprojection.pdf /tmp/nlos_pdf_pages_before/page >/dev/null 2>&1
+          pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_pages_after/page >/dev/null 2>&1
+          test "$(find /tmp/nlos_pdf_pages_before -name 'page-*.png' | wc -l)" -gt 0
+          test "$(find /tmp/nlos_pdf_pages_after -name 'page-*.png' | wc -l)" -gt 0
+          grep -F "Fast Back-Projection for Non-Line of Sight Reconstruction" README.md
+          grep -F "Fast Back-Projection for Non-Line of Sight Reconstruction" index.html
+          grep -F "ellipsoidal-manifold voxelization" article/2active.tex
+          grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" README.md
+          grep -F "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency" index.html
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+            echo "Undefined citations or references detected" >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo "Missing or repeated BibTeX entries detected" >&2
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def normalized(path: str) -> str:
+              text = Path(path).read_text(encoding="utf-8", errors="ignore")
+              return re.sub(r"\s+", " ", text).lower()
+
+          readme = Path("README.md").read_text(encoding="utf-8")
+          index = Path("index.html").read_text(encoding="utf-8")
+          active = Path("article/2active.tex").read_text(encoding="utf-8")
+          learning = Path("article/4datadriven.tex").read_text(encoding="utf-8")
+          bib = Path("egbib_merged_20260711.bib").read_text(encoding="utf-8")
+          bbl_norm = normalized("bare_jrnl.bbl")
+          pdf_norm = normalized("bare_jrnl.txt")
+
+          fast_title = "Fast Back-Projection for Non-Line of Sight Reconstruction"
+          fast_key = "arellanoFastBackprojectionNonline2017"
+          st_title = "Toward Dynamic Non-Line-of-Sight Imaging with Mamba Enforced Temporal Consistency"
+          st_key = "liMambaTemporalConsistency2024"
+
+          if readme.count("[" + fast_title + "]") != 1:
+              raise SystemExit("Fast back-projection README entry is missing or duplicated")
+          if index.count('title:"' + fast_title + '"') != 1:
+              raise SystemExit("Fast back-projection homepage entry is missing or duplicated")
+          table = active[:active.index(r"\end{table*}")]
+          if table.count(fast_key) != 1:
+              raise SystemExit("Fast back-projection active-table citation is missing or duplicated")
+          if active.count("ellipsoidal-manifold voxelization") != 1:
+              raise SystemExit("Fast back-projection survey narrative is missing or duplicated")
+          if bib.lower().count("{" + fast_key.lower() + ",") != 1:
+              raise SystemExit("Fast back-projection canonical bibliography entry is missing or duplicated")
+          if "10.1364/oe.25.011574" not in bib.lower():
+              raise SystemExit("Fast back-projection DOI is missing")
+          if fast_title.lower() not in bbl_norm:
+              raise SystemExit("Fast back-projection title is missing from generated bibliography")
+          if "ellipsoidal space--time manifolds" not in active.lower():
+              raise SystemExit("Fast back-projection technical summary is missing")
+          if "ellipsoidal-manifold voxelization" not in pdf_norm:
+              raise SystemExit("Fast back-projection narrative is missing from generated PDF")
+
+          if readme.count("[" + st_title + "]") != 1 or index.count('title:"' + st_title + '"') != 1:
+              raise SystemExit("Pending ST-Mamba public synchronization did not complete")
+          if table.count(st_key) != 1 or learning.count(st_key) < 1:
+              raise SystemExit("ST-Mamba survey citations are incomplete")
+          if "{" + st_key + "," not in bib:
+              raise SystemExit("ST-Mamba bibliography entry is missing")
+          if '<div class="stat"><b>106</b><span>tracked latest entries</span></div>' not in index:
+              raise SystemExit("Homepage tracked count should be 106")
+          if "16 July 2026" not in readme or "16 July 2026" not in index:
+              raise SystemExit("Public update dates are not synchronized")
+          print("Fast back-projection and pending ST-Mamba updates are mutually consistent.")
+          PY
+          rm bare_jrnl.txt
+
+      - name: Commit synchronized sources and generated PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex article/4datadriven.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-16-fast-backprojection-citation-tracing.md updates/2026-07-16-st-mamba-citation-tracing.md
+          if git diff --cached --quiet; then
+            echo "Repository already synchronized."
+            exit 0
+          fi
+          git commit -m "Integrate fast GPU back-projection NLOS milestone"
+          git fetch origin master
+          git rebase origin/master
+          git push origin HEAD:master
