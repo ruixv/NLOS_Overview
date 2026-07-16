@@ -78,6 +78,11 @@ Technically, such unsupervised learning methods~\cite{aittalaComputationalMirror
 
 Recent works have significantly extended this paradigm of combining physical constraints with deep learning.
 
+
+\vspace{0.8mm}
+\noindent \textbf{Learning from under-scanned transients.}
+Dense relay-wall scanning remained a practical acquisition bottleneck even after analytic reconstruction became fast. Li~\etal~introduced the first deep pipeline designed specifically for under-scanning measurements, coupling a transient recovery network that maps sparse scans to a dense measurement grid with a volume reconstruction network that embeds the linear light-path transport operator~\cite{liDeepNLOSUnderscanning2023}. Multi-kernel feature extraction and fusion recover measurement structure, while regularized constraints preserve local detail and suppress oversmoothing. The method remains effective for $8\times8$ confocal scans and reports approximately $50\times$ faster inference than an iterative under-scanning baseline. This work shifts learned active NLOS from post-reconstruction refinement toward joint measurement completion and physics-aware inversion, preceding later signal-superresolution, virtual-scanning, diffusion, and transient-transformer approaches.
+
 \vspace{0.8mm}
 \noindent \textbf{Neural implicit surfaces.}
 Extending the neural transient field (NeTF)~\cite{shenNonlineofsightImagingNeural2021} to surface representations, Fujimura~\etal~proposed NLOS-NeuS~\cite{fujimuraNLOSNeuS2023}, which represents the hidden scene as a neural implicit surface via a signed distance function (SDF). By introducing SDF constraints based on first-returning photon geometry and volume rendering, NLOS-NeuS reconstructs smooth and detailed 3D surfaces without voxel resolution limitations, representing a major step towards high-fidelity 3D NLOS scene understanding.
