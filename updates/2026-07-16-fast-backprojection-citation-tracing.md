@@ -27,13 +27,13 @@ The paper already had an accurate citation key and a brief generic mention in `a
 
 This run adds one canonical correction record in `egbib_20260716_fast_backprojection_updates.bib`, inserts the paper into the public artifacts, expands the back-projection discussion in the semantically appropriate inverse-method section, and regenerates the consolidated bibliography and survey PDF.
 
-The synchronization workflow also completes the already prepared ST-Mamba update, which was present in the LaTeX narrative and update files but had not yet propagated to README, the website explorer/timeline, the active-system table, and the rebuilt PDF.
+The synchronization workflow also verifies the already integrated ST-Mamba update and preserves its consistency across README, the website explorer/timeline, the active-system table, the survey narrative, bibliography, and rebuilt PDF.
 
 ## Verification requirements
 
 The workflow performs the following checks before committing generated artifacts:
 
-1. exactly one README and website explorer entry for each newly synchronized paper;
+1. exactly one README and website explorer entry for each synchronized paper;
 2. final venue, DOI, authors, pages, and citation keys in the merged bibliography;
 3. active-table and semantically placed survey citations;
 4. no undefined citations, missing BibTeX records, or repeated entries;
@@ -41,3 +41,5 @@ The workflow performs the following checks before committing generated artifacts
 6. non-empty PDF, valid page count, text extraction, and full-page rendering;
 7. presence of the new literature-review text in the generated PDF;
 8. mutual consistency among README, `index.html`, survey sources, bibliography, and `bare_jrnl.pdf`.
+
+This rebased branch update triggers the pull-request validation and reproducible PDF rebuild against the latest master snapshot.
