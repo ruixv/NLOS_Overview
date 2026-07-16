@@ -95,8 +95,8 @@ jobs:
               raise SystemExit(f"missing bibliography key: {key}")
           if active.count(key) != 1:
               raise SystemExit("active-table citation is missing or duplicated")
-          if learning.count(key) != 1:
-              raise SystemExit("survey narrative citation is missing or duplicated")
+          if learning.count(key) != 2:
+              raise SystemExit("expected one figure citation and one survey-narrative citation")
           if index.count('title:"' + title + '"') != 1:
               raise SystemExit("homepage title is missing or duplicated")
           if readme.count("[" + title + "]") != 1:
