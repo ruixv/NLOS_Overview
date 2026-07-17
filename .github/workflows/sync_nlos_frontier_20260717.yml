@@ -13,6 +13,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: sync-nlos-frontier-20260717
+  cancel-in-progress: false
+
 jobs:
   sync-build-validate:
     runs-on: ubuntu-latest
@@ -35,6 +39,20 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check bibtexparser==1.4.3
           python scripts/merge_nlos_bibliography.py
+
+      - name: Commit synchronized source artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex article/3passive.tex article/4datadriven.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-17-mdunet-cvpr-venue-patch.md
+          if git diff --cached --quiet; then
+            echo "Source artifacts already synchronized."
+          else
+            git commit -m "Integrate July 2026 NLOS frontier sources"
+            git fetch origin master
+            git rebase origin/master
+            git push origin HEAD:master
+          fi
 
       - name: Install LaTeX and PDF validation tools
         run: |
@@ -150,16 +168,16 @@ jobs:
           PY
           rm bare_jrnl.txt
 
-      - name: Commit synchronized sources and regenerated PDF
+      - name: Commit regenerated PDF
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md index.html article/2active.tex article/3passive.tex article/4datadriven.tex article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-17-mdunet-cvpr-venue-patch.md
+          git add bare_jrnl.pdf
           if git diff --cached --quiet; then
-            echo "Repository already synchronized."
+            echo "Survey PDF already current."
             exit 0
           fi
-          git commit -m "Integrate July 2026 NLOS frontier papers"
+          git commit -m "Rebuild survey for July 2026 NLOS frontier"
           git fetch origin master
           git rebase origin/master
           git push origin HEAD:master
