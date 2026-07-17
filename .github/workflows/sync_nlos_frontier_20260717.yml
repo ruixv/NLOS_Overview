@@ -1,0 +1,165 @@
+name: Sync 17 July 2026 NLOS frontier update
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - egbib_20260717_frontier_updates.bib
+      - scripts/sync_nlos_20260717_frontier.py
+      - updates/2026-07-17-mdunet-cvpr-venue-patch.md
+      - .github/workflows/sync_nlos_frontier_20260717.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out writable branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Synchronize public and survey artifacts
+        run: python scripts/sync_nlos_20260717_frontier.py
+
+      - name: Merge and audit bibliography
+        run: |
+          python -m pip install --disable-pip-version-check bibtexparser==1.4.3
+          python scripts/merge_nlos_bibliography.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean-build survey PDF
+        run: |
+          cp bare_jrnl.pdf /tmp/bare_jrnl_before_20260717.pdf
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate synchronized artifacts
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          test -s /tmp/bare_jrnl_before_20260717.pdf
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          mkdir -p /tmp/nlos_pdf_pages_before /tmp/nlos_pdf_pages_after
+          pdftoppm -png -r 72 /tmp/bare_jrnl_before_20260717.pdf /tmp/nlos_pdf_pages_before/page >/dev/null 2>&1
+          pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_pages_after/page >/dev/null 2>&1
+          test "$(find /tmp/nlos_pdf_pages_before -name 'page-*.png' | wc -l)" -gt 0
+          test "$(find /tmp/nlos_pdf_pages_after -name 'page-*.png' | wc -l)" -gt 0
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+            echo "Undefined citations or references detected" >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo "Missing or repeated BibTeX entries detected" >&2
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def read(path):
+              return Path(path).read_text(encoding="utf-8", errors="ignore")
+
+          def normalized(path):
+              return re.sub(r"\s+", " ", read(path)).lower()
+
+          readme = read("README.md")
+          index = read("index.html")
+          active = read("article/2active.tex")
+          passive = read("article/3passive.tex")
+          learning = read("article/4datadriven.tex")
+          newscenes = read("article/5newscenes.tex")
+          bib = read("egbib_merged_20260711.bib")
+          pdf = normalized("bare_jrnl.txt")
+          bbl = normalized("bare_jrnl.bbl")
+
+          records = [
+              ("MDUNet: Multimodal Decoding UNet for Passive Occluder-Aided Non-line-of-sight 3D Imaging", "rajiMDUNet2026", passive),
+              ("Thermal Non-Line-of-Sight Imaging through Rough Surfaces", "yeThermalNLOSFormer2026", passive),
+              ("Non-line-of-sight imaging via physics-informed cascade learning", "zhaoPICL2026", learning),
+              ("All-day non-line-of-sight imaging based on Si-SPAD and phase-congruency-based structured ε-regularization", "yinAllDayNLOS2026", active),
+          ]
+          for title, key, survey in records:
+              if readme.count("[" + title + "]") != 1:
+                  raise SystemExit(f"README entry missing or duplicated: {title}")
+              if index.count('title:"' + title + '"') != 1:
+                  raise SystemExit(f"Homepage entry missing or duplicated: {title}")
+              if key not in survey:
+                  raise SystemExit(f"Survey citation missing: {key}")
+              if bib.lower().count("{" + key.lower() + ",") != 1:
+                  raise SystemExit(f"Bibliography key missing or duplicated: {key}")
+
+          correction_titles = [
+              "Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling",
+              "Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals",
+              "DENALI: A Dataset Enabling Non-Line-of-Sight Spatial Reasoning with Low-Cost LiDARs",
+          ]
+          for title in correction_titles:
+              if readme.count("[" + title + "]") != 1 or index.count('title:"' + title + '"') != 1:
+                  raise SystemExit(f"Corrected public entry missing or duplicated: {title}")
+
+          if "Nature 2026" not in readme or "CVPR 2026" not in readme:
+              raise SystemExit("Final venue corrections are missing from README")
+          if "somasundaramConsumerLiDAR2026" not in newscenes or "luSeeingThroughBoxes2026" not in newscenes or "behariDENALI2026" not in newscenes:
+              raise SystemExit("Consumer LiDAR / GeRaF / DENALI survey integration is incomplete")
+          if '<div class="stat"><b>110</b><span>tracked latest entries</span></div>' not in index:
+              raise SystemExit("Homepage tracked count should be 110")
+          if "17 July 2026" not in readme or "17 July 2026" not in index:
+              raise SystemExit("Public update dates are not synchronized")
+          if "190+ NLOS papers" not in read("bare_jrnl.tex"):
+              raise SystemExit("Survey paper-count footnote is stale")
+
+          expected_pdf_phrases = [
+              "fully learned multimodal computational periscopy",
+              "thermal nlos through rough relay surfaces",
+              "spad-aware physics-informed cascade learning",
+              "all-day spad nlos imaging",
+              "consumer lidar and low-cost spatial reasoning",
+          ]
+          for phrase in expected_pdf_phrases:
+              if phrase not in pdf:
+                  raise SystemExit(f"Generated PDF is missing: {phrase}")
+
+          expected_bbl_titles = [
+              "mdunet",
+              "thermal non-line-of-sight imaging through rough surfaces",
+              "physics-informed cascade learning",
+              "all-day non-line-of-sight imaging",
+              "imaging hidden objects with consumer lidar",
+              "seeing through boxes",
+              "denali",
+          ]
+          for phrase in expected_bbl_titles:
+              if phrase not in bbl:
+                  raise SystemExit(f"Generated bibliography is missing: {phrase}")
+          print("17 July 2026 NLOS frontier artifacts are mutually consistent.")
+          PY
+          rm bare_jrnl.txt
+
+      - name: Commit synchronized sources and regenerated PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex article/3passive.tex article/4datadriven.tex article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-17-mdunet-cvpr-venue-patch.md
+          if git diff --cached --quiet; then
+            echo "Repository already synchronized."
+            exit 0
+          fi
+          git commit -m "Integrate July 2026 NLOS frontier papers"
+          git fetch origin master
+          git rebase origin/master
+          git push origin HEAD:master
