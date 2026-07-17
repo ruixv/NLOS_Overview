@@ -13,6 +13,7 @@ PASSIVE_10M = "Passive non-line-of-sight imaging at 10 meters"
 HPDI = "Neural Networks Meet Light Transport Physics for Passive Non-Line-of-Sight Imaging Enhancement"
 GEOMETRY_OLD = "Geometric Constrained Non-Line-of-Sight Imaging"
 GEOMETRY = "Geometry-Constrained Non-Line-of-Sight Imaging"
+SUPERFOV = "Super-field-of-view non-line-of-sight imaging via spatial encoding of a translated point spread function"
 
 
 def replace_once(text: str, old: str, new: str, label: str) -> str:
@@ -95,6 +96,10 @@ def update_readme() -> None:
             HPDI,
             f"| 2026 | [{HPDI}](https://doi.org/10.1109/TCI.2026.3653304) — Liang et al. | IEEE TCI 2026 | Introduces HPDI, a dual-path hybrid of a physics-informed coarse-to-fine pathway and a data-driven implicit reconstruction pathway, followed by adaptive fusion. It improves fidelity, generalization, and data efficiency across passive scenes with and without occluders while retaining an interpretable light-transport branch. |",
         ),
+        (
+            SUPERFOV,
+            f"| 2026 | [{SUPERFOV}](https://doi.org/10.1364/PRJ.583728) — Li et al. | Photonics Research 2026 | Translates the transient point-spread function and spatially encodes the corresponding convolution to reconstruct targets outside the physical scan region without additional capture. Simulations cover 9× the detection area, while experiments reconstruct beyond twice the single-axis detection range, equivalent to about 19.6× the original area after translated reconstruction and stitching. |",
+        ),
     ]
     insertion = ""
     for title, row in new_rows:
@@ -110,6 +115,7 @@ def update_readme() -> None:
             "2025 ── Zhou et al.: 10 m passive NLOS — pattern calibration and low-rank background separation move ordinary-camera computational periscopy to long range [Optics Letters]\n"
             "2026 ── Liang et al.: HPDI — physics-informed coarse-to-fine reconstruction fused with an implicit data-driven passive pathway [IEEE TCI]\n"
             "   │     Liu et al.: geometry-constrained NLOS — shape-operator regularization jointly recovers albedo and hidden surface normals [IEEE TVCG]\n"
+            "   │     Li et al.: Super-FoV NLOS — translated-PSF spatial encoding reconstructs beyond the physical relay scan region [Photonics Research]\n"
         )
         text = replace_once(text, marker, "\n" + timeline + "```\n\n---\n\n## Taxonomy", "README timeline ending")
 
@@ -158,10 +164,19 @@ def update_index() -> None:
             "latest passive learning",
             "HPDI adaptively fuses an interpretable physics-informed coarse-to-fine pathway with a data-driven implicit reconstruction pathway for higher-fidelity and more generalizable passive NLOS imaging.",
         ),
+        paper_object(
+            SUPERFOV,
+            "Li et al.",
+            2026,
+            "Photonics Research 2026",
+            "https://doi.org/10.1364/PRJ.583728",
+            "latest active reconstruction",
+            "Translated-PSF spatial encoding shifts the virtual reconstruction region beyond the physical relay scan, enabling efficient multi-target Super-FoV recovery and stitched large-area imaging from one acquisition.",
+        ),
     ]
     inserted = 0
     new_lines = ""
-    for obj, title in zip(objects, (PASSIVE_10M, HPDI)):
+    for obj, title in zip(objects, (PASSIVE_10M, HPDI, SUPERFOV)):
         if f'title:"{title}"' not in text:
             new_lines += obj + "\n"
             inserted += 1
@@ -186,7 +201,7 @@ def update_index() -> None:
         text,
         2026,
         "HPDI adaptively fuses",
-        "HPDI adaptively fuses physics-informed and implicit data-driven passive reconstruction, while geometry-constrained inversion regularizes hidden surface normals with a shape operator.",
+        "HPDI adaptively fuses physics-informed and implicit data-driven passive reconstruction, geometry-constrained inversion regularizes hidden surface normals with a shape operator, and translated-PSF spatial encoding expands transient NLOS beyond the physical detection region.",
     )
     path.write_text(text, encoding="utf-8")
 
@@ -250,6 +265,18 @@ Surface orientation supplies geometric and illumination cues that are discarded 
             paragraph,
             "direct surface-optimization paragraph",
         )
+    if "Super-field-of-view reconstruction by translated PSFs." not in text:
+        paragraph = r"""
+\vspace{0.8mm}
+\noindent \textbf{Super-field-of-view reconstruction by translated PSFs.}
+A finite relay scan conventionally restricts reconstruction to the normal space associated with that detection region. Li~\etal~observed that translating the transient point-spread function equivalently shifts the virtual reconstruction region, and introduced spatial-domain encoding to suppress the circular-convolution artifacts that would otherwise corrupt this extension~\cite{liSuperFoVNLOS2026}. Numerical experiments recover multiple targets over nine times the physical detection area, while measured data reconstruct targets beyond twice the single-axis detection range and support stitched coverage equivalent to approximately $19.6\times$ the original area. This work treats field of view as a computational degree of freedom, complementing sparse scanning and non-planar relay methods without requiring a second acquisition aperture.
+"""
+        text = insert_after_heading_block(
+            text,
+            "Circular confocal acquisition and transient sinograms.",
+            paragraph,
+            "circular confocal paragraph",
+        )
     path.write_text(text, encoding="utf-8")
 
 
@@ -259,7 +286,7 @@ def main() -> None:
     update_passive()
     update_learning()
     update_active()
-    print("Synchronized passive long-range, HPDI, and geometry-constrained NLOS updates.")
+    print("Synchronized passive long-range, HPDI, geometry-constrained, and Super-FoV NLOS updates.")
 
 
 if __name__ == "__main__":
