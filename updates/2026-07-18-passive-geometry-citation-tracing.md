@@ -41,3 +41,7 @@ The guarded synchronizer `scripts/sync_nlos_20260718_passive_geometry.py` perfor
 `egbib_20260718_passive_geometry_updates.bib` provides the canonical metadata. Because dated supplements are merged in filename order, its `liuGeometricConstrainedNLOS2025` record supersedes the earlier arXiv metadata while preserving the citation key already used by the survey.
 
 The associated GitHub Actions workflow runs the guarded edit, regenerates the duplicate-free bibliography, performs a clean LaTeX/BibTeX build, checks citation and bibliography integrity, renders both the previous and updated PDFs, verifies the new review phrases in the generated PDF, and commits the synchronized source artifacts and `bare_jrnl.pdf` only after validation succeeds.
+
+## End-of-run status
+
+At the end of this update run, the verified BibTeX supplement, guarded synchronizer, validation workflow, and this update record were present on `master`, but GitHub Actions had not produced a subsequent source-integration or PDF-rebuild commit. Consequently, `README.md`, `index.html`, the survey sections, the consolidated bibliography, and `bare_jrnl.pdf` must still be treated as pending for this three-record update. No large public-facing file was overwritten blindly, and the PDF is not claimed to have been regenerated.
