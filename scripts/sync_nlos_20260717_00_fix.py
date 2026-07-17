@@ -16,7 +16,14 @@ def repair_latex_escapes(path: Path) -> tuple[int, int]:
 
 
 optics_counts = repair_latex_escapes(root / "sync_nlos_20260717_optics_followup.py")
-stereo_counts = repair_latex_escapes(root / "sync_nlos_20260717_stereo_longrange.py")
+stereo_path = root / "sync_nlos_20260717_stereo_longrange.py"
+stereo_counts = repair_latex_escapes(stereo_path)
+text = stereo_path.read_text(encoding="utf-8")
+text = text.replace(
+    r"\textbf{Model-decomposition reconstruction from sparse transients.}",
+    r"\textbf{Model-decomposition reconstruction from sparse \mbox{transients}.}",
+)
+stereo_path.write_text(text, encoding="utf-8")
 
 frontier = root / "sync_nlos_20260717_frontier.py"
 text = frontier.read_text(encoding="utf-8")
