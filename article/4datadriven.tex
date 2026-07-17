@@ -75,6 +75,18 @@ Chen~\etal~introduced a learned feature-embedding framework that maps transient 
 \vspace{0.8mm}
 \noindent \textbf{Learnable inverse kernels and attention.}
 Yu~\etal~subsequently made the inverse operator itself trainable by introducing a learnable inverse kernel tailored to the transient NLOS point-spread function, together with attention mechanisms for recovering hidden intensity and depth~\cite{yuLearnableInverseKernel2023}. The method remains explicitly tied to the active transient forward model while allowing data-driven adaptation beyond a fixed analytic inverse. In the learned-reconstruction trajectory, it provides an intermediate step between the shared, task-aware feature embeddings of Chen~\etal~and later spatial--temporal transformers or adaptive physical-prior networks: physics determines the operator structure, whereas learned kernels and attention determine how measurement evidence is inverted and emphasized.
+\vspace{0.8mm}
+\noindent \textbf{Learning the light-cone inverse.}
+The original LCT obtains computational efficiency from a closed-form resampling and Wiener-deconvolution pipeline, but fixed low-pass filtering can suppress fine geometry. Gao~\etal~proposed a learned light-cone transform (L2CT) that retains the analytic LCT structure while replacing its frequency response with high-frequency-enhanced learnable Wiener filtering and adding spatiotemporal feature-extraction and volume-projection modules~\cite{gaoLearnedLCT2026}. Its improvement on measurements from different acquisition systems illustrates a useful middle ground between fixed analytic inverses and unconstrained end-to-end networks: the milestone operator remains recognizable, while the poorly conditioned spectral components are learned from data.
+
+\vspace{0.8mm}
+\noindent \textbf{Diffusion-based transient video interpolation.}
+Dynamic NLOS systems face coupled spatial and temporal undersampling before reconstruction begins. Sun~\etal~introduced TransVID, which uses a spatial--temporal attention encoder and latent conditional diffusion to interpolate transient videos jointly across scan position and time~\cite{sunTransVID2026}. The method maps $16\times16$ measurements at 4~fps to $128\times128$ transient videos at 16~fps, providing a measurement-domain complement to ST-Mamba and TransiT: instead of reconstructing hidden video directly from sparse captures, it first synthesizes a dense, high-frame-rate transient sequence that can feed existing physical or learned inverses.
+
+\vspace{0.8mm}
+\noindent \textbf{SPAD-aware physics-informed cascade learning.}
+Zhao~\etal~addressed the coupling between detector noise and ill-posed transient inversion with physics-informed cascade learning (PICL)~\cite{zhaoPICL2026}. A lightweight first network separates SPAD-specific dark-count, timing-jitter, and mixed interference components, after which a second network reconstructs the hidden scene while embedding a differentiable forward model. Because physical measurement consistency supplies self-supervision, PICL avoids dependence on a large paired NLOS dataset and provides a direct bridge from trainable inverse kernels toward hardware-aware, noise-adaptive reconstruction.
+
 Another example of exploiting deep learning to promote the development of NLOS imaging is LiDAR-based imaging~\cite{zhuFastNonlineofsightImaging2021a}.
 For traditional physical models, using commercial LiDAR as the equipment is still a very challenging problem. However, the recent work of Zhu \etal~showed that by performing deep learning to complete feature extraction, LiDAR can be used to complete high-quality and robust 3D NLOS reconstruction\cite{zhuFastNonlineofsightImaging2021a}.
 

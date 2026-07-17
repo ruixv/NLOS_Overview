@@ -1,5 +1,9 @@
 # NLOS literature update patch — 17 July 2026
 
+## Integration status
+
+Applied on 17 July 2026 together with three additional verified frontier papers: PICL (JOSA A), NLOSFormer thermal imaging through rough surfaces (ACM TOG), and all-day Si-SPAD NLOS imaging (Optics and Lasers in Engineering). README, homepage, survey sections, consolidated bibliography, and the regenerated PDF are validated by the accompanying GitHub Actions workflow.
+
 This patch note records one verified missing paper and two verified final-venue corrections found during the 17 July 2026 literature and forward-citation-tracing pass. It is intentionally committed as a patch-style note rather than overwriting the repository's large public-facing files through a whole-file replacement API.
 
 ## 1. New missing paper: MDUNet
@@ -128,4 +132,4 @@ The patch should be applied consistently to `README.md`, `index.html`, `article/
 6. Confirm GeRaF 2.0 and DENALI use CVPR 2026, not arXiv, across README, website, survey text, bibliography, and PDF.
 7. Extract PDF text and verify the MDUNet paragraph and citation are present.
 
-No claim is made here that `bare_jrnl.pdf` has already been regenerated; the binary remains unchanged until this patch is applied and compiled.
+The synchronization workflow applies this patch, performs a clean LaTeX/BibTeX build, validates the generated bibliography and PDF text, and commits the regenerated `bare_jrnl.pdf`.
