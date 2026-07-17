@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Repair legacy synchronizer literals before applying and validating 17 July updates."""
+"""Repair legacy synchronizer literals before validated source and PDF export."""
 from pathlib import Path
 
 root = Path(__file__).resolve().parent
