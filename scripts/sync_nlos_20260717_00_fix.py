@@ -21,7 +21,7 @@ stereo_counts = repair_latex_escapes(stereo_path)
 text = stereo_path.read_text(encoding="utf-8")
 text = text.replace(
     r"\textbf{Model-decomposition reconstruction from sparse transients.}",
-    r"\textbf{Model-decomposition reconstruction from sparse \mbox{transients}.}",
+    r"\textbf{\mbox{Model-decomposition reconstruction} from sparse \mbox{transients}.}",
 )
 stereo_path.write_text(text, encoding="utf-8")
 
