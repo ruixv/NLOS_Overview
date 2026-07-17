@@ -19,10 +19,9 @@ optics_counts = repair_latex_escapes(root / "sync_nlos_20260717_optics_followup.
 stereo_path = root / "sync_nlos_20260717_stereo_longrange.py"
 stereo_counts = repair_latex_escapes(stereo_path)
 text = stereo_path.read_text(encoding="utf-8")
-text = text.replace(
-    r"\\textbf{Model-decomposition reconstruction from sparse transients.}",
-    r"\\textbf{\\mbox{Model-decomposition reconstruction} from sparse \\mbox{transients}.}",
-)
+heading = "Model-decomposition reconstruction from sparse transients."
+count_heading = text.count(heading)
+text = text.replace(heading, r"\\mbox{Model-decomposition reconstruction from sparse transients}.")
 stereo_path.write_text(text, encoding="utf-8")
 
 frontier = root / "sync_nlos_20260717_frontier.py"
@@ -35,5 +34,6 @@ frontier.write_text(text, encoding="utf-8")
 
 print(
     "Repaired legacy synchronizer literals: "
-    f"optics={optics_counts}, stereo={stereo_counts}, passive_table={count_table}."
+    f"optics={optics_counts}, stereo={stereo_counts}, heading={count_heading}, "
+    f"passive_table={count_table}."
 )
