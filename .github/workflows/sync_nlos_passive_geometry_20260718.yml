@@ -108,6 +108,7 @@ jobs:
               ("Passive non-line-of-sight imaging at 10 meters", "zhouPassiveNLOS10m2025", passive),
               ("Neural Networks Meet Light Transport Physics for Passive Non-Line-of-Sight Imaging Enhancement", "liangHPDIPassiveNLOS2026", learning),
               ("Geometry-Constrained Non-Line-of-Sight Imaging", "liuGeometricConstrainedNLOS2025", active),
+              ("Super-field-of-view non-line-of-sight imaging via spatial encoding of a translated point spread function", "liSuperFoVNLOS2026", active),
           ]
           for title, key, section in records:
               if readme.lower().count("[" + title.lower() + "]") != 1:
@@ -143,6 +144,7 @@ jobs:
               "long-range passive nlos under severe background",
               "hybrid physics",
               "geometry-constrained joint normal and albedo reconstruction",
+              "super-field-of-view reconstruction by translated psfs",
           ]
           for phrase in expected_pdf:
               if phrase not in pdf:
@@ -152,6 +154,7 @@ jobs:
               "passive non-line-of-sight imaging at 10 meters",
               "neural networks meet light transport physics",
               "geometry-constrained non-line-of-sight imaging",
+              "super-field-of-view non-line-of-sight imaging",
           ]
           for phrase in expected_bbl:
               if phrase not in bbl:
