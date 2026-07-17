@@ -61,8 +61,10 @@ jobs:
           sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
 
       - name: Clean-build and validate survey
+        id: build
         run: |
           set -euo pipefail
+          exec > >(tee -a /tmp/nlos-build.log) 2>&1
           cp bare_jrnl.pdf /tmp/bare_jrnl_before.pdf
           rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
           latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
@@ -126,6 +128,19 @@ jobs:
           print('NLOS public artifacts, survey sources, bibliography, and PDF are mutually consistent.')
           PY
 
+      - name: Upload LaTeX build diagnostics
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nlos-build-diagnostics
+          path: |
+            /tmp/nlos-build.log
+            bare_jrnl.log
+            bare_jrnl.blg
+            bare_jrnl.bbl
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Commit synchronized sources and regenerated PDF to the PR branch
         if: github.event_name == 'pull_request'
         run: |
@@ -137,4 +152,3 @@ jobs:
           else
             git commit -m 'Synchronize July NLOS literature and rebuild survey'
             git push origin HEAD:${{ github.head_ref }}
-          fi
