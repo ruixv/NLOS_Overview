@@ -135,15 +135,40 @@ jobs:
           name: nlos-build-diagnostics
           path: |
             /tmp/nlos-build.log
+            /tmp/bare_jrnl.txt
             bare_jrnl.log
             bare_jrnl.blg
             bare_jrnl.bbl
           if-no-files-found: warn
           retention-days: 7
 
+      - name: Upload synchronized survey artifacts
+        if: steps.build.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nlos-generated-artifacts
+          path: |
+            README.md
+            index.html
+            article/2active.tex
+            article/3passive.tex
+            article/4datadriven.tex
+            article/5newscenes.tex
+            bare_jrnl.tex
+            egbib_merged_20260711.bib
+            bare_jrnl.pdf
+            updates/2026-07-17-frontier-sync.md
+            updates/2026-07-17-optics-citation-followup.md
+            updates/2026-07-17-stereo-longrange-citation-tracing.md
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Commit synchronized sources and regenerated PDF to the PR branch
+        id: commit
         if: github.event_name == 'pull_request'
         run: |
+          set -o pipefail
+          exec > >(tee -a /tmp/nlos-commit.log) 2>&1
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add README.md index.html article/2active.tex article/3passive.tex article/4datadriven.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates
@@ -151,4 +176,14 @@ jobs:
             echo 'All artifacts already synchronized.'
           else
             git commit -m 'Synchronize July NLOS literature and rebuild survey'
-            git push origin HEAD:${{ github.head_ref }}
+            git push --force-with-lease origin HEAD:${{ github.head_ref }}
+          fi
+
+      - name: Upload branch-update diagnostics
+        if: failure() && steps.commit.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nlos-commit-diagnostics
+          path: /tmp/nlos-commit.log
+          if-no-files-found: error
+          retention-days: 7
