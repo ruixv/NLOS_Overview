@@ -1,6 +1,6 @@
-# 18 July 2026 passive-NLOS and geometry citation-tracing update
+# 18 July 2026 passive-NLOS, geometry, and field-of-view citation-tracing update
 
-This update follows forward citations and direct methodological descendants of computational periscopy, passive light-transport inversion, transient surface optimization, and geometry-aware active NLOS reconstruction. Candidate papers were retained only when the primary task is hidden-scene imaging or reconstruction rather than generic NLOS propagation or localization.
+This update follows forward citations and direct methodological descendants of computational periscopy, passive light-transport inversion, transient surface optimization, geometry-aware active NLOS reconstruction, and confocal convolution methods. Candidate papers were retained only when the primary task is hidden-scene imaging or reconstruction rather than generic NLOS propagation or localization.
 
 ## Newly integrated papers
 
@@ -18,6 +18,13 @@ This update follows forward citations and direct methodological descendants of c
 - DOI: `10.1109/TCI.2026.3653304`
 - Contribution: introduces the HPDI hybrid physics–data framework. A physics-informed coarse-to-fine pathway and a data-driven implicit reconstruction pathway are adaptively fused, improving passive reconstruction fidelity, generalization, interpretability, and data efficiency across settings with and without occluders.
 
+### Super-field-of-view non-line-of-sight imaging via spatial encoding of a translated point spread function
+
+- Authors: Tongyao Li, Yingjie Shi, Jinye Miao, Yi Wei, Lingfeng Liu, Lianfa Bai, Enlai Guo, Jing Han
+- Venue: *Photonics Research* 14(5), 1959–1972 (2026)
+- DOI: `10.1364/PRJ.583728`
+- Contribution: translates the transient point-spread function to shift the virtual reconstruction region and uses spatial encoding to suppress circular-convolution artifacts. Simulations recover multiple targets over nine times the physical detection area; experiments reconstruct beyond twice the single-axis detection range and support stitched coverage equivalent to about 19.6 times the original area from one scan.
+
 ## Final-venue correction and survey completion
 
 ### Geometry-Constrained Non-Line-of-Sight Imaging
@@ -32,11 +39,11 @@ This update follows forward citations and direct methodological descendants of c
 
 The guarded synchronizer `scripts/sync_nlos_20260718_passive_geometry.py` performs idempotent, unique-anchor edits to:
 
-- `README.md`: two new paper rows, the final TVCG venue correction, update date, and timeline entries;
-- `index.html`: two new searchable entries, the corrected geometry record, tracked-entry count, and 2025/2026 timeline context;
+- `README.md`: three new paper rows, the final TVCG venue correction, update date, and timeline entries;
+- `index.html`: three new searchable entries, the corrected geometry record, tracked-entry count, and 2025/2026 timeline context;
 - `article/3passive.tex`: a long-range passive-NLOS literature-review paragraph and table row, plus an HPDI deep-learning table row;
 - `article/4datadriven.tex`: a hybrid physics–data passive reconstruction paragraph;
-- `article/2active.tex`: a geometry-constrained joint normal/albedo paragraph.
+- `article/2active.tex`: geometry-constrained joint normal/albedo and translated-PSF Super-FoV literature-review paragraphs.
 
 `egbib_20260718_passive_geometry_updates.bib` provides the canonical metadata. Because dated supplements are merged in filename order, its `liuGeometricConstrainedNLOS2025` record supersedes the earlier arXiv metadata while preserving the citation key already used by the survey.
 
@@ -44,4 +51,4 @@ The associated GitHub Actions workflow runs the guarded edit, regenerates the du
 
 ## End-of-run status
 
-At the end of this update run, the verified BibTeX supplement, guarded synchronizer, validation workflow, and this update record were present on `master`, but GitHub Actions had not produced a subsequent source-integration or PDF-rebuild commit. Consequently, `README.md`, `index.html`, the survey sections, the consolidated bibliography, and `bare_jrnl.pdf` must still be treated as pending for this three-record update. No large public-facing file was overwritten blindly, and the PDF is not claimed to have been regenerated.
+At the end of this update run, the verified BibTeX supplement, guarded synchronizer, validation workflow, and this update record were present on `master`, but GitHub Actions had not produced a subsequent source-integration or PDF-rebuild commit. Consequently, `README.md`, `index.html`, the survey sections, the consolidated bibliography, and `bare_jrnl.pdf` must still be treated as pending for this four-record update. No large public-facing file was overwritten blindly, and the PDF is not claimed to have been regenerated.
