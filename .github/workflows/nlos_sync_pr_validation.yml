@@ -34,14 +34,26 @@ jobs:
           python-version: '3.12'
 
       - name: Apply guarded literature synchronizers
+        id: synchronize
         run: |
-          set -euo pipefail
+          set -o pipefail
+          : > /tmp/nlos-sync.log
           for f in scripts/sync_nlos_20260717_*.py; do
-            python -m py_compile "$f"
-            python "$f"
+            echo "===== $f =====" | tee -a /tmp/nlos-sync.log
+            python -m py_compile "$f" 2>&1 | tee -a /tmp/nlos-sync.log
+            python "$f" 2>&1 | tee -a /tmp/nlos-sync.log
           done
-          python -m pip install --disable-pip-version-check bibtexparser==1.4.3
-          python scripts/merge_nlos_bibliography.py
+          python -m pip install --disable-pip-version-check bibtexparser==1.4.3 2>&1 | tee -a /tmp/nlos-sync.log
+          python scripts/merge_nlos_bibliography.py 2>&1 | tee -a /tmp/nlos-sync.log
+
+      - name: Upload synchronization diagnostics
+        if: failure() && steps.synchronize.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nlos-sync-diagnostics
+          path: /tmp/nlos-sync.log
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Install LaTeX and PDF validation tools
         run: |
