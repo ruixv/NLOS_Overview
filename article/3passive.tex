@@ -13,6 +13,15 @@ When using ambient light, the hidden scene produces shadows (or speckles) on the
 
 Conventional cameras are the most inexpensive but have at least two limitations among all the cameras discussed in this article. First, the shadow is very sensitive to ambient light intensity, i.e., SNR decreases as the ambient light intensity increases. Second, for broadband illumination, the optical memory effect is no longer valid, due to which the problem is extremely ill-posed and usually requires additional constraints and priors.
 
+\vspace{0.8mm}
+\noindent \textbf{Diffuse-aware attention encoding for passive NLOS.}
+Recent ordinary-camera methods increasingly encode the relay-wall transport structure inside the network rather than relying on a generic image-to-image backbone. Wang~\etal~introduced diffuse-aware attention-enhanced encoding for passive NLOS reconstruction~\cite{wangDiffuseAwarePassive2026}. By explicitly emphasizing features that survive diffuse relay transport, the method represents a further step from early U-Net mappings toward attention mechanisms designed around the conditioning of the passive forward process.
+
+\vspace{0.8mm}
+\noindent \textbf{Thermal NLOS through rough relay surfaces.}
+Thermal cameras remove the need for external illumination by sensing radiation emitted by hidden targets, but rough relay walls strongly mix the measured spatial signal. Ye~\etal~formulated this transport as a convolution and proposed NLOSFormer, which explicitly estimates the corresponding kernel and uses it to guide an end-to-end reconstruction network~\cite{yeThermalNLOSFormer2026}. The accompanying ThermalNLOS dataset and geometry-aware augmentation improve generalization across wall materials. Experiments further demonstrate relative depth estimation and dynamic thermal NLOS reconstruction at 4~fps, extending passive thermal imaging beyond the reflective-surface assumptions of earlier systems.
+
+
 
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Interferometer}
 \subsubsection{Interferometer}
@@ -61,6 +70,7 @@ Passive methods based on speckle coherence have a special imaging model and reco
    \cite{8747343} & Infrared radiation & Infrared camera & Infrared intensity &  Detection/ Tracking/ Identification\\%%%% Table body
    \cite{geng2022passive} & Ambient/incoherent light & Conventional camera & Intensity via optimal transport &  2D reconstruction\\%%%% Table body
    \cite{zhang2025passive} & Ambient light & Conventional camera & Modulated light transport intensity &  2D/3D reconstruction\\%%%% Table body
+    \cite{rajiMDUNet2026} & Ambient light & Conventional camera & Soft-shadow occlusion with coupled learned 2D/3D decoding & Joint 2D radiosity and 3D occluder reconstruction\\%%%% Table body
 
    \hline
    \end{tabular}}{}
@@ -84,6 +94,10 @@ Passive NLOS imaging modelled by Eq.~(\ref{eq2_1}) can be solved as an optimal p
 \end{equation}
 where $\Gamma$ represents regularization terms, such as total variation (TV) or other sparsity constraints. When the position of the partial occlusion $p$ is known, the optical transport matrix $\mathbf{A}$ can be estimated, after which the inverse problem can be solved through Eq.~(\ref{eqK_2}). The results of \cite{saundersComputationalPeriscopyOrdinary2019}, a representative work using TV regularization, are shown in Fig.~\ref{fig:passive}-(b).
 When the partially occluded position $p$ cannot be obtained, the constraints at different times can also be used to estimate the optical transport matrix $\mathbf{A}$ and the corresponding hidden scene $I_{\rho}$. For example, Aittala~\etal~performed matrix decomposition through an unsupervised learning method to complete passive NLOS imaging\cite{aittalaComputationalMirrorsBlind2019}. This is essentially similar similar to blind deconvolution\cite{chanTotalVariationBlind1998,kundurBlindImageDeconvolution1996,levinUnderstandingEvaluatingBlind2009}, as discussed in \cite{yedidiaUsingUnknownOccluders2019}.
+
+\vspace{0.8mm}
+\noindent \textbf{Fully learned multimodal computational periscopy.}
+Recent occluder-aided passive methods recover both the hidden occluding geometry and the radiance distribution of non-occluding content. Raji and Murray-Bruce proposed MDUNet, whose shared encoder and specialized 3D-SDF and 2D-radiosity decoder paths jointly infer these representations from a single soft-shadow photograph~\cite{rajiMDUNet2026}. Compared with the preceding hybrid diffusion and physics pipeline, the fully trained model substantially reduces inference time while transferring from simulation to real measurements under changing ambient illumination, marking a shift toward direct multimodal passive reconstruction.
 
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Polarizer}
 \subsubsection{Polarizer}

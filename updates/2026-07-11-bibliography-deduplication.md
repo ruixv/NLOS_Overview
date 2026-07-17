@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 40 source files and keeps one highest-priority record for each of 361 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 43 source files and keeps one highest-priority record for each of 374 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 386
-- Case-insensitive duplicate replacements: 25
+- Parsed source records: 401
+- Case-insensitive duplicate replacements: 27
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -37,6 +37,8 @@ This update generates `egbib_merged_20260711.bib` from 40 source files and keeps
 - `chen_learned_2020` / `chen_learned_2020`: `egbib.bib` → `egbib_20260716_learned_feature_embeddings_updates.bib`
 - `sultanOptimizedSamplingNLOS2025` / `sultanOptimizedSamplingNLOS2025`: `egbib_2026_updates.bib` → `egbib_20260716_optimized_sampling_updates.bib`
 - `liMambaTemporalConsistency2024` / `liMambaTemporalConsistency2024`: `egbib.bib` → `egbib_20260716_st_mamba_updates.bib`
+- `behariDENALI2026` / `behariDENALI2026`: `egbib_2026_updates.bib` → `egbib_20260717_frontier_updates.bib`
+- `shiFastNLOSTransientSimulation2025` / `shiFastNLOSTransientSimulation2025`: `egbib_20260714_simbenchmark_updates.bib` → `egbib_20260717_optics_followup_updates.bib`
 
 ## Citation-key spellings normalized
 
