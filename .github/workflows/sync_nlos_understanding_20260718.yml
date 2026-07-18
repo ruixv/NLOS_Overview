@@ -1,4 +1,5 @@
 name: Sync 18 July 2026 NLOS understanding update
+# Explicit post-merge trigger for the guarded source and PDF synchronization.
 
 on:
   push:
