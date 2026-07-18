@@ -32,3 +32,5 @@ The synchronizer updates:
 6. Cross-file validation for unique public entries, survey citations, BibTeX records, bibliography output, extracted PDF text, and rendered PDF pages.
 
 The final journal versions are used instead of the earlier conference abstract or arXiv record. The workflow must not claim the PDF is current unless the clean build and consistency checks succeed.
+
+A post-workflow-file push triggers the guarded source integration and PDF validation after all required helper files are present on the default branch.
