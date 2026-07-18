@@ -42,6 +42,7 @@ jobs:
             scripts/prepare_nlos_20260718_geometry_venue.py
             scripts/sync_nlos_20260718_passive_geometry.py
             scripts/sync_nlos_20260718_core_citation.py
+            scripts/finalize_nlos_20260718_public_counts.py
           )
           for f in "${synchronizers[@]}"; do
             test -f "$f"
