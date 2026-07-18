@@ -9,6 +9,7 @@ INDEX = ROOT / "index.html"
 FOLLOWUPS = [
     ROOT / "scripts" / "sync_nlos_20260718_visibility_detection.py",
     ROOT / "scripts" / "sync_nlos_20260718_reconstruction_pose_consistency.py",
+    ROOT / "scripts" / "cleanup_nlos_20260718_timeline_duplicates.py",
 ]
 
 
