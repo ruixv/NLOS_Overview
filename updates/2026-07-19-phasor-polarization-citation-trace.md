@@ -1,6 +1,6 @@
 # 19 July 2026 — phasor-field and polarized-transient citation trace
 
-STATUS: STAGED — source synchronization and PDF rebuild are pending.
+STATUS: SYNCHRONIZED — guarded source integration completed; the PDF is committed only after clean-build validation.
 
 ## Verified additions
 

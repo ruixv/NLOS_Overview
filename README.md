@@ -64,10 +64,12 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 18 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 19 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [Forward and inverse diffraction in phasor fields](https://doi.org/10.1364/OE.553755) - Garcia-Pueyo and Muñoz | Optics Express 2025 | Recasts phasor-field NLOS reconstruction as an inverse-diffraction problem, derives an explicit Inverse Phasor Fields operator, analyzes when the inverse is well posed, and proposes a diffraction-operator rank metric connected to the Rayleigh resolution criterion. |
+| 2024 | [Time-Gated Polarization for Active Non-Line-of-Sight Imaging](https://doi.org/10.1145/3680528.3687575) - Pueyo-Ciutad et al. | SIGGRAPH Asia 2024 | Combines picosecond time-of-flight capture with polarization-aware transport and inversion, using directional information induced by the relay surface to recover hidden features inside the conventional missing cone with fewer relay-wall measurements. |
 | 2026 | [CUDA-accelerated Non-line-of-sight imaging with irregular relay surfaces](https://doi.org/10.1016/j.optlaseng.2025.109591) - Sun et al. | Optics and Lasers in Engineering 2026 | Runs filtered back projection directly on non-planar relay geometry and arbitrary nonuniform source-detector samples, avoiding planarization or resampling; a CUDA implementation provides at least two orders of magnitude acceleration while retaining competitive measured-data reconstruction quality. |
 | 2025 | [Reprojection-Guided Non-Line-of-Sight Imaging Under Irregular Undersampling](https://doi.org/10.1109/JSTSP.2025.3620710) - Cui, Yue, Yang | IEEE JSTSP 2025 | Recovers dense denoised transients from sparse, irregular, or fragmented relay measurements; range-space reprojection supplies physics-grounded guidance that spatio-temporal modulation blocks inject adaptively, improving simulated-to-real and cross-relay generalization. |
 | 2025 | [Looking Around Flatland: End-to-End 2D Real-Time NLOS Imaging](https://doi.org/10.1109/TCI.2025.3536092) - Peña, Gutierrez, Marco | IEEE TCI 2025 | Reformulates transient light transport in self-contained 2D worlds and couples it to phasor-field camera models, enabling end-to-end real-time simulation, progressive reconstruction, and controlled analysis of filtering, reflectance, and geometry at up to five orders of magnitude lower cost than equivalent 3D experiments. |
@@ -263,10 +265,12 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Royo et al.: virtual mirrors — higher-order phasor transport and two-corner NLOS [SIGGRAPH / TOG]
    │
 2024 ── Li et al.: ST-Mamba — state-space temporal modeling and phasor-domain wave supervision for consistent dynamic NLOS video [NeurIPS]
+   │     Pueyo-Ciutad et al.: time-gated polarization — picosecond polarimetric transport reduces the missing cone and recovers directionally ambiguous hidden surfaces [SIGGRAPH Asia]
    │
 2025 ── Shi et al.: fast configurable transient simulation and an open NLOS benchmark [arXiv]
    │     Liu et al.: geometric constraints on hidden surface normals for fast sparse-transient reconstruction [arXiv]
    │     Sultan et al.: optimized NUFFT/SFFT sampling — irregular relay scans and flexible hidden-volume grids at FFT-like cost [arXiv]
+   │     Garcia-Pueyo and Muñoz: inverse phasor fields — diffraction-operator conditioning and a rank-based recoverability metric [Optics Express]
    │
 2026 ── Zhao et al.: PICL — SPAD-aware denoising cascaded with self-supervised differentiable-physics reconstruction [JOSA A]
    │     Ye et al.: NLOSFormer — real-time thermal NLOS through rough surfaces with explicit kernel estimation [ACM TOG]
@@ -318,6 +322,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    |     Reprojection-guided transient recovery advances learned NLOS from fixed sparse grids to fragmented and irregular relay sampling [IEEE JSTSP]
    |     Flatland provides a real-time 2D transient-and-phasor testbed for controlled end-to-end NLOS analysis [IEEE TCI]
    |     18 July 2026 irregular-relay citation trace: three final-venue records integrated across public, survey, bibliography, and build artifacts
+   |     19 July 2026 phasor/polarization citation trace: inverse-diffraction conditioning and time-gated polarimetric recovery integrated across public, survey, bibliography, and build artifacts
    |     18 July 2026 core-citation tracing: forward-citation and modality-expansion audit completed
 ```
 
