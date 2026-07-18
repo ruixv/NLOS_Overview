@@ -1,0 +1,117 @@
+name: Correct Flatland hardware-table categorization
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - scripts/fix_flatland_hardware_table_20260718.py
+      - .github/workflows/fix_flatland_hardware_table_20260718.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-nlos-irregular-relay-flatland-20260718
+  cancel-in-progress: false
+
+jobs:
+  correct-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out writable branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Correct hardware-table categorization
+        run: python scripts/fix_flatland_hardware_table_20260718.py
+
+      - name: Commit corrected source artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add article/2active.tex updates/2026-07-18-irregular-relay-flatland-citation-trace.md
+          if git diff --cached --quiet; then
+            echo "Categorization already correct."
+          else
+            git commit -m "Correct Flatland hardware-table categorization"
+            git fetch origin master
+            git rebase origin/master
+            git push origin HEAD:master
+          fi
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean-build survey PDF
+        run: |
+          cp bare_jrnl.pdf /tmp/bare_jrnl_before_flatland_correction.pdf
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate corrected survey
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          mkdir -p /tmp/nlos_pdf_flatland_before /tmp/nlos_pdf_flatland_after
+          pdftoppm -png -r 72 /tmp/bare_jrnl_before_flatland_correction.pdf /tmp/nlos_pdf_flatland_before/page >/dev/null 2>&1
+          pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_flatland_after/page >/dev/null 2>&1
+          test "$(find /tmp/nlos_pdf_flatland_before -name 'page-*.png' | wc -l)" -gt 0
+          test "$(find /tmp/nlos_pdf_flatland_after -name 'page-*.png' | wc -l)" -gt 0
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+            echo "Undefined citations or references detected" >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo "Missing or repeated BibTeX entries detected" >&2
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          active = Path("article/2active.tex").read_text(encoding="utf-8")
+          table = active.split("\\end{table*}", 1)[0]
+          if "sunCUDAIrregularRelayNLOS2026" not in table:
+              raise SystemExit("CUDA irregular-relay paper is missing from the active-SPAD hardware table")
+          if "penaFlatlandNLOS2025" in table:
+              raise SystemExit("Flatland was incorrectly retained in the hardware-specific active-SPAD table")
+          if active.count("penaFlatlandNLOS2025") != 1:
+              raise SystemExit("Flatland should appear exactly once in the active review text")
+
+          pdf = re.sub(r"\s+", " ", Path("bare_jrnl.txt").read_text(encoding="utf-8", errors="ignore")).lower()
+          for phrase in [
+              "direct arbitrary-relay back projection on gpus",
+              "real-time two-dimensional transient testbeds",
+              "reprojection-guided recovery from irregular relay samples",
+          ]:
+              if phrase not in pdf:
+                  raise SystemExit(f"Generated PDF is missing: {phrase}")
+          print("Flatland categorization and rebuilt PDF are consistent.")
+          PY
+          rm bare_jrnl.txt
+
+      - name: Commit regenerated PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bare_jrnl.pdf
+          if git diff --cached --quiet; then
+            echo "Survey PDF already current."
+            exit 0
+          fi
+          git commit -m "Rebuild survey after Flatland categorization correction"
+          git fetch origin master
+          git rebase origin/master
+          git push origin HEAD:master
