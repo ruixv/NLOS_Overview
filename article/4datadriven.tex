@@ -87,6 +87,10 @@ Dynamic NLOS systems face coupled spatial and temporal undersampling before reco
 \noindent \textbf{SPAD-aware physics-informed cascade learning.}
 Zhao~\etal~addressed the coupling between detector noise and ill-posed transient inversion with physics-informed cascade learning (PICL)~\cite{zhaoPICL2026}. A lightweight first network separates SPAD-specific dark-count, timing-jitter, and mixed interference components, after which a second network reconstructs the hidden scene while embedding a differentiable forward model. Because physical measurement consistency supplies self-supervision, PICL avoids dependence on a large paired NLOS dataset and provides a direct bridge from trainable inverse kernels toward hardware-aware, noise-adaptive reconstruction.
 
+\vspace{0.8mm}
+\noindent \textbf{Hybrid physics--data passive enhancement.}
+Purely data-driven passive reconstruction can be difficult to interpret and generalize, whereas a fixed light-transport inverse may preserve physics but lose perceptual detail. Liang~\etal~proposed HPDI, a dual-path architecture that combines a physics-informed coarse-to-fine pathway with a data-driven implicit reconstruction pathway and learns an adaptive fusion of their outputs~\cite{liangHPDIPassiveNLOS2026}. Evaluation across passive datasets with and without explicit occluders shows how a recognizable transport model and scene-specific statistical priors can be complementary rather than competing constraints. This hybrid design extends computational periscopy and blind transport factorization toward trainable passive solvers with improved fidelity, generalization, and data efficiency.
+
 Another example of exploiting deep learning to promote the development of NLOS imaging is LiDAR-based imaging~\cite{zhuFastNonlineofsightImaging2021a}.
 For traditional physical models, using commercial LiDAR as the equipment is still a very challenging problem. However, the recent work of Zhu \etal~showed that by performing deep learning to complete feature extraction, LiDAR can be used to complete high-quality and robust 3D NLOS reconstruction\cite{zhuFastNonlineofsightImaging2021a}.
 
@@ -112,6 +116,10 @@ Sun~\etal~introduced a framework with learnable physical priors~\cite{sunGeneral
 \vspace{0.8mm}
 \noindent \textbf{Diffusion model priors.}
 Su~\etal~proposed a model-guided iterative diffusion sampling approach for NLOS reconstruction~\cite{suModelGuidedDiffusion2024}, where the physical forward model of NLOS imaging guides the diffusion sampling process to generate reconstructions that satisfy measurement constraints while leveraging the strong generative prior of a pre-trained diffusion model. This approach achieves state-of-the-art NLOS reconstruction quality, demonstrating that diffusion models are a powerful new tool for solving the NLOS inverse problem.
+
+\vspace{0.8mm}
+\noindent \textbf{Diffusion-prior Fourier single-pixel imaging.}
+Fu~\etal~combined Fourier single-pixel acquisition with a generative diffusion prior for hidden imaging under severe scattering and extreme undersampling~\cite{fuFourierSinglePixelDiffusion2026}. Measured low-frequency Fourier coefficients remain enforced as a data-consistency constraint during iterative denoising, while the learned prior supplies the missing high-frequency structure. Experiments through multiple paper layers at sampling rates down to 3\% illustrate a distinct diffusion trajectory from transient-volume reconstruction: the generative prior operates directly on compressed single-pixel spectral measurements.
 
 \vspace{0.8mm}
 \noindent \textbf{Plug-and-Play for dynamic NLOS.}

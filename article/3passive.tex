@@ -18,6 +18,14 @@ Conventional cameras are the most inexpensive but have at least two limitations 
 Recent ordinary-camera methods increasingly encode the relay-wall transport structure inside the network rather than relying on a generic image-to-image backbone. Wang~\etal~introduced diffuse-aware attention-enhanced encoding for passive NLOS reconstruction~\cite{wangDiffuseAwarePassive2026}. By explicitly emphasizing features that survive diffuse relay transport, the method represents a further step from early U-Net mappings toward attention mechanisms designed around the conditioning of the passive forward process.
 
 \vspace{0.8mm}
+\noindent \textbf{Long-range passive NLOS under severe background.}
+The practical range of ordinary-camera passive NLOS is commonly limited by geometric attenuation and ambient illumination. Zhou~\etal~combined pattern-based calibration with low-rank matrix decomposition to enhance the wall-encoded indirect component and separate slowly varying background contributions~\cite{zhouPassiveNLOS10m2025}. Their experiment placed the camera 10~m from the relay wall and the hidden object 4.5~m from the wall, retaining centimeter-scale resolution at an SBR as low as $-13$~dB. This result extends the computational-periscopy trajectory from laboratory-scale conditioning improvements toward long-range passive sensing with inexpensive hardware.
+
+\vspace{0.8mm}
+\noindent \textbf{Structure-guided adaptive total variation.}
+A fixed TV weight cannot simultaneously preserve weak boundaries and suppress spatially varying passive-NLOS noise across different scenes. Zhang~\etal~derive a guidance map from a preliminary reconstruction and use it to assign spatially varying regularization strengths~\cite{zhangStructureGuidedATV2026}. The resulting parameter-free SG-ATV solver removes manual tuning while retaining the conventional-camera light-transport model, showing how classical computational periscopy can remain competitive through scene-adaptive optimization rather than learned priors alone.
+
+\vspace{0.8mm}
 \noindent \textbf{Thermal NLOS through rough relay surfaces.}
 Thermal cameras remove the need for external illumination by sensing radiation emitted by hidden targets, but rough relay walls strongly mix the measured spatial signal. Ye~\etal~formulated this transport as a convolution and proposed NLOSFormer, which explicitly estimates the corresponding kernel and uses it to guide an end-to-end reconstruction network~\cite{yeThermalNLOSFormer2026}. The accompanying ThermalNLOS dataset and geometry-aware augmentation improve generalization across wall materials. Experiments further demonstrate relative depth estimation and dynamic thermal NLOS reconstruction at 4~fps, extending passive thermal imaging beyond the reflective-surface assumptions of earlier systems.
 
@@ -70,6 +78,9 @@ Passive methods based on speckle coherence have a special imaging model and reco
    \cite{8747343} & Infrared radiation & Infrared camera & Infrared intensity &  Detection/ Tracking/ Identification\\%%%% Table body
    \cite{geng2022passive} & Ambient/incoherent light & Conventional camera & Intensity via optimal transport &  2D reconstruction\\%%%% Table body
    \cite{zhang2025passive} & Ambient light & Conventional camera & Modulated light transport intensity &  2D/3D reconstruction\\%%%% Table body
+    \cite{zhouPassiveNLOS10m2025} & Ambient light & Conventional camera & Pattern calibration and low-rank background separation & Long-range 2D reconstruction\\%%%% Table body
+    \cite{zhangStructureGuidedATV2026} & Ambient light & Conventional color camera & Intensity with structure-guided adaptive TV & Parameter-free 2D reconstruction\\%%%% Table body
+    \cite{chenMultipleObjectPassiveNLOS2026} & Infrared radiation & Infrared camera & Learned multi-attention transport features & Multiple-object 2D reconstruction\\%%%% Table body
     \cite{rajiMDUNet2026} & Ambient light & Conventional camera & Soft-shadow occlusion with coupled learned 2D/3D decoding & Joint 2D radiosity and 3D occluder reconstruction\\%%%% Table body
 
    \hline
@@ -98,6 +109,10 @@ When the partially occluded position $p$ cannot be obtained, the constraints at 
 \vspace{0.8mm}
 \noindent \textbf{Fully learned multimodal computational periscopy.}
 Recent occluder-aided passive methods recover both the hidden occluding geometry and the radiance distribution of non-occluding content. Raji and Murray-Bruce proposed MDUNet, whose shared encoder and specialized 3D-SDF and 2D-radiosity decoder paths jointly infer these representations from a single soft-shadow photograph~\cite{rajiMDUNet2026}. Compared with the preceding hybrid diffusion and physics pipeline, the fully trained model substantially reduces inference time while transferring from simulation to real measurements under changing ambient illumination, marking a shift toward direct multimodal passive reconstruction.
+
+\vspace{0.8mm}
+\noindent \textbf{Multi-object passive reconstruction.}
+Most learned passive systems are trained and evaluated with one dominant hidden target. Chen~\etal~introduced a nested U-Net multi-attention architecture for infrared scenes containing one to three hidden objects~\cite{chenMultipleObjectPassiveNLOS2026}. Channel, spatial, and self-attention emphasize complementary transport features, while multiple decoder branches and joint supervision stabilize reconstruction at different semantic scales. The work broadens passive deep reconstruction from isolated silhouettes toward scenes with variable object count and mutual signal mixing.
 
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Polarizer}
 \subsubsection{Polarizer}
@@ -179,6 +194,8 @@ Adding constraints is an effective way to improve the condition. When the additi
    \cite{chen_learned_2020} & Learned feature embeddings & Transient images & 3D reconstruction &  Pulsed laser + SPAD like \cite{otooleConfocalNonlineofsightImaging2018} & Synthetic data\\%%%%
    \cite{zhuFastNonlineofsightImaging2021a} & Learned feature embeddings & Depth and intensity images & 3D reconstruction &  Commercial LiDAR & Synthetic data\\%%%%
    \cite{isogawaOpticalNonLineofSightPhysicsBased2020} & Physics-based deepRL framework & Transient images & Pose estimation &  Pulsed laser + SPAD like \cite{otooleConfocalNonlineofsightImaging2018} & Synthetic data\\ %%%%
+    \cite{liangHPDIPassiveNLOS2026} & Hybrid physics--data dual path & Scattering image & 2D image & Ambient-light passive NLOS with or without an occluder & Synthetic and experimental data\\%%%%
+    \cite{chenMultipleObjectPassiveNLOS2026} & End-to-End: nested U-Net with multi-attention & Infrared scattering image & Multiple hidden-object image & Passive infrared NLOS with variable object count & Experimental and synthetic data\\ %%%%
    \cite{du2025passive} & End-to-End: Parallel Encoder & Scattering image & 2D Image &  Ambient light + conventional camera & Synthetic data\\ %%%%
    \cite{wang2025nlos} & End-to-End: Alternate R\&R & Scattering image & 2D reconstruction + recognition &  Ambient light + conventional camera & Synthetic data\\ %%%%
 
