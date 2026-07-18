@@ -45,3 +45,5 @@ The guarded synchronizer updates:
 6. `bare_jrnl.pdf` through a clean LaTeX/BibTeX build and PDF text/render validation.
 
 The workflow rejects missing or duplicated public entries, undefined citations, repeated or absent BibTeX records, stale homepage counts, and PDFs that do not contain the newly integrated review text.
+
+A pull-request event is used for the final guarded execution so that workflow status and failure diagnostics remain inspectable before the trigger-only branch is closed.
