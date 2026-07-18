@@ -36,15 +36,20 @@ jobs:
       - name: Apply guarded literature synchronizers
         id: synchronize
         run: |
-          set -o pipefail
-          : > /tmp/nlos-sync.log
-          for f in scripts/sync_nlos_20260717_*.py; do
-            echo "===== $f =====" | tee -a /tmp/nlos-sync.log
-            python -m py_compile "$f" 2>&1 | tee -a /tmp/nlos-sync.log
-            python "$f" 2>&1 | tee -a /tmp/nlos-sync.log
+          set -euo pipefail
+          exec > >(tee -a /tmp/nlos-sync.log) 2>&1
+          synchronizers=(
+            scripts/sync_nlos_20260718_passive_geometry.py
+            scripts/sync_nlos_20260718_core_citation.py
+          )
+          for f in "${synchronizers[@]}"; do
+            test -f "$f"
+            echo "===== $f ====="
+            python -m py_compile "$f"
+            python "$f"
           done
-          python -m pip install --disable-pip-version-check bibtexparser==1.4.3 2>&1 | tee -a /tmp/nlos-sync.log
-          python scripts/merge_nlos_bibliography.py 2>&1 | tee -a /tmp/nlos-sync.log
+          python -m pip install --disable-pip-version-check bibtexparser==1.4.3
+          python scripts/merge_nlos_bibliography.py
 
       - name: Upload synchronization diagnostics
         if: failure() && steps.synchronize.outcome == 'failure'
@@ -77,36 +82,49 @@ jobs:
           pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_after/page >/dev/null 2>&1
           test "$(find /tmp/nlos_pdf_before -name 'page-*.png' | wc -l)" -gt 0
           test "$(find /tmp/nlos_pdf_after -name 'page-*.png' | wc -l)" -gt 0
-          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then exit 1; fi
-          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then exit 1; fi
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+            echo 'Undefined citations or references detected' >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo 'Missing or repeated BibTeX entries detected' >&2
+            exit 1
+          fi
           python - <<'PY'
           from pathlib import Path
           import re
 
+          def read(path):
+              return Path(path).read_text(encoding='utf-8', errors='ignore')
+
           files = {
-              'readme': Path('README.md').read_text(encoding='utf-8'),
-              'index': Path('index.html').read_text(encoding='utf-8'),
-              'active': Path('article/2active.tex').read_text(encoding='utf-8'),
-              'passive': Path('article/3passive.tex').read_text(encoding='utf-8'),
-              'learning': Path('article/4datadriven.tex').read_text(encoding='utf-8'),
-              'new': Path('article/5newscenes.tex').read_text(encoding='utf-8'),
-              'bib': Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'),
-              'pdf': Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore'),
+              'readme': read('README.md'),
+              'index': read('index.html'),
+              'active': read('article/2active.tex'),
+              'passive': read('article/3passive.tex'),
+              'learning': read('article/4datadriven.tex'),
+              'new': read('article/5newscenes.tex'),
+              'main': read('bare_jrnl.tex'),
+              'bib': read('egbib_merged_20260711.bib'),
+              'bbl': read('bare_jrnl.bbl'),
+              'pdf': read('/tmp/bare_jrnl.txt'),
           }
+          source = '\n'.join(files[k] for k in ('active', 'passive', 'learning', 'new'))
           records = [
-              ('MDUNet: Multimodal Decoding UNet for Passive Occluder-Aided Non-line-of-sight 3D Imaging', 'rajiMDUNet2026'),
-              ('Thermal Non-Line-of-Sight Imaging through Rough Surfaces', 'yeThermalNLOSFormer2026'),
-              ('Non-line-of-sight imaging via physics-informed cascade learning', 'zhaoPICL2026'),
-              ('All-day non-line-of-sight imaging based on Si-SPAD and phase-congruency-based structured ε-regularization', 'yinAllDayNLOS2026'),
-              ('Passive non-line-of-sight imaging with diffuse-aware attention-enhanced encoding', 'wangDiffuseAwarePassive2026'),
-              ('Learned light-cone transform for fast and accurate non-line-of-sight imaging', 'gaoLearnedLCT2026'),
-              ('Transient video interpolation for dynamic non-line-of-sight imaging', 'sunTransVID2026'),
-              ('Multi-surface sub-resolution non-line-of-sight imaging via transient waveform deposition', 'weiMultiSurfaceNLOS2025'),
-              ('Stereo non-line-of-sight imaging', 'luesiaStereoNLOS2026'),
-              ('Compact non-line-of-sight imager at long range', 'zengCompactLongRangeNLOS2026'),
-              ('A model decomposition method for the real-time non-line-of-sight imaging', 'yangModelDecompositionNLOS2026'),
+              ('Passive non-line-of-sight imaging at 10 meters', 'zhouPassiveNLOS10m2025'),
+              ('Neural Networks Meet Light Transport Physics for Passive Non-Line-of-Sight Imaging Enhancement', 'liangHPDIPassiveNLOS2026'),
+              ('Super-field-of-view non-line-of-sight imaging via spatial encoding of a translated point spread function', 'liSuperFoVNLOS2026'),
+              ('Geometry-Constrained Non-Line-of-Sight Imaging', 'liuGeometricConstrainedNLOS2025'),
+              ('Adaptive Spiral Scanning for Confocal Non-Line-of-Sight Imaging', 'oyamaAdaptiveSpiralNLOS2026'),
+              ('Submillimeter non-line-of-sight ranging and imaging via cost-effective FMCW interferometry', 'liangFMCWNLOS2026'),
+              ('Breaking the speed-resolution trade-off in 3.3-km non-line-of-sight imaging using scanning-free laser reflective tomography', 'wangLaserReflectiveTomography2026'),
+              ('Non-confocal non-line-of-sight imaging using frequency-domain phase compensation with the reference function', 'yuNonconfocalPhaseCompensation2026'),
+              ('Structure-guided adaptive total variation for parameter-free passive non-line-of-sight imaging', 'zhangStructureGuidedATV2026'),
+              ('Non-Line-of-Sight Imaging via Sparse Bayesian Learning Deconvolution', 'tianSparseBayesianNLOS2026'),
+              ('Non-Line-of-Sight Single-Pixel Imaging Using Polarization Speckle Modulation', 'zhouPolarizationSpeckleNLOS2026'),
+              ('High-resolution Fourier single-pixel non-line-of-sight imaging employing diffusion model', 'fuFourierSinglePixelDiffusion2026'),
+              ('Multiple-object passive non-line-of-sight imaging', 'chenMultipleObjectPassiveNLOS2026'),
           ]
-          source = '\n'.join(files[k] for k in ('active','passive','learning','new'))
           for title, key in records:
               if files['readme'].lower().count('[' + title.lower() + ']') != 1:
                   raise SystemExit(f'README entry missing or duplicated: {title}')
@@ -116,16 +134,50 @@ jobs:
                   raise SystemExit(f'Survey citation missing: {key}')
               if files['bib'].lower().count('{' + key.lower() + ',') != 1:
                   raise SystemExit(f'Bibliography key missing or duplicated: {key}')
-          if '<div class="stat"><b>117</b><span>tracked latest entries</span></div>' not in files['index']:
-              raise SystemExit('Homepage tracked count should be 117')
-          for phrase in (
-              'stereo relay-wall acquisition',
-              'compact kilometer-range nlos imaging',
-              'model-decomposition reconstruction from sparse transients',
-          ):
-              if phrase not in re.sub(r'\s+', ' ', files['pdf']).lower():
+
+          displayed = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', files['index'])
+          if not displayed:
+              raise SystemExit('Homepage tracked-count stat is missing')
+          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', files['index'], flags=re.MULTILINE))
+          if int(displayed.group(1)) != paper_count:
+              raise SystemExit(f'Homepage count mismatch: stat={displayed.group(1)}, objects={paper_count}')
+
+          if '18 July 2026' not in files['readme'] or '18 July 2026' not in files['index']:
+              raise SystemExit('Public update dates are not synchronized')
+          if 'advances from 2022 through 18 July 2026' not in files['main']:
+              raise SystemExit('Survey update horizon is not explicit')
+
+          geometry_lines = [line for line in files['readme'].splitlines() if '[Geometry-Constrained Non-Line-of-Sight Imaging]' in line]
+          if len(geometry_lines) != 1 or '10.1109/TVCG.2026.3684832' not in geometry_lines[0]:
+              raise SystemExit('Final geometry-constrained venue metadata is missing')
+          if '[Geometric Constrained Non-Line-of-Sight Imaging]' in files['readme']:
+              raise SystemExit('Preliminary geometry-constrained title remains public')
+
+          normalized_pdf = re.sub(r'\s+', ' ', files['pdf']).lower()
+          expected_pdf = [
+              'adaptive spiral relay-wall sampling',
+              'cost-effective fmcw interferometry',
+              'scanning-free laser reflective tomography',
+              'reference-function phase compensation',
+              'sparse bayesian transient restoration',
+              'structure-guided adaptive total variation',
+              'polarization-speckle single-pixel imaging',
+              'diffusion-prior fourier single-pixel imaging',
+              'multi-object passive reconstruction',
+          ]
+          for phrase in expected_pdf:
+              if phrase not in normalized_pdf:
                   raise SystemExit(f'Generated PDF is missing: {phrase}')
-          print('NLOS public artifacts, survey sources, bibliography, and PDF are mutually consistent.')
+
+          normalized_bbl = re.sub(r'[^a-z0-9]+', ' ', re.sub(r'\s+', ' ', files['bbl']).lower())
+          for title, _ in records:
+              compact = re.sub(r'[^a-z0-9]+', ' ', title.lower()).strip()
+              words = compact.split()
+              probe = ' '.join(words[: min(6, len(words))])
+              if probe not in normalized_bbl:
+                  raise SystemExit(f'Generated bibliography is missing: {title}')
+
+          print('18 July 2026 README, homepage, survey sources, bibliography, and regenerated PDF are mutually consistent.')
           PY
 
       - name: Upload LaTeX build diagnostics
@@ -157,9 +209,8 @@ jobs:
             bare_jrnl.tex
             egbib_merged_20260711.bib
             bare_jrnl.pdf
-            updates/2026-07-17-frontier-sync.md
-            updates/2026-07-17-optics-citation-followup.md
-            updates/2026-07-17-stereo-longrange-citation-tracing.md
+            updates/2026-07-18-passive-geometry-citation-tracing.md
+            updates/2026-07-18-core-citation-and-modality-update.md
           if-no-files-found: error
           retention-days: 7
 
@@ -167,7 +218,7 @@ jobs:
         id: commit
         if: github.event_name == 'pull_request'
         run: |
-          set -o pipefail
+          set -euo pipefail
           exec > >(tee -a /tmp/nlos-commit.log) 2>&1
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -175,7 +226,7 @@ jobs:
           if git diff --cached --quiet; then
             echo 'All artifacts already synchronized.'
           else
-            git commit -m 'Synchronize July NLOS literature and rebuild survey'
+            git commit -m 'Synchronize 18 July NLOS literature and rebuild survey'
             git push --force-with-lease origin HEAD:${{ github.head_ref }}
           fi
 
