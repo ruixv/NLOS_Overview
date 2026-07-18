@@ -1,9 +1,15 @@
 name: Sync 18 July 2026 NLOS understanding update
-# Explicit post-merge trigger for the guarded source and PDF synchronization.
-# This workflow revision is merged through a PR so the workflow already exists on the default branch when the push event is received.
+# Guarded source, bibliography, LaTeX, PDF, and cross-artifact synchronization.
 
 on:
   push:
+    branches: [master]
+    paths:
+      - egbib_20260718_nlos_understanding_updates.bib
+      - scripts/sync_nlos_20260718_understanding.py
+      - updates/2026-07-18-nlos-understanding-citation-trace.md
+      - .github/workflows/sync_nlos_understanding_20260718.yml
+  pull_request:
     branches: [master]
     paths:
       - egbib_20260718_nlos_understanding_updates.bib
