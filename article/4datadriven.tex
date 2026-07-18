@@ -161,6 +161,11 @@ Complementing physically complete transient renderers with a benchmark-oriented 
     \label{fig:newNLOS}
 \end{figure*}
 
+
+\vspace{0.8mm}
+\noindent \textbf{Differentiable transient simulation infrastructure.}
+Royo~\etal~released \textit{mitransient}, an extension of Mitsuba~3 for CPU/GPU time-resolved light transport~\cite{royoMitransient2025}. The toolkit supports realistic materials and participating media, transient polarization tracking, differentiable rendering, NLOS scene construction, and capture-noise simulation. It complements task-specific synthetic datasets by providing a reusable forward-model layer for testing acquisition designs, generating training data, and optimizing transient inverse problems under a consistent physically based renderer.
+
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Network Architecture}
 \subsubsection{Network Architecture}
 According to Sec. IV~\ref{endToEnd} and \ref{combined}, most NLOS imaging networks currently use the classic network structure (or with tiny changes), such as U-Net~\cite{ronnebergerUnetConvolutionalNetworks2015a} and ResNet~\cite{heDeepResidualLearning2016a}. However, these well-known network structures are not necessarily suitable for NLOS imaging. Compared with recent works in other inverse problems, such as low-light image recovery~\cite{liu_pd-gan_2021} and image deblurring~\cite{rozumnyi_defmo_2020}, networks designed for specific tasks achieve better results. Therefore, it can be expected that in the future, more novel network architectures based on the characteristics of NLOS imaging(e.g., \cite{chen_learned_2020}) will be proposed to improve the performance of NLOS imaging.
