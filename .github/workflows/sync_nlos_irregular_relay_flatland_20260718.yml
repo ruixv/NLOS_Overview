@@ -1,4 +1,5 @@
 name: Sync 18 July 2026 irregular-relay citation trace
+# PR-merge trigger for the guarded synchronization workflow.
 
 on:
   push:
