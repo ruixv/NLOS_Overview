@@ -154,6 +154,10 @@ Xu~\etal~compressed the hidden volume along its relatively redundant depth profi
 \noindent \textbf{Ground-truth-independent artifact cancellation.}
 Zhou~\etal~introduced time-of-flight structural similarity (TOF-SSIM), which forward-projects a candidate hidden reconstruction and evaluates its consistency with the measured transient without requiring hidden-scene ground truth~\cite{zhouAdaptiveArtifactCancellation2025}. The resulting adaptive artifact-cancellation procedure modifies and backprojects the transient contribution associated with streaking artifacts and applies to both confocal and non-confocal data. This closes a practical gap between fast backprojection and heavier iterative solvers by making reconstruction-parameter selection and artifact suppression measurement-driven.
 
+\vspace{0.8mm}
+\noindent \textbf{Reprojection-guided recovery from irregular relay samples.}
+Cui~\etal~extended transient completion beyond fixed sparse grids to noisy, irregularly undersampled, and spatially fragmented relay measurements~\cite{cuiReprojectionGuidedNLOS2025}. Their transient-recovery network is guided by a range-space reprojection module that extracts measurement-intrinsic structure; spatio-temporal modulation blocks then control where and how strongly this physical guidance affects denoising and interpolation. Evaluation on simulated and measured data shows improved transfer across relay layouts. In the development from under-scanning recovery and Virtual Scanning to TransDiff, this work makes reprojection consistency an explicit conditioning signal rather than relying only on an implicit learned prior.
+
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Challenges and Prospects}
 \subsection{Challenges and Prospects}
 NLOS imaging based on deep learning still faces many challenges, including lack of datasets, lockstep network structure, and limited generalization capability. Here, we discuss these three challenges and the corresponding prospects separately.

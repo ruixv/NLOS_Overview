@@ -68,6 +68,9 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [CUDA-accelerated Non-line-of-sight imaging with irregular relay surfaces](https://doi.org/10.1016/j.optlaseng.2025.109591) - Sun et al. | Optics and Lasers in Engineering 2026 | Runs filtered back projection directly on non-planar relay geometry and arbitrary nonuniform source-detector samples, avoiding planarization or resampling; a CUDA implementation provides at least two orders of magnitude acceleration while retaining competitive measured-data reconstruction quality. |
+| 2025 | [Reprojection-Guided Non-Line-of-Sight Imaging Under Irregular Undersampling](https://doi.org/10.1109/JSTSP.2025.3620710) - Cui, Yue, Yang | IEEE JSTSP 2025 | Recovers dense denoised transients from sparse, irregular, or fragmented relay measurements; range-space reprojection supplies physics-grounded guidance that spatio-temporal modulation blocks inject adaptively, improving simulated-to-real and cross-relay generalization. |
+| 2025 | [Looking Around Flatland: End-to-End 2D Real-Time NLOS Imaging](https://doi.org/10.1109/TCI.2025.3536092) - Peña, Gutierrez, Marco | IEEE TCI 2025 | Reformulates transient light transport in self-contained 2D worlds and couples it to phasor-field camera models, enabling end-to-end real-time simulation, progressive reconstruction, and controlled analysis of filtering, reflectance, and geometry at up to five orders of magnitude lower cost than equivalent 3D experiments. |
 | 2025 | [Learning-based NLOS imaging with Kolmogorov-Arnold network-enhanced transformer](https://doi.org/10.1016/j.optlastec.2025.113463) - Liu et al. | Optics & Laser Technology 2025 | Combines a KAN-enhanced Transformer for nonlinear global transient features, convolutional attention for local detail, and EfficientSAM contour guidance, improving simulated and measured active-NLOS reconstructions. |
 | 2025 | [Feature enhanced non-line-of-sight imaging using graph model in latent space](https://doi.org/10.1016/j.optlastec.2024.111538) - Xu et al. | Optics & Laser Technology 2025 | Uses a group graph-Laplacian model in a compressed latent representation as a RED-style structural regularizer, balancing detail preservation, noise suppression, and efficiency for confocal and non-confocal transients. |
 | 2025 | [Non-line-of-sight imaging with adaptive artifact cancellation](https://doi.org/10.1016/j.optlastec.2024.112081) - Zhou et al. | Optics & Laser Technology 2025 | Introduces ground-truth-independent TOF-SSIM for parameter selection and adaptively cancels backprojection artifacts by modifying and reprojecting transient histograms in confocal and non-confocal settings. |
@@ -311,6 +314,10 @@ Key breakthroughs that shaped the NLOS Imaging field:
    |     Long-wave-infrared transport decomposition and commodity CW-ToF scattering mapping extend practical passive and low-cost depth-camera NLOS [Optics and Lasers in Engineering / Photonics Research]
    |     Visible/LWIR dual-spectral fusion moves passive NLOS toward low-power edge deployment [SPIE NDTA]
    |     18 July 2026 citation-gap follow-up: seven final-venue records integrated across public, survey, bibliography, and build artifacts
+   |     Direct CUDA back projection extends active transient reconstruction to arbitrary irregular relay geometry and nonuniform scans [Optics and Lasers in Engineering]
+   |     Reprojection-guided transient recovery advances learned NLOS from fixed sparse grids to fragmented and irregular relay sampling [IEEE JSTSP]
+   |     Flatland provides a real-time 2D transient-and-phasor testbed for controlled end-to-end NLOS analysis [IEEE TCI]
+   |     18 July 2026 irregular-relay citation trace: three final-venue records integrated across public, survey, bibliography, and build artifacts
    |     18 July 2026 core-citation tracing: forward-citation and modality-expansion audit completed
 ```
 

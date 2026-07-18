@@ -1,6 +1,6 @@
 # 18 July 2026 irregular-relay and Flatland citation trace
 
-STATUS: STAGED — public sources and PDF have not yet been rebuilt.
+STATUS: SYNCHRONIZED — source artifacts were updated by the guarded workflow; PDF validity is checked before its separate commit.
 
 ## Scope
 
