@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [Ultrasound synthetic aperture non-line-of-sight imaging](https://doi.org/10.1038/s42005-025-02335-3) - Li et al. | Communications Physics 2025 | Transfers the core optical ToF/f-k reconstruction trajectory to coherent ultrasound: a phase-sensitive scanning emitter-receiver synthetic aperture reconstructs complex hidden 3D scenes at meter-scale range with approximately 1 cm lateral and depth resolution, using low-power eye-safe hardware. |
 | 2026 | [QSS-Net: A Quanta-State-Slot Network for Non-line-of-Sight Classification](https://doi.org/10.1007/978-981-92-2487-6_3) - Lin et al. | FLINS-ISKE / Springer LNCS 2026 | Formalizes a recognition-oriented NLOS direction with a Quanta-State-Slot network, shifting the target from complete hidden 3D recovery toward efficient semantic classification for time-sensitive perception. |
 | 2026 | [Multi-view clustering for non-line-of-sight imaging with neighborhood consistency reweighting](https://doi.org/10.1016/j.neucom.2026.133462) - Lin et al. | Neurocomputing 2026 | Refines photon-corrupted neighborhood graphs across multiple NLOS reconstructions using shared-neighbor consistency, Huber-smoothed dual consistency gates, and adaptive view weighting, with closed-form alternating updates and convergence guarantees. |
 | 2025 | [Adaptive motion enhancement for passive non-line-of-sight action recognition](https://doi.org/10.1016/j.neucom.2025.131372) - Sun et al. | Neurocomputing 2025 | Introduces AME-Net for recognizing hidden human actions from ordinary RGB videos of a visible relay wall and releases NLOS-Action, the first passive NLOS action-recognition dataset, with 2,000 synthetic and more than 500 real sequences. |
@@ -296,6 +297,9 @@ Key breakthroughs that shaped the NLOS Imaging field:
    |     Lin et al.: neighborhood-consistency reweighting extends NLOS understanding to robust multi-view clustering [Neurocomputing]
    |     QSS-Net: recognition-oriented quanta-state-slot modeling advances efficient NLOS semantic classification [FLINS-ISKE / Springer LNCS]
    |     18 July 2026 recognition and clustering citation trace: semantic NLOS records integrated into the survey and bibliography
+   |     Li et al.: coherent ultrasound synthetic apertures reach centimeter-scale hidden 3D reconstruction at meter-scale range [Communications Physics]
+   |     Sommer and Katz: knife-edge diffraction enables relay-free passive acoustic NLOS localization [Physical Review Applied]
+   |     18 July 2026 acoustic citation trace: final-venue ultrasound and edge-diffraction records synchronized across public and survey artifacts
    |     18 July 2026 core-citation tracing: forward-citation and modality-expansion audit completed
 ```
 

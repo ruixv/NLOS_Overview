@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 48 source files and keeps one highest-priority record for each of 399 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 49 source files and keeps one highest-priority record for each of 400 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 430
-- Case-insensitive duplicate replacements: 31
+- Parsed source records: 432
+- Case-insensitive duplicate replacements: 32
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -39,6 +39,7 @@ This update generates `egbib_merged_20260711.bib` from 48 source files and keeps
 - `liMambaTemporalConsistency2024` / `liMambaTemporalConsistency2024`: `egbib.bib` → `egbib_20260716_st_mamba_updates.bib`
 - `behariDENALI2026` / `behariDENALI2026`: `egbib_2026_updates.bib` → `egbib_20260717_frontier_updates.bib`
 - `shiFastNLOSTransientSimulation2025` / `shiFastNLOSTransientSimulation2025`: `egbib_20260714_simbenchmark_updates.bib` → `egbib_20260717_optics_followup_updates.bib`
+- `ultrasoundNLOS2025` / `ultrasoundNLOS2025`: `egbib.bib` → `egbib_20260718_acoustic_modality_updates.bib`
 - `liuGeometricConstrainedNLOS2025` / `liuGeometricConstrainedNLOS2025`: `egbib_20260714_geometric_constraints_updates.bib` → `egbib_20260718_passive_geometry_updates.bib`
 - `liSuperFoVNLOS2026` / `liSuperFoVNLOS2026`: `egbib.bib` → `egbib_20260718_passive_geometry_updates.bib`
 - `chenBeyondLambdaEMVS2026` / `chenBeyondLambdaEMVS2026`: `egbib_2026_updates.bib` → `egbib_20260718_reconstruction_pose_consistency.bib`
