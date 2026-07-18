@@ -106,7 +106,7 @@ def update_index() -> None:
     match = stat_pattern.search(text)
     if not match:
         raise RuntimeError("Homepage tracked-entry statistic not found")
-    expected = text.count('title:"')
+    expected = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', text, flags=re.MULTILINE))
     current = int(match.group(2))
     if current != expected:
         text = stat_pattern.sub(lambda m: m.group(1) + str(expected) + m.group(3), text, count=1)
@@ -124,13 +124,28 @@ def update_index() -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def insert_passive_table_row(text: str) -> str:
+    if "sunAdaptiveMotionNLOS2025" in text:
+        return text
+    row_pattern = re.compile(
+        r"^(?P<indent>\s*)\\cite\{boumanTurningCornersCameras2017\}[^\n]*Detection/\s*Tracking/\s*Identification[^\n]*\n",
+        flags=re.MULTILINE,
+    )
+    matches = list(row_pattern.finditer(text))
+    if len(matches) != 1:
+        raise RuntimeError(f"Expected one passive Bouman recognition row, found {len(matches)}")
+    match = matches[0]
+    table_row = (
+        f"{match.group('indent')}\\cite{{sunAdaptiveMotionNLOS2025}} & Ambient light & Conventional RGB camera "
+        "& Temporal relay-wall motion & Action recognition\\\\%%%% Table body\n"
+    )
+    return text[: match.end()] + table_row + text[match.end() :]
+
+
 def update_passive() -> None:
     path = ROOT / "article/3passive.tex"
     text = path.read_text(encoding="utf-8")
-    if "sunAdaptiveMotionNLOS2025" not in text:
-        table_anchor = "    \\cite{boumanTurningCornersCameras2017} & Ambient light & Conventional camera & Intensity &  Detection/ Tracking/ Identification\\\\%%%% Table body\n"
-        table_row = "    \\cite{sunAdaptiveMotionNLOS2025} & Ambient light & Conventional RGB camera & Temporal relay-wall motion & Action recognition\\\\%%%% Table body\n"
-        text = replace_once(text, table_anchor, table_anchor + table_row, "passive recognition table row")
+    text = insert_passive_table_row(text)
 
     heading = "Passive action recognition from relay-wall video."
     if heading not in text:
