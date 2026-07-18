@@ -68,6 +68,8 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [Finite-Aperture Limits for Yaw Estimation in Confocal Non-Line-of-Sight Imaging](https://doi.org/10.3390/jimaging12060248) - Romanelli et al. | Journal of Imaging 2026 | Derives a finite-relay-wall switch-line criterion and Fisher-information bounds for yaw observability in confocal transient NLOS. Simulated and measured f-k/backprojection results show how angular information degrades as informative transient features are clipped, providing quantitative guidance for relay-aperture placement and orientation recovery. |
+| 2026 | [Machine Learning-Based Human Detection Using Active Non-Line-of-Sight Laser Sensing](https://doi.org/10.3390/s26072046) - Celebi, Turkoglu | Sensors 2026 | Uses real SPAD-TCSPC transient measurements from controlled rubble-like scenes to compare CNN, GRU, and random-forest classifiers for hidden-human presence across poses, orientations, and object layouts. All models reach full sensitivity, while random forest provides the strongest specificity and weighted F1 under limited photon counts. |
 | 2026 | [Adaptive Spiral Scanning for Confocal Non-Line-of-Sight Imaging](https://doi.org/10.1109/OJSP.2026.3688052) - Oyama et al. | IEEE OJSP 2026 | Dynamically shifts an Archimedean spiral toward relay-wall regions with strong measured return intensity and applies Voronoi density compensation to correct the resulting nonuniform sampling, extending transient-sinogram acquisition from fixed circular trajectories to adaptive measurement allocation. |
 | 2026 | [Submillimeter non-line-of-sight ranging and imaging via cost-effective FMCW interferometry](https://doi.org/10.1364/PRJ.595776) - Liang et al. | Photonics Research 2026 | Uses a dual-path FMCW interferometer with fixed-delay fiber calibration and dynamic temporal phase subdivision to compensate sweep nonlinearity, demonstrating 450-um ranging resolution, millimeter-scale 3D NLOS imaging, and operation under more than 8 klux ambient illumination. |
 | 2026 | [Breaking the speed-resolution trade-off in 3.3-km non-line-of-sight imaging using scanning-free laser reflective tomography](https://doi.org/10.29026/oes.2026.260007) - Wang et al. | Opto-Electronic Science 2026 | Treats the diffuse relay wall as a natural beam expander and combines single-point third-bounce detection with multi-angle laser reflective tomography. The scanning-free system reports roughly 91x faster acquisition, 3.3-km operation, and better-than-3-cm resolution in about three minutes. |
@@ -274,6 +276,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
    |     Zhang et al.: structure-guided adaptive total variation removes manual passive-NLOS regularization tuning [Optics Express]
    |     Fu et al.: a diffusion prior restores high-frequency Fourier single-pixel measurements at extreme undersampling [Optics and Lasers in Engineering]
    |     Chen et al.: multi-attention passive reconstruction handles several simultaneously hidden objects [Frontiers of Computer Science]
+   |     Romanelli et al.: finite-aperture switch-line and Fisher-information analysis quantifies yaw observability [Journal of Imaging]
+   |     Celebi and Turkoglu: real SPAD-TCSPC measurements enable learned hidden-human detection [Sensors]
    |     18 July 2026 core-citation tracing: forward-citation and modality-expansion audit completed
 ```
 
