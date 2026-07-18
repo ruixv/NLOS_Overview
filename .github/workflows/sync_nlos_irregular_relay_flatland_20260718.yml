@@ -1,0 +1,157 @@
+name: Sync 18 July 2026 irregular-relay citation trace
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - egbib_20260718_irregular_relay_flatland_updates.bib
+      - scripts/sync_nlos_20260718_irregular_relay_flatland.py
+      - updates/2026-07-18-irregular-relay-flatland-citation-trace.md
+      - .github/workflows/sync_nlos_irregular_relay_flatland_20260718.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-nlos-irregular-relay-flatland-20260718
+  cancel-in-progress: false
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out writable branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Synchronize public and survey artifacts
+        run: python scripts/sync_nlos_20260718_irregular_relay_flatland.py
+
+      - name: Merge and audit bibliography
+        run: |
+          python -m pip install --disable-pip-version-check bibtexparser==1.4.3
+          python scripts/merge_nlos_bibliography.py
+
+      - name: Commit synchronized source artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/2active.tex article/4datadriven.tex bare_jrnl.tex egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-18-irregular-relay-flatland-citation-trace.md
+          if git diff --cached --quiet; then
+            echo "Source artifacts already synchronized."
+          else
+            git commit -m "Integrate irregular-relay and Flatland NLOS citation trace"
+            git fetch origin master
+            git rebase origin/master
+            git push origin HEAD:master
+          fi
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean-build survey PDF
+        run: |
+          cp bare_jrnl.pdf /tmp/bare_jrnl_before_irregular_relay_20260718.pdf
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate synchronized artifacts
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          test -s /tmp/bare_jrnl_before_irregular_relay_20260718.pdf
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          mkdir -p /tmp/nlos_pdf_irregular_before /tmp/nlos_pdf_irregular_after
+          pdftoppm -png -r 72 /tmp/bare_jrnl_before_irregular_relay_20260718.pdf /tmp/nlos_pdf_irregular_before/page >/dev/null 2>&1
+          pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_irregular_after/page >/dev/null 2>&1
+          test "$(find /tmp/nlos_pdf_irregular_before -name 'page-*.png' | wc -l)" -gt 0
+          test "$(find /tmp/nlos_pdf_irregular_after -name 'page-*.png' | wc -l)" -gt 0
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
+            echo "Undefined citations or references detected" >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo "Missing or repeated BibTeX entries detected" >&2
+            exit 1
+          fi
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def read(path):
+              return Path(path).read_text(encoding="utf-8", errors="ignore")
+
+          def normalized(path):
+              return re.sub(r"\s+", " ", read(path)).lower()
+
+          readme = read("README.md")
+          index = read("index.html")
+          active = read("article/2active.tex")
+          learning = read("article/4datadriven.tex")
+          master = read("bare_jrnl.tex")
+          bib = read("egbib_merged_20260711.bib")
+          pdf = normalized("bare_jrnl.txt")
+          bbl = read("bare_jrnl.bbl").lower()
+
+          records = [
+              ("CUDA-accelerated Non-line-of-sight imaging with irregular relay surfaces", "sunCUDAIrregularRelayNLOS2026", active),
+              ("Reprojection-Guided Non-Line-of-Sight Imaging Under Irregular Undersampling", "cuiReprojectionGuidedNLOS2025", learning),
+              ("Looking Around Flatland: End-to-End 2D Real-Time NLOS Imaging", "penaFlatlandNLOS2025", active),
+          ]
+          for title, key, section in records:
+              if readme.count("[" + title + "]") != 1:
+                  raise SystemExit(f"README entry missing or duplicated: {title}")
+              if index.count('title:"' + title + '"') != 1:
+                  raise SystemExit(f"Homepage entry missing or duplicated: {title}")
+              if key not in section:
+                  raise SystemExit(f"Survey citation missing: {key}")
+              if bib.lower().count("{" + key.lower() + ",") != 1:
+                  raise SystemExit(f"Bibliography key missing or duplicated: {key}")
+              if key.lower() not in bbl:
+                  raise SystemExit(f"Generated bibliography does not cite: {key}")
+
+          if "irregular-relay citation trace integrates cuda" not in master.lower():
+              raise SystemExit("Master LaTeX integration marker missing")
+
+          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', index, flags=re.MULTILINE))
+          match = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', index)
+          if not match or int(match.group(1)) != paper_count:
+              raise SystemExit("Homepage tracked-entry count does not match the paper array")
+
+          expected_pdf_phrases = [
+              "direct arbitrary-relay back projection on gpus",
+              "real-time two-dimensional transient testbeds",
+              "reprojection-guided recovery from irregular relay samples",
+          ]
+          for phrase in expected_pdf_phrases:
+              if phrase not in pdf:
+                  raise SystemExit(f"Generated PDF is missing: {phrase}")
+
+          print(f"Irregular-relay artifacts are mutually consistent across {paper_count} homepage entries.")
+          PY
+          rm bare_jrnl.txt
+
+      - name: Commit regenerated PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bare_jrnl.pdf
+          if git diff --cached --quiet; then
+            echo "Survey PDF already current."
+            exit 0
+          fi
+          git commit -m "Rebuild survey for irregular-relay NLOS citation trace"
+          git fetch origin master
+          git rebase origin/master
+          git push origin HEAD:master
