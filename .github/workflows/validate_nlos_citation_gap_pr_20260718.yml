@@ -1,0 +1,50 @@
+name: Validate 18 July 2026 citation-gap update
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Re-run guarded synchronization and bibliography merge
+        run: |
+          python scripts/sync_nlos_20260718_citation_gap_followup.py
+          python -m pip install --disable-pip-version-check bibtexparser==1.4.3
+          python scripts/merge_nlos_bibliography.py
+          git diff --exit-code README.md index.html article/3passive.tex article/4datadriven.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib updates/2026-07-18-citation-gap-followup.md
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+      - name: Clean-build and validate survey
+        run: |
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then exit 1; fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then exit 1; fi
+          grep -qi "Kolmogorov" bare_jrnl.txt
+          grep -qi "scalable scattering mapping" bare_jrnl.txt
+          grep -qi "long-range infrared transport decomposition" bare_jrnl.txt
+          grep -qi "coherent synthetic-aperture ultrasound" bare_jrnl.txt
+          grep -qi "knife-edge diffraction" bare_jrnl.txt
+      - name: Upload validated PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: validated-bare-jrnl-citation-gap
+          path: bare_jrnl.pdf
