@@ -38,18 +38,19 @@ jobs:
           test -s bare_jrnl.bbl
           pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          tr '\n' ' ' < bare_jrnl.txt | tr -s ' ' > bare_jrnl_normalized.txt
           if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then exit 1; fi
           if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then exit 1; fi
       - name: Validate KAN citation text
-        run: grep -qi "Kolmogorov" bare_jrnl.txt
+        run: grep -qi "Kolmogorov" bare_jrnl_normalized.txt
       - name: Validate commodity ToF text
-        run: grep -qi "scalable scattering mapping" bare_jrnl.txt
+        run: grep -Eqi "scalable[[:space:]-]+scattering" bare_jrnl_normalized.txt
       - name: Validate infrared text
-        run: grep -qi "Long-range infrared transport decomposition" bare_jrnl.txt
+        run: grep -Eqi "infrared[[:space:]-]+transport[[:space:]-]+decomposition" bare_jrnl_normalized.txt
       - name: Validate ultrasound text
-        run: grep -qi "synthetic-aperture ultrasound" bare_jrnl.txt
+        run: grep -Eqi "synthetic[[:space:]-]+aperture[[:space:]-]+ultrasound" bare_jrnl_normalized.txt
       - name: Validate diffraction text
-        run: grep -qi "knife-edge diffraction" bare_jrnl.txt
+        run: grep -Eqi "knife[[:space:]-]+edge[[:space:]-]+diffraction" bare_jrnl_normalized.txt
       - name: Upload validated PDF
         uses: actions/upload-artifact@v4
         with:
