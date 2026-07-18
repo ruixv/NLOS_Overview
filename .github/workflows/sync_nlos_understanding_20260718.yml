@@ -1,5 +1,6 @@
 name: Sync 18 July 2026 NLOS understanding update
 # Explicit post-merge trigger for the guarded source and PDF synchronization.
+# This workflow revision is merged through a PR so the workflow already exists on the default branch when the push event is received.
 
 on:
   push:
