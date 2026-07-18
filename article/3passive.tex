@@ -35,6 +35,14 @@ Thermal cameras remove the need for external illumination by sensing radiation e
 
 
 
+\vspace{0.8mm}
+\noindent \textbf{Long-range infrared transport decomposition.}
+Chen~\etal~extended passive NLOS pedestrian imaging to long-wave infrared sensing and explicitly decomposed the light-transport matrix into illumination and reflection components~\cite{chenLTMDPassiveNLOS2025}. The illumination component restores gross brightness, while the reflection component sharpens contours; an illumination-oriented Transformer restricts contextual modeling to informative regions instead of propagating low-SNR background. The accompanying IF-NLOS dataset contains 33,000 images across distances, relay angles, and illumination conditions, and experiments reach hidden-pedestrian ranges of 20~m. This work connects computational-periscopy-style transport estimation with self-emitted thermal cues and task-specific long-range perception.
+
+\vspace{0.8mm}
+\noindent \textbf{Dual-spectral passive NLOS at the edge.}
+Shi~\etal~combined synchronized visible and long-wave-infrared relay observations with attention-based dual-branch fusion and INT8 inference~\cite{shiDualSpectralEdgeNLOS2026}. The CPU-oriented implementation reports 78.4~ms latency and sub-10~W power on an embedded Jetson platform. Although the conference study emphasizes deployment rather than a new light-transport inverse, it marks a useful systems trajectory: complementary spectral cues can be fused under strict latency and energy constraints instead of assuming a laboratory GPU and a single sensing band.
+
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Interferometer}
 \subsubsection{Interferometer}
 Considering the limitations of intensity information, some studies employ interferometry to obtain phase information and use coherence to solve it, as illustrated in Tab.~\ref{tab:passive}. 

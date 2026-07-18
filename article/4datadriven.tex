@@ -142,6 +142,18 @@ TransDiff~\cite{cuiTransDiffTIP2025} extends unsupervised transient completion t
 \noindent \textbf{Untrained network priors.}
 Wu~\etal~demonstrated that an untrained deep decoder network can serve as an effective image prior for NLOS reconstruction without any training data~\cite{wuUntrainedDecoder2022}, leveraging the deep image prior inherent in the network architecture to regularize the ill-posed NLOS inverse problem, offering flexibility for novel experimental configurations where training data is unavailable.
 
+\vspace{0.8mm}
+\noindent \textbf{KAN-enhanced transient Transformers with semantic guidance.}
+Liu~\etal~combined a Kolmogorov--Arnold Network-enhanced Transformer with convolutional attention for active transient NLOS reconstruction~\cite{liuKANTransformerNLOS2025}. Learnable KAN activations model nonlinear global transport features, the convolutional branch preserves local structure, and EfficientSAM-derived contours enter through a semantic loss. The measured-data evaluation places this method in the trajectory from NLOST and TransiT toward hybrid architectures that jointly exploit global transient dependencies, local spatial evidence, and pretrained semantic priors.
+
+\vspace{0.8mm}
+\noindent \textbf{Latent graph and zero-shot mixture regularization.}
+Xu~\etal~compressed the hidden volume along its relatively redundant depth profile and built a group graph-Laplacian feature extractor in the latent space~\cite{xuGraphLatentNLOS2025}. Used as a regularization-by-denoising structural term, it combines learned feature statistics with iterative measurement inversion while lowering the cost of full three-dimensional nonlocal graphs. Zhang~\etal~take a complementary training-free route: a mixture distribution separates target and background residual behavior, and dual-space adaptive weights become a zero-shot attention mechanism inside alternating minimization~\cite{zhangAdaptiveMixtureZeroShot2025}. Together these methods show that attention-like adaptivity need not be confined to supervised neural networks; it can also emerge from probabilistic residual models and optimization dual variables.
+
+\vspace{0.8mm}
+\noindent \textbf{Ground-truth-independent artifact cancellation.}
+Zhou~\etal~introduced time-of-flight structural similarity (TOF-SSIM), which forward-projects a candidate hidden reconstruction and evaluates its consistency with the measured transient without requiring hidden-scene ground truth~\cite{zhouAdaptiveArtifactCancellation2025}. The resulting adaptive artifact-cancellation procedure modifies and backprojects the transient contribution associated with streaking artifacts and applies to both confocal and non-confocal data. This closes a practical gap between fast backprojection and heavier iterative solvers by making reconstruction-parameter selection and artifact suppression measurement-driven.
+
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Challenges and Prospects}
 \subsection{Challenges and Prospects}
 NLOS imaging based on deep learning still faces many challenges, including lack of datasets, lockstep network structure, and limited generalization capability. Here, we discuss these three challenges and the corresponding prospects separately.
