@@ -7,8 +7,8 @@
     \cite{guptaReconstructionHidden3D2012,veltenRecoveringThreedimensionalShape2012} & Pulsed laser & Streak camera & Time of fight &  3D reconstruction\\%%%% Table body
     \cite{buttafavaNonlineofsightImagingUsing2015,laurenzisMultiplereturnSinglephotonCounting2015,heideNonlineofsightImagingPartial2017,jinReconstructionMultipleNonlineofsight2018,arellanoFastBackprojectionNonline2017,mannaErrorBackprojectionAlgorithms2018,otooleConfocalNonlineofsightImaging2018,Lindell:2019:Wave,tsaiVolumetricAlbedoSurface2019,pediredlaSNLOSNonlineofsightScanning2019,xinTheoryFermatPaths2019,musarraNonlineofsight3DImaging2019,liuVirtualWaveOptics2018,liuPhasorFieldDiffraction2020,Ahn_2019_ICCV,chopiteDeepNonLineofSightReconstruction2020,Young:2020:dlct,iseringhausen:2018,mannaNonlineofsightimagingUsingDynamic2020,liMambaTemporalConsistency2024,chen_learned_2020,yuLearnableInverseKernel2023,wuNonLineofsightImaging2021,yeCompressedSensingActive2021,isogawaTransientSinograms2020,wuMiniaturizedTCSPC2024,liuGeometricConstrainedNLOS2025,grauOcclusionFields2022,choiSelfCalibratingNLOS2023,guFastNLOSNonPlanar2023,sultanOptimizedSamplingNLOS2025,liDeepNLOSUnderscanning2023,yinAllDayNLOS2026,gaoLearnedLCT2026,sunTransVID2026,weiMultiSurfaceNLOS2025,luesiaStereoNLOS2026,zengCompactLongRangeNLOS2026,yangModelDecompositionNLOS2026,oyamaAdaptiveSpiralNLOS2026,liangFMCWNLOS2026,wangLaserReflectiveTomography2026,yuNonconfocalPhaseCompensation2026,tianSparseBayesianNLOS2026,zhouPolarizationSpeckleNLOS2026} & Pulsed laser & SPAD & Time of fight &  3D reconstruction\\%%%% Table body
     \cite{thrampoulidisExploitingOcclusionNonLineofSight2018,xuPhotonEfficientOcclusion2018} & Pulsed laser & SPAD & Integrated photon counts and occlusion & 2D reflectivity reconstruction\\%%%% Table body
-    \cite{chanNonlineofsightTrackingPeople2017a}(long range),\cite{caramazzaNeuralNetworkIdentification2017,musarraDetectionIdentificationTracking2019}(single point) & Pulsed laser & SPAD & Time of fight &  Detection/ Tracking/ Identification\\%%%% Table body
-    \cite{isogawaOpticalNonLineofSightPhysicsBased2020} & Pulsed laser & SPAD & Time of fight &  Pose estimation\\%%%% Table body
+    \cite{chanNonlineofsightTrackingPeople2017a,celebiHumanDetectionNLOS2026}(long range),\cite{caramazzaNeuralNetworkIdentification2017,musarraDetectionIdentificationTracking2019}(single point) & Pulsed laser & SPAD & Time of fight &  Detection/ Tracking/ Identification\\%%%% Table body
+    \cite{isogawaOpticalNonLineofSightPhysicsBased2020,romanelliFiniteApertureYawNLOS2026} & Pulsed laser & SPAD & Time of fight &  Pose estimation\\%%%% Table body
     \cite{nam_real-time_2020,jinScannerlessNonlineofsightThree2020} & Pulsed laser & SPAD array & Time of fight &  3D reconstruction\\%%%% Table body
     \cite{gariepyDetectionTrackingMoving2016} & Pulsed laser & SPAD array & Time of fight &  Detection/ Tracking/ Identification\\%%%% Table body
     \cite{Willomitzer:18,xinTheoryFermatPaths2019,rezaPhasorFieldWaves2019} & Pulsed laser & Interferometer & Coherence &  3D reconstruction\\%%%% Table body
@@ -360,6 +360,10 @@ Marco~\etal~extended phasor-field virtual wave optics beyond hidden-geometry rec
 Beyond developing faster inverses, Liu~\etal~analyzed which hidden-scene features are physically visible in transient NLOS measurements~\cite{liuAnalysisFeatureVisibility2019}. Their study connects recoverability to surface orientation, finite relay-wall aperture, and acquisition geometry, explaining why some surfaces remain weak or absent even under accurate reconstruction. This visibility perspective established an important limit-aware complement to LCT, $f$--$k$ migration, and phasor-field propagation, and motivates later methods that explicitly model normals, occlusion, and adaptive capture.
 
 \vspace{0.8mm}
+\noindent \textbf{Finite-aperture yaw observability.}
+Romanelli~\etal~characterized how a finite sampled relay wall limits orientation recovery in confocal transient NLOS~\cite{romanelliFiniteApertureYawNLOS2026}. A geometric switch-line criterion identifies when the endpoint ordering that supports unique planar reconstruction leaves the measured aperture, while a Fisher-information analysis shows that yaw sensitivity decays continuously rather than disappearing abruptly. Simulated and experimental $f$--$k$ and backprojection results connect this loss of angular information to edge-like or spatially ambiguous reconstructions. The study turns the qualitative missing-cone and feature-visibility limitation into quantitative guidance for relay-wall size, placement, and pose estimation.
+
+\vspace{0.8mm}
 \noindent \textbf{Stereo relay-wall acquisition.}
 The missing cone is not only an algorithmic artifact: with one finite relay aperture, surfaces whose orientations direct little transport toward that aperture remain intrinsically weak. Luesia-Lahoz~\etal~introduced a stereo NLOS configuration with two distinct relay walls and used phasor fields to treat both as generalized virtual camera apertures~\cite{luesiaStereoNLOS2026}. The reconstruction combines measurements that illuminate and detect on the same wall with cross-wall paths that illuminate one wall and observe the other. These complementary angular views improve conditioning, diminish missing-cone artifacts, and provide surface-orientation cues from the relative wall contributions, extending phasor-field imaging from a single virtual aperture to coordinated multi-aperture capture.
 
@@ -415,6 +419,11 @@ For localization tasks, a naive but effective algorithm is back projection\cite{
 
 For recognition tasks, traditional algorithms are limited by their ability to understand high-level semantics, making it difficult to map from experimental data to label results directly.
 Therefore, NLOS recognition is typically  based on data-driven methods (see Sec.~\ref{sec4} for details).
+
+\vspace{0.8mm}
+\noindent \textbf{Real-measurement hidden-human detection.}
+Celebi and Turkoglu built an active SPAD--TCSPC NLOS sensing system and collected transient waveforms for hidden people across multiple poses, orientations, and rubble-like object configurations~\cite{celebiHumanDetectionNLOS2026}. CNN, GRU, and random-forest models all detected the human-present class with full sensitivity, while the random forest achieved the strongest specificity and weighted F1 under the available photon statistics. This result complements image reconstruction and tracking by showing that low-cost transient hardware can support a high-level search-and-rescue decision directly from measured histograms, without first recovering a detailed hidden scene.
+
 
 \begin{figure*}[!h]
     \centering
