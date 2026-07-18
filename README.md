@@ -68,6 +68,9 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [QSS-Net: A Quanta-State-Slot Network for Non-line-of-Sight Classification](https://doi.org/10.1007/978-981-92-2487-6_3) - Lin et al. | FLINS-ISKE / Springer LNCS 2026 | Formalizes a recognition-oriented NLOS direction with a Quanta-State-Slot network, shifting the target from complete hidden 3D recovery toward efficient semantic classification for time-sensitive perception. |
+| 2026 | [Multi-view clustering for non-line-of-sight imaging with neighborhood consistency reweighting](https://doi.org/10.1016/j.neucom.2026.133462) - Lin et al. | Neurocomputing 2026 | Refines photon-corrupted neighborhood graphs across multiple NLOS reconstructions using shared-neighbor consistency, Huber-smoothed dual consistency gates, and adaptive view weighting, with closed-form alternating updates and convergence guarantees. |
+| 2025 | [Adaptive motion enhancement for passive non-line-of-sight action recognition](https://doi.org/10.1016/j.neucom.2025.131372) - Sun et al. | Neurocomputing 2025 | Introduces AME-Net for recognizing hidden human actions from ordinary RGB videos of a visible relay wall and releases NLOS-Action, the first passive NLOS action-recognition dataset, with 2,000 synthetic and more than 500 real sequences. |
 | 2026 | [Non-line-of-sight human pose estimation](https://doi.org/10.1016/j.optlaseng.2026.109658) - Xiao et al. | Optics and Lasers in Engineering 2026 | Directly estimates semantic body joints from transient-derived intensity and depth features, using a physics-based smartphone-video synthesis pipeline for training and demonstrating robust measured-data pose recovery at 1.75 m and SNR 0.13. |
 | 2026 | [Frequency-domain multi-regularization-experts fusion for robust non-line-of-sight imaging](https://doi.org/10.1016/j.patcog.2025.112914) - Zhang et al. | Pattern Recognition 2026 | Introduces a frequency-domain mixture of regularization experts whose gating weights are derived from optimization dual variables, combining direct-method efficiency with improved robustness and real-data albedo reconstruction. |
 | 2026 | [Canny operator-based artifact identification and suppression for non-line-of-sight imaging](https://doi.org/10.1016/j.optlastec.2025.114542) - Chen et al. | Optics and Laser Technology 2026 | Combines Canny/morphological artifact segmentation, reference-free sharpness and residual metrics, and genetic optimization of a transient blur kernel to suppress backprojection artifacts in simulated and measured confocal and non-confocal data. |
@@ -289,6 +292,10 @@ Key breakthroughs that shaped the NLOS Imaging field:
    |     Shi et al.: specular-flight-path priors improve non-confocal multi-orientation recovery [Photonics Research]
    |     Miao et al.: pulse multiplexing computationally exceeds detector timing resolution [Optics and Lasers in Engineering]
    |     18 July 2026 reconstruction/pose consistency audit: public-only RF, robotics, renderer, and Quasi-Fresnel records integrated into the survey
+   |     Sun et al.: ordinary RGB relay-wall video enables passive hidden-action recognition and the NLOS-Action benchmark [Neurocomputing]
+   |     Lin et al.: neighborhood-consistency reweighting extends NLOS understanding to robust multi-view clustering [Neurocomputing]
+   |     QSS-Net: recognition-oriented quanta-state-slot modeling advances efficient NLOS semantic classification [FLINS-ISKE / Springer LNCS]
+   |     18 July 2026 recognition and clustering citation trace: semantic NLOS records integrated into the survey and bibliography
    |     18 July 2026 core-citation tracing: forward-citation and modality-expansion audit completed
 ```
 
