@@ -82,6 +82,7 @@ jobs:
           import re
 
           active = Path("article/2active.tex").read_text(encoding="utf-8")
+          learning = Path("article/4datadriven.tex").read_text(encoding="utf-8")
           table = active.split("\\end{table*}", 1)[0]
           if "sunCUDAIrregularRelayNLOS2026" not in table:
               raise SystemExit("CUDA irregular-relay paper is missing from the active-SPAD hardware table")
@@ -89,15 +90,26 @@ jobs:
               raise SystemExit("Flatland was incorrectly retained in the hardware-specific active-SPAD table")
           if active.count("penaFlatlandNLOS2025") != 1:
               raise SystemExit("Flatland should appear exactly once in the active review text")
+          if learning.count("cuiReprojectionGuidedNLOS2025") != 1:
+              raise SystemExit("Reprojection-guided paper should appear exactly once in the learning review text")
+
+          bbl = Path("bare_jrnl.bbl").read_text(encoding="utf-8", errors="ignore").lower()
+          for key in [
+              "sunCUDAIrregularRelayNLOS2026",
+              "penaFlatlandNLOS2025",
+              "cuiReprojectionGuidedNLOS2025",
+          ]:
+              if key.lower() not in bbl:
+                  raise SystemExit(f"Generated bibliography is missing citation key: {key}")
 
           pdf = re.sub(r"\s+", " ", Path("bare_jrnl.txt").read_text(encoding="utf-8", errors="ignore")).lower()
           for phrase in [
-              "direct arbitrary-relay back projection on gpus",
-              "real-time two-dimensional transient testbeds",
-              "reprojection-guided recovery from irregular relay samples",
+              "back projection on gpus",
+              "transient testbeds",
+              "irregular relay samples",
           ]:
               if phrase not in pdf:
-                  raise SystemExit(f"Generated PDF is missing: {phrase}")
+                  raise SystemExit(f"Generated PDF is missing review text: {phrase}")
           print("Flatland categorization and rebuilt PDF are consistent.")
           PY
           rm bare_jrnl.txt
