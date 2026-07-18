@@ -5,7 +5,7 @@ on:
     branches: [master]
     paths:
       - 'egbib_*.bib'
-      - 'scripts/sync_nlos_*.py'
+      - 'scripts/*.py'
       - '.github/workflows/nlos_sync_pr_validation.yml'
       - 'updates/*.md'
   workflow_dispatch:
@@ -39,6 +39,7 @@ jobs:
           set -euo pipefail
           exec > >(tee -a /tmp/nlos-sync.log) 2>&1
           synchronizers=(
+            scripts/prepare_nlos_20260718_geometry_venue.py
             scripts/sync_nlos_20260718_passive_geometry.py
             scripts/sync_nlos_20260718_core_citation.py
           )
@@ -114,7 +115,6 @@ jobs:
               ('Passive non-line-of-sight imaging at 10 meters', 'zhouPassiveNLOS10m2025'),
               ('Neural Networks Meet Light Transport Physics for Passive Non-Line-of-Sight Imaging Enhancement', 'liangHPDIPassiveNLOS2026'),
               ('Super-field-of-view non-line-of-sight imaging via spatial encoding of a translated point spread function', 'liSuperFoVNLOS2026'),
-              ('Geometry-Constrained Non-Line-of-Sight Imaging', 'liuGeometricConstrainedNLOS2025'),
               ('Adaptive Spiral Scanning for Confocal Non-Line-of-Sight Imaging', 'oyamaAdaptiveSpiralNLOS2026'),
               ('Submillimeter non-line-of-sight ranging and imaging via cost-effective FMCW interferometry', 'liangFMCWNLOS2026'),
               ('Breaking the speed-resolution trade-off in 3.3-km non-line-of-sight imaging using scanning-free laser reflective tomography', 'wangLaserReflectiveTomography2026'),
@@ -135,6 +135,21 @@ jobs:
               if files['bib'].lower().count('{' + key.lower() + ',') != 1:
                   raise SystemExit(f'Bibliography key missing or duplicated: {key}')
 
+          geometry_title = 'Geometry-Constrained Non-Line-of-Sight Imaging'
+          geometry_key = 'liuGeometricConstrainedNLOS2025'
+          geometry_lines = [line for line in files['readme'].splitlines() if '[' + geometry_title + ']' in line]
+          if not geometry_lines:
+              raise SystemExit('Final geometry-constrained README records are missing')
+          for line in geometry_lines:
+              if '10.1109/TVCG.2026.3684832' not in line or 'IEEE TVCG 2026' not in line or '| 2026 |' not in line:
+                  raise SystemExit('A geometry-constrained README record retains preliminary metadata')
+          if '[Geometric Constrained Non-Line-of-Sight Imaging]' in files['readme']:
+              raise SystemExit('Preliminary geometry-constrained title remains public')
+          if files['index'].lower().count('title:"' + geometry_title.lower() + '"') != 1:
+              raise SystemExit('Final geometry-constrained homepage record is missing or duplicated')
+          if geometry_key not in source or files['bib'].lower().count('{' + geometry_key.lower() + ',') != 1:
+              raise SystemExit('Geometry-constrained survey or bibliography record is inconsistent')
+
           displayed = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', files['index'])
           if not displayed:
               raise SystemExit('Homepage tracked-count stat is missing')
@@ -146,12 +161,6 @@ jobs:
               raise SystemExit('Public update dates are not synchronized')
           if 'advances from 2022 through 18 July 2026' not in files['main']:
               raise SystemExit('Survey update horizon is not explicit')
-
-          geometry_lines = [line for line in files['readme'].splitlines() if '[Geometry-Constrained Non-Line-of-Sight Imaging]' in line]
-          if len(geometry_lines) != 1 or '10.1109/TVCG.2026.3684832' not in geometry_lines[0]:
-              raise SystemExit('Final geometry-constrained venue metadata is missing')
-          if '[Geometric Constrained Non-Line-of-Sight Imaging]' in files['readme']:
-              raise SystemExit('Preliminary geometry-constrained title remains public')
 
           normalized_pdf = re.sub(r'\s+', ' ', files['pdf']).lower()
           expected_pdf = [
@@ -170,9 +179,8 @@ jobs:
                   raise SystemExit(f'Generated PDF is missing: {phrase}')
 
           normalized_bbl = re.sub(r'[^a-z0-9]+', ' ', re.sub(r'\s+', ' ', files['bbl']).lower())
-          for title, _ in records:
-              compact = re.sub(r'[^a-z0-9]+', ' ', title.lower()).strip()
-              words = compact.split()
+          for title, _ in records + [(geometry_title, geometry_key)]:
+              words = re.sub(r'[^a-z0-9]+', ' ', title.lower()).strip().split()
               probe = ' '.join(words[: min(6, len(words))])
               if probe not in normalized_bbl:
                   raise SystemExit(f'Generated bibliography is missing: {title}')
