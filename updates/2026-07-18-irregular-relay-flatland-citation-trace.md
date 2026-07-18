@@ -42,3 +42,7 @@ This pass followed forward citations and close descendants of the active transie
 ## Validation requirements
 
 The guarded workflow must verify unique README and homepage records, citation presence in the relevant survey section, one canonical BibTeX entry per key, a homepage count matching the paper array, no undefined or repeated bibliography entries, nonempty rendered PDF pages, and recognizable new review text and references in the generated PDF. The PDF must be committed only after all checks pass.
+
+## Hardware-table clarification
+
+Flatland is an enabling 2D transient simulation and analysis framework, not a pulsed-laser/SPAD hardware experiment. It is integrated in the active-method literature review and bibliography, but intentionally excluded from the hardware-specific active-SPAD summary row.
