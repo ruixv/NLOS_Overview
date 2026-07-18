@@ -1,0 +1,58 @@
+name: Rebuild citation-gap NLOS survey PDF
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/rebuild_nlos_citation_gap_pdf_20260718.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+      - name: Clean-build survey
+        run: |
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+      - name: Validate survey
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          tr '\n' ' ' < bare_jrnl.txt | tr -s ' ' > bare_jrnl_normalized.txt
+          if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then exit 1; fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then exit 1; fi
+          grep -qi "Kolmogorov" bare_jrnl_normalized.txt
+          grep -Eqi "scalable[[:space:]-]+scattering" bare_jrnl_normalized.txt
+          grep -Eqi "infrared[[:space:]-]+transport[[:space:]-]+decomposition" bare_jrnl_normalized.txt
+          grep -Eqi "synthetic[[:space:]-]+aperture[[:space:]-]+ultrasound" bare_jrnl_normalized.txt
+          grep -Eqi "knife[[:space:]-]+edge[[:space:]-]+diffraction" bare_jrnl_normalized.txt
+          for key in liuKANTransformerNLOS2025 xuGraphLatentNLOS2025 zhouAdaptiveArtifactCancellation2025 zhangAdaptiveMixtureZeroShot2025 chenLTMDPassiveNLOS2025 fangScalableScatteringTOF2025 shiDualSpectralEdgeNLOS2026 ultrasoundNLOS2025 sommerPassiveAcousticNLOS2026; do
+            grep -qi "$key" bare_jrnl.aux
+          done
+      - name: Commit regenerated PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bare_jrnl.pdf
+          if git diff --cached --quiet; then
+            echo "Survey PDF already current."
+            exit 0
+          fi
+          git commit -m "Rebuild survey for citation-traced NLOS gaps"
+          git fetch origin master
+          git rebase origin/master
+          git push origin HEAD:master
