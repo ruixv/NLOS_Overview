@@ -110,6 +110,7 @@ def update_index() -> None:
     path = ROOT / "index.html"
     text = path.read_text(encoding="utf-8")
     text = text.replace("Updated 18 July 2026 · 190+ papers", "Updated 19 July 2026 · 190+ papers", 1)
+    text = text.replace("Last updated: 18 July 2026", "Last updated: 19 July 2026", 1)
 
     additions = [paper_object(p) for p in PAPERS if f'title:"{p["title"]}"' not in text]
     if additions:
