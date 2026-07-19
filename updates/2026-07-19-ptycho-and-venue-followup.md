@@ -12,7 +12,7 @@ STATUS: STAGED — guarded source synchronization and PDF rebuild are pending.
 - Publication history: accepted 23 December 2025; published online 22 January 2026; assigned to the March/April 2026 issue.
 - Relevance: direct steady-state NLOS reconstruction, not a passing citation. The method combines polarization-differential speckle correlography with overlapping ptychographic relay-wall scanning, jointly improving Fourier-amplitude sampling and phase retrieval for structurally complex hidden targets. Geometry-based scan-position correction addresses practical 3D setup errors.
 
-## Final-venue correction
+## Final-venue corrections
 
 ### Generalizable Non-Line-of-Sight Imaging with Learnable Physical Priors
 
@@ -23,6 +23,16 @@ The repository currently exposes the 2024 arXiv version in README/homepage metad
 - Official CVF open-access record: `https://openaccess.thecvf.com/content/ICCV2025/html/Sun_Generalizable_Non-Line-of-Sight_Imaging_with_Learnable_Physical_Priors_ICCV_2025_paper.html`
 
 The existing citation key `sunGeneralizable2025` is retained; the dated bibliography supplement overrides its preliminary metadata with the final ICCV record.
+
+### Passive acoustic non-line-of-sight localization without a relay surface
+
+The survey section and bibliography already use the final publication, but README/homepage still expose the 2025 arXiv label. Public metadata should be synchronized to:
+
+- Tal I. Sommer and Ori Katz
+- *Physical Review Applied* 25(2), article 024064, published 20 February 2026
+- DOI: `10.1103/p97k-sf71`
+
+A separate guarded public-metadata correction updates only the existing README and homepage records; no survey-text or PDF change is required for this correction because the LaTeX source already cites the final journal record.
 
 ## Pending radar/THz source integration carried forward
 
@@ -35,8 +45,8 @@ The revised synchronizer integrates these records together with the ptychographi
 
 ## Intended cross-artifact changes
 
-- `README.md`: add the three missing radar/THz/coherent-optical records; correct Learnable Physical Priors to ICCV 2025; extend the 2025/2026 timeline and audit log.
-- `index.html`: add three searchable paper objects, correct the ICCV venue/link, update the 2026 development timeline, and recompute the tracked-entry count.
+- `README.md`: add the three missing radar/THz/coherent-optical records; correct Learnable Physical Priors to ICCV 2025 and passive acoustic localization to Physical Review Applied 2026; extend the 2025/2026 timeline and audit log.
+- `index.html`: add three searchable paper objects, correct both final venues/links, update the 2026 development timeline, and recompute the tracked-entry count.
 - `article/5newscenes.tex`: add semantically placed operator-learned mmWave, sub-THz, and ptychography-enhanced correlography review paragraphs.
 - `article/4datadriven.tex`: identify Learnable Physical Priors as the final ICCV 2025 work while retaining its existing citation key and technical discussion.
 - `bare_jrnl.tex`: advance coverage through 19 July 2026 and add a source-integration marker.
