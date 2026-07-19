@@ -6,7 +6,7 @@ STATUS: STAGED — verified metadata has been committed in dated BibTeX suppleme
 
 This pass combined fresh keyword searches with a forward/backward citation trace around the optical core papers and the repository's modality-expansion milestones. In particular, the radar branch was followed backward from the staged 2026 range-migration operator-learning paper through its directly cited measured-mmWave reconstruction lineage. Candidates were retained only when the publisher record and abstract established genuine hidden-target NLOS 3D reconstruction rather than detection-only, communications-only, or a passing citation.
 
-No directly relevant NLOS imaging paper published later than *Non-line-of-sight imaging via physics-informed cascade learning* (JOSA A, published 15 July 2026, DOI `10.1364/JOSAA.593401`) was verified in this pass.
+The most recent journal paper with an explicit verified online-publication date remains *Non-line-of-sight imaging via physics-informed cascade learning* (JOSA A, published 15 July 2026, DOI `10.1364/JOSAA.593401`). The final 3D-GTR record belongs to SIGGRAPH Conference Papers '26, whose conference dates are 19–23 July 2026, but the public metadata checked in this pass did not expose a separate online-publication date for ordering it against PICL.
 
 ## Newly verified missing radar/mmWave reconstruction papers
 
