@@ -1,6 +1,6 @@
 # 19 July 2026 ptychographic-correlography and final-venue follow-up
 
-STATUS: STAGED — guarded source synchronization and PDF rebuild are pending.
+STATUS: STAGED — guarded radar/THz/ptychography source synchronization and PDF rebuild are pending. The passive-acoustic public venue correction is complete.
 
 ## Newly verified missing paper
 
@@ -26,13 +26,13 @@ The existing citation key `sunGeneralizable2025` is retained; the dated bibliogr
 
 ### Passive acoustic non-line-of-sight localization without a relay surface
 
-The survey section and bibliography already use the final publication, but README/homepage still expose the 2025 arXiv label. Public metadata should be synchronized to:
+The survey section and bibliography already used the final publication, while README/homepage still exposed the 2025 arXiv label at the beginning of this pass. The guarded correction has now synchronized both public records to:
 
 - Tal I. Sommer and Ori Katz
 - *Physical Review Applied* 25(2), article 024064, published 20 February 2026
 - DOI: `10.1103/p97k-sf71`
 
-A separate guarded public-metadata correction updates only the existing README and homepage records; no survey-text or PDF change is required for this correction because the LaTeX source already cites the final journal record.
+This correction required no survey-text or PDF rebuild because the LaTeX source already cited the final journal record.
 
 ## Pending radar/THz source integration carried forward
 
@@ -45,8 +45,8 @@ The revised synchronizer integrates these records together with the ptychographi
 
 ## Intended cross-artifact changes
 
-- `README.md`: add the three missing radar/THz/coherent-optical records; correct Learnable Physical Priors to ICCV 2025 and passive acoustic localization to Physical Review Applied 2026; extend the 2025/2026 timeline and audit log.
-- `index.html`: add three searchable paper objects, correct both final venues/links, update the 2026 development timeline, and recompute the tracked-entry count.
+- `README.md`: add the three missing radar/THz/coherent-optical records; correct Learnable Physical Priors to ICCV 2025; extend the 2025/2026 timeline and audit log. The passive-acoustic final venue is already corrected.
+- `index.html`: add three searchable paper objects, correct the ICCV venue/link, update the 2026 development timeline, and recompute the tracked-entry count. The passive-acoustic final venue is already corrected.
 - `article/5newscenes.tex`: add semantically placed operator-learned mmWave, sub-THz, and ptychography-enhanced correlography review paragraphs.
 - `article/4datadriven.tex`: identify Learnable Physical Priors as the final ICCV 2025 work while retaining its existing citation key and technical discussion.
 - `bare_jrnl.tex`: advance coverage through 19 July 2026 and add a source-integration marker.
