@@ -1,12 +1,14 @@
-name: Sync 19 July 2026 radar and THz operator citation trace
+name: Sync 19 July 2026 radar THz and ptychography citation trace
 
 on:
   push:
     branches: [master]
     paths:
       - egbib_20260719_radar_operator_updates.bib
+      - egbib_20260719_ptycho_venue_updates.bib
       - scripts/sync_nlos_20260719_radar_operator.py
       - updates/2026-07-19-radar-operator-citation-trace.md
+      - updates/2026-07-19-ptycho-and-venue-followup.md
       - .github/workflows/sync_nlos_radar_operator_20260719.yml
   workflow_dispatch:
 
@@ -44,11 +46,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-19-radar-operator-citation-trace.md
+          git add README.md index.html article/4datadriven.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-19-radar-operator-citation-trace.md updates/2026-07-19-ptycho-and-venue-followup.md
           if git diff --cached --quiet; then
             echo "Source artifacts already synchronized."
           else
-            git commit -m "Integrate learned mmWave and THz NLOS operators"
+            git commit -m "Integrate radar THz and ptychographic NLOS citation trace"
             git fetch origin master
             git rebase origin/master
             git push origin HEAD:master
@@ -61,7 +63,7 @@ jobs:
 
       - name: Clean-build survey PDF
         run: |
-          cp bare_jrnl.pdf /tmp/bare_jrnl_before_radar_operator_20260719.pdf
+          cp bare_jrnl.pdf /tmp/bare_jrnl_before_radar_ptycho_20260719.pdf
           rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.fdb_latexmk bare_jrnl.fls
           latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex
 
@@ -69,14 +71,14 @@ jobs:
         run: |
           test -s bare_jrnl.pdf
           test -s bare_jrnl.bbl
-          test -s /tmp/bare_jrnl_before_radar_operator_20260719.pdf
+          test -s /tmp/bare_jrnl_before_radar_ptycho_20260719.pdf
           pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
-          mkdir -p /tmp/nlos_pdf_radar_before /tmp/nlos_pdf_radar_after
-          pdftoppm -png -r 72 /tmp/bare_jrnl_before_radar_operator_20260719.pdf /tmp/nlos_pdf_radar_before/page >/dev/null 2>&1
-          pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_radar_after/page >/dev/null 2>&1
-          test "$(find /tmp/nlos_pdf_radar_before -name 'page-*.png' | wc -l)" -gt 0
-          test "$(find /tmp/nlos_pdf_radar_after -name 'page-*.png' | wc -l)" -gt 0
+          mkdir -p /tmp/nlos_pdf_before /tmp/nlos_pdf_after
+          pdftoppm -png -r 72 /tmp/bare_jrnl_before_radar_ptycho_20260719.pdf /tmp/nlos_pdf_before/page >/dev/null 2>&1
+          pdftoppm -png -r 72 bare_jrnl.pdf /tmp/nlos_pdf_after/page >/dev/null 2>&1
+          test "$(find /tmp/nlos_pdf_before -name 'page-*.png' | wc -l)" -gt 0
+          test "$(find /tmp/nlos_pdf_after -name 'page-*.png' | wc -l)" -gt 0
           if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then
             echo "Undefined citations or references detected" >&2
             exit 1
@@ -97,6 +99,7 @@ jobs:
 
           readme = read("README.md")
           index = read("index.html")
+          learning = read("article/4datadriven.tex")
           newscenes = read("article/5newscenes.tex")
           master = read("bare_jrnl.tex")
           bib = read("egbib_merged_20260711.bib")
@@ -106,6 +109,7 @@ jobs:
           records = [
               ("RM Operator Learning-driven Non-line-of-sight 3D Imaging Method for Millimeter Wave Radar", "chenRMOperatorMmWaveNLOS2026"),
               ("Learning to See Around Corners: A Deep Unfolding Framework for Terahertz Radar Non-Line-of-Sight 3D Imaging", "chenDeepUnfoldingTHzNLOS2026"),
+              ("Ptychography-enhanced correlography for non-line-of-sight imaging", "liuPtychographyCorrelographyNLOS2026"),
           ]
           for title, key in records:
               if readme.count("[" + title + "]") != 1:
@@ -119,10 +123,20 @@ jobs:
               if key.lower() not in bbl:
                   raise SystemExit(f"Generated bibliography does not cite: {key}")
 
+          generalizable = "Generalizable Non-Line-of-Sight Imaging with Learnable Physical Priors"
+          if readme.count("[" + generalizable + "]") != 1 or "| ICCV 2025 |" not in readme:
+              raise SystemExit("README final-venue correction missing")
+          if index.count('title:"' + generalizable + '"') != 1 or 'venue:"ICCV 2025"' not in index:
+              raise SystemExit("Homepage final-venue correction missing")
+          if "final ICCV 2025 framework with learnable physical priors" not in learning:
+              raise SystemExit("Survey final-venue sentence missing")
+          if bib.lower().count("{sungeneralizable2025,") != 1 or "international conference on computer vision" not in bib.lower():
+              raise SystemExit("Final ICCV bibliography override missing")
+
           if "through 19 july 2026" not in master.lower():
               raise SystemExit("Master survey coverage date was not advanced to 19 July 2026")
-          if "radar/thz citation trace integrates learned range-migration" not in master.lower():
-              raise SystemExit("Master LaTeX radar/THz integration marker missing")
+          if "radar/thz/ptychography citation trace integrates" not in master.lower():
+              raise SystemExit("Master integration marker missing")
 
           paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', index, flags=re.MULTILINE))
           match = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', index)
@@ -132,12 +146,14 @@ jobs:
           expected_pdf_phrases = [
               "operator-learned range migration for mmwave nlos",
               "deep-unfolded sub-thz radar imaging",
+              "ptychography-enhanced steady-state correlography",
+              "final iccv 2025 framework with learnable physical priors",
           ]
           for phrase in expected_pdf_phrases:
               if phrase not in pdf:
                   raise SystemExit(f"Generated PDF is missing: {phrase}")
 
-          print(f"Radar/THz artifacts are mutually consistent across {paper_count} homepage entries.")
+          print(f"Radar/THz/ptychography artifacts are mutually consistent across {paper_count} homepage entries.")
           PY
           rm bare_jrnl.txt
 
@@ -150,7 +166,7 @@ jobs:
             echo "Survey PDF already current."
             exit 0
           fi
-          git commit -m "Rebuild survey for learned radar and THz NLOS operators"
+          git commit -m "Rebuild survey for radar THz and ptychographic NLOS"
           git fetch origin master
           git rebase origin/master
           git push origin HEAD:master
