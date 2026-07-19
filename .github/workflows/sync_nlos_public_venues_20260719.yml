@@ -1,0 +1,53 @@
+name: Correct 19 July 2026 public NLOS venue metadata
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - scripts/fix_nlos_public_venues_20260719.py
+      - .github/workflows/sync_nlos_public_venues_20260719.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-nlos-public-venues-20260719
+  cancel-in-progress: false
+
+jobs:
+  correct-public-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Correct public venue metadata
+        run: python scripts/fix_nlos_public_venues_20260719.py
+      - name: Validate and commit
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          title = "Passive acoustic non-line-of-sight localization without a relay surface"
+          readme = Path("README.md").read_text(encoding="utf-8")
+          index = Path("index.html").read_text(encoding="utf-8")
+          assert readme.count("[" + title + "]") == 1
+          assert "Physical Review Applied 2026" in next(line for line in readme.splitlines() if "[" + title + "]" in line)
+          assert index.count('title:"' + title + '"') == 1
+          assert 'venue:"Physical Review Applied 2026"' in next(line for line in index.splitlines() if 'title:"' + title + '"' in line)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html
+          if git diff --cached --quiet; then
+            echo "Public venue metadata already current."
+          else
+            git commit -m "Correct passive acoustic NLOS final venue"
+            git fetch origin master
+            git rebase origin/master
+            git push origin HEAD:master
+          fi
