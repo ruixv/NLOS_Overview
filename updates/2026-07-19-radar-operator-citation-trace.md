@@ -40,3 +40,5 @@ The guarded synchronizer updates:
 ## Latest-paper check
 
 No directly relevant NLOS imaging paper later than *Non-line-of-sight imaging via physics-informed cascade learning*, published 15 July 2026, was verified during this run. A SIGGRAPH 2026 item published online on 19 July was not added because the available public metadata did not establish direct hidden-scene imaging or reconstruction relevance.
+
+<!-- workflow trigger: radar-operator synchronization -->
