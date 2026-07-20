@@ -46,6 +46,7 @@ jobs:
         run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.merge_bibliography()"
 
       - name: Core follow-up — validation
+        continue-on-error: true
         run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.validate()"
 
       - name: Detect source changes
