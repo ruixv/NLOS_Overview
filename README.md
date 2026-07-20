@@ -64,10 +64,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 20 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 21 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2024 | [Efficient non-line-of-sight tracking with computational neuromorphic imaging](https://doi.org/10.1364/OL.530066) — Zhu et al. | Optics Letters 2024 | Uses an event camera to retain only motion-induced changes in dynamic NLOS speckle, suppressing static relay/background redundancy and enabling direct, efficient hidden-target motion estimation without first reconstructing a complete hidden scene. |
 | 2025 | [Zero-Phase Phasor Fields for Non-Line-of-Sight Imaging](https://doi.org/10.1109/ICCP64821.2025.11143850) — Luesia-Lahoz et al. | IEEE ICCP 2025 | Uses zero crossings of the virtual phasor-field phase as a geometry cue, obtaining highly precise hidden depth while retaining the noise robustness of phase-based wave propagation. |
 | 2024 | [Towards a More Accurate Light Transport Model for Non-Line-of-Sight Imaging](https://doi.org/10.1364/OE.508034) — Sultan, Reza, Velten | Optics Express 2024 | Derives a more complete transient transport model that unifies time-of-flight and shadow/occlusion NLOS formulations and exposes approximations made by widely used three-bounce models. |
 | 2024 | [Cohesive Framework for Non-Line-of-Sight Imaging Based on Dirac Notation](https://doi.org/10.1364/OE.518466) — Redo-Sanchez et al. | Optics Express 2024 | Places backprojection, f-k migration, and phasor-field propagation in one operator notation, clarifying their mathematical relationships and the role of Rayleigh–Sommerfeld propagation. |
@@ -275,6 +276,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
 2024 ── Li et al.: ST-Mamba — state-space temporal modeling and phasor-domain wave supervision for consistent dynamic NLOS video [NeurIPS]
    │     Pueyo-Ciutad et al.: time-gated polarization — picosecond polarimetric transport reduces the missing cone and recovers directionally ambiguous hidden surfaces [SIGGRAPH Asia]
+   │     Zhu et al.: computational neuromorphic NLOS tracking — event streams isolate motion-induced speckle changes for direct hidden-target motion estimation [Optics Letters]
    │     Sultan et al.: accurate transport modeling — a unified formulation connects transient ToF and occlusion/shadow NLOS [Optics Express]
    │     Redo-Sanchez et al.: Dirac-notation framework — backprojection, f-k migration, and phasor fields become comparable operators [Optics Express]
    │     Czajkowski and Murray-Bruce: TERI — two doorway edges and one ordinary image enable passive full-colour 3D NLOS [Nature Communications]
