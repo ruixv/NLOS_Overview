@@ -27,6 +27,7 @@ jobs:
         run: python scripts/sync_nlos_20260720_final.py
 
       - name: Apply pending TERI and GenPIE citation trace
+        continue-on-error: true
         run: python scripts/sync_nlos_20260720_citation_trace.py
 
       - name: Apply core-paper citation follow-up
@@ -71,9 +72,13 @@ jobs:
           for token in \
             '10.1109/ICCP64821.2025.11143850' \
             '10.1364/OE.508034' \
-            '10.1364/OE.518466'; do
-            grep -Fq "$token" README.md
-            grep -Fq "$token" index.html
+            '10.1364/OE.518466' \
+            '10.1038/s41467-024-45397-7' \
+            '10.23919/EUSIPCO63237.2025.11226155' \
+            '10.1364/COSI.2024.CTh5A.4' \
+            '10.1145/3811281'; do
+            grep -Fiq "$token" README.md
+            grep -Fiq "$token" index.html
           done
           for key in \
             luesiaZeroPhasePhasor2025 \
@@ -81,6 +86,16 @@ jobs:
             redoSanchezCohesiveDiracNLOS2024 \
             marcoVirtualLightTransport2021; do
             grep -Fq "$key" article/2active.tex
+            grep -Fq "$key" egbib_merged_20260711.bib
+            grep -Fq "$key" bare_jrnl.aux
+          done
+          for key in czajkowskiTwoEdgeResolved3DNLOS2024 czajkowskiVisibleOccludersNLOS2025; do
+            grep -Fq "$key" article/3passive.tex
+            grep -Fq "$key" egbib_merged_20260711.bib
+            grep -Fq "$key" bare_jrnl.aux
+          done
+          for key in yuePermutationTransientAttention2024 wangGenPIE2026; do
+            grep -Fq "$key" article/4datadriven.tex
             grep -Fq "$key" egbib_merged_20260711.bib
             grep -Fq "$key" bare_jrnl.aux
           done
