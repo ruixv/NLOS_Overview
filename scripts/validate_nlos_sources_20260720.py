@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Cross-artifact validator for the final 20 July 2026 source integration run."""
 from __future__ import annotations
 
 import re
