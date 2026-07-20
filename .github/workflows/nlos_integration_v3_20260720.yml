@@ -1,0 +1,70 @@
+name: NLOS integration v3
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout pull-request branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Update README
+        run: python -c "import importlib.util as u; s=u.spec_from_file_location('x','scripts/sync_nlos_20260720_scanfree_event.py'); m=u.module_from_spec(s); s.loader.exec_module(m); m.update_readme()"
+
+      - name: Update website
+        run: python -c "import importlib.util as u; s=u.spec_from_file_location('x','scripts/sync_nlos_20260720_scanfree_event.py'); m=u.module_from_spec(s); s.loader.exec_module(m); m.update_index()"
+
+      - name: Update active survey section
+        run: python -c "import importlib.util as u; s=u.spec_from_file_location('x','scripts/sync_nlos_20260720_scanfree_event.py'); m=u.module_from_spec(s); s.loader.exec_module(m); m.update_active_tex()"
+
+      - name: Update passive survey section
+        run: python scripts/update_passive_event_20260720.py
+
+      - name: Update master survey and bibliography
+        run: python -c "import importlib.util as u; s=u.spec_from_file_location('x','scripts/sync_nlos_20260720_scanfree_event.py'); m=u.module_from_spec(s); s.loader.exec_module(m); m.update_master_and_bib()"
+
+      - name: Update integration notes
+        run: python -c "import importlib.util as u; s=u.spec_from_file_location('x','scripts/sync_nlos_20260720_scanfree_event.py'); m=u.module_from_spec(s); s.loader.exec_module(m); m.update_notes()"
+
+      - name: Validate source consistency
+        run: python scripts/validate_nlos_sources_20260720.py
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Validate rendered PDF
+        run: |
+          python -m pip install --quiet pypdf
+          python scripts/validate_nlos_pdf_v3_20260720.py
+
+      - name: Commit integrated sources and PDF
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/2active.tex article/3passive.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-07-19-scanfree-spatial-correlation-citation-trace.md updates/2026-07-20-event-camera-final-venue-correction.md
+          git rm -f .github/workflows/nlos_integration_v3_20260720.yml scripts/update_passive_event_20260720.py scripts/validate_nlos_sources_20260720.py scripts/validate_nlos_pdf_v3_20260720.py .github/workflows/sync_nlos_scanfree_event_20260720.yml scripts/sync_nlos_20260720_scanfree_event.py
+          git commit -m 'Integrate scan-free and event-camera NLOS updates'
+          git push origin HEAD:${HEAD_BRANCH}
