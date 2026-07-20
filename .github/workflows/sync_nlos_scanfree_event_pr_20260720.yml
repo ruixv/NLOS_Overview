@@ -28,7 +28,60 @@ jobs:
           python-version: '3.12'
 
       - name: Apply guarded cross-artifact synchronization
-        run: python scripts/sync_nlos_20260720_scanfree_event.py
+        run: |
+          python - <<'PY'
+          import importlib.util
+          import re
+          from pathlib import Path
+
+          spec = importlib.util.spec_from_file_location(
+              'nlos_sync', 'scripts/sync_nlos_20260720_scanfree_event.py'
+          )
+          sync = importlib.util.module_from_spec(spec)
+          assert spec.loader is not None
+          spec.loader.exec_module(sync)
+          sync.update_readme()
+          sync.update_index()
+          sync.update_active_tex()
+          sync.update_passive_tex()
+          sync.update_master_and_bib()
+          sync.update_notes()
+
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          active = Path('article/2active.tex').read_text(encoding='utf-8')
+          passive = Path('article/3passive.tex').read_text(encoding='utf-8')
+          master = Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+
+          for doi in ('10.1063/5.0235687', '10.1016/j.optlaseng.2025.109100'):
+              if readme.count(doi) != 1 or index.count(doi) != 1 or doi not in bib:
+                  raise SystemExit(f'Cross-artifact DOI validation failed: {doi}')
+          event_doi = '10.1109/jsen.2024.3468909'
+          if readme.lower().count(event_doi) != 1 or index.lower().count(event_doi) != 1 or event_doi not in bib.lower():
+              raise SystemExit('Cross-artifact event-camera DOI validation failed')
+          if any('2404.05977' in item for item in (readme, index, bib)):
+              raise SystemExit('Obsolete event-camera preprint metadata remains')
+
+          for key, source in (
+              ('zhangRealTimeScanFreeNLOS2024', active),
+              ('zhangSpatialCorrelationNLOS2025', active),
+              ('wangEventEnhancedPassiveNLOS2024', passive),
+          ):
+              if key not in source or bib.count('{' + key + ',') != 1:
+                  raise SystemExit(f'Citation/BibTeX consistency failed: {key}')
+          if 'through 20 July 2026' not in master:
+              raise SystemExit('Survey coverage date was not advanced')
+
+          papers = re.search(r'const\s+papers\s*=\s*\[(.*?)\n\s*\];', index, flags=re.DOTALL)
+          stat = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', index)
+          if not papers or not stat:
+              raise SystemExit('Website paper-array or statistic missing')
+          count = len(re.findall(r'\{cat:"', papers.group(1)))
+          if int(stat.group(1)) != count:
+              raise SystemExit(f'Website count mismatch: stat={stat.group(1)}, objects={count}')
+          print('Guarded source synchronization and consistency validation passed.')
+          PY
 
       - name: Build the updated LaTeX survey
         uses: xu-cheng/latex-action@v3
@@ -60,13 +113,13 @@ jobs:
           reader = PdfReader(str(pdf))
           if len(reader.pages) < 10:
               raise SystemExit('Regenerated survey has an implausibly small page count')
-          compact = re.sub(r'\s+', ' ', '\n'.join((p.extract_text() or '') for p in reader.pages)).lower()
+          compact = re.sub(r'[^a-z0-9]+', ' ', '\n'.join((p.extract_text() or '') for p in reader.pages).lower())
           for phrase in (
-              'scan-free transient acquisition',
-              'spatial-correlation super-resolution for scan-free nlos',
-              'event-camera passive nlos for moving objects',
-              'real-time scan-free non-line-of-sight imaging',
-              'event-enhanced passive non-line-of-sight imaging for moving objects with physical embedding',
+              'scan free transient acquisition',
+              'spatial correlation super resolution for scan free nlos',
+              'event camera passive nlos for moving objects',
+              'real time scan free non line of sight imaging',
+              'event enhanced passive non line of sight imaging for moving objects with physical embedding',
           ):
               if phrase not in compact:
                   raise SystemExit(f'Expected PDF text missing: {phrase}')
@@ -84,6 +137,8 @@ jobs:
             updates/2026-07-19-scanfree-spatial-correlation-citation-trace.md \
             updates/2026-07-20-event-camera-final-venue-correction.md
           git rm -f .automation/nlos-scanfree-event-20260720.trigger \
-            .github/workflows/sync_nlos_scanfree_event_pr_20260720.yml
+            .github/workflows/sync_nlos_scanfree_event_pr_20260720.yml \
+            .github/workflows/sync_nlos_scanfree_event_20260720.yml \
+            scripts/sync_nlos_20260720_scanfree_event.py
           git commit -m 'Integrate scan-free and event-camera NLOS updates'
           git push origin HEAD:${HEAD_BRANCH}
