@@ -26,6 +26,10 @@ The practical range of ordinary-camera passive NLOS is commonly limited by geome
 Passive computational periscopy has primarily reconstructed static hidden intensity, whereas many safety and assistive applications require only the hidden activity class. Sun~\etal~introduced AME-Net, which recognizes actions from standard RGB videos of a visible relay wall by adaptively amplifying weak frame-to-frame motion while reducing environment-specific variation~\cite{sunAdaptiveMotionNLOS2025}. Its alternating recurrent feature extractor combines raw and enhanced frames, and the accompanying NLOS-Action benchmark contains 2,000 synthetic and more than 500 measured videos. This work extends passive NLOS from image recovery and tracking toward semantic temporal understanding without active illumination.
 
 \vspace{0.8mm}
+\noindent \textbf{Event-camera passive NLOS for moving objects.}
+Wang~\etal~used an event camera to isolate asynchronous motion-induced changes in relay-wall diffusion patterns and combined them with a physics-embedded reconstruction network~\cite{wangEventEnhancedPassiveNLOS2024}. Simulation-based pretraining models dynamic light transport and sensor behavior, followed by fine-tuning on limited measured data. This extends frame-based passive NLOS toward neuromorphic acquisition, emphasizing weak temporal changes that would otherwise be attenuated or aliased in conventional video.
+
+\vspace{0.8mm}
 \noindent \textbf{Structure-guided adaptive total variation.}
 A fixed TV weight cannot simultaneously preserve weak boundaries and suppress spatially varying passive-NLOS noise across different scenes. Zhang~\etal~derive a guidance map from a preliminary reconstruction and use it to assign spatially varying regularization strengths~\cite{zhangStructureGuidedATV2026}. The resulting parameter-free SG-ATV solver removes manual tuning while retaining the conventional-camera light-transport model, showing how classical computational periscopy can remain competitive through scene-adaptive optimization rather than learned priors alone.
 
@@ -88,6 +92,7 @@ Passive methods based on speckle coherence have a special imaging model and reco
    \cite{boumanTurningCornersCameras2017} & Ambient light & Conventional camera & Intensity of moving object &  2D reconstruction\\%%%% Table body
    \cite{boumanTurningCornersCameras2017} & Ambient light & Conventional camera & Intensity &  Detection/ Tracking/ Identification\\%%%% Table body
    \cite{sunAdaptiveMotionNLOS2025} & Ambient light & Conventional RGB camera & Temporal relay-wall motion & Action recognition\\%%%% Table body
+   \cite{wangEventEnhancedPassiveNLOS2024} & Ambient/incoherent illumination & Event camera + conventional camera & Asynchronous diffusion-pattern motion with physics-embedded learning & Dynamic 2D reconstruction\\%%%% Table body
    \cite{8747343} & Infrared radiation & Infrared camera & Infrared intensity &  Detection/ Tracking/ Identification\\%%%% Table body
    \cite{geng2022passive} & Ambient/incoherent light & Conventional camera & Intensity via optimal transport &  2D reconstruction\\%%%% Table body
    \cite{zhang2025passive} & Ambient light & Conventional camera & Modulated light transport intensity &  2D/3D reconstruction\\%%%% Table body
