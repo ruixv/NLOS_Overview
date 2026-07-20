@@ -30,8 +30,23 @@ jobs:
         continue-on-error: true
         run: python scripts/sync_nlos_20260720_citation_trace.py
 
-      - name: Apply core-paper citation follow-up
-        run: python scripts/sync_nlos_20260720_core_citation_followup.py
+      - name: Core follow-up — README
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.update_readme()"
+
+      - name: Core follow-up — website
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.update_index()"
+
+      - name: Core follow-up — active survey
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.update_active()"
+
+      - name: Core follow-up — master TeX metadata
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.update_master()"
+
+      - name: Core follow-up — bibliography
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.merge_bibliography()"
+
+      - name: Core follow-up — validation
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.validate()"
 
       - name: Detect source changes
         id: changes
