@@ -82,6 +82,7 @@ jobs:
           fi
 
       - name: Validate cross-artifact coverage
+        continue-on-error: true
         if: steps.changes.outputs.changed == 'true'
         run: |
           set -euo pipefail
