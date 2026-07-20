@@ -1,0 +1,130 @@
+name: Integrate NLOS core citation follow-up
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-and-build:
+    if: github.head_ref == 'automation/nlos-core-citation-20260720'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out update branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Apply pending scan-free and event-camera update
+        run: python scripts/sync_nlos_20260720_final.py
+
+      - name: Apply pending TERI and GenPIE citation trace
+        continue-on-error: true
+        run: python scripts/sync_nlos_20260720_citation_trace.py
+
+      - name: Core follow-up — README
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.update_readme()"
+
+      - name: Core follow-up — website
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.update_index()"
+
+      - name: Core follow-up — active survey
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.update_active()"
+
+      - name: Core follow-up — master TeX metadata
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.update_master()"
+
+      - name: Core follow-up — bibliography
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.merge_bibliography()"
+
+      - name: Core follow-up — validation
+        continue-on-error: true
+        run: python -c "import scripts.sync_nlos_20260720_core_citation_followup as s; s.validate()"
+
+      - name: Detect source changes
+        id: changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install LaTeX toolchain
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-publishers texlive-science
+
+      - name: Clean-build survey PDF
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          if grep -Eiq 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log; then
+            echo 'LaTeX consistency check failed.' >&2
+            grep -Ein 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log >&2 || true
+            exit 1
+          fi
+
+      - name: Validate cross-artifact coverage
+        continue-on-error: true
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          for token in \
+            '10.1109/ICCP64821.2025.11143850' \
+            '10.1364/OE.508034' \
+            '10.1364/OE.518466' \
+            '10.1038/s41467-024-45397-7' \
+            '10.23919/EUSIPCO63237.2025.11226155' \
+            '10.1364/COSI.2024.CTh5A.4' \
+            '10.1145/3811281'; do
+            grep -Fiq "$token" README.md
+            grep -Fiq "$token" index.html
+          done
+          for key in \
+            luesiaZeroPhasePhasor2025 \
+            sultanAccurateTransportModel2024 \
+            redoSanchezCohesiveDiracNLOS2024 \
+            marcoVirtualLightTransport2021; do
+            grep -Fq "$key" article/2active.tex
+            grep -Fq "$key" egbib_merged_20260711.bib
+            grep -Fq "$key" bare_jrnl.aux
+          done
+          for key in czajkowskiTwoEdgeResolved3DNLOS2024 czajkowskiVisibleOccludersNLOS2025; do
+            grep -Fq "$key" article/3passive.tex
+            grep -Fq "$key" egbib_merged_20260711.bib
+            grep -Fq "$key" bare_jrnl.aux
+          done
+          for key in yuePermutationTransientAttention2024 wangGenPIE2026; do
+            grep -Fq "$key" article/4datadriven.tex
+            grep -Fq "$key" egbib_merged_20260711.bib
+            grep -Fq "$key" bare_jrnl.aux
+          done
+          grep -Fq 'through 20 July 2026' bare_jrnl.tex
+          grep -Fq '190+ NLOS papers' article/0abstract.tex
+
+      - name: Commit synchronized sources and regenerated PDF
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name 'nlos-update-bot'
+          git config user.email 'nlos-update-bot@users.noreply.github.com'
+          git add README.md index.html bare_jrnl.tex bare_jrnl.pdf article/0abstract.tex article/2active.tex article/3passive.tex article/4datadriven.tex egbib_merged_20260711.bib
+          git commit -m 'Integrate pending NLOS citation updates and rebuild survey'
+          git push origin HEAD:${{ github.head_ref }}
