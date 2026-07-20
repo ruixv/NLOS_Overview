@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Stable three-space table anchor verified against the current survey source.
 from pathlib import Path
 
 path = Path(__file__).resolve().parents[1] / "article/3passive.tex"
