@@ -1,0 +1,76 @@
+name: Integrate neuromorphic NLOS tracking
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-and-build:
+    if: github.head_ref == 'automation/nlos-neuromorphic-tracking-20260721'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out update branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Apply guarded source synchronization
+        run: python scripts/sync_nlos_20260721_neuromorphic_tracking.py
+
+      - name: Install LaTeX toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-publishers texlive-science
+
+      - name: Clean-build survey PDF
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          if grep -Eiq 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log; then
+            echo 'LaTeX consistency check failed.' >&2
+            grep -Ein 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log >&2 || true
+            exit 1
+          fi
+
+      - name: Validate cross-artifact consistency
+        run: |
+          set -euo pipefail
+          grep -Fq '10.1364/OL.530066' README.md
+          grep -Fq '10.1364/OL.530066' index.html
+          grep -Fq 'zhuEfficientNeuromorphicNLOSTracking2024' article/5newscenes.tex
+          grep -Fq 'zhuEfficientNeuromorphicNLOSTracking2024' egbib_merged_20260711.bib
+          grep -Fq 'zhuEfficientNeuromorphicNLOSTracking2024' bare_jrnl.aux
+          grep -Fq '21 July 2026 citation trace' bare_jrnl.tex
+          grep -Fq 'Updated 21 July 2026' index.html
+          grep -Fq 'Last updated: 21 July 2026' index.html
+          grep -Fq '**Update run: 21 July 2026.**' README.md
+          test "$(grep -Foc '10.1364/OL.530066' README.md)" -eq 1
+          test "$(grep -Foc '10.1364/OL.530066' index.html)" -eq 1
+          test "$(grep -Foc 'zhuEfficientNeuromorphicNLOSTracking2024' egbib_merged_20260711.bib)" -eq 1
+
+      - name: Commit synchronized sources and regenerated PDF
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo 'No source changes were needed.'
+            exit 0
+          fi
+          git config user.name 'nlos-update-bot'
+          git config user.email 'nlos-update-bot@users.noreply.github.com'
+          git add README.md index.html bare_jrnl.tex bare_jrnl.pdf article/5newscenes.tex egbib_merged_20260711.bib
+          git commit -m 'Integrate neuromorphic NLOS tracking and rebuild survey'
+          git push origin HEAD:${{ github.head_ref }}
