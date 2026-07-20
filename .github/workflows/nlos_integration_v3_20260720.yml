@@ -6,6 +6,7 @@ on:
       - master
     types:
       - opened
+      - synchronize
   workflow_dispatch:
 
 permissions:
@@ -13,6 +14,7 @@ permissions:
 
 jobs:
   integrate:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout pull-request branch
