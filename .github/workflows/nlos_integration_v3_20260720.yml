@@ -50,17 +50,43 @@ jobs:
         run: python scripts/validate_nlos_sources_20260720.py
 
       - name: Build survey PDF
+        id: latex
+        continue-on-error: true
         uses: xu-cheng/latex-action@v3
         with:
           root_file: bare_jrnl.tex
           args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
 
+      - name: Commit LaTeX diagnostics on failure
+        if: steps.latex.outcome == 'failure'
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+        run: |
+          mkdir -p updates
+          {
+            echo 'LaTeX build failed during the 20 July 2026 NLOS integration.'
+            echo
+            echo '--- bare_jrnl.log tail ---'
+            tail -n 180 bare_jrnl.log 2>/dev/null || true
+            echo
+            echo '--- latexmk log tail ---'
+            tail -n 180 bare_jrnl.fdb_latexmk 2>/dev/null || true
+          } > updates/2026-07-20-latex-build-error.log
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add updates/2026-07-20-latex-build-error.log
+          git commit -m 'Record NLOS survey LaTeX build failure'
+          git push origin HEAD:${HEAD_BRANCH}
+          exit 1
+
       - name: Validate rendered PDF
+        if: steps.latex.outcome == 'success'
         run: |
           python -m pip install --quiet pypdf
           python scripts/validate_nlos_pdf_v3_20260720.py
 
       - name: Commit integrated sources and PDF
+        if: steps.latex.outcome == 'success'
         env:
           HEAD_BRANCH: ${{ github.head_ref }}
         run: |
