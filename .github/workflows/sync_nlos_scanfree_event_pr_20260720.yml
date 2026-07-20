@@ -1,0 +1,89 @@
+name: Validate and integrate scan-free and event-camera NLOS updates
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '.automation/nlos-scanfree-event-20260720.trigger'
+      - '.github/workflows/sync_nlos_scanfree_event_pr_20260720.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-build-validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull-request branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply guarded cross-artifact synchronization
+        run: python scripts/sync_nlos_20260720_scanfree_event.py
+
+      - name: Build the updated LaTeX survey
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Validate citations, bibliography, and rendered PDF
+        run: |
+          python -m pip install --quiet pypdf
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          from pypdf import PdfReader
+
+          log = Path('bare_jrnl.log').read_text(encoding='utf-8', errors='ignore')
+          for pattern in (
+              r'Citation .* undefined',
+              r'There were undefined references',
+              r'undefined citations',
+              r'Fatal error occurred',
+          ):
+              if re.search(pattern, log, flags=re.IGNORECASE):
+                  raise SystemExit(f'LaTeX validation failed: {pattern}')
+
+          pdf = Path('bare_jrnl.pdf')
+          if not pdf.exists() or pdf.stat().st_size < 100_000:
+              raise SystemExit('bare_jrnl.pdf was not generated or is unexpectedly small')
+          reader = PdfReader(str(pdf))
+          if len(reader.pages) < 10:
+              raise SystemExit('Regenerated survey has an implausibly small page count')
+          compact = re.sub(r'\s+', ' ', '\n'.join((p.extract_text() or '') for p in reader.pages)).lower()
+          for phrase in (
+              'scan-free transient acquisition',
+              'spatial-correlation super-resolution for scan-free nlos',
+              'event-camera passive nlos for moving objects',
+              'real-time scan-free non-line-of-sight imaging',
+              'event-enhanced passive non-line-of-sight imaging for moving objects with physical embedding',
+          ):
+              if phrase not in compact:
+                  raise SystemExit(f'Expected PDF text missing: {phrase}')
+          print(f'Validated {len(reader.pages)} PDF pages.')
+          PY
+
+      - name: Commit synchronized artifacts to the pull-request branch
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/2active.tex article/3passive.tex bare_jrnl.tex \
+            egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-07-19-scanfree-spatial-correlation-citation-trace.md \
+            updates/2026-07-20-event-camera-final-venue-correction.md
+          git rm -f .automation/nlos-scanfree-event-20260720.trigger \
+            .github/workflows/sync_nlos_scanfree_event_pr_20260720.yml
+          git commit -m 'Integrate scan-free and event-camera NLOS updates'
+          git push origin HEAD:${HEAD_BRANCH}
