@@ -7,11 +7,11 @@ key = "wangEventEnhancedPassiveNLOS2024"
 
 if key not in text:
     row_anchor = (
-        "    \\cite{sunAdaptiveMotionNLOS2025} & Ambient light & Conventional RGB camera & "
+        "   \\cite{sunAdaptiveMotionNLOS2025} & Ambient light & Conventional RGB camera & "
         "Temporal relay-wall motion & Action recognition\\\\%%%% Table body\n"
     )
     event_row = (
-        "    \\cite{wangEventEnhancedPassiveNLOS2024} & Ambient/incoherent illumination & "
+        "   \\cite{wangEventEnhancedPassiveNLOS2024} & Ambient/incoherent illumination & "
         "Event camera + conventional camera & Asynchronous diffusion-pattern motion with "
         "physics-embedded learning & Dynamic 2D reconstruction\\\\%%%% Table body\n"
     )
