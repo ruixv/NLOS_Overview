@@ -25,16 +25,35 @@ jobs:
 
       - name: Apply all pending guarded synchronizers
         run: |
-          set -euo pipefail
-          python scripts/sync_nlos_20260720_final.py
-          python scripts/sync_nlos_20260720_citation_trace.py
-          python scripts/sync_nlos_20260720_core_citation_followup.py
+          set +e
+          mkdir -p updates
+          : > updates/2026-07-20-integration-diagnostics.log
+          rc=0
+          for script in \
+            scripts/sync_nlos_20260720_final.py \
+            scripts/sync_nlos_20260720_citation_trace.py \
+            scripts/sync_nlos_20260720_core_citation_followup.py; do
+            echo "===== $script =====" | tee -a updates/2026-07-20-integration-diagnostics.log
+            python "$script" 2>&1 | tee -a updates/2026-07-20-integration-diagnostics.log
+            rc=${PIPESTATUS[0]}
+            if [ "$rc" -ne 0 ]; then
+              break
+            fi
+          done
+          if [ "$rc" -ne 0 ]; then
+            git config user.name 'nlos-update-bot'
+            git config user.email 'nlos-update-bot@users.noreply.github.com'
+            git add updates/2026-07-20-integration-diagnostics.log
+            git commit -m 'Record NLOS synchronization failure diagnostics' || true
+            git push origin HEAD:${{ github.head_ref }} || true
+            exit "$rc"
+          fi
 
       - name: Detect source changes
         id: changes
         shell: bash
         run: |
-          if git diff --quiet; then
+          if git diff --quiet -- . ':!updates/2026-07-20-integration-diagnostics.log'; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -91,6 +110,7 @@ jobs:
           set -euo pipefail
           git config user.name 'nlos-update-bot'
           git config user.email 'nlos-update-bot@users.noreply.github.com'
+          rm -f updates/2026-07-20-integration-diagnostics.log
           git add README.md index.html bare_jrnl.tex bare_jrnl.pdf article/0abstract.tex article/2active.tex article/3passive.tex article/4datadriven.tex egbib_merged_20260711.bib
           git commit -m 'Integrate pending NLOS citation updates and rebuild survey'
           git push origin HEAD:${{ github.head_ref }}
