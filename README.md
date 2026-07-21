@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [Deep Learning–Aided Frequency-Modulated Continuous-Wave Radar for Around-the-Corner Non-Line-of-Sight Perception at Urban Intersections](https://doi.org/10.32604/cmes.2026.078862) — Lin, Chen | Computer Modeling in Engineering & Sciences 2026 | Uses simulated 77 GHz automotive FMCW echoes and a compact residual AlexNet-derived chirp-restoration network to exploit building specular reflections for around-corner range and angle estimation at urban intersections. The paper is an application-facing NLOS radar-perception result; all reported evaluations are simulation-only, with measured-data validation left for future work. |
 | 2024 | [Non-Line-of-Sight Imaging and Vibrometry Using a Comb-Calibrated Coherent Sensor](https://doi.org/10.1103/PhysRevLett.132.233802) — Huang et al. | Physical Review Letters 2024 | Establishes coherent optical NLOS sensing with an optical-frequency-comb-calibrated FMCW LiDAR, providing sub-picosecond effective temporal resolution, submillimeter hidden-scene localization and 3D imaging, and frequency-resolved NLOS vibrometry under strong ambient light. |
 | 2025 | [High-Resolution Non-Line-of-Sight Tracking by Comb-Calibrated FMCW LiDAR](https://doi.org/10.1002/lpor.202401250) — Ye et al. | Laser & Photonics Reviews 2025 | Extends comb-calibrated coherent NLOS from static imaging to snapshot multi-object tracking, reporting 2 mm 3D position accuracy and 2 mm/s velocity accuracy without temporal accumulation. |
 | 2025 | [Non-Line-of-Sight Ranging and 3D Imaging Using Vector Enhanced Sensitive FMCW LiDAR](https://doi.org/10.1109/JLT.2024.3523206) — Chen et al. | Journal of Lightwave Technology 2025 | Uses laser-feedback interferometry, polarization-vector enhancement, and K-domain resampling for a simpler sensitive FMCW architecture, demonstrating better-than-32-µm NLOS absolute ranging and millimeter-level hidden 3D imaging at about 2.8 m. |
@@ -304,6 +305,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Raji & Murray-Bruce: MDUNet — fast joint 2D/3D passive computational periscopy [WACV]
    │     Somasundaram et al.: consumer-LiDAR NLOS via motion-induced aperture sampling [Nature]
    │     Lu et al. and Behari et al.: RF geometry reconstruction and low-cost-LiDAR spatial-reasoning benchmarks [CVPR]
+   │     Lin and Chen: urban-intersection FMCW NLOS perception — chirp-level residual learning suppresses simulated interference before conventional range/angle estimation [Computer Modeling in Engineering & Sciences]
    │     Gao et al.: learned LCT — high-frequency-preserving trainable inversion grounded in the original light-cone transform [Physical Review Applied]
    │     Sun et al.: TransVID — diffusion-based spatial-temporal interpolation for dynamic transient video [Optics Express]
    │     Wang et al.: diffuse-aware attention encoding for passive NLOS through relay-wall diffusion [Optics Express]
