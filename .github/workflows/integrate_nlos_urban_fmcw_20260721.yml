@@ -1,0 +1,68 @@
+name: Integrate urban-intersection FMCW NLOS citation trace
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-build-validate:
+    if: github.head_ref == 'automation/nlos-urban-fmcw-20260721'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out update branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Synchronize source artifacts
+        run: python scripts/sync_nlos_20260721_urban_fmcw.py
+
+      - name: Validate synchronized sources
+        run: python scripts/validate_nlos_20260721_urban_fmcw.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-publishers texlive-science poppler-utils
+
+      - name: Clean-build survey PDF
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
+          grep -Fq 'Urban-intersection FMCW radar perception' /tmp/bare_jrnl.txt
+          ! grep -Eq 'LaTeX Warning: Citation .* undefined' bare_jrnl.log
+          ! grep -Fq 'There were undefined references' bare_jrnl.log
+          grep -Fq 'linDeepLearningFMCWRadar2026' bare_jrnl.aux
+
+      - name: Revalidate sources after build
+        run: python scripts/validate_nlos_20260721_urban_fmcw.py
+
+      - name: Commit synchronized sources and regenerated PDF
+        run: |
+          set -euo pipefail
+          git config user.name 'nlos-update-bot'
+          git config user.email 'nlos-update-bot@users.noreply.github.com'
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit.'
+          else
+            git commit -m 'Integrate urban-intersection FMCW radar NLOS perception'
+            git push origin HEAD:${{ github.head_ref }}
+          fi
