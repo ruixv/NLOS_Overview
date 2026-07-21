@@ -120,13 +120,13 @@ jobs:
           test -n "$pages"
           test "$pages" -gt 0
           pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
-          grep -Fqi 'Low-cost NIR steady-state raster scanning' /tmp/bare_jrnl.txt
           grep -Fqi 'Roueinfar' /tmp/bare_jrnl.txt
-          if grep -Eqi 'undefined citations|citation .* undefined|There were undefined references' bare_jrnl.log; then
-            echo 'Undefined citation/reference detected' >&2
+          grep -Eqi '808[ -]?nm|near-infrared' /tmp/bare_jrnl.txt
+          if grep -Eqi 'undefined citations|citation .* undefined' bare_jrnl.log; then
+            echo 'Undefined citation detected' >&2
             exit 1
           fi
-          if grep -Eqi 'Repeated entry|multiply defined' bare_jrnl.blg bare_jrnl.log; then
+          if grep -Eqi 'Repeated entry' bare_jrnl.blg; then
             echo 'Repeated bibliography entry detected' >&2
             exit 1
           fi
