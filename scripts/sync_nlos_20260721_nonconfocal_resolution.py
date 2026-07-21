@@ -145,6 +145,17 @@ def validate_sources() -> None:
             raise RuntimeError(f"article/2active.tex: key not integrated in table and prose: {key}")
 
 
+def bibliography_matches(token: str) -> list[str]:
+    found: list[str] = []
+    for path in sorted(ROOT.glob("egbib*.bib")):
+        text = path.read_text(encoding="utf-8-sig")
+        if token in text:
+            entries = re.findall(r"(?ms)^@(\w+)\s*\{\s*([^,]+),.*?^\}", text)
+            entry_ids = [entry_id.strip() for _kind, entry_id in entries if token in text]
+            found.append(f"{path.name}: token_count={text.count(token)}, parsed_entry_count={len(entries)}, entry_ids_sample={entry_ids[:8]}")
+    return found
+
+
 def main() -> None:
     update_readme()
     update_index()
@@ -154,8 +165,18 @@ def main() -> None:
     subprocess.run([sys.executable, str(ROOT / "scripts/merge_nlos_bibliography.py")], cwd=ROOT, check=True)
     merged = read("egbib_merged_20260711.bib")
     for key, doi in zip(KEYS, DOIS):
-        if merged.count(key) != 1 or merged.count(doi) != 1:
-            raise RuntimeError(f"merged bibliography inconsistency for {key} / {doi}")
+        key_count = merged.count(key)
+        doi_count = merged.count(doi)
+        if key_count != 1 or doi_count != 1:
+            details = [
+                f"merged key_count={key_count}",
+                f"merged doi_count={doi_count}",
+                *bibliography_matches(key),
+                *bibliography_matches(doi),
+            ]
+            raise RuntimeError(
+                f"merged bibliography inconsistency for {key} / {doi}: " + " | ".join(details)
+            )
     print("Integrated three verified non-confocal resolution papers.")
 
 
