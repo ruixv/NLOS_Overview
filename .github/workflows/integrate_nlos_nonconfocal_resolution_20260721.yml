@@ -83,7 +83,7 @@ jobs:
             grep -Fq "$doi" index.html
             test "$(grep -Foc "$doi" README.md)" -eq 1
             test "$(grep -Foc "$doi" index.html)" -eq 1
-            test "$(grep -Foc "$doi" egbib_merged_20260711.bib)" -eq 1
+            test "$(grep -Eic "^[[:space:]]*doi[[:space:]]*=[[:space:]]*\\{$doi\\}" egbib_merged_20260711.bib)" -eq 1
           done
           for key in zhengSemiConfocalNLOS2024 wangIRFDeconvolutionNLOS2024 yuSphericalSliceNonconfocal2024; do
             grep -Fq "$key" article/2active.tex
