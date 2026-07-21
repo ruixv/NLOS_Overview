@@ -98,7 +98,7 @@ jobs:
           fi
           test "$(grep -F "$doi" README.md | wc -l)" -eq 1
           test "$(grep -F "$doi" index.html | wc -l)" -eq 1
-          test "$(grep -F "@$key" egbib_merged_20260711.bib | wc -l)" -eq 1
+          test "$(grep -F "{$key," egbib_merged_20260711.bib | wc -l)" -eq 1
 
       - name: Clean LaTeX build
         shell: bash
