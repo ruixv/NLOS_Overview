@@ -1,0 +1,130 @@
+name: Sync NIR final venue and rebuild survey
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'scripts/sync_nlos_20260722_nir_final_venue.py'
+      - 'updates/2026-07-22-nir-final-venue-correction.md'
+      - '.github/workflows/sync_nlos_nir_final_venue_20260722.yml'
+      - '.github/nir-final-venue-trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-nir-final-venue-20260722
+  cancel-in-progress: false
+
+jobs:
+  synchronize-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python and LaTeX dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install bibtexparser
+          sudo apt-get update
+          sudo apt-get install -y \
+            texlive-latex-base \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            texlive-science \
+            texlive-publishers \
+            texlive-bibtex-extra \
+            poppler-utils
+
+      - name: Synchronize corrected final venue
+        run: python scripts/sync_nlos_20260722_nir_final_venue.py
+
+      - name: Regenerate consolidated bibliography
+        run: python scripts/merge_nlos_bibliography.py
+
+      - name: Validate synchronized sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          doi='10.1109/ICEE67339.2025.11213924'
+          key='roueinfarNIRRaster2025'
+          grep -Fq "$doi" README.md
+          grep -Fq '| IEEE ICEE 2025 |' README.md
+          grep -Fq "$doi" index.html
+          grep -Fq 'venue:"IEEE ICEE 2025"' index.html
+          grep -Fq "$key" article/2active.tex
+          grep -Fq "$key" egbib_merged_20260711.bib
+          grep -Fq '22 July 2026 venue audit' bare_jrnl.tex
+          if grep -Fq 'https://arxiv.org/abs/2607.04183' README.md; then
+            echo 'README still uses the superseded arXiv URL' >&2
+            exit 1
+          fi
+          if grep -Fq 'https://arxiv.org/abs/2607.04183' index.html; then
+            echo 'Homepage still uses the superseded arXiv URL' >&2
+            exit 1
+          fi
+          test "$(grep -F "$doi" README.md | wc -l)" -eq 1
+          test "$(grep -F "$doi" index.html | wc -l)" -eq 1
+          test "$(grep -F "@$key" egbib_merged_20260711.bib | wc -l)" -eq 1
+
+      - name: Clean LaTeX build
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate PDF and citations
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          grep -Fqi 'Low-cost NIR steady-state raster scanning' /tmp/bare_jrnl.txt
+          grep -Fqi 'Roueinfar' /tmp/bare_jrnl.txt
+          if grep -Eqi 'undefined citations|citation .* undefined|There were undefined references' bare_jrnl.log; then
+            echo 'Undefined citation/reference detected' >&2
+            exit 1
+          fi
+          if grep -Eqi 'Repeated entry|multiply defined' bare_jrnl.blg bare_jrnl.log; then
+            echo 'Repeated bibliography entry detected' >&2
+            exit 1
+          fi
+
+      - name: Commit synchronized public artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            README.md \
+            index.html \
+            article/2active.tex \
+            bare_jrnl.tex \
+            bare_jrnl.pdf \
+            egbib_20260722_nir_final_venue_updates.bib \
+            egbib_merged_20260711.bib \
+            updates/2026-07-11-bibliography-deduplication.md
+          if git diff --cached --quiet; then
+            echo 'No synchronized changes remain to commit.'
+          else
+            git commit -m 'Correct NIR raster-scanning paper to IEEE ICEE 2025'
+            git push
+          fi
