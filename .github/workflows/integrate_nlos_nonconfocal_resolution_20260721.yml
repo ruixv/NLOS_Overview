@@ -17,6 +17,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
+          show-progress: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,7 +28,21 @@ jobs:
         run: python -m pip install --disable-pip-version-check bibtexparser==1.4.1
 
       - name: Apply guarded source synchronization
-        run: python scripts/sync_nlos_20260721_nonconfocal_resolution.py
+        run: |
+          set +e
+          python scripts/sync_nlos_20260721_nonconfocal_resolution.py > /tmp/nonconfocal-sync.log 2>&1
+          status=$?
+          cat /tmp/nonconfocal-sync.log
+          if [ "$status" -ne 0 ]; then
+            mkdir -p updates
+            cp /tmp/nonconfocal-sync.log updates/2026-07-21-nonconfocal-sync-error.log
+            git config user.name 'nlos-update-bot'
+            git config user.email 'nlos-update-bot@users.noreply.github.com'
+            git add updates/2026-07-21-nonconfocal-sync-error.log
+            git commit -m 'Record nonconfocal synchronizer failure' || true
+            git push origin HEAD:${{ github.head_ref }} || true
+            exit "$status"
+          fi
 
       - name: Install LaTeX and PDF validation tools
         run: |
