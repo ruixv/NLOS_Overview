@@ -41,7 +41,7 @@ jobs:
       - name: Merge and validate bibliography
         run: |
           python -c "import scripts.sync_nlos_20260721_coherent_fmcw as s; s.merge_bibliography()"
-          python -c "import scripts.sync_nlos_20260721_coherent_fmcw as s; s.validate()"
+          python scripts/validate_nlos_20260721_coherent_fmcw.py
 
       - name: Install LaTeX and PDF validation tools
         run: |
