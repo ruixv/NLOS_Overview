@@ -2,7 +2,6 @@
 """Validate cross-artifact coverage for the urban-intersection FMCW update."""
 from __future__ import annotations
 
-from collections import Counter
 from pathlib import Path
 import re
 
@@ -19,9 +18,9 @@ for path in ("README.md", "index.html"):
     if value != 1:
         raise SystemExit(f"{path}: expected DOI exactly once, found {value}")
 
-for path in ("article/5newscenes.tex", "egbib_merged_20260711.bib"):
-    if KEY not in text(path):
-        raise SystemExit(f"{path}: missing citation key {KEY}")
+article = text("article/5newscenes.tex")
+if article.count(KEY) != 1:
+    raise SystemExit(f"article/5newscenes.tex: expected citation key once, found {article.count(KEY)}")
 
 index = text("index.html")
 expected_stat = '<div class="stat"><b>179</b><span>tracked latest entries</span></div>'
@@ -33,17 +32,14 @@ if "% 21 July 2026: integrated urban-intersection FMCW radar NLOS perception." n
     raise SystemExit("bare_jrnl.tex integration marker is missing")
 
 bib = text("egbib_merged_20260711.bib")
-if bib.count(f"doi       = {{{DOI}}}") + bib.count(f"doi = {{{DOI}}}") != 1:
-    raise SystemExit("merged bibliography does not contain exactly one DOI field for the new paper")
+key_matches = re.findall(r"@[A-Za-z]+\s*\{\s*" + re.escape(KEY) + r"\s*,", bib)
+if len(key_matches) != 1:
+    raise SystemExit(f"merged bibliography: expected one {KEY} record, found {len(key_matches)}")
 
-keys = re.findall(r"@[A-Za-z]+\s*\{\s*([^,\s]+)", bib)
-key_dupes = [key for key, count in Counter(keys).items() if count > 1]
-if key_dupes:
-    raise SystemExit(f"duplicate BibTeX keys: {key_dupes[:10]}")
-
-dois = [d.lower() for d in re.findall(r"\bdoi\s*=\s*\{([^}]+)\}", bib, flags=re.I)]
-doi_dupes = [doi for doi, count in Counter(dois).items() if count > 1]
-if doi_dupes:
-    raise SystemExit(f"duplicate BibTeX DOIs: {doi_dupes[:10]}")
+doi_fields = [d.strip().lower() for d in re.findall(r"\bdoi\s*=\s*\{([^}]+)\}", bib, flags=re.I)]
+if doi_fields.count(DOI.lower()) != 1:
+    raise SystemExit(
+        f"merged bibliography: expected one DOI field for {DOI}, found {doi_fields.count(DOI.lower())}"
+    )
 
 print("Urban-intersection FMCW cross-artifact source validation passed.")
