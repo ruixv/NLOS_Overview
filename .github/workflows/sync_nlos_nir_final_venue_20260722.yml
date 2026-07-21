@@ -143,7 +143,7 @@ jobs:
             article/2active.tex \
             bare_jrnl.tex \
             bare_jrnl.pdf \
-            egbib_20260722_nir_final_venue_updates.bib \
+            egbib_20260709_updates.bib \
             egbib_merged_20260711.bib \
             updates/2026-07-11-bibliography-deduplication.md
           if git diff --cached --quiet; then
