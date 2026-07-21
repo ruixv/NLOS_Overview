@@ -8,23 +8,29 @@ on:
       - 'updates/2026-07-22-nir-final-venue-correction.md'
       - '.github/workflows/sync_nlos_nir_final_venue_20260722.yml'
       - '.github/nir-final-venue-trigger'
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/nir-final-venue-trigger'
+      - '.github/workflows/sync_nlos_nir_final_venue_20260722.yml'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: nlos-nir-final-venue-20260722
+  group: nlos-nir-final-venue-20260722-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   synchronize-and-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out repository branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -126,5 +132,5 @@ jobs:
             echo 'No synchronized changes remain to commit.'
           else
             git commit -m 'Correct NIR raster-scanning paper to IEEE ICEE 2025'
-            git push
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
           fi
