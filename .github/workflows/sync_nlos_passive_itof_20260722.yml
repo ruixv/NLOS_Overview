@@ -57,7 +57,13 @@ jobs:
             '10.1109/ICASSP48485.2024.10446406'; do
             test "$(grep -F "$doi" README.md | wc -l)" -eq 1
             test "$(grep -F "$doi" index.html | wc -l)" -eq 1
-            test "$(grep -F "$doi" egbib_merged_20260711.bib | wc -l)" -eq 1
+          done
+          for key in \
+            'caligiuriNIGHT2024' \
+            'rajiSoftShadowDiffusion2024' \
+            'rajiSNLLSComputationalPersicopy2024' \
+            'czajkowskiFisherTERI2024'; do
+            test "$(grep -E "^@[A-Za-z]+\\{$key," egbib_merged_20260711.bib | wc -l)" -eq 1
           done
           grep -Fq 'caligiuriNIGHT2024' article/2active.tex
           grep -Fq 'rajiSNLLSComputationalPersicopy2024' article/3passive.tex
