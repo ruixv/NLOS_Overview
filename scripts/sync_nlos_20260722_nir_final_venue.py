@@ -86,8 +86,19 @@ def update_homepage() -> None:
         f'title:"{TITLE}",authors:"Roueinfar and Salmanian",year:2025,venue:"IEEE ICEE 2025",'
         f'url:"{DOI_URL}",key:"Uses a 500 mW 808 nm laser, pan-tilt relay-wall raster scanning, and an NIR camera for low-cost steady-state three-bounce imaging; final IEEE conference metadata replaces the later arXiv upload."}},'
     )
+    inserted = False
     if DOI not in text:
-        text = replace_once(text, object_rx, replacement, "homepage NIR paper object")
+        old_matches = list(object_rx.finditer(text))
+        if len(old_matches) == 1:
+            text = object_rx.sub(lambda _m: replacement, text, count=1)
+        elif len(old_matches) == 0:
+            anchor = "    const papers=[\n"
+            if text.count(anchor) != 1:
+                raise RuntimeError(f"Homepage paper-array anchor count is {text.count(anchor)}, expected one")
+            text = text.replace(anchor, anchor + replacement + "\n", 1)
+            inserted = True
+        else:
+            raise RuntimeError(f"Homepage old NIR object count is {len(old_matches)}, expected zero or one")
     elif text.count(DOI) != 1:
         raise RuntimeError(f"Homepage DOI count is {text.count(DOI)}, expected one")
 
@@ -104,6 +115,13 @@ def update_homepage() -> None:
             raise RuntimeError(f"Homepage 2025 timeline block count is {len(matches)}, expected one")
         m = matches[0]
         text = text[: m.start()] + m.group(1) + m.group(2) + timeline_sentence + m.group(3) + text[m.end() :]
+
+    if inserted:
+        old_count = '<div class="stat"><b>179</b><span>tracked latest entries</span></div>'
+        new_count = '<div class="stat"><b>180</b><span>tracked latest entries</span></div>'
+        if text.count(old_count) != 1:
+            raise RuntimeError(f"Homepage tracked-entry count anchor occurs {text.count(old_count)} times, expected one")
+        text = text.replace(old_count, new_count, 1)
 
     if "21 July 2026" in text:
         text = text.replace("21 July 2026", "22 July 2026")
@@ -165,7 +183,6 @@ def update_bibliography_source() -> None:
   publisher = {{IEEE}}
 }}
 """
-    # The consolidated file is generated; source supplements are authoritative.
     matching_sources: list[Path] = []
     for path in sorted(ROOT.glob("egbib*.bib")):
         if path.name == "egbib_merged_20260711.bib":
@@ -180,7 +197,6 @@ def update_bibliography_source() -> None:
     if len(matching_sources) == 1:
         source = matching_sources[0]
         text = source.read_text(encoding="utf-8-sig")
-        # Fail closed instead of trying to parse nested BibTeX braces in place.
         if DOI.lower() not in text.lower() or "booktitle" not in text.lower() or "2025" not in text:
             raise RuntimeError(
                 f"An older source record exists in {source.name}; replace it manually rather than risking a malformed BibTeX edit"
