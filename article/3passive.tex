@@ -18,6 +18,14 @@ Conventional cameras are the most inexpensive but have at least two limitations 
 Recent ordinary-camera methods increasingly encode the relay-wall transport structure inside the network rather than relying on a generic image-to-image backbone. Wang~\etal~introduced diffuse-aware attention-enhanced encoding for passive NLOS reconstruction~\cite{wangDiffuseAwarePassive2026}. By explicitly emphasizing features that survive diffuse relay transport, the method represents a further step from early U-Net mappings toward attention mechanisms designed around the conditioning of the passive forward process.
 
 \vspace{0.8mm}
+\vspace{0.8mm}
+\noindent \textbf{From separable soft-shadow inversion to diffusion.}
+Raji and Murray-Bruce generalized ordinary-camera computational periscopy from low-dimensional hidden images to joint three-dimensional occluder geometry and two-dimensional non-occluding radiosity. Their ICASSP formulation separates these unknowns into a nonlinear least-squares block and a conditionally linear block, enabling alternating optimization from a single soft-shadow photograph~\cite{rajiSNLLSComputationalPersicopy2024}. The subsequent Soft Shadow Diffusion framework retains this transport decomposition but learns a physics-inspired solver from simulation, transferring to unseen simulated classes and real measurements while remaining robust to ambient illumination and noise~\cite{rajiSoftShadowDiffusion2024}. Together, these works provide the methodological bridge from computational periscopy to the later multimodal MDUNet architecture.
+
+\vspace{0.8mm}
+\noindent \textbf{Fisher-equalized edge-resolved depth sampling.}
+The two-edge-resolved doorway camera gains depth information because orthogonal penumbrae encode complementary hidden coordinates, but uniform range discretization wastes variables where the measurement is insensitive. Czajkowski and Murray-Bruce used Fisher information to equalize the discretization of the hidden range axis~\cite{czajkowskiFisherTERI2024}, providing a compact conditioning-oriented companion to their full-colour TERI system. This analysis clarifies how computational-aperture geometry should determine the numerical representation rather than only the forward model.
+
 \noindent \textbf{Long-range passive NLOS under severe background.}
 The practical range of ordinary-camera passive NLOS is commonly limited by geometric attenuation and ambient illumination. Zhou~\etal~combined pattern-based calibration with low-rank matrix decomposition to enhance the wall-encoded indirect component and separate slowly varying background contributions~\cite{zhouPassiveNLOS10m2025}. Their experiment placed the camera 10~m from the relay wall and the hidden object 4.5~m from the wall, retaining centimeter-scale resolution at an SBR as low as $-13$~dB. This result extends the computational-periscopy trajectory from laboratory-scale conditioning improvements toward long-range passive sensing with inexpensive hardware.
 
@@ -99,6 +107,8 @@ Passive methods based on speckle coherence have a special imaging model and reco
     \cite{zhouPassiveNLOS10m2025} & Ambient light & Conventional camera & Pattern calibration and low-rank background separation & Long-range 2D reconstruction\\%%%% Table body
     \cite{zhangStructureGuidedATV2026} & Ambient light & Conventional color camera & Intensity with structure-guided adaptive TV & Parameter-free 2D reconstruction\\%%%% Table body
     \cite{chenMultipleObjectPassiveNLOS2026} & Infrared radiation & Infrared camera & Learned multi-attention transport features & Multiple-object 2D reconstruction\\%%%% Table body
+    \cite{rajiSNLLSComputationalPersicopy2024,rajiSoftShadowDiffusion2024} & Ambient/incoherent illumination & Conventional camera & Soft-shadow intensity with separable occluder/radiosity model & Joint 3D geometry and 2D reconstruction\\%%%% Table body
+    \cite{czajkowskiFisherTERI2024} & Ambient light & Conventional camera & Two orthogonal edge penumbrae with Fisher-equalized depth discretization & 3D reconstruction\\%%%% Table body
     \cite{rajiMDUNet2026} & Ambient light & Conventional camera & Soft-shadow occlusion with coupled learned 2D/3D decoding & Joint 2D radiosity and 3D occluder reconstruction\\%%%% Table body
 
    \hline
