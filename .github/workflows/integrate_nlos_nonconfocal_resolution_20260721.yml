@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   integrate-and-build:
@@ -16,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-          fetch-depth: 0
+          fetch-depth: 1
           show-progress: false
 
       - name: Set up Python
@@ -28,19 +29,22 @@ jobs:
         run: python -m pip install --disable-pip-version-check bibtexparser==1.4.1
 
       - name: Apply guarded source synchronization
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set +e
           python scripts/sync_nlos_20260721_nonconfocal_resolution.py > /tmp/nonconfocal-sync.log 2>&1
           status=$?
           cat /tmp/nonconfocal-sync.log
           if [ "$status" -ne 0 ]; then
-            mkdir -p updates
-            cp /tmp/nonconfocal-sync.log updates/2026-07-21-nonconfocal-sync-error.log
-            git config user.name 'nlos-update-bot'
-            git config user.email 'nlos-update-bot@users.noreply.github.com'
-            git add updates/2026-07-21-nonconfocal-sync-error.log
-            git commit -m 'Record nonconfocal synchronizer failure' || true
-            git push origin HEAD:${{ github.head_ref }} || true
+            {
+              echo '### Nonconfocal synchronizer diagnostic'
+              echo
+              echo '```text'
+              cat /tmp/nonconfocal-sync.log
+              echo '```'
+            } > /tmp/pr-comment.md
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/pr-comment.md || true
             exit "$status"
           fi
 
