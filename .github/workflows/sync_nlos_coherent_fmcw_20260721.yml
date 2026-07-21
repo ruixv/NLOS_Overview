@@ -48,17 +48,29 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-publishers texlive-science poppler-utils
 
-      - name: Clean-build survey PDF
+      - name: First LaTeX pass
         run: |
           set -euo pipefail
           rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
-          bibtex bare_jrnl
+
+      - name: BibTeX pass
+        run: bibtex bare_jrnl
+
+      - name: Final LaTeX passes
+        run: |
+          set -euo pipefail
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate generated PDF
+        run: |
+          set -euo pipefail
           test -s bare_jrnl.pdf
           pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
-          pdftotext bare_jrnl.pdf - | grep -F 'Coherent FMCW NLOS ranging, imaging, tracking, and vibrometry'
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          grep -Fiq 'coherent FMCW NLOS' /tmp/bare_jrnl.txt
+          grep -Fiq 'comb-calibrated' /tmp/bare_jrnl.txt
           if grep -Eiq 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log; then
             grep -Ein 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log >&2 || true
             exit 1
