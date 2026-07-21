@@ -15,7 +15,7 @@
     \cite{huangCombCalibratedNLOS2024,yeCombCalibratedFMCWTracking2025,chenVectorEnhancedFMCWNLOS2025,liangFMCWNLOS2026} & Frequency-swept laser & Coherent FMCW interferometer & Beat frequency, phase, and Doppler & 3D imaging / tracking / vibrometry\\%%%% Table body
     \cite{heideDiffuseMirrors3D2014,kadambiOccludedImagingTimeofflight2016,caligiuriNIGHT2024} & Modulated laser & ToF camera & Time of fight &  3D reconstruction\\%%%% Table body
     \cite{zhuFastNonlineofsightImaging2021a} & Integrated & LiDAR & Depth and intensity &  3D reconstruction\\%%%% Table body
-    \cite{chenSteadystateNonLineofSightImaging2019,vedaldi_imaging_2020} & Continuous laser & Conventional camera & Intensity &  3D reconstruction\\%%%% Table body
+    \cite{chenSteadystateNonLineofSightImaging2019,vedaldi_imaging_2020,roueinfarNIRRaster2025} & Continuous laser & Conventional camera & Intensity &  3D reconstruction\\%%%% Table body
     \cite{kleinTrackingObjectsOutside2016,smithTrackingMultipleObjects2018a,leiDirectObjectRecognition2019} & Continuous laser & Conventional camera & Intensity &  Detection/ Tracking/ Identification\\%%%% Table body
     \cite{chandranAdaptiveLightingDataDriven2019} & Incoherent light source (imaging side) & Conventional camera & Intensity &  Detection/ Tracking/ Identification\\%%%% Table body
     \cite{DBLP:journals/corr/abs-1810-11710} & Incoherent light source (imaging side) & Conventional camera & Intensity &  2D reconstruction\\%%%% Table body
@@ -136,6 +136,10 @@ Liang~\etal~developed a coherent NLOS ranging and imaging system based on freque
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Laser and conventional camera}
 \subsubsection{Laser and conventional camera}
 In this paper, a conventional camera refers to a camera that uses conventional intensity sensors, such as CCD or CMOS array, which cannot record spatial/temporal coherent information or ToF information. Since transient images cannot be measured, imaging using traditional cameras is often called steady-state imaging. Because conventional cameras can only record intensity information, they are mainly used in passive NLOS imaging. However, because the conventional camera has the advantages of not requiring scanning and low cost, Chen \etal~completed RGB active NLOS imaging using lasers with different wavelengths for illumination and exploiting conventional cameras to collect intensity information\cite{chenSteadystateNonLineofSightImaging2019}. Due to the lack of distance information, it is not easy to complete high-precision three-dimensional reconstruction only using conventional cameras.
+
+\vspace{0.8mm}
+\noindent \textbf{Low-cost NIR steady-state raster scanning.}
+Roueinfar and Salmanian demonstrated a deliberately simple active NLOS acquisition baseline using a 500~mW, 808~nm laser mounted on a pan--tilt unit to raster scan the relay wall and a conventional NIR camera to record the three-bounce steady-state response~\cite{roueinfarNIRRaster2025}. Experiments on three hidden targets quantify image error with MSE and RMSE. The method does not recover transient depth or introduce a new inverse operator, but it shows how near-infrared illumination and commodity spatial capture can lower hardware complexity. Although uploaded to arXiv in July 2026, the work had already appeared in the 2025 IEEE International Conference on Electrical Engineering; the survey therefore cites the final conference version.
 
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{LiDAR}
 \subsubsection{LiDAR}

@@ -64,7 +64,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 21 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 22 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
@@ -159,7 +159,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2024 | [Real-time non-line-of-sight computational imaging using spectrum filtering and motion compensation](https://doi.org/10.1038/s43588-024-00722-4) — Ye et al. | Nature Computational Science 2024 | Couples spectrum-domain filtering with motion compensation/interleaved scanning to deliver room-scale real-time NLOS video. |
 | 2024 | [Plug-and-play algorithms for dynamic non-line-of-sight imaging](https://doi.org/10.1145/3665139) — Ye et al. | ACM TOG 2024 | A flexible dynamic-NLOS inverse framework that combines wave-physics filtering with learned denoiser priors for temporally consistent hidden-scene video. |
 | 2024 | [Domain Reduction Strategy for Non Line of Sight Imaging](https://arxiv.org/abs/2308.10269) — Shim et al. | ECCV 2024 | Periodically prunes empty hidden-space regions during inverse rendering, accelerating geometry/albedo recovery under sparse and general acquisition setups. |
-| 2026 | [Non-Line-of-Sight imaging using raster scanning at NIR wavelength](https://arxiv.org/abs/2607.04183) — Roueinfar, Salmanian | arXiv 2026 | Demonstrates a low-cost 808 nm NIR raster-scanning active NLOS setup with pan-tilt illumination and NIR-camera capture over three hidden targets; useful as a simple hardware/acquisition baseline rather than a new inverse-model frontier. |
+| 2025 | [Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength](https://doi.org/10.1109/ICEE67339.2025.11213924) — Roueinfar, Salmanian | IEEE ICEE 2025 | Uses a 500 mW, 808 nm laser on a pan-tilt raster scanner and an NIR camera to recover three hidden targets through steady-state three-bounce transport. It is a low-cost acquisition baseline rather than a new inverse-model frontier; the repository uses the final IEEE conference record instead of the later arXiv upload. |
 | 2026 | [Non-line-of-sight imaging with arbitrary relay surface geometries via 3D Gaussian Transient Rendering](https://arxiv.org/abs/2606.21270) — Wang et al. | SIGGRAPH 2026 | Uses 3D Gaussian primitives and differentiable transient rendering; targets spatially limited, non-planar, arbitrary relay surfaces. |
 | 2026 | [Imaging Hidden Objects with Consumer LiDAR via Motion Induced Sampling](https://doi.org/10.1038/s41586-026-10502-x) — Somasundaram et al. | Nature 2026 | Demonstrates plug-and-play NLOS on smartphone-grade consumer LiDAR through motion-induced aperture sampling and multi-frame fusion, supporting hidden 3D reconstruction, single/multi-object tracking, and camera localization with off-the-shelf hardware. |
 | 2026 | [Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals](https://openaccess.thecvf.com/content/CVPR2026/html/Lu_Seeing_through_boxes_Non-Line-of-Sight_3D_Reconstruction_from_Radar_Signals_CVPR_2026_paper.html) — Lu et al. | CVPR 2026 | GeRaF 2.0 combines visible exterior geometry with NLOS RF propagation in a unified neural field, stabilizing signed-distance optimization and producing physically consistent visible and hidden surfaces. |
@@ -260,6 +260,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
 2020 ── Iseringhausen & Hullin: physically based transient analysis-by-synthesis — surface-, BRDF-, and visibility-aware NLOS inverse rendering [ACM TOG]
    │     Chen et al.: learned NLOS feature embeddings — a shared physics-aware representation for reconstruction, detection, and recognition [SIGGRAPH Asia / TOG]
+   │
+2025 ── Roueinfar & Salmanian: low-cost 808 nm steady-state NIR raster scanning [IEEE ICEE]
    │     Isogawa et al.: C2NLOS transient sinograms — 1D circular confocal scanning with far fewer measurements [ECCV]
    │     Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
    │
