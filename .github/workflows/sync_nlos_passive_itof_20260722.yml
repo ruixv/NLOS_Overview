@@ -1,0 +1,122 @@
+name: Sync passive and iToF citation trace
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'egbib_20260722_passive_itof_citation_trace.bib'
+      - 'scripts/sync_nlos_20260722_passive_itof.py'
+      - 'updates/2026-07-22-passive-itof-citation-trace.md'
+      - '.github/workflows/sync_nlos_passive_itof_20260722.yml'
+      - '.github/passive-itof-20260722-trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-passive-itof-20260722-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  synchronize-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull-request branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install bibtexparser
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Synchronize source artifacts
+        run: python scripts/sync_nlos_20260722_passive_itof.py
+
+      - name: Regenerate consolidated bibliography
+        run: python scripts/merge_nlos_bibliography.py
+
+      - name: Validate source consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          for doi in \
+            '10.1007/978-3-031-93806-1_12' \
+            '10.1007/978-3-031-72989-8_22' \
+            '10.1109/ICASSP48485.2024.10446230' \
+            '10.1109/ICASSP48485.2024.10446406'; do
+            test "$(grep -F "$doi" README.md | wc -l)" -eq 1
+            test "$(grep -F "$doi" index.html | wc -l)" -eq 1
+          done
+          for key in \
+            'caligiuriNIGHT2024' \
+            'rajiSoftShadowDiffusion2024' \
+            'rajiSNLLSComputationalPersicopy2024' \
+            'czajkowskiFisherTERI2024'; do
+            test "$(grep -E "^@[A-Za-z]+\\{$key," egbib_merged_20260711.bib | wc -l)" -eq 1
+          done
+          grep -Fq 'caligiuriNIGHT2024' article/2active.tex
+          grep -Fq 'rajiSNLLSComputationalPersicopy2024' article/3passive.tex
+          grep -Fq 'rajiSoftShadowDiffusion2024' article/3passive.tex
+          grep -Fq 'czajkowskiFisherTERI2024' article/3passive.tex
+          grep -Fq '22 July 2026 citation trace corrects NIGHT' bare_jrnl.tex
+          ! grep -Fq 'https://arxiv.org/abs/2403.19376' README.md
+          ! grep -Fq 'https://arxiv.org/abs/2601.12257' README.md
+          ! grep -Fq 'https://arxiv.org/abs/2403.19376' index.html
+          ! grep -Fq 'https://arxiv.org/abs/2601.12257' index.html
+
+      - name: Clean LaTeX build
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate rebuilt PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          grep -Fqi 'Soft Shadow Diffusion' /tmp/bare_jrnl.txt
+          grep -Fqi 'Fisher-equalized' /tmp/bare_jrnl.txt
+          grep -Fqi 'indirect-ToF' /tmp/bare_jrnl.txt
+          if grep -Eqi 'undefined citations|citation .* undefined' bare_jrnl.log; then
+            echo 'Undefined citation detected' >&2
+            exit 1
+          fi
+          if grep -Eqi 'Repeated entry' bare_jrnl.blg; then
+            echo 'Repeated bibliography entry detected' >&2
+            exit 1
+          fi
+
+      - name: Commit synchronized artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/2active.tex article/3passive.tex bare_jrnl.tex bare_jrnl.pdf egbib_20260722_passive_itof_citation_trace.bib egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md
+          if git diff --cached --quiet; then
+            echo 'No synchronized changes remain to commit.'
+          else
+            git commit -m 'Integrate passive soft-shadow and commodity-iToF NLOS lineage'
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
+          fi
