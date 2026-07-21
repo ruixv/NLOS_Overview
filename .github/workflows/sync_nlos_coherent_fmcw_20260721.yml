@@ -1,0 +1,87 @@
+name: Integrate coherent FMCW NLOS citation trace
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-build-validate:
+    if: github.head_ref == 'automation/nlos-fmcw-citation-20260721'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out update branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install bibliography dependency
+        run: python -m pip install bibtexparser
+
+      - name: Synchronize public and survey sources
+        run: python scripts/sync_nlos_20260721_coherent_fmcw.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-publishers texlive-science poppler-utils
+
+      - name: Clean-build survey PDF
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
+          pdftotext bare_jrnl.pdf - | grep -F 'Coherent FMCW NLOS ranging, imaging, tracking, and vibrometry'
+          if grep -Eiq 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log; then
+            grep -Ein 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log >&2 || true
+            exit 1
+          fi
+
+      - name: Validate DOI and citation coverage
+        run: |
+          set -euo pipefail
+          for doi in \
+            '10.1103/PhysRevLett.132.233802' \
+            '10.1002/lpor.202401250' \
+            '10.1109/JLT.2024.3523206'; do
+            test "$(grep -Fic "$doi" README.md)" -eq 1
+            test "$(grep -Fic "$doi" index.html)" -eq 1
+            test "$(grep -Fic "doi = {$doi}" egbib_merged_20260711.bib)" -eq 1
+          done
+          for key in \
+            huangCombCalibratedNLOS2024 \
+            yeCombCalibratedFMCWTracking2025 \
+            chenVectorEnhancedFMCWNLOS2025 \
+            liangFMCWNLOS2026; do
+            grep -Fq "$key" article/2active.tex
+            grep -Fq "$key" egbib_merged_20260711.bib
+            grep -Fq "$key" bare_jrnl.aux
+          done
+          grep -Fq 'through 21 July 2026' bare_jrnl.tex
+          grep -Fq '<div class="stat"><b>178</b><span>tracked latest entries</span></div>' index.html
+
+      - name: Commit synchronized sources and regenerated PDF
+        run: |
+          set -euo pipefail
+          git config user.name 'nlos-update-bot'
+          git config user.email 'nlos-update-bot@users.noreply.github.com'
+          git add README.md index.html article/2active.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit.'
+          else
+            git commit -m 'Integrate coherent FMCW optical NLOS lineage'
+            git push origin HEAD:${{ github.head_ref }}
+          fi
