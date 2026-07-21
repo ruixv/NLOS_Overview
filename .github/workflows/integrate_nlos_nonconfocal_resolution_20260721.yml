@@ -54,18 +54,39 @@ jobs:
           sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-publishers texlive-science poppler-utils
 
       - name: Clean-build survey PDF
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          set -euo pipefail
+          set +e
           rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
-          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
-          bibtex bare_jrnl
-          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
-          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
-          test -s bare_jrnl.pdf
-          if grep -Eiq 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log; then
-            echo 'LaTeX consistency check failed.' >&2
-            grep -Ein 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log >&2 || true
-            exit 1
+          {
+            echo '=== pdflatex pass 1 ==='
+            pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex || exit $?
+            echo '=== bibtex ==='
+            bibtex bare_jrnl || exit $?
+            echo '=== pdflatex pass 2 ==='
+            pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex || exit $?
+            echo '=== pdflatex pass 3 ==='
+            pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex || exit $?
+            test -s bare_jrnl.pdf || exit $?
+            if grep -Eiq 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log; then
+              echo 'LaTeX consistency check failed.'
+              grep -Ein 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log || true
+              exit 91
+            fi
+          } > /tmp/nonconfocal-latex.log 2>&1
+          status=$?
+          cat /tmp/nonconfocal-latex.log
+          if [ "$status" -ne 0 ]; then
+            {
+              echo '### Nonconfocal survey build diagnostic'
+              echo
+              echo '```text'
+              tail -n 220 /tmp/nonconfocal-latex.log
+              echo '```'
+            } > /tmp/pr-comment.md
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/pr-comment.md || true
+            exit "$status"
           fi
 
       - name: Validate PDF and cross-artifact consistency
