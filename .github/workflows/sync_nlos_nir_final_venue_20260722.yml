@@ -52,7 +52,25 @@ jobs:
             poppler-utils
 
       - name: Synchronize corrected final venue
-        run: python scripts/sync_nlos_20260722_nir_final_venue.py
+        id: synchronize
+        continue-on-error: true
+        shell: bash
+        run: python scripts/sync_nlos_20260722_nir_final_venue.py > sync-nir-final-venue.log 2>&1
+
+      - name: Upload synchronizer diagnostics
+        if: steps.synchronize.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sync-nir-final-venue-diagnostics
+          path: sync-nir-final-venue.log
+          if-no-files-found: error
+
+      - name: Stop after synchronizer failure
+        if: steps.synchronize.outcome == 'failure'
+        shell: bash
+        run: |
+          cat sync-nir-final-venue.log
+          exit 1
 
       - name: Regenerate consolidated bibliography
         run: python scripts/merge_nlos_bibliography.py
