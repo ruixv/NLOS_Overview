@@ -68,6 +68,9 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2024 | [Non-Line-of-Sight Imaging and Vibrometry Using a Comb-Calibrated Coherent Sensor](https://doi.org/10.1103/PhysRevLett.132.233802) — Huang et al. | Physical Review Letters 2024 | Establishes coherent optical NLOS sensing with an optical-frequency-comb-calibrated FMCW LiDAR, providing sub-picosecond effective temporal resolution, submillimeter hidden-scene localization and 3D imaging, and frequency-resolved NLOS vibrometry under strong ambient light. |
+| 2025 | [High-Resolution Non-Line-of-Sight Tracking by Comb-Calibrated FMCW LiDAR](https://doi.org/10.1002/lpor.202401250) — Ye et al. | Laser & Photonics Reviews 2025 | Extends comb-calibrated coherent NLOS from static imaging to snapshot multi-object tracking, reporting 2 mm 3D position accuracy and 2 mm/s velocity accuracy without temporal accumulation. |
+| 2025 | [Non-Line-of-Sight Ranging and 3D Imaging Using Vector Enhanced Sensitive FMCW LiDAR](https://doi.org/10.1109/JLT.2024.3523206) — Chen et al. | Journal of Lightwave Technology 2025 | Uses laser-feedback interferometry, polarization-vector enhancement, and K-domain resampling for a simpler sensitive FMCW architecture, demonstrating better-than-32-µm NLOS absolute ranging and millimeter-level hidden 3D imaging at about 2.8 m. |
 | 2024 | [Efficient non-line-of-sight tracking with computational neuromorphic imaging](https://doi.org/10.1364/OL.530066) — Zhu et al. | Optics Letters 2024 | Uses an event camera to retain only motion-induced changes in dynamic NLOS speckle, suppressing static relay/background redundancy and enabling direct, efficient hidden-target motion estimation without first reconstructing a complete hidden scene. |
 | 2025 | [Zero-Phase Phasor Fields for Non-Line-of-Sight Imaging](https://doi.org/10.1109/ICCP64821.2025.11143850) — Luesia-Lahoz et al. | IEEE ICCP 2025 | Uses zero crossings of the virtual phasor-field phase as a geometry cue, obtaining highly precise hidden depth while retaining the noise robustness of phase-based wave propagation. |
 | 2024 | [Towards a More Accurate Light Transport Model for Non-Line-of-Sight Imaging](https://doi.org/10.1364/OE.508034) — Sultan, Reza, Velten | Optics Express 2024 | Derives a more complete transient transport model that unifies time-of-flight and shadow/occlusion NLOS formulations and exposes approximations made by widely used three-bounce models. |
@@ -283,6 +286,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Yue et al.: permutation transient attention — attention and Permute-MLP blocks improve learned transient features [COSI]
    │     Zhang et al.: real-time scan-free NLOS — parallel SPAD-array boundary migration reaches 151-fps acquisition and 19-fps reconstruction [APL Photonics]
    │     Wang et al.: event-enhanced passive NLOS — asynchronous diffusion-pattern changes and physics-embedded learning reconstruct moving hidden objects [IEEE Sensors Journal]
+    │     Huang et al.: comb-calibrated coherent FMCW NLOS — sub-picosecond equivalent timing enables submillimeter 3D imaging and hidden-object vibrometry [Physical Review Letters]
    │
 2025 ── Shi et al.: fast configurable transient simulation and an open NLOS benchmark [arXiv]
    │     Liu et al.: geometric constraints on hidden surface normals for fast sparse-transient reconstruction [arXiv]
@@ -291,6 +295,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Luesia-Lahoz et al.: zero-phase phasor fields — phase zero crossings provide precise and noise-robust hidden depth [ICCP]
    │     Czajkowski and Murray-Bruce: visible occluders as opportunistic apertures — passive wide-FoV 3D recovery for extended-depth scenes [EUSIPCO]
    │     Zhang et al.: spatial-correlation scan-free NLOS — a 3D blur-kernel model and correlation resampling recover 2-cm detail at 5 fps from a 16×16 detector [Optics and Lasers in Engineering]
+    │     Ye et al.: comb-calibrated FMCW tracking — snapshot multi-object position and velocity recovery at 2-mm and 2-mm/s accuracy [Laser & Photonics Reviews]
+    │     Chen et al.: vector-enhanced sensitive FMCW LiDAR — laser-feedback interferometry and K-domain resampling provide micrometer ranging and millimeter hidden 3D imaging [Journal of Lightwave Technology]
    │
 2026 ── Zhao et al.: PICL — SPAD-aware denoising cascaded with self-supervised differentiable-physics reconstruction [JOSA A]
    │     Ye et al.: NLOSFormer — real-time thermal NLOS through rough surfaces with explicit kernel estimation [ACM TOG]

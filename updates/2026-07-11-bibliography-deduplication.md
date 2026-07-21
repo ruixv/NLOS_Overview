@@ -2,13 +2,13 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 52 source files and keeps one highest-priority record for each of 412 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 62 source files and keeps one highest-priority record for each of 433 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 444
-- Case-insensitive duplicate replacements: 32
+- Parsed source records: 469
+- Case-insensitive duplicate replacements: 36
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
-- Truly missing citation keys: 0
+- Truly missing citation keys: 1
 
 ## Duplicate records resolved
 
@@ -44,6 +44,10 @@ This update generates `egbib_merged_20260711.bib` from 52 source files and keeps
 - `liSuperFoVNLOS2026` / `liSuperFoVNLOS2026`: `egbib.bib` → `egbib_20260718_passive_geometry_updates.bib`
 - `chenBeyondLambdaEMVS2026` / `chenBeyondLambdaEMVS2026`: `egbib_2026_updates.bib` → `egbib_20260718_reconstruction_pose_consistency.bib`
 - `wangDiffuseAwarePassive2026` / `wangDiffuseAwarePassive2026`: `egbib_20260717_optics_followup_updates.bib` → `egbib_20260718_reconstruction_pose_consistency.bib`
+- `sunGeneralizable2025` / `sunGeneralizable2025`: `egbib_20260701_updates.bib` → `egbib_20260719_ptycho_venue_updates.bib`
+- `marcoVirtualLightTransport2021` / `marcoVirtualLightTransport2021`: `egbib_20260711_vltm_updates.bib` → `egbib_20260720_core_citation_followup.bib`
+- `wangEventEnhancedPassiveNLOS2024` / `wangEventEnhancedPassiveNLOS2024`: `egbib_2026_updates.bib` → `egbib_20260720_event_camera_final_venue.bib`
+- `zhouPolarizationSpeckleNLOS2026` / `zhouPolarizationSpeckleNLOS2026`: `egbib_20260718_core_citation_updates.bib` → `egbib_20260720_polarization_single_pixel.bib`
 
 ## Citation-key spellings normalized
 
@@ -135,6 +139,6 @@ This update generates `egbib_merged_20260711.bib` from 52 source files and keeps
 
 ## Truly missing citation keys and source locations
 
-- None.
+- `zhuEfficientNeuromorphicNLOSTracking2024` — `article/5newscenes.tex:30`
 
 The CI workflow performs a clean LaTeX/BibTeX build, rejects undefined citations or repeated entries, validates the PDF with `pdfinfo` and `pdftotext`, and verifies that the newly integrated X-band radar and Neural Illumination Fields records appear in the generated bibliography.
