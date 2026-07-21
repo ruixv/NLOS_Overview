@@ -27,7 +27,7 @@ jobs:
         run: python -m pip install bibtexparser
 
       - name: Update README
-        run: python -c "import scripts.sync_nlos_20260721_coherent_fmcw as s; s.update_readme()"
+        run: python scripts/sync_nlos_20260721_coherent_fmcw_readme.py
 
       - name: Update website
         run: python -c "import scripts.sync_nlos_20260721_coherent_fmcw as s; s.update_index()"
