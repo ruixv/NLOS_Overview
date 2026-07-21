@@ -8,14 +8,13 @@ import re
 
 DOI = "10.32604/cmes.2026.078862"
 KEY = "linDeepLearningFMCWRadar2026"
-TITLE_FRAGMENT = "Deep Learning"
 
 
 def text(path: str) -> str:
     return Path(path).read_text(encoding="utf-8", errors="strict")
 
 
-for path in ("README.md", "index.html", "egbib_merged_20260711.bib"):
+for path in ("README.md", "index.html"):
     value = text(path).count(DOI)
     if value != 1:
         raise SystemExit(f"{path}: expected DOI exactly once, found {value}")
@@ -34,6 +33,9 @@ if "% 21 July 2026: integrated urban-intersection FMCW radar NLOS perception." n
     raise SystemExit("bare_jrnl.tex integration marker is missing")
 
 bib = text("egbib_merged_20260711.bib")
+if bib.count(f"doi       = {{{DOI}}}") + bib.count(f"doi = {{{DOI}}}") != 1:
+    raise SystemExit("merged bibliography does not contain exactly one DOI field for the new paper")
+
 keys = re.findall(r"@[A-Za-z]+\s*\{\s*([^,\s]+)", bib)
 key_dupes = [key for key, count in Counter(keys).items() if count > 1]
 if key_dupes:
