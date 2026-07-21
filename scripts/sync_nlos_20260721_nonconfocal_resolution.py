@@ -57,13 +57,14 @@ def update_readme() -> None:
     )
     header = "|------|-------|----------------|----------------|\n"
     text = replace_once(text, header, header + rows, "README latest table")
-    timeline_anchor = "2025 ── Shi et al.: fast configurable transient simulation and an open NLOS benchmark [arXiv]"
+    timeline_anchor = "   │     Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]"
     timeline_rows = (
-        "   │     Zheng et al.: sectionalized-ellipsoid interpolation — non-confocal SPAD-array measurements become timing-refined semi-confocal histograms [Optics and Lasers in Engineering]\n"
+        "\n   │\n"
+        "2024 ── Zheng et al.: sectionalized-ellipsoid interpolation — non-confocal SPAD-array measurements become timing-refined semi-confocal histograms [Optics and Lasers in Engineering]\n"
         "   │     Wang et al.: instrument-response deconvolution — calibrated Poisson deblurring restores spatial resolution before LCT or f-k migration under severe timing jitter [Optics Express]\n"
-        "   │     Yu et al.: spherical-slice transform — fast high-resolution non-confocal reconstruction without geometric artifacts or position offsets [Optics Letters]\n"
+        "   │     Yu et al.: spherical-slice transform — fast high-resolution non-confocal reconstruction without geometric artifacts or position offsets [Optics Letters]"
     )
-    text = replace_once(text, timeline_anchor, timeline_rows + timeline_anchor, "README 2024 timeline")
+    text = replace_once(text, timeline_anchor, timeline_anchor + timeline_rows, "README 2024 timeline")
     write(path, text)
 
 
