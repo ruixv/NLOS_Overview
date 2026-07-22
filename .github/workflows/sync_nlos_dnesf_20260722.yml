@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - '.github/dnesf-20260722-trigger'
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/dnesf-20260722-trigger'
   workflow_dispatch:
 
 permissions:
@@ -18,11 +22,11 @@ jobs:
   synchronize-build-validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out master
+      - name: Check out target branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: master
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -99,5 +103,5 @@ jobs:
             echo 'No synchronized changes remain to commit.'
           else
             git commit -m 'Integrate dynamic neural shadow fields for two-bounce NLOS'
-            git push origin HEAD:master
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
           fi
