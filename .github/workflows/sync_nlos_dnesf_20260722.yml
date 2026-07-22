@@ -81,8 +81,8 @@ jobs:
           test -n "$pages"
           test "$pages" -gt 0
           pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
-          grep -Fqi 'Dynamic neural shadow fields for moving two-bounce scenes' /tmp/bare_jrnl.txt
           grep -Fqi 'D-NeSF' /tmp/bare_jrnl.txt
+          grep -Fqi 'moving hidden targets' /tmp/bare_jrnl.txt
           if grep -Eqi 'undefined citations|citation .* undefined' bare_jrnl.log; then
             echo 'Undefined citation detected' >&2
             exit 1
