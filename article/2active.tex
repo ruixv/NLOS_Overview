@@ -15,7 +15,7 @@
     \cite{huangCombCalibratedNLOS2024,yeCombCalibratedFMCWTracking2025,chenVectorEnhancedFMCWNLOS2025,liangFMCWNLOS2026} & Frequency-swept laser & Coherent FMCW interferometer & Beat frequency, phase, and Doppler & 3D imaging / tracking / vibrometry\\%%%% Table body
     \cite{heideDiffuseMirrors3D2014,kadambiOccludedImagingTimeofflight2016,caligiuriNIGHT2024} & Modulated laser & ToF camera & Time of fight &  3D reconstruction\\%%%% Table body
     \cite{zhuFastNonlineofsightImaging2021a} & Integrated & LiDAR & Depth and intensity &  3D reconstruction\\%%%% Table body
-    \cite{chenSteadystateNonLineofSightImaging2019,vedaldi_imaging_2020,roueinfarNIRRaster2025} & Continuous laser & Conventional camera & Intensity &  3D reconstruction\\%%%% Table body
+    \cite{chenSteadystateNonLineofSightImaging2019,vedaldi_imaging_2020,roueinfarNIRRaster2025,liuPolarizationDifferentialCorrelography2025} & Continuous laser & Conventional camera & Intensity &  3D reconstruction\\%%%% Table body
     \cite{kleinTrackingObjectsOutside2016,smithTrackingMultipleObjects2018a,leiDirectObjectRecognition2019} & Continuous laser & Conventional camera & Intensity &  Detection/ Tracking/ Identification\\%%%% Table body
     \cite{chandranAdaptiveLightingDataDriven2019} & Incoherent light source (imaging side) & Conventional camera & Intensity &  Detection/ Tracking/ Identification\\%%%% Table body
     \cite{DBLP:journals/corr/abs-1810-11710} & Incoherent light source (imaging side) & Conventional camera & Intensity &  2D reconstruction\\%%%% Table body
@@ -144,6 +144,10 @@ In this paper, a conventional camera refers to a camera that uses conventional i
 \vspace{0.8mm}
 \noindent \textbf{Low-cost NIR steady-state raster scanning.}
 Roueinfar and Salmanian demonstrated a deliberately simple active NLOS acquisition baseline using a 500~mW, 808~nm laser mounted on a pan--tilt unit to raster scan the relay wall and a conventional NIR camera to record the three-bounce steady-state response~\cite{roueinfarNIRRaster2025}. Experiments on three hidden targets quantify image error with MSE and RMSE. The method does not recover transient depth or introduce a new inverse operator, but it shows how near-infrared illumination and commodity spatial capture can lower hardware complexity. Although uploaded to arXiv in July 2026, the work had already appeared in the 2025 IEEE International Conference on Electrical Engineering; the survey therefore cites the final conference version.
+
+\vspace{0.8mm}
+\noindent \textbf{Single-shot polarization differential correlography.}
+Liu~\etal~introduced PDC-NLOS, a steady-state active system that illuminates the relay wall with independently polarized laser speckles and forms a polarization-difference correlogram before phase retrieval~\cite{liuPolarizationDifferentialCorrelography2025}. Polarization modulation replaces repeated mechanical scanning, while differential speckle statistics add redundancy against vibration and coloured perturbations. Experiments on horizontal and vertical stripe targets demonstrate millimeter-level resolution, and the reported average SSIM of about 0.76 improves on the authors' earlier chromato-axial single-shot correlography baseline. This work connects steady-state NLOS, speckle correlation, and polarization coding, providing a low-complexity high-resolution alternative to transient time-of-flight inversion.
 
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{LiDAR}
 \subsubsection{LiDAR}

@@ -64,10 +64,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 22 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 23 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [High-resolution non-line-of-sight imaging via polarization differential correlography](https://doi.org/10.3788/COL202523.081104) — Liu et al. | Chinese Optics Letters 2025 | Introduces PDC-NLOS, a single-shot steady-state system that encodes hidden objects with independently polarized laser speckles and uses polarization differencing before correlographic phase retrieval. It removes mechanical relay scanning, improves perturbation robustness, and demonstrates millimeter-level resolution with an average reported SSIM of about 0.76. |
 | 2026 | [D-NeSF: Dynamic Neural Shadow Fields for Two-bounce Non-line-of-sight Stereo Reconstruction](https://doi.org/10.1117/12.3095236) — Zhang et al. | ICGIP 2025 / Proceedings of SPIE 14124 (2026) | Extends two-bounce shadow-based NLOS from static occupancy or illumination fields to moving hidden geometry. A spatiotemporally disentangled six-plane neural field, cyclic multi-position illumination, and self-supervised cumulative-transmittance constraints reconstruct temporally consistent dynamic 3D targets from shadow sequences. |
 | 2026 | [Detection of sUAS in Urban Environments using Multi-Antenna Micro-Doppler Radar](https://arxiv.org/abs/2607.11868) — Liyanage et al. | IEEE VTC2026-Fall (accepted) | Uses a hardware-validated 2.47 GHz four-receiver CW MIMO radar and cyclostationary propeller micro-Doppler features for hidden-drone detection in indoor and semi-urban NLOS settings. A compact EfficientNet-B0 model reaches 86.11% overall accuracy; the result is detection-only, with stationary airframes and no hidden-target localization or 3D reconstruction. |
 | 2022 | [Fast non-line-of-sight imaging based on first photon event stamping](https://doi.org/10.1364/OL.446079) — Li et al. | Optics Letters 2022 | Introduces time-sequential first-photon (TSFP) acquisition for active transient NLOS, modeling the detection process rather than changing the downstream inverse operator. Synthetic and measured experiments retain comparable reconstruction quality with substantially shorter acquisition, making the method relevant to photon-starved and real-time systems. |
@@ -306,6 +307,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Luesia-Lahoz et al.: zero-phase phasor fields — phase zero crossings provide precise and noise-robust hidden depth [ICCP]
    │     Czajkowski and Murray-Bruce: visible occluders as opportunistic apertures — passive wide-FoV 3D recovery for extended-depth scenes [EUSIPCO]
    │     Zhang et al.: spatial-correlation scan-free NLOS — a 3D blur-kernel model and correlation resampling recover 2-cm detail at 5 fps from a 16×16 detector [Optics and Lasers in Engineering]
+   │     Liu et al.: polarization differential correlography — single-shot polarized speckle encoding removes mechanical scanning and achieves millimeter-scale steady-state NLOS reconstruction [Chinese Optics Letters]
     │     Ye et al.: comb-calibrated FMCW tracking — snapshot multi-object position and velocity recovery at 2-mm and 2-mm/s accuracy [Laser & Photonics Reviews]
     │     Chen et al.: vector-enhanced sensitive FMCW LiDAR — laser-feedback interferometry and K-domain resampling provide micrometer ranging and millimeter hidden 3D imaging [Journal of Lightwave Technology]
    │
