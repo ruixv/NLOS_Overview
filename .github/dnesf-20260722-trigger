@@ -2,3 +2,4 @@ Trigger guarded D-NeSF source synchronization, bibliography merge, clean LaTeX b
 
 PR trigger: 2026-07-22 dynamic two-bounce citation trace.
 Retry: robust PDF text extraction validation.
+Retry 2: structural PDF validation after successful clean build.
