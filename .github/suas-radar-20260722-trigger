@@ -1,1 +1,3 @@
 Trigger the guarded source synchronization, bibliography merge, clean LaTeX build, PDF validation, and commit for the experimental NLOS micro-Doppler drone-detection citation trace.
+
+PR trigger: 2026-07-22.
