@@ -1,0 +1,106 @@
+name: Sync polarization differential correlography citation trace
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/pdc-nlos-20260723-trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-pdc-20260723-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  synchronize-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install bibtexparser
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Synchronize source artifacts
+        run: python scripts/sync_nlos_20260723_pdc_nlos_v2.py
+
+      - name: Regenerate consolidated bibliography
+        run: python scripts/merge_nlos_bibliography.py
+
+      - name: Validate source consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          doi='10.3788/COL202523.081104'
+          key='liuPolarizationDifferentialCorrelography2025'
+          test "$(grep -F "$doi" README.md | wc -l)" -eq 1
+          test "$(grep -F "$doi" index.html | wc -l)" -eq 1
+          test "$(grep -E "^@[A-Za-z]+\\{$key," egbib_merged_20260711.bib | wc -l)" -eq 1
+          test "$(grep -F "$key" article/2active.tex | wc -l)" -eq 2
+          grep -Fq 'Single-shot polarization differential correlography' article/2active.tex
+          grep -Fq '23 July 2026 citation trace: polarization differential correlography NLOS integrated' bare_jrnl.tex
+          grep -Fq 'through 23 July 2026' bare_jrnl.tex
+          grep -Fq '<b>185</b><span>tracked latest entries</span>' index.html
+          grep -Fq 'Updated 23 July 2026 · 190+ papers' index.html
+          grep -Fq 'Last updated: 23 July 2026' index.html
+          grep -Fq '**Update run: 23 July 2026.**' README.md
+
+      - name: Clean LaTeX build
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate rebuilt PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          grep -Fqi 'PDC-NLOS' /tmp/bare_jrnl.txt
+          grep -Fqi 'polarization differential' /tmp/bare_jrnl.txt
+          if grep -Eqi 'undefined citations|citation .* undefined' bare_jrnl.log; then
+            echo 'Undefined citation detected' >&2
+            exit 1
+          fi
+          if grep -Eqi 'Repeated entry' bare_jrnl.blg; then
+            echo 'Repeated bibliography entry detected' >&2
+            exit 1
+          fi
+
+      - name: Commit synchronized artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/2active.tex bare_jrnl.tex bare_jrnl.pdf egbib_20260723_pdc_nlos.bib egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-23-polarization-differential-correlography.md
+          if git diff --cached --quiet; then
+            echo 'No synchronized changes remain to commit.'
+          else
+            git commit -m 'Integrate polarization differential correlography NLOS'
+            git push origin HEAD:master
+          fi
