@@ -1,44 +1,43 @@
 #!/usr/bin/env python3
-"""Synchronize the 2022 time-sequential first-photon NLOS acquisition milestone.
+"""Synchronize the 2022 time-sequential first-photon NLOS milestone.
 
-The script is deliberately fail-closed: every insertion uses a unique verified
-anchor and refuses to run if the DOI is already present or repository structure
-has drifted. This avoids blind replacement of the large public-facing files.
+The script is fail-closed but tolerant of harmless whitespace changes: every
+edit uses a structurally unique regex anchor and validates the final state.
 """
 from __future__ import annotations
 
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 DOI = "10.1364/OL.446079"
 KEY = "liFirstPhotonStamping2022"
-TITLE = "Fast non-line-of-sight imaging based on first photon event stamping"
 
 
-def read(path: str) -> str:
-    return (ROOT / path).read_text(encoding="utf-8")
+def load(name: str) -> str:
+    return (ROOT / name).read_text(encoding="utf-8")
 
 
-def write(path: str, text: str) -> None:
-    (ROOT / path).write_text(text, encoding="utf-8")
+def save(name: str, text: str) -> None:
+    (ROOT / name).write_text(text, encoding="utf-8")
 
 
-def replace_once(text: str, old: str, new: str, label: str) -> str:
-    count = text.count(old)
+def sub_once(pattern: str, repl: str, text: str, label: str, flags: int = 0) -> str:
+    out, count = re.subn(pattern, repl, text, count=1, flags=flags)
     if count != 1:
         raise RuntimeError(f"Expected one {label} anchor, found {count}")
-    return text.replace(old, new, 1)
+    return out
 
 
-def ensure_absent(text: str, needle: str, label: str) -> None:
-    if needle.lower() in text.lower():
-        raise RuntimeError(f"{label} already contains {needle!r}; refusing duplicate insertion")
+def assert_absent(text: str, needle: str, label: str) -> None:
+    if needle.casefold() in text.casefold():
+        raise RuntimeError(f"{label} already contains {needle!r}; refusing duplication")
 
 
 def update_readme() -> None:
-    path = "README.md"
-    text = read(path)
-    ensure_absent(text, DOI, path)
+    name = "README.md"
+    text = load(name)
+    assert_absent(text, DOI, name)
     row = (
         "| 2022 | [Fast non-line-of-sight imaging based on first photon event stamping]"
         "(https://doi.org/10.1364/OL.446079) — Li et al. | Optics Letters 2022 | "
@@ -48,27 +47,30 @@ def update_readme() -> None:
         "substantially shorter acquisition, making the method relevant to photon-starved and "
         "real-time systems. |\n"
     )
-    header = "|------|-------|----------------|----------------|\n"
-    text = replace_once(text, header, header + row, "README latest-additions table")
-    milestone = (
-        "2022 ── Grau et al.: Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes [arXiv]\n"
+    text = sub_once(
+        r"(?m)^(\|------\|-------\|----------------\|----------------\|\s*)$",
+        lambda m: m.group(1) + "\n" + row.rstrip("\n"),
+        text,
+        "README latest-additions header",
     )
-    addition = (
-        milestone
-        + "   │     Li et al.: time-sequential first-photon stamping — detection-aware acquisition reduces photon collection time for active transient NLOS [Optics Letters]\n"
+    text = sub_once(
+        r"(?m)^(2022 ── Grau et al\.: Occlusion Fields[^\n]*)(\n)",
+        lambda m: m.group(1) + m.group(2)
+        + "   │     Li et al.: time-sequential first-photon stamping — detection-aware acquisition reduces photon collection time for active transient NLOS [Optics Letters]\n",
+        text,
+        "README 2022 milestone",
     )
-    text = replace_once(text, milestone, addition, "README 2022 milestone")
-    write(path, text)
+    save(name, text)
 
 
 def update_index() -> None:
-    path = "index.html"
-    text = read(path)
-    ensure_absent(text, DOI, path)
-    text = replace_once(
-        text,
-        '<div class="stat"><b>181</b><span>tracked latest entries</span></div>',
+    name = "index.html"
+    text = load(name)
+    assert_absent(text, DOI, name)
+    text = sub_once(
+        r'<div class="stat"><b>181</b><span>tracked latest entries</span></div>',
         '<div class="stat"><b>182</b><span>tracked latest entries</span></div>',
+        text,
         "homepage tracked-entry count",
     )
     paper = (
@@ -80,56 +82,80 @@ def update_index() -> None:
         'preserving comparable hidden-scene reconstruction with substantially shorter acquisition '
         'for photon-starved and prospective real-time transient NLOS."},\n'
     )
-    text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + paper, "homepage paper array")
-    old_2022 = (
-        "differentiable transient rendering and Occlusion Fields broadened inverse-rendering and implicit-surface recovery.</p>"
-    )
-    new_2022 = (
-        "differentiable transient rendering and Occlusion Fields broadened inverse-rendering and implicit-surface recovery. "
-        "Time-sequential first-photon stamping additionally moved acquisition design into the detector model, reducing the photon-collection burden without replacing established LCT, f-k, or phasor-field reconstruction back ends.</p>"
-    )
-    text = replace_once(text, old_2022, new_2022, "homepage 2022 timeline")
-    write(path, text)
-
-
-def update_active_survey() -> None:
-    path = "article/2active.tex"
-    text = read(path)
-    ensure_absent(text, KEY, path)
-    text = replace_once(
+    text = sub_once(
+        r"(?m)^(\s*const papers=\[\s*)$",
+        lambda m: m.group(1) + "\n" + paper.rstrip("\n"),
         text,
-        "marcoVirtualLightTransport2021}",
-        "marcoVirtualLightTransport2021,liFirstPhotonStamping2022}",
-        "active SPAD reconstruction table citation",
+        "homepage paper array",
     )
-    anchor = (
-        "Moreover, SPAD has been widely used in commercial LiDAR systems, and the SPAD array, which can avoid the mechanical raster scan process, has the potential to save scanning time and realize real-time data collection for active NLOS imaging. \n"
+    timeline_pattern = r'(<div class="tl"><div class="year">2022</div>.*?<p>)(.*?)(</p></div></div>)'
+    match = re.search(timeline_pattern, text, flags=re.S)
+    if not match:
+        raise RuntimeError("Could not locate homepage 2022 timeline")
+    if "time-sequential first-photon" in match.group(2).casefold():
+        raise RuntimeError("Homepage 2022 timeline already contains TSFP")
+    replacement = (
+        match.group(1) + match.group(2).rstrip()
+        + " Time-sequential first-photon stamping additionally moved acquisition design into the detector model, reducing the photon-collection burden without replacing established LCT, f-k, or phasor-field reconstruction back ends."
+        + match.group(3)
     )
+    text = text[:match.start()] + replacement + text[match.end():]
+    save(name, text)
+
+
+def update_active() -> None:
+    name = "article/2active.tex"
+    text = load(name)
+    assert_absent(text, KEY, name)
+    table_pattern = r"(?m)^(\s*\\cite\{[^\n}]*marcoVirtualLightTransport2021)(\}\s*& Pulsed laser & SPAD & Time of fight &\s*3D reconstruction.*)$"
+    text = sub_once(
+        table_pattern,
+        lambda m: m.group(1) + "," + KEY + m.group(2),
+        text,
+        "active SPAD reconstruction table",
+    )
+    spad_sentence = (
+        "Moreover, SPAD has been widely used in commercial LiDAR systems, and the SPAD array, "
+        "which can avoid the mechanical raster scan process, has the potential to save scanning "
+        "time and realize real-time data collection for active NLOS imaging."
+    )
+    pos = text.find(spad_sentence)
+    if pos < 0:
+        raise RuntimeError("Could not locate SPAD-array discussion")
+    end = pos + len(spad_sentence)
     paragraph = (
-        anchor
-        + "\n\\vspace{0.8mm}\n"
-        + "\\noindent \\textbf{Time-sequential first-photon acquisition.}\n"
-        + "Most transient NLOS work optimizes the forward model or inverse solver after accumulating a photon-arrival histogram. Li~\\etal~instead examined the detector process and represented each measurement by time-sequential first-photon events~\\cite{liFirstPhotonStamping2022}. Their TSFP likelihood uses the earliest detection in successive laser periods and was validated on synthetic and measured hidden scenes, obtaining reconstruction quality comparable to conventional histogram acquisition with substantially less collection time. This detection-aware branch is complementary to LCT, $f$-$k$ migration, and phasor-field propagation: it reduces the photon and acquisition budget before those inverse operators are applied, and therefore provides an early link between single-photon statistics, photon-starved operation, and later real-time NLOS systems.\n"
+        "\n\n\\vspace{0.8mm}\n"
+        "\\noindent \\textbf{Time-sequential first-photon acquisition.}\n"
+        "Most transient NLOS work optimizes the forward model or inverse solver after accumulating a photon-arrival histogram. Li~\\etal~instead examined the detector process and represented each measurement by time-sequential first-photon events~\\cite{liFirstPhotonStamping2022}. Their TSFP likelihood uses the earliest detection in successive laser periods and was validated on synthetic and measured hidden scenes, obtaining reconstruction quality comparable to conventional histogram acquisition with substantially less collection time. This detection-aware branch is complementary to LCT, $f$-$k$ migration, and phasor-field propagation: it reduces the photon and acquisition budget before those inverse operators are applied, and therefore provides an early link between single-photon statistics, photon-starved operation, and later real-time NLOS systems."
     )
-    text = replace_once(text, anchor, paragraph, "SPAD hardware discussion")
-    write(path, text)
+    text = text[:end] + paragraph + text[end:]
+    save(name, text)
 
 
-def update_master_tex() -> None:
-    path = "bare_jrnl.tex"
-    text = read(path)
-    marker = "% 22 July 2026 citation trace: time-sequential first-photon NLOS acquisition integrated.\n"
-    ensure_absent(text, marker.strip(), path)
-    text = replace_once(text, "%% bare_jrnl.tex\n", "%% bare_jrnl.tex\n" + marker, "master survey header")
-    write(path, text)
+def update_master() -> None:
+    name = "bare_jrnl.tex"
+    text = load(name)
+    marker = "% 22 July 2026 citation trace: time-sequential first-photon NLOS acquisition integrated."
+    assert_absent(text, marker, name)
+    text = sub_once(
+        r"(?m)^%% bare_jrnl\.tex\s*$",
+        "%% bare_jrnl.tex\n" + marker,
+        text,
+        "master survey header",
+    )
+    save(name, text)
 
 
 def main() -> None:
     update_readme()
     update_index()
-    update_active_survey()
-    update_master_tex()
-    print(f"Integrated {TITLE} ({DOI}) across public and survey sources.")
+    update_active()
+    update_master()
+    for name in ("README.md", "index.html", "article/2active.tex"):
+        text = load(name)
+        if DOI not in text and KEY not in text:
+            raise RuntimeError(f"Postcondition failed for {name}")
+    print("Integrated TSFP NLOS acquisition across README, homepage, survey, and master source.")
 
 
 if __name__ == "__main__":
