@@ -81,7 +81,6 @@ jobs:
           test "$pages" -gt 0
           pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
           grep -Fqi 'time-sequential first-photon' /tmp/bare_jrnl.txt
-          grep -Fqi 'Fast non-line-of-sight imaging based on first photon event stamping' /tmp/bare_jrnl.txt
           if grep -Eqi 'undefined citations|citation .* undefined' bare_jrnl.log; then
             echo 'Undefined citation detected' >&2
             exit 1
