@@ -14,6 +14,10 @@ Building on the two-bounce NLOS setup, Somasundaram~\etal~provided the first sys
 
 A complementary steady-state trajectory replaces binary shadow carving with a continuous learned scene model. Zhang~\etal~introduced Neural Illumination Fields (NIF)~\cite{zhangNeuralIlluminationFields2026}, which jointly represents hidden-space density and illumination-dependent image formation with multilayer perceptrons and optimizes the representation through differentiable intensity rendering. Because NIF synthesizes measured shadow images directly, it avoids error-prone binary shadow segmentation and remains effective under low shadow contrast and ambient-light interference. This work shifts two-bounce NLOS from discrete occupancy carving toward self-supervised neural inverse rendering for large hidden volumes.
 
+\vspace{0.8mm}
+\noindent \textbf{Dynamic neural shadow fields for moving two-bounce scenes.}
+The static-scene assumption remains restrictive when hidden people or objects move during a cyclic multi-position scan. Zhang~\etal~addressed this regime with D-NeSF~\cite{zhangDynamicNeuralShadowFields2026}, decomposing the four-dimensional hidden volume into six spatiotemporal feature planes whose interpolated features are mapped by an MLP to time-varying voxel density. A cyclic acquisition strategy aligns repeated illumination positions with periodic shadow observations, while a cumulative-transmittance constraint enables self-supervised fitting to captured binary shadow sequences. This work extends the two-bounce neural-field trajectory from high-fidelity static geometry to temporally consistent reconstruction of moving hidden targets, and exposes motion modeling and scan-time synchronization as central design variables for dynamic shadow-based NLOS.
+
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Keyhole Imaging}
 \subsection{Keyhole Imaging}
 For all the NLOS imaging systems introduced above, there is a limitation that a large illumination/imaging area is required.
