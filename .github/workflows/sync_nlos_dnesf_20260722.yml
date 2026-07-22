@@ -1,0 +1,103 @@
+name: Sync dynamic neural shadow fields citation trace
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/dnesf-20260722-trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-dnesf-20260722-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  synchronize-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install bibtexparser
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Synchronize source artifacts
+        run: python scripts/sync_nlos_20260722_dnesf.py
+
+      - name: Regenerate consolidated bibliography
+        run: python scripts/merge_nlos_bibliography.py
+
+      - name: Validate source consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          doi='10.1117/12.3095236'
+          key='zhangDynamicNeuralShadowFields2026'
+          test "$(grep -F "$doi" README.md | wc -l)" -eq 1
+          test "$(grep -F "$doi" index.html | wc -l)" -eq 1
+          test "$(grep -E "^@[A-Za-z]+\\{$key," egbib_merged_20260711.bib | wc -l)" -eq 1
+          test "$(grep -F "$key" article/5newscenes.tex | wc -l)" -eq 1
+          grep -Fq 'Dynamic neural shadow fields for moving two-bounce scenes' article/5newscenes.tex
+          grep -Fq '22 July 2026 citation trace: dynamic neural shadow fields for moving two-bounce NLOS integrated' bare_jrnl.tex
+          grep -Fq 'through 22 July 2026' bare_jrnl.tex
+          grep -Fq '<b>184</b><span>tracked latest entries</span>' index.html
+
+      - name: Clean LaTeX build
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate rebuilt PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          grep -Fqi 'Dynamic neural shadow fields for moving two-bounce scenes' /tmp/bare_jrnl.txt
+          grep -Fqi 'D-NeSF' /tmp/bare_jrnl.txt
+          if grep -Eqi 'undefined citations|citation .* undefined' bare_jrnl.log; then
+            echo 'Undefined citation detected' >&2
+            exit 1
+          fi
+          if grep -Eqi 'Repeated entry' bare_jrnl.blg; then
+            echo 'Repeated bibliography entry detected' >&2
+            exit 1
+          fi
+
+      - name: Commit synchronized artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf egbib_20260722_dnesf.bib egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-22-dnesf-dynamic-two-bounce.md
+          if git diff --cached --quiet; then
+            echo 'No synchronized changes remain to commit.'
+          else
+            git commit -m 'Integrate dynamic neural shadow fields for two-bounce NLOS'
+            git push origin HEAD:master
+          fi
