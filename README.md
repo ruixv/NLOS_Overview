@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2022 | [Fast non-line-of-sight imaging based on first photon event stamping](https://doi.org/10.1364/OL.446079) — Li et al. | Optics Letters 2022 | Introduces time-sequential first-photon (TSFP) acquisition for active transient NLOS, modeling the detection process rather than changing the downstream inverse operator. Synthetic and measured experiments retain comparable reconstruction quality with substantially shorter acquisition, making the method relevant to photon-starved and real-time systems. |
 | 2026 | [Deep Learning–Aided Frequency-Modulated Continuous-Wave Radar for Around-the-Corner Non-Line-of-Sight Perception at Urban Intersections](https://doi.org/10.32604/cmes.2026.078862) — Lin, Chen | Computer Modeling in Engineering & Sciences 2026 | Uses simulated 77 GHz automotive FMCW echoes and a compact residual AlexNet-derived chirp-restoration network to exploit building specular reflections for around-corner range and angle estimation at urban intersections. The paper is an application-facing NLOS radar-perception result; all reported evaluations are simulation-only, with measured-data validation left for future work. |
 | 2024 | [Non-Line-of-Sight Imaging and Vibrometry Using a Comb-Calibrated Coherent Sensor](https://doi.org/10.1103/PhysRevLett.132.233802) — Huang et al. | Physical Review Letters 2024 | Establishes coherent optical NLOS sensing with an optical-frequency-comb-calibrated FMCW LiDAR, providing sub-picosecond effective temporal resolution, submillimeter hidden-scene localization and 3D imaging, and frequency-resolved NLOS vibrometry under strong ambient light. |
 | 2025 | [High-Resolution Non-Line-of-Sight Tracking by Comb-Calibrated FMCW LiDAR](https://doi.org/10.1002/lpor.202401250) — Ye et al. | Laser & Photonics Reviews 2025 | Extends comb-calibrated coherent NLOS from static imaging to snapshot multi-object tracking, reporting 2 mm 3D position accuracy and 2 mm/s velocity accuracy without temporal accumulation. |
@@ -271,6 +272,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Peng et al.: NLOS photography — direct high-resolution hidden-view image synthesis from transients [arXiv]
    │
 2022 ── Grau et al.: Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes [arXiv]
+   │     Li et al.: time-sequential first-photon stamping — detection-aware acquisition reduces photon collection time for active transient NLOS [Optics Letters]
    │
 2023 ── Wang et al.: Signal Superresolution Network — plug-and-play 16× sparse-scan acceleration [CVPR]
    │     Liu et al.: SSCR — mixed-dimensional regularization from 5×5 confocal measurements [CVPR]
