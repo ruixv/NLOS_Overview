@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import re
+from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 ARXIV_ID = "2607.11868"
@@ -23,7 +24,13 @@ def save(name: str, text: str) -> None:
     (ROOT / name).write_text(text, encoding="utf-8")
 
 
-def sub_once(pattern: str, repl: str | callable, text: str, label: str, flags: int = 0) -> str:
+def sub_once(
+    pattern: str,
+    repl: str | Callable[[re.Match[str]], str],
+    text: str,
+    label: str,
+    flags: int = 0,
+) -> str:
     out, count = re.subn(pattern, repl, text, count=1, flags=flags)
     if count != 1:
         raise RuntimeError(f"Expected one {label} anchor, found {count}")
@@ -63,25 +70,23 @@ def update_readme() -> None:
         "detection-only, with stationary airframes and no hidden-target localization or 3D reconstruction. |\n"
     )
     text = sub_once(
-        r"(?m)^(\|------\|-------\|----------------\|----------------\|\s*)$",
+        r"(?m)^(\|------\|-------\|----------------\|----------------\|)[ \t]*$",
         lambda m: m.group(1) + "\n" + row.rstrip("\n"),
         text,
         "README latest-additions header",
     )
 
-    anchor = (
-        "    │     Lin and Chen: urban-intersection FMCW NLOS perception — chirp-level residual "
-        "learning suppresses simulated interference before conventional range/angle estimation "
-        "[Computer Modeling in Engineering & Sciences]"
-    )
     milestone = (
         "    │     Liyanage et al.: multi-antenna micro-Doppler radar preserves cyclostationary rotor "
         "cues through cabinets, doors, and walls for experimental NLOS drone detection "
         "[IEEE VTC2026-Fall, accepted]"
     )
-    if text.count(anchor) != 1:
-        raise RuntimeError(f"Expected one README radar milestone anchor, found {text.count(anchor)}")
-    text = text.replace(anchor, anchor + "\n" + milestone, 1)
+    text = sub_once(
+        r"(?m)^(\s*│\s+Lin and Chen: urban-intersection FMCW NLOS perception[^\n]*)$",
+        lambda m: m.group(1) + "\n" + milestone,
+        text,
+        "README urban-radar milestone",
+    )
     save(name, text)
 
 
@@ -136,20 +141,6 @@ def update_radar_survey() -> None:
     if KEY in text:
         raise RuntimeError("Radar survey already cites the sUAS paper")
 
-    anchor = (
-        "Lin and Chen studied an application-facing 77~GHz automotive-radar setting in which specular "
-        "reflections from buildings provide around-corner observations at occluded urban intersections~"
-        "\\cite{linDeepLearningFMCWRadar2026}. Their compact one-dimensional, AlexNet-derived regression "
-        "network restores interference-corrupted chirps before standard range and angular estimation, "
-        "reducing simulated severe-interference errors from $5.48$~m/$18.95^{\\circ}$/$10.77^{\\circ}$ "
-        "to $0.56$~m/$0.46^{\\circ}$/$0.73^{\\circ}$ for range, angle, and azimuth deviation, respectively. "
-        "Unlike measured radar geometry reconstruction systems, the study is evaluated entirely in MATLAB "
-        "simulation; its value is therefore as a learned signal-restoration and autonomous-driving NLOS "
-        "perception branch, with real-road multipath and material validation remaining open."
-    )
-    if text.count(anchor) != 1:
-        raise RuntimeError(f"Expected one urban-radar paragraph anchor, found {text.count(anchor)}")
-
     paragraph = (
         "\n\n\\vspace{0.8mm}\n"
         "\\noindent \\textbf{Cyclostationary micro-Doppler detection in fully NLOS scenes.}\n"
@@ -164,7 +155,14 @@ def update_radar_survey() -> None:
         "stationary while the propellers rotated, and the reported task was binary detection rather than "
         "localization, tracking, or hidden-shape reconstruction."
     )
-    text = text.replace(anchor, anchor + paragraph, 1)
+    text = sub_once(
+        r"(\\noindent \\textbf\{Urban-intersection FMCW radar perception\.\}\s*\n.*?"
+        r"real-road multipath and material validation remaining open\.)",
+        lambda m: m.group(1) + paragraph,
+        text,
+        "urban-intersection radar discussion",
+        flags=re.S,
+    )
     save(name, text)
 
 
