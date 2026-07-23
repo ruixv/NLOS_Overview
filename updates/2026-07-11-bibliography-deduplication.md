@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 69 source files and keeps one highest-priority record for each of 442 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 70 source files and keeps one highest-priority record for each of 443 case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 479
-- Case-insensitive duplicate replacements: 37
+- Parsed source records: 484
+- Case-insensitive duplicate replacements: 41
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 1
@@ -49,6 +49,10 @@ This update generates `egbib_merged_20260711.bib` from 69 source files and keeps
 - `wangEventEnhancedPassiveNLOS2024` / `wangEventEnhancedPassiveNLOS2024`: `egbib_2026_updates.bib` → `egbib_20260720_event_camera_final_venue.bib`
 - `zhouPolarizationSpeckleNLOS2026` / `zhouPolarizationSpeckleNLOS2026`: `egbib_20260718_core_citation_updates.bib` → `egbib_20260720_polarization_single_pixel.bib`
 - `caligiuriNIGHT2024` / `caligiuriNIGHT2024`: `egbib_20260713_consumer_tof_updates.bib` → `egbib_20260722_passive_itof_citation_trace.bib`
+- `doveParaxialTheoryPhasor2019` / `doveParaxialTheoryPhasor2019`: `egbib_20260704_updates.bib` → `egbib_20260723_zz_phasor_lineage.bib`
+- `doveParaxialPhysicalOptics2020` / `doveParaxialPhysicalOptics2020`: `egbib_20260704_updates.bib` → `egbib_20260723_zz_phasor_lineage.bib`
+- `doveNonparaxialPhasor2020` / `doveNonparaxialPhasor2020`: `egbib_20260704_updates.bib` → `egbib_20260723_zz_phasor_lineage.bib`
+- `luesiaScatteringPhasor2023` / `luesiaScatteringPhasor2023`: `egbib_20260703_updates.bib` → `egbib_20260723_zz_phasor_lineage.bib`
 
 ## Citation-key spellings normalized
 
