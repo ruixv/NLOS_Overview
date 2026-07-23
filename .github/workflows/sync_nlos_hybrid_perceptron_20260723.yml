@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  synchronize-build-validate:
+  synchronize-sources:
     runs-on: ubuntu-latest
     steps:
       - name: Check out master
@@ -29,12 +29,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install build dependencies
+      - name: Install bibliography dependency
         run: |
           python -m pip install --upgrade pip
           python -m pip install bibtexparser
-          sudo apt-get update
-          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers texlive-bibtex-extra poppler-utils
 
       - name: Synchronize source artifacts
         run: python scripts/sync_nlos_20260723_hybrid_perceptron.py
@@ -57,12 +55,43 @@ jobs:
           grep -Fq '23 July 2026 citation trace: HP-CDT active steady-state cross-domain learning integrated' bare_jrnl.tex
           grep -Fq '<b>192</b><span>tracked latest entries</span>' index.html
           grep -Fq '**Update run: 23 July 2026.**' README.md
-          grep -Fq '**Status after automation:** integrated across public sources' updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
+          grep -Fq '**Status after source synchronization:** README, website, survey source, and bibliography integrated; PDF rebuild pending validation.' updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
+
+      - name: Commit synchronized sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/4datadriven.tex bare_jrnl.tex egbib_20260723_zzz_hybrid_perceptron.bib egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
+          if git diff --cached --quiet; then
+            echo 'No synchronized source changes remain to commit.'
+          else
+            git commit -m 'Integrate HP-CDT active steady-state NLOS sources'
+            git push origin HEAD:master
+          fi
+
+  rebuild-survey-pdf:
+    needs: synchronize-sources
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out updated master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers texlive-bibtex-extra poppler-utils
 
       - name: Clean LaTeX build
         shell: bash
         run: |
           set -euo pipefail
+          grep -Fq 'liangHybridPerceptronSteadyState2025' article/4datadriven.tex
+          grep -Fq 'liangHybridPerceptronSteadyState2025' egbib_merged_20260711.bib
           rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           bibtex bare_jrnl
@@ -90,16 +119,30 @@ jobs:
             exit 1
           fi
 
-      - name: Commit synchronized artifacts
+      - name: Mark PDF completion
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('updates/2026-07-23-hybrid-perceptron-steady-state-audit.md')
+          text = path.read_text(encoding='utf-8')
+          old = '**Status after source synchronization:** README, website, survey source, and bibliography integrated; PDF rebuild pending validation.'
+          new = '**Status after automation:** README, website, survey source, bibliography, and rebuilt PDF are mutually synchronized and validated.'
+          if text.count(old) != 1:
+              raise SystemExit(f'Expected one pending status, found {text.count(old)}')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Commit rebuilt PDF
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add README.md index.html article/4datadriven.tex bare_jrnl.tex bare_jrnl.pdf egbib_20260723_zzz_hybrid_perceptron.bib egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
+          git add bare_jrnl.pdf updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
           if git diff --cached --quiet; then
-            echo 'No synchronized changes remain to commit.'
+            echo 'No rebuilt PDF changes remain to commit.'
           else
-            git commit -m 'Integrate HP-CDT active steady-state NLOS learning'
+            git commit -m 'Rebuild survey for HP-CDT active steady-state NLOS'
             git push origin HEAD:master
           fi
