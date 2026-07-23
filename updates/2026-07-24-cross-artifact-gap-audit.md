@@ -45,4 +45,4 @@ The guarded synchronizer `scripts/sync_nlos_20260724_cross_artifact_gaps.py` wil
 5. Update the coverage date and audit marker in `bare_jrnl.tex`.
 6. Clean-build `bare_jrnl.pdf` and validate citations, bibliography uniqueness, extracted PDF text, and cross-artifact DOI coverage.
 
-**Status before automation:** verified metadata and guarded synchronization plan committed; source synchronization and PDF rebuild pending validation.
+**Status after automation:** README, website, semantically placed survey prose, normalized bibliography, and rebuilt PDF are mutually synchronized and validated.
