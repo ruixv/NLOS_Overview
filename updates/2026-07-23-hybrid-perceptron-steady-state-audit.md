@@ -20,4 +20,4 @@ Repository-wide title, DOI, and method-name checks found no existing README, hom
 - `egbib_merged_20260711.bib`: regenerate from the canonical supplement and retain exactly one DOI/key record.
 - `bare_jrnl.pdf`: perform a clean `pdflatex -> bibtex -> pdflatex x2` rebuild, reject undefined citations or repeated BibTeX entries, and verify extracted PDF text.
 
-**Status after source synchronization:** README, website, survey source, and bibliography integrated; PDF rebuild pending validation.
+**Status after automation:** README, website, survey source, bibliography, and rebuilt PDF are mutually synchronized and validated.
