@@ -25,8 +25,9 @@ jobs:
       - name: Check out master
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           ref: master
+          show-progress: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -82,8 +83,9 @@ jobs:
       - name: Check out updated master
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
           ref: master
+          show-progress: false
 
       - name: Install LaTeX and PDF validation tools
         run: |
