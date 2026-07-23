@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  synchronize-sources:
+  synchronize-text-sources:
     runs-on: ubuntu-latest
     steps:
       - name: Check out master
@@ -29,55 +29,75 @@ jobs:
           ref: master
           show-progress: false
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      - name: Synchronize text artifacts
+        run: python3 scripts/sync_nlos_20260723_hybrid_perceptron.py
 
-      - name: Install bibliography dependency
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install bibtexparser
-
-      - name: Synchronize source artifacts
-        run: python scripts/sync_nlos_20260723_hybrid_perceptron.py
-
-      - name: Regenerate consolidated bibliography
-        run: python scripts/merge_nlos_bibliography.py
-
-      - name: Validate source consistency
+      - name: Validate text artifacts
         shell: bash
         run: |
           set -euo pipefail
-          doi='10.1016/j.sigpro.2025.110072'
-          key='liangHybridPerceptronSteadyState2025'
-          test "$(grep -F "$doi" README.md | wc -l)" -eq 1
-          test "$(grep -F "$doi" index.html | wc -l)" -eq 1
-          test "$(grep -F "$key" article/4datadriven.tex | wc -l)" -eq 1
-          test "$(grep -E "^@[A-Za-z]+\\{$key," egbib_merged_20260711.bib | wc -l)" -eq 1
-          test "$(grep -Fi 'doi = {10.1016/j.sigpro.2025.110072}' egbib_merged_20260711.bib | wc -l)" -eq 1
+          grep -Fq '10.1016/j.sigpro.2025.110072' README.md
+          grep -Fq '10.1016/j.sigpro.2025.110072' index.html
+          grep -Fq 'liangHybridPerceptronSteadyState2025' article/4datadriven.tex
           grep -Fq 'Cross-domain transfer for active steady-state NLOS' article/4datadriven.tex
           grep -Fq '23 July 2026 citation trace: HP-CDT active steady-state cross-domain learning integrated' bare_jrnl.tex
           grep -Fq '<b>192</b><span>tracked latest entries</span>' index.html
-          grep -Fq '**Update run: 23 July 2026.**' README.md
-          grep -Fq '**Status after source synchronization:** README, website, survey source, and bibliography integrated; PDF rebuild pending validation.' updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
 
-      - name: Commit synchronized sources
+      - name: Commit synchronized text sources
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add README.md index.html article/4datadriven.tex bare_jrnl.tex egbib_20260723_zzz_hybrid_perceptron.bib egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
+          git add README.md index.html article/4datadriven.tex bare_jrnl.tex updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
           if git diff --cached --quiet; then
-            echo 'No synchronized source changes remain to commit.'
+            echo 'No synchronized text changes remain to commit.'
           else
             git commit -m 'Integrate HP-CDT active steady-state NLOS sources'
             git push origin HEAD:master
           fi
 
+  merge-bibliography:
+    needs: synchronize-text-sources
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out updated master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: master
+          show-progress: false
+
+      - name: Install bibliography dependency
+        run: python3 -m pip install bibtexparser
+
+      - name: Regenerate consolidated bibliography
+        run: python3 scripts/merge_nlos_bibliography.py
+
+      - name: Validate bibliography
+        shell: bash
+        run: |
+          set -euo pipefail
+          key='liangHybridPerceptronSteadyState2025'
+          test "$(grep -E "^@[A-Za-z]+\\{$key," egbib_merged_20260711.bib | wc -l)" -eq 1
+          test "$(grep -Fi 'doi = {10.1016/j.sigpro.2025.110072}' egbib_merged_20260711.bib | wc -l)" -eq 1
+
+      - name: Commit merged bibliography
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add egbib_20260723_zzz_hybrid_perceptron.bib egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md
+          if git diff --cached --quiet; then
+            echo 'No bibliography changes remain to commit.'
+          else
+            git commit -m 'Merge HP-CDT active steady-state NLOS bibliography'
+            git push origin HEAD:master
+          fi
+
   rebuild-survey-pdf:
-    needs: synchronize-sources
+    needs: merge-bibliography
     runs-on: ubuntu-latest
     steps:
       - name: Check out updated master
@@ -128,7 +148,7 @@ jobs:
       - name: Mark PDF completion
         shell: bash
         run: |
-          python - <<'PY'
+          python3 - <<'PY'
           from pathlib import Path
           path = Path('updates/2026-07-23-hybrid-perceptron-steady-state-audit.md')
           text = path.read_text(encoding='utf-8')
