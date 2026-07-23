@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - '.github/hybrid-perceptron-20260723-trigger'
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/hybrid-perceptron-20260723-pr-trigger'
   workflow_dispatch:
 
 permissions:
