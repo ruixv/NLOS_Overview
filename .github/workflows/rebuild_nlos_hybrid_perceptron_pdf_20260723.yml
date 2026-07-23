@@ -1,0 +1,90 @@
+name: Rebuild HP-CDT NLOS survey PDF
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/hybrid-perceptron-pdf-20260723-pr-trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out updated master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: master
+          show-progress: false
+
+      - name: Validate integrated sources
+        run: |
+          grep -Fq 'liangHybridPerceptronSteadyState2025' article/4datadriven.tex
+          grep -Fq 'liangHybridPerceptronSteadyState2025' egbib_merged_20260711.bib
+          grep -Fq '10.1016/j.sigpro.2025.110072' README.md
+          grep -Fq '10.1016/j.sigpro.2025.110072' index.html
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean LaTeX build
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate rebuilt PDF
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          grep -Fqi 'HP-CDT' /tmp/bare_jrnl.txt
+          if grep -Eqi 'undefined citations|citation .* undefined' bare_jrnl.log; then
+            echo 'Undefined citation detected' >&2
+            exit 1
+          fi
+          if grep -Eqi 'Repeated entry' bare_jrnl.blg; then
+            echo 'Repeated bibliography entry detected' >&2
+            exit 1
+          fi
+
+      - name: Mark PDF completion
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('updates/2026-07-23-hybrid-perceptron-steady-state-audit.md')
+          text = path.read_text(encoding='utf-8')
+          old = '**Status after source synchronization:** README, website, survey source, and bibliography integrated; PDF rebuild pending validation.'
+          new = '**Status after automation:** README, website, survey source, bibliography, and rebuilt PDF are mutually synchronized and validated.'
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('Expected pending or completed HP-CDT status marker')
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit rebuilt PDF
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add bare_jrnl.pdf updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
+          if git diff --cached --quiet; then
+            echo 'No rebuilt PDF changes remain to commit.'
+          else
+            git commit -m 'Rebuild survey for HP-CDT active steady-state NLOS'
+            git push origin HEAD:master
+          fi
