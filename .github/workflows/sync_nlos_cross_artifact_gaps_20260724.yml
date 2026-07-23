@@ -1,0 +1,105 @@
+name: Synchronize NLOS cross-artifact gaps
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/nlos-cross-artifact-20260724-trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  synchronize-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out current master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: master
+          show-progress: false
+
+      - name: Run guarded source synchronization
+        run: python3 scripts/sync_nlos_20260724_cross_artifact_gaps.py
+
+      - name: Validate public and survey sources
+        run: |
+          set -euo pipefail
+          for doi in \
+            '10.1364/OE.601398' \
+            '10.1364/PRJ.595776' \
+            '10.1016/j.optlaseng.2026.109724'; do
+            test "$(grep -Fio "$doi" README.md | wc -l)" -eq 1
+            test "$(grep -Fio "$doi" index.html | wc -l)" -eq 1
+            test "$(grep -Fio "$doi" egbib_merged_20260711.bib | wc -l)" -eq 2
+          done
+          grep -Fq 'wangDiffuseAwarePassive2026' article/3passive.tex
+          grep -Fq 'liangFMCWNLOS2026' article/2active.tex
+          grep -Fq 'fuFourierSinglePixelDiffusion2026' article/4datadriven.tex
+          grep -Fq 'through 24 July 2026' bare_jrnl.tex
+          grep -Fq '<b>195</b><span>tracked latest entries</span>' index.html
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean LaTeX build
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate rebuilt survey PDF
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          grep -Fqi 'Diffuse-aware attention encoding' /tmp/bare_jrnl.txt
+          grep -Fqi 'cost-effective FMCW' /tmp/bare_jrnl.txt
+          grep -Fqi 'Diffusion-prior Fourier single-pixel imaging' /tmp/bare_jrnl.txt
+          if grep -Eqi 'undefined citations|citation .* undefined' bare_jrnl.log; then
+            echo 'Undefined citation detected' >&2
+            exit 1
+          fi
+          if grep -Eqi 'Repeated entry' bare_jrnl.blg; then
+            echo 'Repeated bibliography entry detected' >&2
+            exit 1
+          fi
+
+      - name: Mark audit complete
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('updates/2026-07-24-cross-artifact-gap-audit.md')
+          text = path.read_text(encoding='utf-8')
+          old = '**Status before automation:** verified metadata and guarded synchronization plan committed; source synchronization and PDF rebuild pending validation.'
+          new = '**Status after automation:** README, website, semantically placed survey prose, normalized bibliography, and rebuilt PDF are mutually synchronized and validated.'
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('Expected pending or completed audit status marker')
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit synchronized artifacts
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-07-24-cross-artifact-gap-audit.md
+          if git diff --cached --quiet; then
+            echo 'No synchronized artifact changes remain to commit.'
+          else
+            git commit -m 'Synchronize three NLOS cross-artifact gaps'
+            git push origin HEAD:master
+          fi
