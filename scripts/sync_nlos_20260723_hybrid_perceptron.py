@@ -62,7 +62,7 @@ def update_index() -> None:
         "homepage tracked-paper count",
     )
     paper = '      {cat:"latest active learning steady-state",title:"A hybrid perceptron with cross-domain transferability towards active steady-state non-line-of-sight imaging",authors:"Liang et al.",year:2025,venue:"Signal Processing 2025",url:"https://doi.org/10.1016/j.sigpro.2025.110072",key:"HP-CDT combines hierarchical pooling and feature fusion with local CNN and global Transformer perception, then transfers LOS-domain latent representations as priors for lightweight, high-fidelity active steady-state hidden-image reconstruction."},'
-    text = replace_once(text, "      const papers=[", "      const papers=[\n" + paper, "homepage paper-array anchor")
+    text = replace_once(text, "    const papers=[", "    const papers=[\n" + paper, "homepage paper-array anchor")
 
     pattern = r'(<div class="tl"><div class="year">2025</div>.*?<p>)(.*?)(</p></div></div>)'
     match = re.search(pattern, text, flags=re.S)
