@@ -100,7 +100,7 @@ def update_note() -> None:
     text = replace_once(
         text,
         "**Status before automation:** staged; public artifacts and PDF not yet updated.",
-        "**Status after automation:** integrated across public sources; clean LaTeX/BibTeX rebuild and PDF validation completed.",
+        "**Status after source synchronization:** README, website, survey source, and bibliography integrated; PDF rebuild pending validation.",
         "update-note status",
     )
     write(NOTE, text)
