@@ -1,0 +1,170 @@
+name: Sync HP-CDT active steady-state NLOS v2
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/hybrid-perceptron-v2-20260723-pr-trigger'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-hybrid-perceptron-v2-20260723-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  synchronize-text-sources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: master
+          show-progress: false
+
+      - name: Synchronize text artifacts
+        run: python3 scripts/run_sync_nlos_20260723_hybrid_perceptron_v2.py
+
+      - name: Validate text artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq '10.1016/j.sigpro.2025.110072' README.md
+          grep -Fq '10.1016/j.sigpro.2025.110072' index.html
+          grep -Fq 'liangHybridPerceptronSteadyState2025' article/4datadriven.tex
+          grep -Fq 'Cross-domain transfer for active steady-state NLOS' article/4datadriven.tex
+          grep -Fq '23 July 2026 citation trace: HP-CDT active steady-state cross-domain learning integrated' bare_jrnl.tex
+          grep -Fq '<b>192</b><span>tracked latest entries</span>' index.html
+
+      - name: Commit synchronized text sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/4datadriven.tex bare_jrnl.tex scripts/sync_nlos_20260723_hybrid_perceptron.py updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
+          if git diff --cached --quiet; then
+            echo 'No synchronized text changes remain to commit.'
+          else
+            git commit -m 'Integrate HP-CDT active steady-state NLOS sources'
+            git push origin HEAD:master
+          fi
+
+  merge-bibliography:
+    needs: synchronize-text-sources
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out updated master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: master
+          show-progress: false
+
+      - name: Install bibliography dependency
+        run: python3 -m pip install bibtexparser
+
+      - name: Regenerate consolidated bibliography
+        run: python3 scripts/merge_nlos_bibliography.py
+
+      - name: Validate bibliography
+        shell: bash
+        run: |
+          set -euo pipefail
+          key='liangHybridPerceptronSteadyState2025'
+          test "$(grep -E "^@[A-Za-z]+\\{$key," egbib_merged_20260711.bib | wc -l)" -eq 1
+          test "$(grep -Fi 'doi = {10.1016/j.sigpro.2025.110072}' egbib_merged_20260711.bib | wc -l)" -eq 1
+
+      - name: Commit merged bibliography
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add egbib_20260723_zzz_hybrid_perceptron.bib egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md
+          if git diff --cached --quiet; then
+            echo 'No bibliography changes remain to commit.'
+          else
+            git commit -m 'Merge HP-CDT active steady-state NLOS bibliography'
+            git push origin HEAD:master
+          fi
+
+  rebuild-survey-pdf:
+    needs: merge-bibliography
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out updated master
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: master
+          show-progress: false
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Clean LaTeX build
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'liangHybridPerceptronSteadyState2025' article/4datadriven.tex
+          grep -Fq 'liangHybridPerceptronSteadyState2025' egbib_merged_20260711.bib
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate rebuilt PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          grep -Fqi 'hierarchical pooling' /tmp/bare_jrnl.txt
+          grep -Fqi 'LOS latent representations' /tmp/bare_jrnl.txt || grep -Fqi 'line-of-sight latent representations' /tmp/bare_jrnl.txt
+          if grep -Eqi 'undefined citations|citation .* undefined' bare_jrnl.log; then
+            echo 'Undefined citation detected' >&2
+            exit 1
+          fi
+          if grep -Eqi 'Repeated entry' bare_jrnl.blg; then
+            echo 'Repeated bibliography entry detected' >&2
+            exit 1
+          fi
+
+      - name: Mark PDF completion
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('updates/2026-07-23-hybrid-perceptron-steady-state-audit.md')
+          text = path.read_text(encoding='utf-8')
+          old = '**Status after source synchronization:** README, website, survey source, and bibliography integrated; PDF rebuild pending validation.'
+          new = '**Status after automation:** README, website, survey source, bibliography, and rebuilt PDF are mutually synchronized and validated.'
+          if text.count(old) != 1:
+              raise SystemExit(f'Expected one pending status, found {text.count(old)}')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Commit rebuilt PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add bare_jrnl.pdf updates/2026-07-23-hybrid-perceptron-steady-state-audit.md
+          if git diff --cached --quiet; then
+            echo 'No rebuilt PDF changes remain to commit.'
+          else
+            git commit -m 'Rebuild survey for HP-CDT active steady-state NLOS'
+            git push origin HEAD:master
+          fi
