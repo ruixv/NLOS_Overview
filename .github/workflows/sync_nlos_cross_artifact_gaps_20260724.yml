@@ -27,19 +27,36 @@ jobs:
       - name: Validate public and survey sources
         run: |
           set -euo pipefail
-          for doi in \
-            '10.1364/OE.601398' \
-            '10.1364/PRJ.595776' \
-            '10.1016/j.optlaseng.2026.109724'; do
-            test "$(grep -Fio "$doi" README.md | wc -l)" -eq 1
-            test "$(grep -Fio "$doi" index.html | wc -l)" -eq 1
-            test "$(grep -Fio "$doi" egbib_merged_20260711.bib | wc -l)" -eq 2
-          done
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          survey = Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          dois = [
+              '10.1364/OE.601398',
+              '10.1364/PRJ.595776',
+              '10.1016/j.optlaseng.2026.109724',
+          ]
+          for doi in dois:
+              assert readme.lower().count(doi.lower()) == 1, (doi, 'README')
+              assert index.lower().count(doi.lower()) == 1, (doi, 'index')
+              assert bib.lower().count(doi.lower()) == 2, (doi, 'bibliography DOI+URL')
+
+          match = re.search(r'<b>(\d+)</b><span>tracked latest entries</span>', index)
+          assert match, 'tracked-entry count missing'
+          stat_count = int(match.group(1))
+          paper_block = index.split('const papers=[', 1)[1].split('];', 1)[0]
+          object_count = paper_block.count('{cat:')
+          print(f'tracked-entry stat={stat_count}; paper objects={object_count}')
+          assert stat_count == object_count, (stat_count, object_count)
+          assert 'through 24 July 2026' in survey
+          PY
           grep -Fq 'wangDiffuseAwarePassive2026' article/3passive.tex
           grep -Fq 'liangFMCWNLOS2026' article/2active.tex
           grep -Fq 'fuFourierSinglePixelDiffusion2026' article/4datadriven.tex
-          grep -Fq 'through 24 July 2026' bare_jrnl.tex
-          grep -Fq '<b>195</b><span>tracked latest entries</span>' index.html
 
       - name: Install LaTeX and PDF validation tools
         run: |
