@@ -1,0 +1,1 @@
+Run the guarded NIF and SCISA-Net cross-artifact synchronization, bibliography validation, and survey PDF rebuild on 25 July 2026.
