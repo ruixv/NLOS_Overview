@@ -1,3 +1,4 @@
 Trigger the guarded radar/mmWave/sub-THz NLOS reconstruction lineage synchronization and survey PDF rebuild.
 PR-triggered validation request: 24 July 2026.
 Diagnostic retry after guarded synchronization failure.
+Bibliography-aware v2 validation request.
