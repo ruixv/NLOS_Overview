@@ -1,13 +1,13 @@
-name: Sync Neural Illumination Fields and rebuild survey PDF
+name: Sync NIF and SCISA-Net and rebuild survey PDF
 
 on:
   workflow_dispatch:
   push:
     branches: [master]
     paths:
-      - scripts/sync_nlos_20260725_neural_illumination_fields.py
+      - scripts/sync_nlos_20260725_nif_scisa.py
       - .github/workflows/sync_nlos_neural_illumination_20260725.yml
-      - updates/trigger-neural-illumination-20260725.txt
+      - updates/trigger-nif-scisa-20260725.txt
 
 permissions:
   contents: write
@@ -34,23 +34,23 @@ jobs:
             texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
             texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
 
-      - name: Apply fail-closed NIF synchronization
+      - name: Apply fail-closed NIF and SCISA-Net synchronization
         id: sync
         continue-on-error: true
-        run: python3 scripts/sync_nlos_20260725_neural_illumination_fields.py > /tmp/nif-sync.log 2>&1
+        run: python3 scripts/sync_nlos_20260725_nif_scisa.py > /tmp/nif-scisa-sync.log 2>&1
 
       - name: Upload synchronizer diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: neural-illumination-sync-diagnostics
-          path: /tmp/nif-sync.log
+          name: nif-scisa-sync-diagnostics
+          path: /tmp/nif-scisa-sync.log
           if-no-files-found: error
 
       - name: Stop on synchronization failure
         if: steps.sync.outcome != 'success'
         run: |
-          cat /tmp/nif-sync.log
+          cat /tmp/nif-scisa-sync.log
           exit 1
 
       - name: Validate synchronized sources
@@ -58,30 +58,43 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
-          title = 'Neural illumination fields: High-fidelity and ambient-robust stereo reconstruction for two-bounce non-line-of-sight imaging'
-          doi = '10.1016/j.optlaseng.2025.109514'
-          key = 'zhangNeuralIlluminationFields2026'
+          papers = [
+              (
+                  'Neural illumination fields: High-fidelity and ambient-robust stereo reconstruction for two-bounce non-line-of-sight imaging',
+                  '10.1016/j.optlaseng.2025.109514',
+                  'zhangNeuralIlluminationFields2026',
+              ),
+              (
+                  'SCISA-Net: Scene-Constrained Inverse-to-Subband Attention for Semantic Inference from Wall-Mediated Indirect Observations',
+                  '10.3390/photonics13060575',
+                  'daiSCISANet2026',
+              ),
+          ]
           readme = Path('README.md').read_text(encoding='utf-8')
           index = Path('index.html').read_text(encoding='utf-8')
-          survey_section = Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          data = Path('article/4datadriven.tex').read_text(encoding='utf-8')
+          newscenes = Path('article/5newscenes.tex').read_text(encoding='utf-8')
           master = Path('bare_jrnl.tex').read_text(encoding='utf-8')
           bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
 
-          assert readme.lower().count(title.lower()) == 1
-          assert index.lower().count(title.lower()) == 1
-          assert readme.count(doi) == 1
-          assert index.count(doi) == 1
-          assert bib.lower().count('doi = {' + doi.lower() + '}') == 1
-          assert bib.lower().count('{' + key.lower() + ',') == 1
-          assert survey_section.count(r'\cite{' + key + '}') == 1
-          assert survey_section.lower().count('neural illumination fields') == 1
-          assert 'binary shadow segmentation' in survey_section.lower()
-          assert '<b>202</b><span>tracked latest entries</span>' in index
+          for title, doi, key in papers:
+              assert readme.lower().count(title.lower()) == 1, title
+              assert index.lower().count(title.lower()) == 1, title
+              assert readme.count(doi) == 1, doi
+              assert index.count(doi) == 1, doi
+              assert bib.lower().count('doi = {' + doi.lower() + '}') == 1, doi
+              assert bib.lower().count('{' + key.lower() + ',') == 1, key
+          assert newscenes.count(r'\cite{zhangNeuralIlluminationFields2026}') == 1
+          assert newscenes.lower().count('neural illumination fields') == 1
+          assert 'binary shadow segmentation' in newscenes.lower()
+          assert data.count(r'\cite{daiSCISANet2026}') == 1
+          assert data.count(r'\noindent \textbf{Calibrated wall-mediated semantic inference.}') == 1
+          assert '<b>203</b><span>tracked latest entries</span>' in index
           assert '**Update run: 25 July 2026.**' in readme
           assert 'Updated 25 July 2026 · 190+ papers' in index
           assert 'Last updated: 25 July 2026' in index
-          assert '25 July 2026 consistency trace: Neural Illumination Fields synchronized across public artifacts.' in master
-          print('Pre-build NIF cross-artifact validation passed.')
+          assert '25 July 2026 consistency trace: Neural Illumination Fields and SCISA-Net synchronized across public and survey artifacts.' in master
+          print('Pre-build NIF and SCISA-Net cross-artifact validation passed.')
           PY
 
       - name: Clean-build updated survey
@@ -95,7 +108,9 @@ jobs:
       - name: Validate bibliography and regenerated PDF
         run: |
           test -s bare_jrnl.pdf
-          grep -Fq '\bibitem{zhangNeuralIlluminationFields2026}' bare_jrnl.bbl
+          while IFS= read -r key; do
+            test -z "$key" || grep -Fq "\\bibitem{$key}" bare_jrnl.bbl
+          done < updates/2026-07-25-nif-scisa-keys.txt
           ! grep -Eq 'Citation .* undefined|There were undefined citations|multiply defined' bare_jrnl.log
           pdfinfo bare_jrnl.pdf | tee /tmp/bare_jrnl_pdfinfo.txt
           pages=$(awk '/^Pages:/ {print $2}' /tmp/bare_jrnl_pdfinfo.txt)
@@ -108,11 +123,13 @@ jobs:
               'neural illumination fields',
               'binary shadow segmentation',
               'dynamic neural shadow fields',
-              'two-bounce nlos',
+              'calibrated wall-mediated semantic inference',
+              'scene-aware regularized inverse encoding',
+              'haar-subband attention',
           )
           missing = [term for term in required if term not in text]
           assert not missing, f'Missing expected PDF text: {missing}'
-          print('NIF and static-to-dynamic two-bounce trajectory found in PDF text.')
+          print('NIF and SCISA-Net trajectories found in PDF text.')
           PY
           rm -rf /tmp/nlos-render && mkdir -p /tmp/nlos-render
           pdftoppm -png -r 60 bare_jrnl.pdf /tmp/nlos-render/page >/dev/null 2>&1
@@ -124,13 +141,13 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add README.md index.html article/5newscenes.tex bare_jrnl.tex \
+          git add README.md index.html article/4datadriven.tex article/5newscenes.tex bare_jrnl.tex \
             egbib_merged_20260711.bib bare_jrnl.pdf \
-            updates/2026-07-25-neural-illumination-fields.md \
-            updates/2026-07-25-neural-illumination-keys.txt
+            updates/2026-07-25-nif-scisa-consistency.md \
+            updates/2026-07-25-nif-scisa-keys.txt
           if git diff --cached --quiet; then
             echo 'No synchronized source or PDF changes were needed.'
             exit 0
           fi
-          git commit -m 'Integrate Neural Illumination Fields across public artifacts [skip ci]'
+          git commit -m 'Integrate NIF and SCISA-Net across NLOS survey artifacts [skip ci]'
           git push origin HEAD:master
