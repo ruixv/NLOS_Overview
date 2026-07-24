@@ -1,2 +1,3 @@
 Trigger the validated PEC-NLOS source synchronization and survey PDF rebuild.
 PR trigger: 2026-07-24 citation-tracing integration.
+Retry after preserving the existing stable bibliography key.
