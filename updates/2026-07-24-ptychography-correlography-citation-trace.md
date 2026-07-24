@@ -23,4 +23,4 @@ The guarded synchronizer and build workflow will:
 5. Add a traceable citation-audit marker to `bare_jrnl.tex` without altering the already-current 24 July coverage date.
 6. Clean-build `bare_jrnl.pdf` and validate DOI coverage, bibliography uniqueness, extracted PDF text, page validity, and unresolved citations.
 
-**Status before automation:** verified metadata and fail-closed synchronization/build workflow committed; public-source integration and PDF rebuild pending validation.
+**Status after automation:** README, website, active-survey prose and table, consolidated bibliography, and rebuilt PDF are mutually synchronized and validated.
