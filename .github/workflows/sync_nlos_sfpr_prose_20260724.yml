@@ -7,6 +7,11 @@ on:
     paths:
       - scripts/sync_nlos_20260724_sfpr_prose.py
       - .github/workflows/sync_nlos_sfpr_prose_20260724.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - scripts/sync_nlos_20260724_sfpr_prose.py
+      - .github/workflows/sync_nlos_sfpr_prose_20260724.yml
 
 permissions:
   contents: write
@@ -16,9 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Check out repository
+      - name: Check out repository master
         uses: actions/checkout@v4
         with:
+          ref: master
           fetch-depth: 0
 
       - name: Install LaTeX and PDF validation tools
