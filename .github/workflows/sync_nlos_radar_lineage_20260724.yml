@@ -8,11 +8,13 @@ on:
     paths:
       - scripts/sync_nlos_20260724_radar_lineage.py
       - .github/workflows/sync_nlos_radar_lineage_20260724.yml
+      - updates/trigger-radar-lineage-20260724.txt
   pull_request:
     branches: [master]
     paths:
       - scripts/sync_nlos_20260724_radar_lineage.py
       - .github/workflows/sync_nlos_radar_lineage_20260724.yml
+      - updates/trigger-radar-lineage-20260724.txt
 
 permissions:
   contents: write
