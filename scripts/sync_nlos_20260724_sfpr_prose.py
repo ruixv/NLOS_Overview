@@ -89,8 +89,10 @@ if "  month = {March}," not in entry:
 if "  note = {Published 19 March 2026}," not in entry:
     entry = entry.replace("  number = {4},\n", "  note = {Published 19 March 2026},\n  number = {4},\n", 1)
 bib = entry_pattern.sub(entry, bib, count=1)
-if bib.count("@article{" + KEY) != 1 or bib.count(DOI) != 1:
-    raise SystemExit("Bibliography key or DOI is duplicated after normalization")
+if bib.count("@article{" + KEY) != 1:
+    raise SystemExit("Canonical bibliography key is duplicated after normalization")
+if bib.count(f"doi = {{{DOI}}}") != 1:
+    raise SystemExit("Canonical DOI field is missing or duplicated after normalization")
 
 note = f"""# SFPR survey-prose consistency integration — 24 July 2026
 
@@ -112,7 +114,7 @@ The citation-tracing and cross-artifact audit instead found one semantic integra
 
 ## Consistency checks
 
-- Exactly one DOI record in README, website, and consolidated bibliography.
+- Exactly one DOI record in README and website, plus one canonical DOI field in the consolidated bibliography.
 - Exactly one canonical BibTeX key and one dedicated survey heading.
 - Existing active-system-table citation retained.
 - Clean `pdflatex → bibtex → pdflatex ×2` build.
