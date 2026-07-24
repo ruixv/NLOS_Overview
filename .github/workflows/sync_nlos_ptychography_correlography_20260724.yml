@@ -35,7 +35,7 @@ jobs:
           test "$(grep -Fio "$doi" README.md | wc -l)" -eq 1
           test "$(grep -Fio "$doi" index.html | wc -l)" -eq 1
           test "$(grep -Fio "$doi" egbib_merged_20260711.bib | wc -l)" -eq 2
-          test "$(grep -Fo 'liuPtychographyCorrelography2026' article/2active.tex | wc -l)" -ge 2
+          test "$(grep -Fo 'liuPtychographyCorrelographyNLOS2026' article/2active.tex | wc -l)" -ge 2
           grep -Fq 'Ptychography-enhanced correlography' README.md
           grep -Fq 'Ptychography-enhanced correlography' index.html
           grep -Fq 'Ptychography-enhanced correlography' article/2active.tex
