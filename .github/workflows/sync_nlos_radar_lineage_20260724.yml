@@ -5,13 +5,13 @@ on:
   push:
     branches: [master]
     paths:
-      - scripts/sync_nlos_20260724_radar_lineage_v2.py
+      - scripts/sync_nlos_20260724_radar_lineage_v3.py
       - .github/workflows/sync_nlos_radar_lineage_20260724.yml
       - updates/trigger-radar-lineage-20260724.txt
   pull_request:
     branches: [master]
     paths:
-      - scripts/sync_nlos_20260724_radar_lineage_v2.py
+      - scripts/sync_nlos_20260724_radar_lineage_v3.py
       - .github/workflows/sync_nlos_radar_lineage_20260724.yml
       - updates/trigger-radar-lineage-20260724.txt
 
@@ -36,16 +36,16 @@ jobs:
             texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
             texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
 
-      - name: Apply bibliography-aware guarded update
+      - name: Apply corrected bibliography-aware guarded update
         id: sync
         continue-on-error: true
-        run: python3 scripts/sync_nlos_20260724_radar_lineage_v2.py > /tmp/radar-sync.log 2>&1
+        run: python3 scripts/sync_nlos_20260724_radar_lineage_v3.py > /tmp/radar-sync.log 2>&1
 
       - name: Upload synchronizer diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: radar-lineage-sync-diagnostics-v2
+          name: radar-lineage-sync-diagnostics-v3
           path: /tmp/radar-sync.log
           if-no-files-found: error
 
