@@ -1,18 +1,17 @@
 name: Sync radar NLOS reconstruction lineage and rebuild PDF
 
-# Trigger revision: capture fail-closed synchronizer diagnostics as a workflow artifact.
 on:
   workflow_dispatch:
   push:
     branches: [master]
     paths:
-      - scripts/sync_nlos_20260724_radar_lineage.py
+      - scripts/sync_nlos_20260724_radar_lineage_v2.py
       - .github/workflows/sync_nlos_radar_lineage_20260724.yml
       - updates/trigger-radar-lineage-20260724.txt
   pull_request:
     branches: [master]
     paths:
-      - scripts/sync_nlos_20260724_radar_lineage.py
+      - scripts/sync_nlos_20260724_radar_lineage_v2.py
       - .github/workflows/sync_nlos_radar_lineage_20260724.yml
       - updates/trigger-radar-lineage-20260724.txt
 
@@ -37,16 +36,16 @@ jobs:
             texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
             texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
 
-      - name: Apply guarded cross-artifact update
+      - name: Apply bibliography-aware guarded update
         id: sync
         continue-on-error: true
-        run: python3 scripts/sync_nlos_20260724_radar_lineage.py > /tmp/radar-sync.log 2>&1
+        run: python3 scripts/sync_nlos_20260724_radar_lineage_v2.py > /tmp/radar-sync.log 2>&1
 
       - name: Upload synchronizer diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: radar-lineage-sync-diagnostics
+          name: radar-lineage-sync-diagnostics-v2
           path: /tmp/radar-sync.log
           if-no-files-found: error
 
@@ -56,36 +55,44 @@ jobs:
           cat /tmp/radar-sync.log
           exit 1
 
-      - name: Validate source consistency before build
+      - name: Validate synchronized sources
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          records = [
-              ('Nonline-of-Sight 3-D Imaging Using Millimeter-Wave Radar', '10.1109/TGRS.2021.3112579', 'weiMillimeterWaveNLOS3D2022'),
-              ('Precise Reconstruction Method for Hidden Targets Based on Non-line-of-sight Radar 3D Imaging', '10.12000/JR24060', 'caiPreciseRadarNLOS2024'),
-              ('RM-CSTV: An Effective High-Resolution Method of Non-Line-of-Sight Millimeter-Wave Radar 3-D Imaging', '10.1360/nso/20230085', 'liuRMCSTVRadarNLOS2024'),
-              ('Non-Line-of-Sight 3D Reconstruction with Radar', '', 'laiHoloRadar2025'),
-              ('Non-Line-of-Sight mmW Radar Imaging With Adaptive Artifact Cancellation and Target Enhancement', '10.1109/TAP.2025.3583778', 'caiACTENetRadarNLOS2025'),
-              ('Non-Line-of-Sight mmW SAR Imaging With Equivariant Adaptive Threshold Learning', '10.1109/TCI.2025.3597462', 'caiEquivariantRadarNLOS2025'),
-              ('RM Operator Learning-driven Non-line-of-sight 3D Imaging Method for Millimeter Wave Radar', '10.12000/JR25132', 'chenRMOperatorRadarNLOS2026'),
-              ('Learning to See Around Corners: A Deep Unfolding Framework for Terahertz Radar Non-Line-of-Sight 3D Imaging', '10.3390/photonics13050440', 'chenDeepUnfoldingTHzNLOS2026'),
+          titles = [
+              'Nonline-of-Sight 3-D Imaging Using Millimeter-Wave Radar',
+              'Precise Reconstruction Method for Hidden Targets Based on Non-line-of-sight Radar 3D Imaging',
+              'RM-CSTV: An Effective High-Resolution Method of Non-Line-of-Sight Millimeter-Wave Radar 3-D Imaging',
+              'Non-Line-of-Sight 3D Reconstruction with Radar',
+              'Non-Line-of-Sight mmW Radar Imaging With Adaptive Artifact Cancellation and Target Enhancement',
+              'Non-Line-of-Sight mmW SAR Imaging With Equivariant Adaptive Threshold Learning',
+              'RM Operator Learning-driven Non-line-of-sight 3D Imaging Method for Millimeter Wave Radar',
+              'Learning to See Around Corners: A Deep Unfolding Framework for Terahertz Radar Non-Line-of-Sight 3D Imaging',
+          ]
+          dois = [
+              '10.1109/TGRS.2021.3112579', '10.12000/JR24060', '10.1360/nso/20230085',
+              '10.1109/TAP.2025.3583778', '10.1109/TCI.2025.3597462',
+              '10.12000/JR25132', '10.3390/photonics13050440',
           ]
           readme = Path('README.md').read_text(encoding='utf-8')
           index = Path('index.html').read_text(encoding='utf-8')
           survey = Path('article/5newscenes.tex').read_text(encoding='utf-8')
           bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
-          for title, doi, key in records:
+          keys = [line.strip() for line in Path('updates/2026-07-24-radar-lineage-keys.txt').read_text().splitlines() if line.strip()]
+          assert len(keys) == 8 and len(set(k.lower() for k in keys)) == 8
+          for title in titles:
               assert readme.lower().count(title.lower()) == 1, title
               assert index.lower().count(title.lower()) == 1, title
-              assert bib.count('{' + key + ',') == 1, key
+          for doi in dois:
+              assert readme.count(doi) == index.count(doi) == 1, doi
+              assert bib.lower().count(f'doi = {{{doi.lower()}}}') == 1, doi
+          for key in keys:
               assert survey.count(r'\cite{' + key + '}') >= 1, key
-              if doi:
-                  assert readme.count(doi) == index.count(doi) == 1, doi
-                  assert bib.count(f'doi = {{{doi}}}') == 1, doi
+              assert bib.lower().count('{' + key.lower() + ',') == 1, key
           assert '<b>201</b><span>tracked latest entries</span>' in index
           assert survey.count(r'\noindent \textbf{Measured mmWave reconstruction from physical models to fast regularized migration.}') == 1
           assert survey.count(r'\noindent \textbf{Self-supervised and model-unfolded radar NLOS reconstruction.}') == 1
-          print('Pre-build radar-lineage consistency checks passed.')
+          print('Pre-build cross-artifact validation passed.')
           PY
 
       - name: Clean-build updated survey
@@ -96,15 +103,12 @@ jobs:
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
 
-      - name: Validate new bibliography items and regenerated PDF
+      - name: Validate resolved bibliography and regenerated PDF
         run: |
           test -s bare_jrnl.pdf
-          for key in \
-            weiMillimeterWaveNLOS3D2022 caiPreciseRadarNLOS2024 liuRMCSTVRadarNLOS2024 \
-            laiHoloRadar2025 caiACTENetRadarNLOS2025 caiEquivariantRadarNLOS2025 \
-            chenRMOperatorRadarNLOS2026 chenDeepUnfoldingTHzNLOS2026; do
-            grep -Fq "\\bibitem{$key}" bare_jrnl.bbl
-          done
+          while IFS= read -r key; do
+            test -z "$key" || grep -Fq "\\bibitem{$key}" bare_jrnl.bbl
+          done < updates/2026-07-24-radar-lineage-keys.txt
           pdfinfo bare_jrnl.pdf | tee /tmp/bare_jrnl_pdfinfo.txt
           pages=$(awk '/^Pages:/ {print $2}' /tmp/bare_jrnl_pdfinfo.txt)
           test -n "$pages" && test "$pages" -gt 0
@@ -112,22 +116,23 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           text = ' '.join(Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').lower().split())
-          required = ('measured', 'mmwave', 'self-supervised', 'model-unfolded', 'acte-net', 'holoradar', '121')
+          required = ('measured mmwave reconstruction', 'self-supervised and model-unfolded radar', 'acte-net', 'holoradar', '121 ghz')
           missing = [term for term in required if term not in text]
-          assert not missing, f'Missing expected PDF text terms: {missing}'
-          print('Radar-lineage discussion found in extracted PDF text.')
+          assert not missing, f'Missing expected PDF text: {missing}'
+          print('Radar-lineage discussion found in PDF text.')
           PY
           rm -rf /tmp/nlos-render && mkdir -p /tmp/nlos-render
           pdftoppm -png -r 60 bare_jrnl.pdf /tmp/nlos-render/page >/dev/null 2>&1
           rendered=$(find /tmp/nlos-render -type f -name 'page-*.png' -size +0c | wc -l)
           test "$rendered" -gt 0
-          echo "Validated $pages PDF pages and $rendered rendered page images."
+          echo "Validated $pages PDF pages and $rendered rendered images."
 
       - name: Commit synchronized sources and PDF
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-07-24-radar-reconstruction-lineage.md
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-07-24-radar-reconstruction-lineage.md updates/2026-07-24-radar-lineage-keys.txt
           if git diff --cached --quiet; then
             echo 'No synchronized source or PDF changes were needed.'
             exit 0
