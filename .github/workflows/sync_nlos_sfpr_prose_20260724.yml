@@ -1,0 +1,97 @@
+name: Sync SFPR survey prose and rebuild PDF
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - scripts/sync_nlos_20260724_sfpr_prose.py
+      - .github/workflows/sync_nlos_sfpr_prose_20260724.yml
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
+
+      - name: Apply guarded cross-artifact update
+        run: python3 scripts/sync_nlos_20260724_sfpr_prose.py
+
+      - name: Validate source consistency before build
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          title = 'Nonconfocal non-line-of-sight imaging with specular-flight-path regularization for complex multi-orientation objects'
+          doi = '10.1364/PRJ.579183'
+          key = 'shiSpecularFlightPathNLOS2026'
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          active = Path('article/2active.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          assert title.lower() in readme.lower() and title.lower() in index.lower()
+          assert readme.count(doi) == index.count(doi) == bib.count(doi) == 1
+          assert bib.count('@article{' + key) == 1
+          assert active.count(r'\noindent \textbf{Specular-flight-path regularization for nonconfocal multi-orientation scenes.}') == 1
+          assert active.count(r'\cite{' + key + '}') >= 1
+          assert '<b>193</b><span>tracked latest entries</span>' in index
+          print('Pre-build source consistency checks passed.')
+          PY
+
+      - name: Clean-build updated survey
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate citations and regenerated PDF
+        run: |
+          test -s bare_jrnl.pdf
+          if grep -Eiq 'Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log; then
+            echo 'LaTeX citation/reference validation failed.'
+            grep -Ein 'Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log || true
+            exit 1
+          fi
+          if grep -Eiq 'repeated entry|already exists' bare_jrnl.blg; then
+            echo 'BibTeX duplicate-entry validation failed.'
+            grep -Ein 'repeated entry|already exists' bare_jrnl.blg || true
+            exit 1
+          fi
+          pdfinfo bare_jrnl.pdf | tee /tmp/bare_jrnl_pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/bare_jrnl_pdfinfo.txt)
+          test -n "$pages" && test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          grep -qi 'Specular-flight-path regularization' /tmp/bare_jrnl.txt
+          grep -qi 'Shi' /tmp/bare_jrnl.txt
+          mkdir -p /tmp/nlos-render
+          pdftoppm -png -r 90 bare_jrnl.pdf /tmp/nlos-render/page >/dev/null 2>&1
+          rendered=$(find /tmp/nlos-render -type f -name 'page-*.png' -size +0c | wc -l)
+          test "$rendered" -eq "$pages"
+          echo "Validated $pages PDF pages and $rendered rendered pages."
+
+      - name: Commit synchronized sources and PDF
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add article/2active.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-07-24-sfpr-survey-integration.md
+          if git diff --cached --quiet; then
+            echo 'No synchronized source or PDF changes were needed.'
+            exit 0
+          fi
+          git commit -m 'Integrate SFPR nonconfocal NLOS survey discussion [skip ci]'
+          git push origin HEAD:master
