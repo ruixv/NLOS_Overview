@@ -68,6 +68,14 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2022 | [Nonline-of-Sight 3-D Imaging Using Millimeter-Wave Radar](https://doi.org/10.1109/TGRS.2021.3112579) — Wei et al. | IEEE TGRS 2022 | Establishes a measured 77 GHz MIMO around-corner 3D imaging model, resolution analysis, mirror-symmetry backprojection, and relay-surface phase-error compensation, providing the physical foundation for later model-driven mmWave NLOS reconstruction. |
+| 2024 | [Precise Reconstruction Method for Hidden Targets Based on Non-line-of-sight Radar 3D Imaging](https://doi.org/10.12000/JR24060) — Cai et al. | Journal of Radars 2024 | Separates LOS and NLOS multipath echoes and jointly estimates hidden reflectivity, total-variation structure, and relay-surface phase error; measured corner experiments reconstruct knives and metal racks under aperture occlusion. |
+| 2024 | [RM-CSTV: An Effective High-Resolution Method of Non-Line-of-Sight Millimeter-Wave Radar 3-D Imaging](https://doi.org/10.1360/nso/20230085) — Liu et al. | National Science Open 2024 | Couples a fast range-migration kernel with complex sparsity and total variation, corrects virtual-target geometry, and preserves hidden contours under sparse sampling while reducing computation by roughly two orders of magnitude versus matrix-based CSTV. |
+| 2025 | [Non-Line-of-Sight 3D Reconstruction with Radar (HoloRadar)](https://proceedings.neurips.cc/paper_files/paper/2025/hash/6994a52f9499b865b7c9e167f5495ef3-Abstract-Conference.html) — Lai, Lan, Zhao | NeurIPS 2025 | Uses a single mobile mmWave radar to predict multi-return range images and then map mirrored observations to their physical locations with a ray-interaction-aware network, reconstructing complete LOS and hidden 3D scenes in real environments. |
+| 2025 | [Non-Line-of-Sight mmW Radar Imaging With Adaptive Artifact Cancellation and Target Enhancement](https://doi.org/10.1109/TAP.2025.3583778) — Cai et al. | IEEE TAP 2025 | Introduces unsupervised ACTE-Net: Gaussian-convolution artifact cancellation, energy-based target enhancement, and a 2D holographic operator suppress multipath blur without storing a large sensing matrix; measured hidden-letter and trellis experiments validate 3D reconstruction. |
+| 2025 | [Non-Line-of-Sight mmW SAR Imaging With Equivariant Adaptive Threshold Learning](https://doi.org/10.1109/TCI.2025.3597462) — Cai et al. | IEEE TCI 2025 | Proposes a fully self-supervised equivariant-imaging framework with TV-constrained deep unfolding and an adaptive peak-convolution threshold module, reconstructing measured 2D/3D mmWave SAR images from partial, noisy, multipath-corrupted NLOS echoes. |
+| 2026 | [RM Operator Learning-driven Non-line-of-sight 3D Imaging Method for Millimeter Wave Radar](https://doi.org/10.12000/JR25132) — Chen et al. | Journal of Radars 2026 | Embeds a fast range-migration operator in a FISTA-derived unfolding network to compensate phase error, aperture shadowing, and multipath; measured near-field targets under ideal and non-ideal reflectors show higher precision and about 100× speedup over sparse solvers. |
+| 2026 | [Learning to See Around Corners: A Deep Unfolding Framework for Terahertz Radar Non-Line-of-Sight 3D Imaging](https://doi.org/10.3390/photonics13050440) — Chen et al. | Photonics 2026 | Extends model-driven NLOS radar reconstruction to a measured 121 GHz platform, embedding a fast holographic operator in FISTA-Net to correct phase error, aperture occlusion, and multipath while avoiding a prohibitively large sensing matrix. |
 | 2026 | [Iterating the transient light transport matrix for non-line-of-sight imaging](https://doi.org/10.1038/s41467-026-75177-4) — Sultan et al. | Nature Communications 2026 | Measures the full first-order transient light-transport matrix with dense relay-wall illumination and a gated 16×16 SPAD array, then independently focuses virtual illumination and detection inside the hidden scene to recover hidden-to-hidden TLTM-2. The recovered transport exposes indirect shadows, interreflections, and volumetric scattering and supports direct/indirect separation, virtual relighting, and dual photography. |
 | 2026 | [Ptychography-enhanced correlography for non-line-of-sight imaging](https://doi.org/10.1117/1.APN.5.2.026001) — Liu et al. | Advanced Photonics Nexus 2026 | Introduces PEC-NLOS, which scans overlapping indirect speckle probes across the relay wall and applies ptychographic phase retrieval to jointly refine the hidden object and probe. A geometry-based 3D data-correction stage compensates scan-position and probe distortion, extending steady-state correlography from simple targets to high-spatial-frequency, high-entropy hidden scenes. |
 | 2025 | [High-resolution non-line-of-sight imaging via polarization differential correlography](https://doi.org/10.3788/COL202523.081104) — Liu et al. | Chinese Optics Letters 2025 | Introduces PDC-NLOS, a single-shot steady-state system that encodes hidden objects with independently polarized laser speckles and uses polarization differencing before correlographic phase retrieval. It removes mechanical relay scanning, improves perturbation robustness, and demonstrates millimeter-level resolution with an average reported SSIM of about 0.76. |
@@ -284,6 +292,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Li et al.: time-sequential first-photon stamping — detection-aware acquisition reduces photon collection time for active transient NLOS [Optics Letters]
    │     Luesia et al.: scattering-media phasor fields — virtual-wave reconstruction remains effective for hidden scenes immersed in thick volumetric scattering [Optics Letters]
    │
+   │     Wei et al.: measured 77 GHz mmWave NLOS 3D imaging establishes mirror-symmetry backprojection and relay-phase compensation [IEEE TGRS]
 2023 ── Wang et al.: Signal Superresolution Network — plug-and-play 16× sparse-scan acceleration [CVPR]
    │     Liu et al.: SSCR — mixed-dimensional regularization from 5×5 confocal measurements [CVPR]
    │     Li et al.: deep under-scanning reconstruction — learned transient recovery plus physics-aware volumetric inversion from grids as sparse as 8×8 [NeurIPS]
@@ -307,6 +316,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Wang et al.: event-enhanced passive NLOS — asynchronous diffusion-pattern changes and physics-embedded learning reconstruct moving hidden objects [IEEE Sensors Journal]
     │     Huang et al.: comb-calibrated coherent FMCW NLOS — sub-picosecond equivalent timing enables submillimeter 3D imaging and hidden-object vibrometry [Physical Review Letters]
    │
+   │     Cai et al. and Liu et al.: NSIR and RM-CSTV combine echo separation, phase correction, range migration, sparsity, and total variation for measured radar reconstruction [Journal of Radars / National Science Open]
 2025 ── Shi et al.: fast configurable transient simulation and an open NLOS benchmark [arXiv]
    │     Liu et al.: geometric constraints on hidden surface normals for fast sparse-transient reconstruction [arXiv]
    │     Sultan et al.: optimized NUFFT/SFFT sampling — irregular relay scans and flexible hidden-volume grids at FFT-like cost [arXiv]
@@ -319,6 +329,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
     │     Ye et al.: comb-calibrated FMCW tracking — snapshot multi-object position and velocity recovery at 2-mm and 2-mm/s accuracy [Laser & Photonics Reviews]
     │     Chen et al.: vector-enhanced sensitive FMCW LiDAR — laser-feedback interferometry and K-domain resampling provide micrometer ranging and millimeter hidden 3D imaging [Journal of Lightwave Technology]
    │
+   │     Lai et al.: HoloRadar reconstructs complete LOS/NLOS 3D scenes with one mobile mmWave radar [NeurIPS]
+   │     Cai et al.: ACTE-Net and equivariant adaptive-threshold unfolding introduce unsupervised and self-supervised measured mmWave inversion [IEEE TAP / TCI]
 2026 ── Zhao et al.: PICL — SPAD-aware denoising cascaded with self-supervised differentiable-physics reconstruction [JOSA A]
    │     Ye et al.: NLOSFormer — real-time thermal NLOS through rough surfaces with explicit kernel estimation [ACM TOG]
    │     Yin et al.: all-day Si-SPAD NLOS — 200 m reconstruction under 94,314 lx ambient illumination [Optics and Lasers in Engineering]
@@ -338,6 +350,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Zeng et al.: compact kilometer-range NLOS — adaptive gating and efficient optics enable daylight 2 fps operation [Optics Express]
    │     Yang et al.: MD-NLOS — spectrally filtered model decomposition for sparse real-time reconstruction [iScience]
    │
+   │     Chen et al.: range-migration and 121 GHz holographic operators embedded in FISTA-style networks extend model-driven NLOS radar to efficient mmWave/sub-THz 3D reconstruction [Journal of Radars / Photonics]
 2025 ── Wei et al.: multi-surface waveform deposition — sub-resolution separation of overlapping transient surfaces before LCT reconstruction [Optics Express]
 2025 ── Zhou et al.: 10 m passive NLOS — pattern calibration and low-rank background separation move ordinary-camera computational periscopy to long range [Optics Letters]
 2026 ── Liang et al.: HPDI — physics-informed coarse-to-fine reconstruction fused with an implicit data-driven passive pathway [IEEE TCI]
