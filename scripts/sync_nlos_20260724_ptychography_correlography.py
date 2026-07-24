@@ -2,7 +2,7 @@
 """Integrate the citation-traced PEC-NLOS paper across repository artifacts.
 
 Every edit is fail-closed and idempotent. Large public files are changed only through
-unique semantic anchors, and the bibliography rejects duplicate citation keys or DOIs.
+unique semantic anchors, and the existing stable bibliography key is preserved.
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ SURVEY = ROOT / "bare_jrnl.tex"
 ACTIVE = ROOT / "article/2active.tex"
 BIB = ROOT / "egbib_merged_20260711.bib"
 
-KEY = "liuPtychographyCorrelography2026"
+KEY = "liuPtychographyCorrelographyNLOS2026"
 DOI = "10.1117/1.APN.5.2.026001"
 
 README_ROW = (
@@ -59,7 +59,7 @@ ARTICLE_PARAGRAPH = (
     "\\vspace{0.8mm}\n"
     "\\noindent \\textbf{Ptychography-enhanced correlography.}\n"
     "Liu~\\etal~subsequently addressed the incomplete Fourier-amplitude sampling and phase ambiguity "
-    "that limit conventional NLOS correlography by introducing PEC-NLOS~\\cite{liuPtychographyCorrelography2026}. "
+    "that limit conventional NLOS correlography by introducing PEC-NLOS~\\cite{liuPtychographyCorrelographyNLOS2026}. "
     "A continuous-wave laser scans overlapping indirect speckle probes across the relay wall, while a "
     "polarization-sensitive camera records local correlation measurements; ptychographic phase retrieval "
     "jointly refines the hidden object and probe. A geometry-derived three-dimensional data-correction stage "
@@ -70,11 +70,12 @@ ARTICLE_PARAGRAPH = (
     "ptychographic reconstruction.\n"
 )
 
-BIB_ENTRY = """@article{liuPtychographyCorrelography2026,
+BIB_ENTRY = """@article{liuPtychographyCorrelographyNLOS2026,
   author = {Liu, Lingfeng and Zhu, Shuo and Qin, Taotao and Bai, Lianfa and Shi, Yingjie and Guo, Enlai and Han, Jing},
   doi = {10.1117/1.APN.5.2.026001},
   journal = {Advanced Photonics Nexus},
-  month = {January},
+  month = {March},
+  note = {Published online 22 January 2026},
   number = {2},
   pages = {026001},
   publisher = {SPIE and Chinese Laser Press},
@@ -112,14 +113,9 @@ def insert_after_unique_line(text: str, needle: str, addition: str, label: str) 
 def normalize_bib_entry(text: str) -> str:
     pattern = re.compile(rf"(?ms)^@\w+\{{{re.escape(KEY)},\n.*?^\}}\s*\n?")
     matches = list(pattern.finditer(text))
-    if len(matches) > 1:
-        raise SystemExit(f"bibliography: duplicate key {KEY}")
-    if matches:
-        text = text[: matches[0].start()] + BIB_ENTRY.rstrip() + "\n\n" + text[matches[0].end() :]
-    else:
-        if DOI.lower() in text.lower():
-            raise SystemExit(f"bibliography: DOI {DOI} exists under a different key")
-        text = text.rstrip() + "\n\n" + BIB_ENTRY.rstrip() + "\n"
+    if len(matches) != 1:
+        raise SystemExit(f"bibliography: expected one existing stable key {KEY}, found {len(matches)}")
+    text = text[: matches[0].start()] + BIB_ENTRY.rstrip() + "\n\n" + text[matches[0].end() :]
     if text.lower().count(DOI.lower()) != 2:
         raise SystemExit("bibliography: canonical DOI/URL count failed")
     return text
@@ -188,7 +184,7 @@ if marker not in survey:
     survey = replace_once(survey, "%% bare_jrnl.tex\n", "%% bare_jrnl.tex\n" + marker, "survey marker")
 write(SURVEY, survey)
 
-# Canonical bibliography normalization.
+# Normalize the existing final-venue bibliography record without changing its stable key.
 bib = normalize_bib_entry(read(BIB))
 write(BIB, bib)
 
