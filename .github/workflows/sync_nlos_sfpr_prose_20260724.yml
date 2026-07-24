@@ -49,7 +49,8 @@ jobs:
           active = Path('article/2active.tex').read_text(encoding='utf-8')
           bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
           assert title.lower() in readme.lower() and title.lower() in index.lower()
-          assert readme.count(doi) == index.count(doi) == bib.count(doi) == 1
+          assert readme.count(doi) == index.count(doi) == 1
+          assert bib.count(f'doi = {{{doi}}}') == 1
           assert bib.count('@article{' + key) == 1
           assert active.count(r'\noindent \textbf{Specular-flight-path regularization for nonconfocal multi-orientation scenes.}') == 1
           assert active.count(r'\cite{' + key + '}') >= 1
