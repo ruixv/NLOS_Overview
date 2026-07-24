@@ -1,6 +1,6 @@
 name: Sync radar NLOS reconstruction lineage and rebuild PDF
 
-# Trigger revision: validate only the newly integrated radar lineage and rendered PDF.
+# Trigger revision: capture fail-closed synchronizer diagnostics as a workflow artifact.
 on:
   workflow_dispatch:
   push:
@@ -38,7 +38,23 @@ jobs:
             texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
 
       - name: Apply guarded cross-artifact update
-        run: python3 scripts/sync_nlos_20260724_radar_lineage.py
+        id: sync
+        continue-on-error: true
+        run: python3 scripts/sync_nlos_20260724_radar_lineage.py > /tmp/radar-sync.log 2>&1
+
+      - name: Upload synchronizer diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: radar-lineage-sync-diagnostics
+          path: /tmp/radar-sync.log
+          if-no-files-found: error
+
+      - name: Stop on guarded synchronization failure
+        if: steps.sync.outcome != 'success'
+        run: |
+          cat /tmp/radar-sync.log
+          exit 1
 
       - name: Validate source consistency before build
         run: |
