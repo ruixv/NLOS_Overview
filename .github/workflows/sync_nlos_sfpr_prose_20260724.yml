@@ -101,3 +101,5 @@ jobs:
           fi
           git commit -m 'Integrate SFPR nonconfocal NLOS survey discussion [skip ci]'
           git push origin HEAD:master
+
+# PR trigger marker: 2026-07-24 SFPR survey consistency pass
