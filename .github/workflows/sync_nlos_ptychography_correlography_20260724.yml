@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - '.github/nlos-ptychography-correlography-20260724-trigger'
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/nlos-ptychography-correlography-20260724-trigger'
   workflow_dispatch:
 
 permissions:
