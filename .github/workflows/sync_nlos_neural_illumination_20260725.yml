@@ -1,0 +1,136 @@
+name: Sync Neural Illumination Fields and rebuild survey PDF
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - scripts/sync_nlos_20260725_neural_illumination_fields.py
+      - .github/workflows/sync_nlos_neural_illumination_20260725.yml
+      - updates/trigger-neural-illumination-20260725.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-neural-illumination-fields-20260725
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
+
+      - name: Apply fail-closed NIF synchronization
+        id: sync
+        continue-on-error: true
+        run: python3 scripts/sync_nlos_20260725_neural_illumination_fields.py > /tmp/nif-sync.log 2>&1
+
+      - name: Upload synchronizer diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: neural-illumination-sync-diagnostics
+          path: /tmp/nif-sync.log
+          if-no-files-found: error
+
+      - name: Stop on synchronization failure
+        if: steps.sync.outcome != 'success'
+        run: |
+          cat /tmp/nif-sync.log
+          exit 1
+
+      - name: Validate synchronized sources
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          title = 'Neural illumination fields: High-fidelity and ambient-robust stereo reconstruction for two-bounce non-line-of-sight imaging'
+          doi = '10.1016/j.optlaseng.2025.109514'
+          key = 'zhangNeuralIlluminationFields2026'
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          survey_section = Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          master = Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+
+          assert readme.lower().count(title.lower()) == 1
+          assert index.lower().count(title.lower()) == 1
+          assert readme.count(doi) == 1
+          assert index.count(doi) == 1
+          assert bib.lower().count('doi = {' + doi.lower() + '}') == 1
+          assert bib.lower().count('{' + key.lower() + ',') == 1
+          assert survey_section.count(r'\cite{' + key + '}') == 1
+          assert survey_section.lower().count('neural illumination fields') == 1
+          assert 'binary shadow segmentation' in survey_section.lower()
+          assert '<b>202</b><span>tracked latest entries</span>' in index
+          assert '**Update run: 25 July 2026.**' in readme
+          assert 'Updated 25 July 2026 · 190+ papers' in index
+          assert 'Last updated: 25 July 2026' in index
+          assert '25 July 2026 consistency trace: Neural Illumination Fields synchronized across public artifacts.' in master
+          print('Pre-build NIF cross-artifact validation passed.')
+          PY
+
+      - name: Clean-build updated survey
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate bibliography and regenerated PDF
+        run: |
+          test -s bare_jrnl.pdf
+          grep -Fq '\bibitem{zhangNeuralIlluminationFields2026}' bare_jrnl.bbl
+          ! grep -Eq 'Citation .* undefined|There were undefined citations|multiply defined' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | tee /tmp/bare_jrnl_pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/bare_jrnl_pdfinfo.txt)
+          test -n "$pages" && test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text = ' '.join(Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').lower().split())
+          required = (
+              'neural illumination fields',
+              'binary shadow segmentation',
+              'dynamic neural shadow fields',
+              'two-bounce nlos',
+          )
+          missing = [term for term in required if term not in text]
+          assert not missing, f'Missing expected PDF text: {missing}'
+          print('NIF and static-to-dynamic two-bounce trajectory found in PDF text.')
+          PY
+          rm -rf /tmp/nlos-render && mkdir -p /tmp/nlos-render
+          pdftoppm -png -r 60 bare_jrnl.pdf /tmp/nlos-render/page >/dev/null 2>&1
+          rendered=$(find /tmp/nlos-render -type f -name 'page-*.png' -size +0c | wc -l)
+          test "$rendered" -eq "$pages"
+          echo "Validated $pages PDF pages and $rendered rendered images."
+
+      - name: Commit synchronized sources and PDF
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex \
+            egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-07-25-neural-illumination-fields.md \
+            updates/2026-07-25-neural-illumination-keys.txt
+          if git diff --cached --quiet; then
+            echo 'No synchronized source or PDF changes were needed.'
+            exit 0
+          fi
+          git commit -m 'Integrate Neural Illumination Fields across public artifacts [skip ci]'
+          git push origin HEAD:master
