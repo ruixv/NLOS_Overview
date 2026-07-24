@@ -14,7 +14,7 @@ permissions:
 
 concurrency:
   group: sync-neural-illumination-fields-20260725
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   integrate-build-validate:
