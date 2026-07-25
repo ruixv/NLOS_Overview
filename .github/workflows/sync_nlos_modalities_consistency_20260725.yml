@@ -6,6 +6,7 @@ on:
     branches: [master]
     paths:
       - updates/trigger-modalities-consistency-20260725.txt
+      - updates/trigger-cvpr-lidar-simulation-gaps-20260725.txt
 
 permissions:
   contents: write
@@ -31,39 +32,56 @@ jobs:
             texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
             texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
 
-      - name: Apply guarded synchronization
-        run: python3 scripts/sync_nlos_20260725_modalities_consistency.py
+      - name: Apply guarded synchronizations
+        run: |
+          python3 scripts/sync_nlos_20260725_modalities_consistency.py
+          python3 scripts/integrate_cvpr_lidar_simulation_gaps_20260725.py
 
       - name: Validate synchronized sources
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          titles = [
+          import re
+          existing_titles = [
               'Thermal Non-Line-of-Sight Imaging through Rough Surfaces',
               'Eye-Safe Non-Line-of-Sight Localization Using Compact Nanosecond Laser Diodes and Single-Photon-Avalanche-Diode Arrays',
               'Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength',
               'A comprehensive study of time-of-flight non-line-of-sight imaging',
               'All-day non-line-of-sight imaging based on Si-SPAD and phase-congruency-based structured ε-regularization',
           ]
+          gap_titles = [
+              'Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals',
+              'DENALI: A Dataset Enabling Non-Line-of-Sight Spatial Reasoning with Low-Cost LiDARs',
+              'Fast non-line-of-sight transient data simulation and an open benchmark dataset',
+          ]
+          gap_keys = ['luSeeingThroughBoxes2026','behariDENALI2026','shiFastNLOSTransientSimulation2025']
           readme = Path('README.md').read_text(encoding='utf-8')
           index = Path('index.html').read_text(encoding='utf-8')
           active = Path('article/2active.tex').read_text(encoding='utf-8')
           data = Path('article/4datadriven.tex').read_text(encoding='utf-8')
           newscenes = Path('article/5newscenes.tex').read_text(encoding='utf-8')
           bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
-          for title in titles:
+          for title in existing_titles:
               assert index.lower().count(title.lower()) == 1, title
-          assert readme.lower().count(titles[1].lower()) == 1
+          assert readme.lower().count(existing_titles[1].lower()) == 1
+          for title in gap_titles:
+              assert readme.lower().count(title.lower()) == 1, title
+              assert index.lower().count(title.lower()) == 1, title
+          for key in gap_keys:
+              assert len(re.findall(r'(?mi)^@\w+\{' + re.escape(key) + r',', bib)) == 1, key
           assert 'Compact eye-safe nanosecond SPAD-array localization' in active
           assert 'Common-model benchmarking of ToF NLOS inverses' in active
           assert 'Physics-embedded thermal transport learning' in data
           assert 'Thermal NLOS through rough relay surfaces' in newscenes
+          assert r'\cite{luSeeingThroughBoxes2026}' in newscenes
+          assert r'\cite{behariDENALI2026}' in newscenes
+          assert r'\cite{shiFastNLOSTransientSimulation2025}' in data
           for token in ('10.1145/3811030','10.1051/jeos/2026019','10.1109/ICEE67339.2025.11213924','2603.09548','10.1016/j.optlaseng.2026.109919'):
               assert token in bib, token
           assert '**Update run: 25 July 2026.**' in readme
           assert 'Updated 25 July 2026' in index
           assert 'Last updated: 25 July 2026' in index
-          print('Cross-artifact modality validation passed.')
+          print('Cross-artifact source validation passed.')
           PY
 
       - name: Clean-build updated survey
@@ -80,6 +98,9 @@ jobs:
           while IFS= read -r key; do
             test -z "$key" || grep -Fq "\\bibitem{$key}" bare_jrnl.bbl
           done < updates/2026-07-25-modalities-consistency-keys.txt
+          for key in luSeeingThroughBoxes2026 behariDENALI2026 shiFastNLOSTransientSimulation2025; do
+            grep -Fq "\\bibitem{$key}" bare_jrnl.bbl
+          done
           ! grep -Eq 'Citation .* undefined|There were undefined citations|multiply defined' bare_jrnl.log
           pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
           pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
@@ -88,10 +109,18 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           text = ' '.join(Path('/tmp/survey.txt').read_text(encoding='utf-8', errors='ignore').lower().split())
-          terms = ('compact eye-safe nanosecond spad-array localization','common-model benchmarking of tof nlos inverses','thermal nlos through rough relay surfaces','physics-embedded thermal transport learning')
+          terms = (
+              'compact eye-safe nanosecond spad-array localization',
+              'common-model benchmarking of tof nlos inverses',
+              'thermal nlos through rough relay surfaces',
+              'physics-embedded thermal transport learning',
+              'seeing through boxes',
+              'denali',
+              'fast non-line-of-sight transient data simulation',
+          )
           missing = [term for term in terms if term not in text]
           assert not missing, missing
-          print('Expected modality trajectories found in PDF text.')
+          print('Expected NLOS trajectories found in PDF text.')
           PY
           rm -rf /tmp/render && mkdir -p /tmp/render
           pdftoppm -png -r 60 bare_jrnl.pdf /tmp/render/page >/dev/null 2>&1
@@ -104,10 +133,16 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add README.md index.html article/2active.tex article/4datadriven.tex article/5newscenes.tex \
             bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
-            updates/2026-07-25-modalities-consistency.md updates/2026-07-25-modalities-consistency-keys.txt
+            updates/2026-07-25-modalities-consistency.md updates/2026-07-25-modalities-consistency-keys.txt \
+            updates/2026-07-25-cvpr-radar-lidar-simulation-gaps.md
           if git diff --cached --quiet; then
             echo 'No synchronized changes were needed.'
             exit 0
           fi
-          git commit -m 'Integrate NLOS modality and hardware consistency [skip ci]'
-          git push origin HEAD:master
+          git commit -m 'Integrate NLOS modality and cross-artifact consistency [skip ci]'
+          for attempt in 1 2 3; do
+            git pull --rebase origin master && git push origin HEAD:master && exit 0
+            echo "Push attempt $attempt failed; retrying."
+            sleep 10
+          done
+          exit 1
