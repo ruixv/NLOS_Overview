@@ -1,1 +1,2 @@
 Trigger the guarded GeRaF 2.0, DENALI, and transient-simulation cross-artifact synchronization and survey PDF rebuild.
+Retry after workflow registration.
