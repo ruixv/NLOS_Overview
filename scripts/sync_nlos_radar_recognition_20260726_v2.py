@@ -46,4 +46,5 @@ def update_readme_v2() -> None:
 
 
 base.update_readme = update_readme_v2
+base.BIB_ENTRIES = re.sub(r"\n  url = \{https://doi\.org/[^}]+\}", "", base.BIB_ENTRIES)
 base.main()
