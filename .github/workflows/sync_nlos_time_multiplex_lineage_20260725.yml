@@ -1,0 +1,105 @@
+name: Sync time-multiplexed NLOS lineage and rebuild survey PDF
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - updates/trigger-time-multiplex-lineage-20260725.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-nlos-time-multiplex-lineage-20260725
+  cancel-in-progress: true
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
+
+      - name: Apply guarded synchronization
+        run: python3 scripts/sync_nlos_time_multiplex_lineage_20260725.py
+
+      - name: Validate synchronized sources
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          titles = [
+              'Time-multiplexing non-line-of-sight imaging',
+              'Non-Line-of-Sight Target Tracking With a Single Time Multiplexed Channel',
+              'Non-line-of-sight target 2D size detection with few channels at a time',
+          ]
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          active = Path('article/2active.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          for title in titles:
+              assert readme.lower().count(title.lower()) == 1, title
+              assert index.lower().count(title.lower()) == 1, title
+          assert 'From few-channel inference to time-multiplexed imaging' in active
+          for key in ('liTimeMultiplexingNLOS2025','zhengSingleChannelTimeMultiplexNLOS2024','liFewChannelSizeNLOS2024'):
+              assert key in active, key
+              assert ('{' + key + ',') in bib, key
+          for doi in ('10.3788/COL202523.071102','10.1109/JPHOT.2024.3471070','10.1016/j.eswa.2023.122996'):
+              assert doi in bib, doi
+          print('Time-multiplexed NLOS source validation passed.')
+          PY
+
+      - name: Clean-build updated survey
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate bibliography and PDF
+        run: |
+          test -s bare_jrnl.pdf
+          while IFS= read -r key; do
+            test -z "$key" || grep -Fq "\\bibitem{$key}" bare_jrnl.bbl
+          done < updates/2026-07-25-time-multiplex-lineage-keys.txt
+          ! grep -Eq 'Citation .* undefined|There were undefined citations|multiply defined' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages" && test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/survey.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text = ' '.join(Path('/tmp/survey.txt').read_text(encoding='utf-8', errors='ignore').lower().split())
+          terms = ('from few-channel inference to time-multiplexed imaging','single time multiplexed channel','time-multiplexing non-line-of-sight imaging')
+          missing = [term for term in terms if term not in text]
+          assert not missing, missing
+          print('Expected time-multiplexed trajectory found in PDF text.')
+          PY
+          rm -rf /tmp/render && mkdir -p /tmp/render
+          pdftoppm -png -r 60 bare_jrnl.pdf /tmp/render/page >/dev/null 2>&1
+          rendered=$(find /tmp/render -type f -name 'page-*.png' -size +0c | wc -l)
+          test "$rendered" -eq "$pages"
+
+      - name: Commit synchronized sources and regenerated PDF
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/2active.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-07-25-time-multiplex-lineage.md updates/2026-07-25-time-multiplex-lineage-keys.txt
+          if git diff --cached --quiet; then
+            echo 'No synchronized changes were needed.'
+            exit 0
+          fi
+          git commit -m 'Integrate time-multiplexed NLOS lineage [skip ci]'
+          git push origin HEAD:master
