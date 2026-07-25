@@ -1,1 +1,1 @@
-Trigger the guarded 25 July 2026 NLOS modality and hardware consistency synchronization and survey PDF rebuild.
+Trigger the guarded 25 July 2026 NLOS modality, GeRaF 2.0, DENALI, and transient benchmark synchronization and survey PDF rebuild.
