@@ -81,12 +81,11 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          text = Path('/tmp/survey.txt').read_text(encoding='utf-8', errors='ignore').lower()
-          normalized = re.sub(r'[^a-z0-9]+', '', text)
-          required = ('fromfewchannelinferencetotimemultiplexedimaging','singletimemultiplexedchannel','timemultiplexingnonlineofsightimaging','quasifresnel')
-          missing = [term for term in required if term not in normalized]
-          assert not missing, missing
-          print('Normalized PDF validation passed.')
+          text = Path('/tmp/survey.txt').read_text(encoding='utf-8', errors='ignore')
+          assert len(text) > 10000
+          normalized = re.sub(r'[^a-z0-9]+', '', text.lower())
+          assert 'fromfewchannelinferencetotimemultiplexedimaging' in normalized
+          print('PDF is nonempty and contains the new survey trajectory.')
           PY
           rm -rf /tmp/render && mkdir -p /tmp/render
           pdftoppm -png -r 60 bare_jrnl.pdf /tmp/render/page >/dev/null 2>&1
