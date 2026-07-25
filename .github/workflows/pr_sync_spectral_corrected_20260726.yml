@@ -1,0 +1,109 @@
+name: Validate corrected spectral NLOS survey integration
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/2026-07-26-spectral-corrected-pr-trigger.md
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: automation/spectral-corrected-20260726
+          fetch-depth: 0
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run corrected fail-closed synchronization
+        run: python3 scripts/sync_nlos_spectral_memory_20260726_v2.py
+
+      - name: Validate website JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          html = Path('index.html').read_text(encoding='utf-8')
+          assert '<script>' in html and '</script>' in html
+          Path('/tmp/nlos-index.js').write_text(html.split('<script>', 1)[1].split('</script>', 1)[0], encoding='utf-8')
+          PY
+          node --check /tmp/nlos-index.js
+
+      - name: Validate semantic survey placement
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          passive = Path('article/3passive.tex').read_text(encoding='utf-8')
+          learning = Path('article/4datadriven.tex').read_text(encoding='utf-8')
+          spectral = passive.split('Hyperspectral and Multispectral Cameras', 1)[1].split('Physical model', 1)[0]
+          assert 'hashemiSpectralContentPassiveNLOS2025' in spectral
+          assert 'chenHyperspectralBandSelectionNLOS2025' in spectral
+          assert 'laiHoloRadar2025' not in spectral
+          assert 'zhouWhiteLightSpeckleNLOS2024' in passive
+          assert 'fuPhysicsEnhancedWhiteLightNLOS2025' in learning
+          assert 'zhangCMFormerNLOS2025' in learning
+          print('Semantic survey placement passed.')
+          PY
+
+      - name: Clean-build survey
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate PDF integrity and rendered pages
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          ! grep -Eq 'Citation .* undefined|There were undefined citations|multiply defined|There were undefined references' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages" && test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/survey.txt
+          test -s /tmp/survey.txt
+          grep -Fqi 'CMFormer' /tmp/survey.txt
+          grep -Fqi 'Isolating Signals in Passive' /tmp/survey.txt
+          grep -Fqi 'Hyperspectral passive non-line-of-sight imaging with band selection' /tmp/survey.txt
+          mkdir -p /tmp/rendered
+          pdftoppm -f 1 -l 1 -png -r 120 bare_jrnl.pdf /tmp/rendered/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -l "$pages" -png -r 120 bare_jrnl.pdf /tmp/rendered/last >/dev/null 2>&1
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          files = sorted(Path('/tmp/rendered').glob('*.png'))
+          assert len(files) == 2
+          for path in files:
+              data = path.read_bytes()
+              assert data[:8] == b'\x89PNG\r\n\x1a\n'
+              width, height = struct.unpack('>II', data[16:24])
+              assert width > 500 and height > 500 and len(data) > 10000
+          PY
+
+      - name: Commit corrected survey and rebuilt PDF to PR branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/3passive.tex article/4datadriven.tex \
+            bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf
+          if git diff --cached --quiet; then
+            echo 'No source or PDF changes were needed.'
+            exit 0
+          fi
+          git commit -m 'Correct spectral passive survey integration and rebuild PDF [skip ci]'
+          git push origin HEAD:automation/spectral-corrected-20260726
