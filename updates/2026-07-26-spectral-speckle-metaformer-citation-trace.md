@@ -43,3 +43,5 @@ This batch follows the forward-citation and related-work chains around Velten 20
 The guarded synchronizer requires exactly one title in README and the website explorer, exactly one DOI and the expected key in the bibliography, and citations in the appropriate survey section. The build workflow additionally checks HTML/JavaScript syntax, unresolved LaTeX citations, duplicate bibliography warnings, PDF metadata/text extraction, and rendered first/last pages before committing the regenerated PDF.
 
 The newest independently date-verified direct NLOS publication remains **Iterating the transient light transport matrix for non-line-of-sight imaging**, published online by *Nature Communications* on 22 July 2026. This batch fills older coverage gaps rather than claiming a later publication.
+
+Workflow retriggered on 26 July 2026 after confirming that the six records were still absent from the public artifacts.
