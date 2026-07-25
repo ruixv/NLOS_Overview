@@ -1,0 +1,1 @@
+Trigger the guarded 25 July 2026 NLOS frontier follow-up synchronization and PDF rebuild.
