@@ -6,6 +6,7 @@ on:
     paths:
       - updates/2026-07-26-radar-recognition-pr-trigger.md
       - scripts/sync_nlos_radar_recognition_20260726.py
+      - scripts/sync_nlos_radar_recognition_20260726_v2.py
 
 permissions:
   contents: write
@@ -32,7 +33,7 @@ jobs:
           node-version: '22'
 
       - name: Run fail-closed source synchronization
-        run: python3 scripts/sync_nlos_radar_recognition_20260726.py
+        run: python3 scripts/sync_nlos_radar_recognition_20260726_v2.py
 
       - name: Validate website JavaScript syntax
         run: |
