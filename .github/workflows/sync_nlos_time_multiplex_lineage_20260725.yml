@@ -31,8 +31,10 @@ jobs:
             texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
             texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
 
-      - name: Apply guarded synchronization
-        run: python3 scripts/sync_nlos_time_multiplex_lineage_20260725.py
+      - name: Apply guarded synchronization and venue correction
+        run: |
+          python3 scripts/correct_quasi_fresnel_final_doi_20260725.py
+          python3 scripts/sync_nlos_time_multiplex_lineage_20260725.py
 
       - name: Validate synchronized sources
         run: |
@@ -56,7 +58,13 @@ jobs:
               assert ('{' + key + ',') in bib, key
           for doi in ('10.3788/COL202523.071102','10.1109/JPHOT.2024.3471070','10.1016/j.eswa.2023.122996'):
               assert doi in bib, doi
-          print('Time-multiplexed NLOS source validation passed.')
+          quasi = 'Fast and Memory-efficient Non-line-of-sight Imaging with Quasi-Fresnel Transform'
+          assert readme.lower().count(quasi.lower()) == 1
+          assert index.lower().count(quasi.lower()) == 1
+          assert 'https://doi.org/10.1364/OPTICA.604217' in readme
+          assert 'https://doi.org/10.1364/OPTICA.604217' in index
+          assert bib.lower().count('10.1364/optica.604217') == 2
+          print('Time-multiplexed NLOS and Quasi-Fresnel source validation passed.')
           PY
 
       - name: Clean-build updated survey
@@ -73,6 +81,7 @@ jobs:
           while IFS= read -r key; do
             test -z "$key" || grep -Fq "\\bibitem{$key}" bare_jrnl.bbl
           done < updates/2026-07-25-time-multiplex-lineage-keys.txt
+          grep -Fq '\\bibitem{weiQuasiFresnel2026}' bare_jrnl.bbl
           ! grep -Eq 'Citation .* undefined|There were undefined citations|multiply defined' bare_jrnl.log
           pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
           pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
@@ -81,10 +90,10 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           text = ' '.join(Path('/tmp/survey.txt').read_text(encoding='utf-8', errors='ignore').lower().split())
-          terms = ('from few-channel inference to time-multiplexed imaging','single time multiplexed channel','time-multiplexing non-line-of-sight imaging')
+          terms = ('from few-channel inference to time-multiplexed imaging','single time multiplexed channel','time-multiplexing non-line-of-sight imaging','quasi-fresnel')
           missing = [term for term in terms if term not in text]
           assert not missing, missing
-          print('Expected time-multiplexed trajectory found in PDF text.')
+          print('Expected time-multiplexed and Quasi-Fresnel content found in PDF text.')
           PY
           rm -rf /tmp/render && mkdir -p /tmp/render
           pdftoppm -png -r 60 bare_jrnl.pdf /tmp/render/page >/dev/null 2>&1
@@ -96,10 +105,11 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add README.md index.html article/2active.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
-            updates/2026-07-25-time-multiplex-lineage.md updates/2026-07-25-time-multiplex-lineage-keys.txt
+            updates/2026-07-25-time-multiplex-lineage.md updates/2026-07-25-time-multiplex-lineage-keys.txt \
+            updates/2026-07-25-quasi-fresnel-final-doi.md
           if git diff --cached --quiet; then
             echo 'No synchronized changes were needed.'
             exit 0
           fi
-          git commit -m 'Integrate time-multiplexed NLOS lineage [skip ci]'
+          git commit -m 'Integrate time-multiplexed NLOS lineage and final venue [skip ci]'
           git push origin HEAD:master
