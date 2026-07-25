@@ -9,7 +9,7 @@
     \cite{thrampoulidisExploitingOcclusionNonLineofSight2018,xuPhotonEfficientOcclusion2018} & Pulsed laser & SPAD & Integrated photon counts and occlusion & 2D reflectivity reconstruction\\%%%% Table body
     \cite{chanNonlineofsightTrackingPeople2017a,celebiHumanDetectionNLOS2026}(long range),\cite{caramazzaNeuralNetworkIdentification2017,musarraDetectionIdentificationTracking2019}(single point) & Pulsed laser & SPAD & Time of fight &  Detection/ Tracking/ Identification\\%%%% Table body
     \cite{isogawaOpticalNonLineofSightPhysicsBased2020,romanelliFiniteApertureYawNLOS2026,xiaoNLOSHumanPose2026} & Pulsed laser & SPAD & Time of fight &  Pose estimation\\%%%% Table body
-    \cite{nam_real-time_2020,jinScannerlessNonlineofsightThree2020,zhangRealTimeScanFreeNLOS2024,zhangSpatialCorrelationNLOS2025} & Pulsed laser & SPAD array & Time of fight &  3D reconstruction\\%%%% Table body
+    \cite{nam_real-time_2020,jinScannerlessNonlineofsightThree2020,zhangRealTimeScanFreeNLOS2024,zhangSpatialCorrelationNLOS2025,albertEyeSafeNLOS2026} & Pulsed laser & SPAD array & Time of fight &  3D reconstruction\\%%%% Table body
     \cite{gariepyDetectionTrackingMoving2016} & Pulsed laser & SPAD array & Time of fight &  Detection/ Tracking/ Identification\\%%%% Table body
     \cite{Willomitzer:18,xinTheoryFermatPaths2019,rezaPhasorFieldWaves2019} & Pulsed laser & Interferometer & Coherence &  3D reconstruction\\%%%% Table body
     \cite{huangCombCalibratedNLOS2024,yeCombCalibratedFMCWTracking2025,chenVectorEnhancedFMCWNLOS2025,liangFMCWNLOS2026} & Frequency-swept laser & Coherent FMCW interferometer & Beat frequency, phase, and Doppler & 3D imaging / tracking / vibrometry\\%%%% Table body
@@ -88,6 +88,10 @@ Rapp~\etal~combined active transient sensing with a ubiquitous vertical edge occ
 \vspace{0.8mm}
 \noindent \textbf{Recent SPAD Advances.}
 Specialized SPAD array designs tailored to NLOS imaging have emerged in recent years to address detector saturation from strong direct-path reflections. Riccardo~\etal~developed a fast-gated $16\times16$ SPAD array with 16 on-chip 6\,ps time-to-digital converters that can selectively gate out the direct-bounce photons while recording the weaker NLOS signal~\cite{riccardoFastGatedSPAD2022}. Taking this further, gradient-gated SPAD arrays apply a spatially varying gate delay across the pixel array, providing improved suppression of saturating photons with minimal hardware overhead~\cite{zhaoGradientGatedSPAD2023}. Beyond silicon SPADs, Feng~\etal~demonstrated NLOS imaging at infrared wavelengths ($\sim1550\,\text{nm}$) using a superconducting nanowire single-photon detector (SNSPD), which offers superior timing jitter and detection efficiency at telecommunication wavelengths~\cite{fengSNSPD2023}. Operating at infrared wavelengths enables NLOS imaging under stronger ambient light and through atmospheric conditions that challenge visible-wavelength systems.
+
+\vspace{0.8mm}
+\noindent \textbf{Compact eye-safe nanosecond SPAD-array localization.}
+Albert~\etal~replace bulky picosecond sources with inexpensive nanosecond laser diodes and observe the relay wall in parallel using a SPAD array with integrated timing~\cite{albertEyeSafeNLOS2026}. Two off-axis illumination positions mitigate first-photon saturation, while matched temporal filtering and ellipsoidal backprojection localize the hidden target despite the extended pulse width. This result complements miniaturized TCSPC and scan-free arrays by showing that deployment cost and eye safety can be improved at the illumination source, provided the acquisition geometry and temporal filtering are co-designed.
 
 \vspace{0.8mm}
 \noindent \textbf{Miniaturized TCSPC electronics.}
@@ -524,6 +528,10 @@ Celebi and Turkoglu built an active SPAD--TCSPC NLOS sensing system and collecte
 \vspace{0.8mm}
 \noindent \textbf{Learned Stolt calibration and dimension-reduced inversion.}
 Wang~\etal~retain the speed of $f$--$k$ migration but replace fixed Stolt interpolation with a lightweight Grid Offset Network that predicts local frequency-domain resampling offsets under timing, propagation-speed, and sparse-sampling perturbations~\cite{wangAdaptiveNeuralGrid2026}. Wei~\etal~take an orthogonal efficiency route with the Quasi-Fresnel transform, representing typical hidden surfaces and aggregated measurements as two-dimensional functions and deriving a direct inversion with substantially lower computational and memory complexity~\cite{weiQuasiFresnel2026}. These developments show that practical acceleration can come from calibrating the migration grid or reducing the inverse problem's intrinsic dimensionality, rather than only pruning relay samples.
+
+\vspace{0.8mm}
+\noindent \textbf{Common-model benchmarking of ToF NLOS inverses.}
+Marco~\etal~place representative ToF NLOS methods under a shared forward model and controlled hardware and photon-count assumptions~\cite{marcoComprehensiveToFNLOS2026}. Their analysis relates Radon-style, frequency-domain, and phasor-field formulations and shows that apparent method differences must be separated from common aperture, visibility, resolution, and noise limits. This benchmark-oriented viewpoint complements algorithm-by-algorithm summaries and provides a reproducible basis for evaluating future inverse operators.
 
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Challenges and Prospects}
 \vspace{0.8mm}
