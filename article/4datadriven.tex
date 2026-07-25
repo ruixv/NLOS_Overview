@@ -71,9 +71,19 @@ Du~\etal~designed a parallel encoder architecture for passive NLOS reconstructio
 \noindent \textbf{From reconstruction to recognition and clustering.}
 Recent work increasingly treats reconstructed NLOS observations as inputs to semantic inference rather than as final outputs. Sun~\etal~introduced AME-Net for passive hidden-action recognition from subtle relay-wall video and released the NLOS-Action synthetic/real benchmark~\cite{sunAdaptiveMotionNLOS2025}. Lin~\etal~then considered multiple photon-corrupted NLOS reconstructions as complementary views: NCR-MVC repairs inconsistent neighborhood graphs with shared-neighbor reweighting, Huber-smoothed dual consistency gates, and adaptive inverse-loss view weights, while retaining closed-form alternating updates and a convergence guarantee~\cite{linNCRMultiViewNLOS2026}. QSS-Net further makes efficient NLOS classification itself the target, representing the field's shift from complete geometric recovery toward time-sensitive semantic decisions~\cite{linQSSNetNLOS2026}. Together with learned feature embeddings and NLOS-R$^2$, these studies establish recognition, action understanding, and clustering as a parallel trajectory to hidden-scene reconstruction.
 
+\vspace{0.8mm}
+\noindent \textbf{Calibrated wall-mediated semantic inference.}
+Dai~\etal~use only a calibrated wall-mediated observation of a display outside the camera field of view for 31-way category inference~\cite{daiSCISANet2026}. Scene-constrained regularized inversion reorganizes weak indirect evidence, while multi-stage Haar-subband attention preserves discriminative mid- and high-frequency cues under attenuation, ambient background, and matched operator re-parameterization. The method performs semantic NLOS sensing rather than full hidden-image, depth, or geometry reconstruction.
+
+
 
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Network combined with physical models}
 \subsection{Network combined with physical models} \label{combined}
+
+\vspace{0.8mm}
+\noindent \textbf{Dual-model guidance for under-scanned transients.}
+Yan~\etal~first recover sufficient-density measurements from sparse transients with three-dimensional pyramid pooling and window attention, then combine LCT and $f$--$k$ branches to retain complementary global structure and fine texture~\cite{yanDualModelUnderscanning2026}. Multi-scale refinement and adaptive fusion place classical geometric- and wave-optics inverses inside one learned under-scanning pipeline, extending measurement completion beyond a single fixed reconstruction backend.
+
 The end-to-end method is convenient for training, but it is highly dependent on the dataset. When the dataset scale is large enough, end-to-end learning can learn the mapping well to achieve good results. However, end-to-end learning may have problems such as over-fitting and poor generalization ability when the data size is insufficient. Due to the cumbersome data acquisition process, NLOS imaging lacks real large-scale datasets (most of the existing large-scale datasets are synthetic). Hence, some state-of-the-art studies in recent years proposed a reconstruction algorithm combining deep learning and physical models instead of the end-to-end network only, as shown in Tab.~\ref{tab:deeplearning}.
 
 Metzler \etal~used the optical memory effect (see Sec.~\ref{sec3}-\ref{memoryEffect1}) to complete NLOS imaging~\cite{metzlerDeepinverseCorrelographyRealtime2020}. Instead of using conventional phase recovery algorithms (e.g., hybrid input-output (HIO)~\cite{fienupPhaseRetrievalAlgorithms1982} and alternating minimization (Alt-Min)\cite{netrapalli_phase_2015}), \cite{metzlerDeepinverseCorrelographyRealtime2020}~adopted U-Net to complete phase recovery, with the $L_1$ norm after autocorrelation as loss function.
