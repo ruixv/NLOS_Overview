@@ -1,0 +1,48 @@
+name: Validate time-multiplexed NLOS synchronization
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - .github/workflows/pr_validate_time_multiplex_20260725.yml
+      - scripts/correct_quasi_fresnel_final_doi_20260725.py
+      - scripts/sync_nlos_time_multiplex_lineage_20260725.py
+
+permissions:
+  contents: read
+
+jobs:
+  validate-source-transform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run guarded source transformations
+        run: |
+          python3 scripts/correct_quasi_fresnel_final_doi_20260725.py
+          python3 scripts/sync_nlos_time_multiplex_lineage_20260725.py
+      - name: Check transformed sources
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          titles = [
+              'Time-multiplexing non-line-of-sight imaging',
+              'Non-Line-of-Sight Target Tracking With a Single Time Multiplexed Channel',
+              'Non-line-of-sight target 2D size detection with few channels at a time',
+          ]
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          active = Path('article/2active.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          for title in titles:
+              assert readme.lower().count(title.lower()) == 1, title
+              assert index.lower().count(title.lower()) == 1, title
+          assert 'From few-channel inference to time-multiplexed imaging' in active
+          for key in ('liTimeMultiplexingNLOS2025','zhengSingleChannelTimeMultiplexNLOS2024','liFewChannelSizeNLOS2024'):
+              assert key in active, key
+              assert ('{' + key + ',') in bib, key
+          for doi in ('10.3788/COL202523.071102','10.1109/JPHOT.2024.3471070','10.1016/j.eswa.2023.122996','10.1364/OPTICA.604217'):
+              assert doi.lower() in bib.lower(), doi
+          print('Source transformation is valid.')
+          PY
