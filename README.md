@@ -348,6 +348,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
    │     Lai et al.: HoloRadar reconstructs complete LOS/NLOS 3D scenes with one mobile mmWave radar [NeurIPS]
    │     Cai et al.: ACTE-Net and equivariant adaptive-threshold unfolding introduce unsupervised and self-supervised measured mmWave inversion [IEEE TAP / TCI]
+2026 ── Yin et al.: Si-SPAD and phase-congruency regularization enable 200 m all-day active NLOS under 94,314 lx sunlight [Optics and Lasers in Engineering]
 2026 ── Zhao et al.: PICL — SPAD-aware denoising cascaded with self-supervised differentiable-physics reconstruction [JOSA A]
    │     Ye et al.: NLOSFormer — real-time thermal NLOS through rough surfaces with explicit kernel estimation [ACM TOG]
    │     Yin et al.: all-day Si-SPAD NLOS — 200 m reconstruction under 94,314 lx ambient illumination [Optics and Lasers in Engineering]
