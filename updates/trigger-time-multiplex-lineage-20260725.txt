@@ -1,3 +1,4 @@
 Trigger guarded synchronization of the citation-traced few-channel and time-multiplexed NLOS lineage and rebuild the survey PDF.
 
 Run after workflow registration and the combined modality/cross-artifact integration.
+Retry from the latest master after concurrent workflow-maintenance commits.
