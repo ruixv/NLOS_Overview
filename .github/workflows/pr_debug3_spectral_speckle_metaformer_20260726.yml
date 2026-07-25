@@ -1,0 +1,20 @@
+name: Minimal diagnose spectral NLOS synchronizer
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/2026-07-26-spectral-speckle-metaformer-debug3-trigger.md
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone quietly and run synchronizer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git clone -q --depth 1 --branch automation/spectral-speckle-metaformer-20260726 \
+            "https://x-access-token:${GH_TOKEN}@github.com/ruixv/NLOS_Overview.git" repo
+          cd repo
+          python3 scripts/sync_nlos_spectral_memory_20260726.py
