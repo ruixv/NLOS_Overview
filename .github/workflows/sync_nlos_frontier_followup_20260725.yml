@@ -1,0 +1,118 @@
+name: Sync NLOS frontier follow-up and rebuild survey PDF
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - scripts/sync_nlos_20260725_frontier_followup.py
+      - .github/workflows/sync_nlos_frontier_followup_20260725.yml
+      - updates/trigger-frontier-followup-20260725.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-nlos-frontier-followup-20260725
+  cancel-in-progress: true
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
+
+      - name: Apply guarded synchronization
+        run: python3 scripts/sync_nlos_20260725_frontier_followup.py
+
+      - name: Validate synchronized sources
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          titles = [
+              'Neural illumination fields: High-fidelity and ambient-robust stereo reconstruction for two-bounce non-line-of-sight imaging',
+              'SCISA-Net: Scene-Constrained Inverse-to-Subband Attention for Semantic Inference from Wall-Mediated Indirect Observations',
+              'Dual-model guided active NLOS imaging with under-scanning measurements',
+              'Non-line-of-sight imaging based on adaptive neural grid resampling',
+              'Non-line-of-sight imaging with arbitrary relay surface geometries via 3D Gaussian Transient Rendering',
+              'Fast and Memory-efficient Non-line-of-sight Imaging with Quasi-Fresnel Transform',
+          ]
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          active = Path('article/2active.tex').read_text(encoding='utf-8')
+          data = Path('article/4datadriven.tex').read_text(encoding='utf-8')
+          newscenes = Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          for title in titles:
+              assert index.lower().count(title.lower()) == 1, title
+          for title in titles[1:4] + titles[5:]:
+              assert readme.lower().count(title.lower()) == 1, title
+          assert readme.count('10.1145/3799902.3811137') == 1
+          assert 'Calibrated wall-mediated semantic inference' in data
+          assert 'Dual-model guidance for under-scanned transients' in data
+          assert 'Learned Stolt calibration and dimension-reduced inversion' in active
+          assert 'Arbitrary Relay Surfaces with Gaussian Transient Rendering' in newscenes
+          for token in ('10.3390/photonics13060575','10.1007/s00371-026-04381-6','10.2139/ssrn.7022018','10.1145/3799902.3811137','2508.02003'):
+              assert token in bib, token
+          assert '**Update run: 25 July 2026.**' in readme
+          assert 'Updated 25 July 2026 · 190+ papers' in index
+          assert 'Last updated: 25 July 2026' in index
+          print('Cross-artifact source validation passed.')
+          PY
+
+      - name: Clean-build updated survey
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate bibliography and PDF
+        run: |
+          test -s bare_jrnl.pdf
+          while IFS= read -r key; do
+            test -z "$key" || grep -Fq "\\bibitem{$key}" bare_jrnl.bbl
+          done < updates/2026-07-25-frontier-followup-keys.txt
+          ! grep -Eq 'Citation .* undefined|There were undefined citations|multiply defined' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages" && test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/survey.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text = ' '.join(Path('/tmp/survey.txt').read_text(encoding='utf-8', errors='ignore').lower().split())
+          terms = ('calibrated wall-mediated semantic inference','dual-model guidance','grid offset network','quasi-fresnel','gaussian transient rendering')
+          missing = [x for x in terms if x not in text]
+          assert not missing, missing
+          print('Expected frontier trajectories found in PDF text.')
+          PY
+          rm -rf /tmp/render && mkdir -p /tmp/render
+          pdftoppm -png -r 60 bare_jrnl.pdf /tmp/render/page >/dev/null 2>&1
+          rendered=$(find /tmp/render -type f -name 'page-*.png' -size +0c | wc -l)
+          test "$rendered" -eq "$pages"
+
+      - name: Commit synchronized sources and regenerated PDF
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/2active.tex article/4datadriven.tex article/5newscenes.tex \
+            bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-07-25-frontier-followup.md updates/2026-07-25-frontier-followup-keys.txt
+          if git diff --cached --quiet; then
+            echo 'No synchronized changes were needed.'
+            exit 0
+          fi
+          git commit -m 'Integrate citation-traced NLOS frontier follow-up [skip ci]'
+          git push origin HEAD:master
