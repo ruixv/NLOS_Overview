@@ -2,3 +2,4 @@ Trigger guarded synchronization of the citation-traced few-channel and time-mult
 
 Run after workflow registration and the combined modality/cross-artifact integration.
 Retry from the latest master after concurrent workflow-maintenance commits.
+Retry with normalized PDF-text validation.
