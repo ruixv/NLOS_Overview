@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - updates/2026-07-26-radar-recognition-debug-trigger.md
+      - scripts/sync_nlos_radar_recognition_20260726_v2.py
 
 jobs:
   diagnose:
@@ -15,4 +16,4 @@ jobs:
           ref: automation/radar-recognition-20260726
           fetch-depth: 1
       - name: Run synchronizer with compact diagnostics
-        run: python3 scripts/sync_nlos_radar_recognition_20260726.py
+        run: python3 scripts/sync_nlos_radar_recognition_20260726_v2.py
