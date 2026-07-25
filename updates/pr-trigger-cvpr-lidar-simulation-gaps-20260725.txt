@@ -1,0 +1,1 @@
+Materialize and validate the GeRaF 2.0, DENALI, and open transient-simulation consistency update on this branch.
