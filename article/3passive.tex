@@ -13,6 +13,11 @@ When using ambient light, the hidden scene produces shadows (or speckles) on the
 
 Conventional cameras are the most inexpensive but have at least two limitations among all the cameras discussed in this article. First, the shadow is very sensitive to ambient light intensity, i.e., SNR decreases as the ambient light intensity increases. Second, for broadband illumination, the optical memory effect is no longer valid, due to which the problem is extremely ill-posed and usually requires additional constraints and priors.
 
+
+\vspace{0.8mm}
+\noindent \textbf{White-light and single-shot speckle correlation.}
+A complementary steady-state trajectory replaces ultrafast timing with statistical structure in wall speckle. Zhou~\etal~used Zernike-polynomial envelope fitting and low-pass correction before autocorrelation and phase retrieval, maintaining white-light reconstruction under ambient background and detector misalignment~\cite{zhouWhiteLightSpeckleNLOS2024}. Fu~\etal~then embedded the speckle-correlation model and an explicit denoising prior inside a physics-enhanced network, improving ordinary-camera scalability without coherent active illumination~\cite{fuPhysicsEnhancedWhiteLightNLOS2025}. A distinct single-shot formulation estimates object-spectrum amplitude from the covariance of one random speckle pattern, removing multi-frame stitching and extending the field of view beyond the conventional optical-memory-effect range while operating at negative SNR~\cite{zhouSingleShotSpeckleNLOS2025}. Together, these methods shift speckle-based NLOS from controlled darkroom demonstrations toward broadband, ambient-light, and reduced-measurement operation.
+
 \vspace{0.8mm}
 \noindent \textbf{Diffuse-aware attention encoding for passive NLOS.}
 Recent ordinary-camera methods increasingly encode the relay-wall transport structure inside the network rather than relying on a generic image-to-image backbone. Wang~\etal~introduced diffuse-aware attention-enhanced encoding for passive NLOS reconstruction~\cite{wangDiffuseAwarePassive2026}. By explicitly emphasizing features that survive diffuse relay transport, the method represents a further step from early U-Net mappings toward attention mechanisms designed around the conditioning of the passive forward process.
@@ -93,6 +98,8 @@ Passive methods based on speckle coherence have a special imaging model and reco
 
    \cite{boger-lombardPassiveOpticalTimeofflight2019} & Incoherent light source (object side) & Conventional camera & Temporal coherence &  Detection/ Tracking/ Identification\\%%%% Table body
    \cite{katz2014non} & Incoherent light source (object side) & Conventional camera & Speckle coherence &  2D reconstruction\\%%%% Table body
+    \cite{zhouWhiteLightSpeckleNLOS2024,fuPhysicsEnhancedWhiteLightNLOS2025,zhouSingleShotSpeckleNLOS2025} & White light / coherent speckle & Conventional camera & Speckle statistics with physics-enhanced or single-shot inversion & 2D reconstruction\\%%%% Table body
+    \cite{hashemiSpectralContentPassiveNLOS2025,chenHyperspectralBandSelectionNLOS2025} & Ambient/incoherent light & Multispectral or hyperspectral camera & Spectral unmixing and learned band selection & Full-colour 2D reconstruction\\%%%% Table body
    \cite{batarsehPassiveSensingCorner2018a} & Incoherent light source (object side) & Interferometer & Spatial coherence &  Detection/ Tracking/ Identification\\%%%% Table body
    \cite{beckusMultiModalNonLineofSightPassive2019} & Ambient light & Interferometer + Conventional camera & Spatial coherence + Intensity&  2D reconstruction\\%%%% Table body
    \cite{yedidiaUsingUnknownOccluders2019,torralbaAccidentalPinholePinspeck2012,aittalaComputationalMirrorsBlind2019,DBLP:conf/iccp/SeidelMMSFYG19,saundersComputationalPeriscopyOrdinary2019,seidelTwoDimensionalNonLineofSightScene2020} & Ambient light & Conventional camera & Intensity with partial occluder &  2D reconstruction\\%%%% Table body

@@ -106,6 +106,11 @@ Dynamic NLOS systems face coupled spatial and temporal undersampling before reco
 \noindent \textbf{SPAD-aware physics-informed cascade learning.}
 Zhao~\etal~addressed the coupling between detector noise and ill-posed transient inversion with physics-informed cascade learning (PICL)~\cite{zhaoPICL2026}. A lightweight first network separates SPAD-specific dark-count, timing-jitter, and mixed interference components, after which a second network reconstructs the hidden scene while embedding a differentiable forward model. Because physical measurement consistency supplies self-supervision, PICL avoids dependence on a large paired NLOS dataset and provides a direct bridge from trainable inverse kernels toward hardware-aware, noise-adaptive reconstruction.
 
+
+\vspace{0.8mm}
+\noindent \textbf{Physics-enhanced white-light reconstruction.}
+For inexpensive broadband acquisition, Fu~\etal~embedded a speckle-correlation image-formation model and denoising prior into a trainable reconstruction pipeline~\cite{fuPhysicsEnhancedWhiteLightNLOS2025}. Unlike a generic wall-image U-Net, the network exposes the autocorrelation-to-object relationship as an internal physical constraint. This provides a passive/steady-state counterpart to differentiable transient physics: the measurement modality changes, but the learned solver remains anchored to an explicit transport statistic.
+
 \vspace{0.8mm}
 \noindent \textbf{Hybrid physics--data passive enhancement.}
 Purely data-driven passive reconstruction can be difficult to interpret and generalize, whereas a fixed light-transport inverse may preserve physics but lose perceptual detail. Liang~\etal~proposed HPDI, a dual-path architecture that combines a physics-informed coarse-to-fine pathway with a data-driven implicit reconstruction pathway and learns an adaptive fusion of their outputs~\cite{liangHPDIPassiveNLOS2026}. Evaluation across passive datasets with and without explicit occluders shows how a recognizable transport model and scene-specific statistical priors can be complementary rather than competing constraints. This hybrid design extends computational periscopy and blind transport factorization toward trainable passive solvers with improved fidelity, generalization, and data efficiency.
@@ -155,6 +160,11 @@ TransDiff~\cite{cuiTransDiffTIP2025} extends unsupervised transient completion t
 \vspace{0.8mm}
 \noindent \textbf{Untrained network priors.}
 Wu~\etal~demonstrated that an untrained deep decoder network can serve as an effective image prior for NLOS reconstruction without any training data~\cite{wuUntrainedDecoder2022}, leveraging the deep image prior inherent in the network architecture to regularize the ill-posed NLOS inverse problem, offering flexibility for novel experimental configurations where training data is unavailable.
+
+
+\vspace{0.8mm}
+\noindent \textbf{Memory-efficient MetaFormer reconstruction.}
+Transient networks improve quality by modeling the joint spatial--temporal volume, but their memory cost can prevent training and deployment on commodity hardware. Zhang~\etal~introduced CMFormer, whose multidimensional global and dilated convolutions act as a purely convolutional MetaFormer token mixer~\cite{zhangCMFormerNLOS2025}. Aggregate feature transmission replaces width-expanding skip connections, cross-layer attention restores detail lost during downsampling, and gradient checkpointing further limits training memory. The reported 8-fps inference and synthetic-to-real evaluation make efficiency itself a learned-reconstruction objective, complementing NLOST-style global modeling rather than merely shrinking input resolution.
 
 \vspace{0.8mm}
 \noindent \textbf{KAN-enhanced transient Transformers with semantic guidance.}

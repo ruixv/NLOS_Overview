@@ -64,10 +64,16 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 25 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 26 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2024 | [Speckle-correlation-based non-line-of-sight imaging under white-light illumination](https://doi.org/10.1016/j.optlastec.2023.110231) — Zhou et al. | Optics & Laser Technology 2024 | ZPF-SCI combines Zernike-polynomial envelope correction with low-pass filtering before speckle autocorrelation and phase retrieval, retaining reconstruction under ambient illumination and camera misalignment with an ordinary camera. |
+| 2025 | [Non-line-of-sight imaging under white-light illumination using physics-enhanced deep learning](https://doi.org/10.1364/AO.561658) — Fu et al. | Applied Optics 2025 | Embeds a speckle-correlation forward model and a denoising prior in a physics-enhanced network, enabling ordinary-camera hidden-image reconstruction under inexpensive broadband white-light illumination. |
+| 2025 | [Single-shot non-line-of-sight imaging based on the statistical average characteristics of a speckle pattern under ambient light](https://doi.org/10.1016/j.optcom.2025.131847) — Zhou et al. | Optics Communications 2025 | Extracts object-spectrum amplitude from the covariance of one random speckle pattern, removing multi-frame stitching and the conventional memory-effect field-of-view limit while reconstructing at −2.06 dB SNR. |
+| 2025 | [Isolating Signals in Passive Non-Line-of-Sight Imaging Using Spectral Content](https://doi.org/10.1109/TPAMI.2023.3301336) — Hashemi et al. | IEEE TPAMI 2025 | Uses multispectral unmixing and a convex known-spectrum formulation to separate desired wall-mediated radiance from much stronger clutter, improving passive reconstruction under realistic backgrounds. |
+| 2025 | [Hyperspectral passive non-line-of-sight imaging with band selection](https://doi.org/10.1016/j.eswa.2025.128394) — Chen et al. | Expert Systems with Applications 2025 | HSBS-Net selects informative spectral bands, applies a spectral-energy-guided KA-Transformer and robust sparse loss, and introduces HP-NLOS for physical full-colour passive hyperspectral reconstruction. |
+| 2025 | [CMFormer: Non-line-of-sight imaging with a memory-efficient MetaFormer network](https://doi.org/10.1016/j.optlaseng.2025.108875) — Zhang et al. | Optics and Lasers in Engineering 2025 | A convolutional MetaFormer token mixer, aggregate feature transmission, cross-layer attention and checkpointing reduce 3D transient memory cost while reaching 8-fps reconstruction on consumer GPUs. |
 | 2025 | [Time-multiplexing non-line-of-sight imaging](https://doi.org/10.3788/COL202523.071102) — Li et al. | Chinese Optics Letters 2025 | Introduces delayed multi-beam temporal multiplexing so one time-resolved channel separates echoes from multiple relay points; the proof-of-concept system reconstructs hidden scenes with half the conventional relay scans. |
 | 2024 | [Non-Line-of-Sight Target Tracking With a Single Time Multiplexed Channel](https://doi.org/10.1109/JPHOT.2024.3471070) — Zheng et al. | IEEE Photonics Journal 2024 | Uses two delayed illumination paths to encode multiple hidden-target echoes into one single-pixel single-photon histogram, enabling centimeter-precision positioning and tracking with a single time-correlated detection channel. |
 | 2024 | [Non-line-of-sight target 2D size detection with few channels at a time](https://doi.org/10.1016/j.eswa.2023.122996) — Li et al. | Expert Systems with Applications 2024 | Learns a rectangle-based mapping from only two or three transient detection channels to hidden-target width and height, extending scan-free few-channel NLOS from localization to coarse 2D size inference rather than full scene reconstruction. |
@@ -321,9 +327,13 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Yue et al.: permutation transient attention — attention and Permute-MLP blocks improve learned transient features [COSI]
    │     Zhang et al.: real-time scan-free NLOS — parallel SPAD-array boundary migration reaches 151-fps acquisition and 19-fps reconstruction [APL Photonics]
    │     Wang et al.: event-enhanced passive NLOS — asynchronous diffusion-pattern changes and physics-embedded learning reconstruct moving hidden objects [IEEE Sensors Journal]
+    │     Zhou et al.: white-light ZPF speckle correlation — ambient-light and alignment-robust ordinary-camera reconstruction [Optics & Laser Technology]
     │     Huang et al.: comb-calibrated coherent FMCW NLOS — sub-picosecond equivalent timing enables submillimeter 3D imaging and hidden-object vibrometry [Physical Review Letters]
    │
    │     Cai et al. and Liu et al.: NSIR and RM-CSTV combine echo separation, phase correction, range migration, sparsity, and total variation for measured radar reconstruction [Journal of Radars / National Science Open]
+2025 ── Fu et al. and Zhou et al.: physics-enhanced and single-shot speckle statistics move steady-state NLOS toward inexpensive white-light and ambient-light operation [Applied Optics / Optics Communications]
+    │     Hashemi et al. and Chen et al.: multispectral clutter separation and learned hyperspectral band selection strengthen passive NLOS under realistic backgrounds [IEEE TPAMI / Expert Systems with Applications]
+    │     Zhang et al.: CMFormer reduces transient-volume memory cost and reaches consumer-GPU real-time reconstruction [Optics and Lasers in Engineering]
 2025 ── Shi et al.: fast configurable transient simulation and an open NLOS benchmark [arXiv]
    │     Liu et al.: geometric constraints on hidden surface normals for fast sparse-transient reconstruction [arXiv]
    │     Sultan et al.: optimized NUFFT/SFFT sampling — irregular relay scans and flexible hidden-volume grids at FFT-like cost [arXiv]
