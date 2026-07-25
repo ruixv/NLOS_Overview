@@ -1,1 +1,3 @@
 Trigger the guarded Quasi-Fresnel Optica DOI correction and survey PDF rebuild.
+
+Retry after relaxing bibliography-style-dependent DOI validation.
