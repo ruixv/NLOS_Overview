@@ -1,0 +1,93 @@
+name: Validate and stage time-multiplexed NLOS synchronization
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - .github/workflows/pr_validate_time_multiplex_20260725.yml
+      - scripts/correct_quasi_fresnel_final_doi_20260725.py
+      - scripts/sync_nlos_time_multiplex_lineage_20260725.py
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: automation/diagnose-time-multiplex-20260725
+          fetch-depth: 0
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
+
+      - name: Run guarded source transformations
+        run: |
+          python3 scripts/correct_quasi_fresnel_final_doi_20260725.py
+          python3 scripts/sync_nlos_time_multiplex_lineage_20260725.py
+
+      - name: Validate transformed sources
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          titles = [
+              'Time-multiplexing non-line-of-sight imaging',
+              'Non-Line-of-Sight Target Tracking With a Single Time Multiplexed Channel',
+              'Non-line-of-sight target 2D size detection with few channels at a time',
+          ]
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          active = Path('article/2active.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          for title in titles:
+              assert readme.lower().count(title.lower()) == 1, title
+              assert index.lower().count(title.lower()) == 1, title
+          assert 'From few-channel inference to time-multiplexed imaging' in active
+          for key in ('liTimeMultiplexingNLOS2025','zhengSingleChannelTimeMultiplexNLOS2024','liFewChannelSizeNLOS2024'):
+              assert key in active, key
+              assert ('{' + key + ',') in bib, key
+          for doi in ('10.3788/COL202523.071102','10.1109/JPHOT.2024.3471070','10.1016/j.eswa.2023.122996','10.1364/OPTICA.604217'):
+              assert doi.lower() in bib.lower(), doi
+          print('Source transformation is valid.')
+          PY
+
+      - name: Clean-build survey
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate build integrity
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          ! grep -Eq 'Citation .* undefined|There were undefined citations|multiply defined' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages" && test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/survey.txt
+          test -s /tmp/survey.txt
+          echo "Clean LaTeX/BibTeX build and PDF integrity validation passed."
+
+      - name: Commit staged sources and regenerated PDF to PR branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/2active.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-07-25-time-multiplex-lineage.md updates/2026-07-25-time-multiplex-lineage-keys.txt \
+            updates/2026-07-25-quasi-fresnel-final-doi.md
+          if git diff --cached --quiet; then
+            echo 'No staged changes were needed.'
+            exit 0
+          fi
+          git commit -m 'Stage time-multiplexed NLOS sources and PDF [skip ci]'
+          git push origin HEAD:automation/diagnose-time-multiplex-20260725
