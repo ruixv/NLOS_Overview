@@ -89,11 +89,13 @@ jobs:
           pdftotext bare_jrnl.pdf /tmp/survey.txt
           python3 - <<'PY'
           from pathlib import Path
-          text = ' '.join(Path('/tmp/survey.txt').read_text(encoding='utf-8', errors='ignore').lower().split())
-          terms = ('from few-channel inference to time-multiplexed imaging','single time multiplexed channel','time-multiplexing non-line-of-sight imaging','quasi-fresnel')
-          missing = [term for term in terms if term not in text]
+          import re
+          text = Path('/tmp/survey.txt').read_text(encoding='utf-8', errors='ignore').lower()
+          normalized = re.sub(r'[^a-z0-9]+', '', text)
+          required = ('fromfewchannelinferencetotimemultiplexedimaging','singletimemultiplexedchannel','timemultiplexingnonlineofsightimaging','quasifresnel')
+          missing = [term for term in required if term not in normalized]
           assert not missing, missing
-          print('Expected time-multiplexed and Quasi-Fresnel content found in PDF text.')
+          print('Normalized time-multiplexed and Quasi-Fresnel PDF validation passed.')
           PY
           rm -rf /tmp/render && mkdir -p /tmp/render
           pdftoppm -png -r 60 bare_jrnl.pdf /tmp/render/page >/dev/null 2>&1
