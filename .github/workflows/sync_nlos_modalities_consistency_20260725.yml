@@ -1,0 +1,113 @@
+name: Sync NLOS modality consistency and rebuild survey PDF
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - updates/trigger-modalities-consistency-20260725.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-nlos-modalities-consistency-20260725
+  cancel-in-progress: true
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
+
+      - name: Apply guarded synchronization
+        run: python3 scripts/sync_nlos_20260725_modalities_consistency.py
+
+      - name: Validate synchronized sources
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          titles = [
+              'Thermal Non-Line-of-Sight Imaging through Rough Surfaces',
+              'Eye-Safe Non-Line-of-Sight Localization Using Compact Nanosecond Laser Diodes and Single-Photon-Avalanche-Diode Arrays',
+              'Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength',
+              'A comprehensive study of time-of-flight non-line-of-sight imaging',
+              'All-day non-line-of-sight imaging based on Si-SPAD and phase-congruency-based structured ε-regularization',
+          ]
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          active = Path('article/2active.tex').read_text(encoding='utf-8')
+          data = Path('article/4datadriven.tex').read_text(encoding='utf-8')
+          newscenes = Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          for title in titles:
+              assert index.lower().count(title.lower()) == 1, title
+          assert readme.lower().count(titles[1].lower()) == 1
+          assert 'Compact eye-safe nanosecond SPAD-array localization' in active
+          assert 'Common-model benchmarking of ToF NLOS inverses' in active
+          assert 'Physics-embedded thermal transport learning' in data
+          assert 'Thermal NLOS through rough relay surfaces' in newscenes
+          for token in ('10.1145/3811030','10.1051/jeos/2026019','10.1109/ICEE67339.2025.11213924','2603.09548','10.1016/j.optlaseng.2026.109919'):
+              assert token in bib, token
+          assert '**Update run: 25 July 2026.**' in readme
+          assert 'Updated 25 July 2026' in index
+          assert 'Last updated: 25 July 2026' in index
+          print('Cross-artifact modality validation passed.')
+          PY
+
+      - name: Clean-build updated survey
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate bibliography and PDF
+        run: |
+          test -s bare_jrnl.pdf
+          while IFS= read -r key; do
+            test -z "$key" || grep -Fq "\\bibitem{$key}" bare_jrnl.bbl
+          done < updates/2026-07-25-modalities-consistency-keys.txt
+          ! grep -Eq 'Citation .* undefined|There were undefined citations|multiply defined' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages" && test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/survey.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text = ' '.join(Path('/tmp/survey.txt').read_text(encoding='utf-8', errors='ignore').lower().split())
+          terms = ('compact eye-safe nanosecond spad-array localization','common-model benchmarking of tof nlos inverses','thermal nlos through rough relay surfaces','physics-embedded thermal transport learning')
+          missing = [term for term in terms if term not in text]
+          assert not missing, missing
+          print('Expected modality trajectories found in PDF text.')
+          PY
+          rm -rf /tmp/render && mkdir -p /tmp/render
+          pdftoppm -png -r 60 bare_jrnl.pdf /tmp/render/page >/dev/null 2>&1
+          rendered=$(find /tmp/render -type f -name 'page-*.png' -size +0c | wc -l)
+          test "$rendered" -eq "$pages"
+
+      - name: Commit synchronized sources and regenerated PDF
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/2active.tex article/4datadriven.tex article/5newscenes.tex \
+            bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-07-25-modalities-consistency.md updates/2026-07-25-modalities-consistency-keys.txt
+          if git diff --cached --quiet; then
+            echo 'No synchronized changes were needed.'
+            exit 0
+          fi
+          git commit -m 'Integrate NLOS modality and hardware consistency [skip ci]'
+          git push origin HEAD:master
