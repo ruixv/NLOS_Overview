@@ -49,12 +49,7 @@ def update_readme_v2() -> None:
     text = re.sub(r"\*\*Update run: \d{1,2} July 2026\.\*\*", "**Update run: 26 July 2026.**", text, count=1)
 
     add_2024 = "    │     Zhou et al.: white-light ZPF speckle correlation — ambient-light and alignment-robust ordinary-camera reconstruction [Optics & Laser Technology]\n"
-    text = line_insert_after(
-        text,
-        "Wang et al.: event-enhanced passive NLOS",
-        add_2024,
-        "README 2024 timeline",
-    )
+    text = line_insert_after(text, "Wang et al.: event-enhanced passive NLOS", add_2024, "README 2024 timeline")
 
     add_2025 = (
         "2025 ── Fu et al. and Zhou et al.: physics-enhanced and single-shot speckle statistics move steady-state NLOS toward inexpensive white-light and ambient-light operation [Applied Optics / Optics Communications]\n"
@@ -67,7 +62,6 @@ def update_readme_v2() -> None:
         add_2025,
         "README 2025 timeline",
     )
-
     base.write_if_changed(base.README, old, text)
 
 
@@ -98,7 +92,34 @@ def update_passive_v2() -> None:
         table = table[:line_end] + rows + table[line_end:]
         text = text[:table_start] + table + text[table_end:]
         base.PASSIVE.write_text(text, encoding="utf-8")
+
     _original_update_passive()
+
+    current = base.read(base.PASSIVE)
+    heading = "\\subsubsection{Hyperspectral and Multispectral Cameras}\n"
+    start = current.find(heading)
+    if start < 0:
+        raise SystemExit("Fail-closed: hyperspectral subsection heading missing")
+    start += len(heading)
+    end = current.find("\n\n\\bookmark[", start)
+    if end < 0:
+        raise SystemExit("Fail-closed: hyperspectral subsection boundary missing")
+    new_paragraph = (
+        "Capturing richer spectral information beyond a single visible-light band can substantially improve passive NLOS imaging quality. "
+        "Chen~\\etal~proposed Hyper-NLOS, which uses a hyperspectral camera and a dedicated fusion network to combine complementary wavelength-dependent cues~\\cite{chenHyperNLOS2024}. "
+        "Hashemi~\\etal~instead used spectral content to separate desired wall-mediated radiance from clutter: multispectral unmixing handles unknown uniformly colored sources, whereas a convex known-spectrum formulation requires fewer bands and remains effective when clutter is much stronger than the target signal~\\cite{hashemiSpectralContentPassiveNLOS2025}. "
+        "HSBS-Net then made band selection part of the reconstruction objective. Entropy-rich wavelengths are selected with differentiable constrained measurement learning, while a spectral-energy key-area Transformer suppresses poorly illuminated regions and a robust sparse loss preserves colour and structure~\\cite{chenHyperspectralBandSelectionNLOS2025}. "
+        "The accompanying HP-NLOS dataset covers physical full-colour targets, 256 spectral bands, multiple distances, and changing external conditions. This progression moves spectral passive NLOS from adding channels indiscriminately toward clutter-aware unmixing and task-driven acquisition."
+    )
+    subsection = current[start:end]
+    if (
+        "hashemiSpectralContentPassiveNLOS2025" not in subsection
+        or "chenHyperspectralBandSelectionNLOS2025" not in subsection
+        or "laiHoloRadar2025" in subsection
+    ):
+        current = current[:start] + new_paragraph + current[end:]
+        base.PASSIVE.write_text(current, encoding="utf-8")
+        print("updated article/3passive.tex hyperspectral subsection")
 
 
 def validate_v2() -> None:
@@ -114,7 +135,6 @@ def validate_v2() -> None:
             raise SystemExit(f"README title count is not one: {p['title']}")
         if index.count(title) != 1:
             raise SystemExit(f"index title count is not one: {p['title']}")
-        # Each canonical record intentionally contains the DOI once in `doi` and once in its DOI URL.
         if bib.count(doi) != 2:
             raise SystemExit(f"bibliography DOI occurrence count is not two: {p['doi']}")
         if ("{" + p["key"].lower() + ",") not in bib:
@@ -128,6 +148,11 @@ def validate_v2() -> None:
     ):
         if key not in passive:
             raise SystemExit(f"passive survey citation missing: {key}")
+    spectral = passive.split("Hyperspectral and Multispectral Cameras", 1)[1].split("Physical model", 1)[0]
+    if "laiHoloRadar2025" in spectral:
+        raise SystemExit("stale HoloRadar citation remains in passive spectral subsection")
+    if "hashemiSpectralContentPassiveNLOS2025" not in spectral or "chenHyperspectralBandSelectionNLOS2025" not in spectral:
+        raise SystemExit("spectral passive citations missing from semantic subsection")
     for key in ("fuPhysicsEnhancedWhiteLightNLOS2025", "zhangCMFormerNLOS2025"):
         if key not in learning:
             raise SystemExit(f"learning survey citation missing: {key}")
