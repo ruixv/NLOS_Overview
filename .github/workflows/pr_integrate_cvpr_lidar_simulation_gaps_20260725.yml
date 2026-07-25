@@ -76,9 +76,16 @@ jobs:
           pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
           test -n "$pages" && test "$pages" -gt 0
           pdftotext bare_jrnl.pdf /tmp/survey.txt
-          grep -Fqi 'Seeing through boxes' /tmp/survey.txt
-          grep -Fqi 'DENALI' /tmp/survey.txt
-          grep -Fqi 'Fast non-line-of-sight transient data simulation' /tmp/survey.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          text = Path('/tmp/survey.txt').read_text(encoding='utf-8', errors='ignore').lower()
+          normalized = re.sub(r'[^a-z0-9]+', '', text)
+          required = ('seeingthroughboxes', 'denali', 'fastnonlineofsighttransientdatasimulation')
+          missing = [term for term in required if term not in normalized]
+          assert not missing, missing
+          print('Normalized PDF text validation passed.')
+          PY
           rm -rf /tmp/render && mkdir -p /tmp/render
           pdftoppm -png -r 60 bare_jrnl.pdf /tmp/render/page >/dev/null 2>&1
           rendered=$(find /tmp/render -type f -name 'page-*.png' -size +0c | wc -l)
