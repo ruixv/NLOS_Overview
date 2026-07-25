@@ -1,0 +1,126 @@
+name: Validate and stage spectral, speckle, and MetaFormer NLOS synchronization
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - .github/workflows/pr_sync_spectral_speckle_metaformer_20260726.yml
+      - scripts/sync_nlos_spectral_memory_20260726.py
+      - updates/2026-07-26-spectral-speckle-metaformer-pr-trigger.md
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: automation/spectral-speckle-metaformer-20260726
+          fetch-depth: 0
+
+      - name: Install LaTeX, JavaScript, and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-publishers texlive-science texlive-bibtex-extra poppler-utils
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run fail-closed source synchronization
+        run: python3 scripts/sync_nlos_spectral_memory_20260726.py
+
+      - name: Validate website JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          html = Path('index.html').read_text(encoding='utf-8')
+          if '<script>' not in html or '</script>' not in html:
+              raise SystemExit('index.html script block missing')
+          Path('/tmp/nlos-index.js').write_text(html.split('<script>', 1)[1].split('</script>', 1)[0], encoding='utf-8')
+          PY
+          node --check /tmp/nlos-index.js
+
+      - name: Validate synchronized source coverage
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          papers = [
+              ('Speckle-correlation-based non-line-of-sight imaging under white-light illumination', '10.1016/j.optlastec.2023.110231', 'zhouWhiteLightSpeckleNLOS2024'),
+              ('Non-line-of-sight imaging under white-light illumination using physics-enhanced deep learning', '10.1364/AO.561658', 'fuPhysicsEnhancedWhiteLightNLOS2025'),
+              ('Single-shot non-line-of-sight imaging based on the statistical average characteristics of a speckle pattern under ambient light', '10.1016/j.optcom.2025.131847', 'zhouSingleShotSpeckleNLOS2025'),
+              ('Isolating Signals in Passive Non-Line-of-Sight Imaging Using Spectral Content', '10.1109/TPAMI.2023.3301336', 'hashemiSpectralContentPassiveNLOS2025'),
+              ('Hyperspectral passive non-line-of-sight imaging with band selection', '10.1016/j.eswa.2025.128394', 'chenHyperspectralBandSelectionNLOS2025'),
+              ('CMFormer: Non-line-of-sight imaging with a memory-efficient MetaFormer network', '10.1016/j.optlaseng.2025.108875', 'zhangCMFormerNLOS2025'),
+          ]
+          readme = Path('README.md').read_text(encoding='utf-8').lower()
+          index = Path('index.html').read_text(encoding='utf-8').lower()
+          passive = Path('article/3passive.tex').read_text(encoding='utf-8')
+          learning = Path('article/4datadriven.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8').lower()
+          for title, doi, key in papers:
+              assert readme.count(title.lower()) == 1, title
+              assert index.count(title.lower()) == 1, title
+              assert bib.count(doi.lower()) == 1, doi
+              assert ('{' + key.lower() + ',') in bib, key
+          for key in [p[2] for p in papers[:5]]:
+              assert key in passive, key
+          assert 'fuPhysicsEnhancedWhiteLightNLOS2025' in learning
+          assert 'zhangCMFormerNLOS2025' in learning
+          assert 'laiHoloRadar2025' not in passive.split('Hyperspectral and Multispectral Cameras', 1)[1].split('Physical model', 1)[0]
+          print('Source coverage and stale-citation validation passed.')
+          PY
+
+      - name: Clean-build survey
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate PDF integrity and rendered pages
+        run: |
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          ! grep -Eq 'Citation .* undefined|There were undefined citations|multiply defined|There were undefined references' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages" && test "$pages" -gt 0
+          pdftotext bare_jrnl.pdf /tmp/survey.txt
+          test -s /tmp/survey.txt
+          grep -Fqi 'CMFormer' /tmp/survey.txt
+          grep -Fqi 'White-light and single-shot speckle correlation' /tmp/survey.txt
+          mkdir -p /tmp/rendered
+          pdftoppm -f 1 -l 1 -png -r 120 bare_jrnl.pdf /tmp/rendered/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -l "$pages" -png -r 120 bare_jrnl.pdf /tmp/rendered/last >/dev/null 2>&1
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          files = sorted(Path('/tmp/rendered').glob('*.png'))
+          assert len(files) == 2, files
+          for path in files:
+              data = path.read_bytes()
+              assert data[:8] == b'\x89PNG\r\n\x1a\n', path
+              width, height = struct.unpack('>II', data[16:24])
+              assert width > 500 and height > 500
+              assert len(data) > 10000
+          PY
+
+      - name: Commit synchronized sources and regenerated PDF to PR branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/3passive.tex article/4datadriven.tex \
+            bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf
+          if git diff --cached --quiet; then
+            echo 'No source or PDF changes were needed.'
+            exit 0
+          fi
+          git commit -m 'Stage spectral passive and memory-efficient NLOS lineage [skip ci]'
+          git push origin HEAD:automation/spectral-speckle-metaformer-20260726
