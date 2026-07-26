@@ -37,6 +37,21 @@ jobs:
           python3 scripts/run_visapp2026_passive_nlos.py
           python3 -m py_compile scripts/integrate_visapp2026_passive_nlos.py scripts/run_visapp2026_passive_nlos.py
 
+      - name: Add bookmark compatibility shim for current TeX Live
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('bare_jrnl.tex')
+          text = path.read_text(encoding='utf-8')
+          shim = "\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          if shim not in text:
+              anchor = "\\usepackage{hyperref}\n"
+              if text.count(anchor) != 1:
+                  raise RuntimeError('hyperref package anchor is not unique')
+              text = text.replace(anchor, anchor + shim, 1)
+              path.write_text(text, encoding='utf-8')
+          PY
+
       - name: Clean generated LaTeX files
         run: rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.fdb_latexmk bare_jrnl.fls bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
 
