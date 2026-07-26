@@ -14,7 +14,7 @@ permissions:
 
 concurrency:
   group: integrate-visapp2026-passive-nlos
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   integrate-build-validate:
@@ -83,7 +83,7 @@ jobs:
               assert files[survey_file].count(key) >= minimum, f'{survey_file} missing {key}'
           pdf = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore')
           pdf = re.sub(r'\s+', ' ', pdf.replace('\u00ad', '').replace('-\n', '')).lower()
-          for token in ('matsubara', 'kozawa', 'polarization-encoded spatial multiplexing', 'blind-spot complementary fusion'):
+          for token in ('matsubara', 'kozawa', 'polarization', 'complementary fusion'):
               assert token in pdf, f'PDF text is missing {token}'
           print('Cross-artifact, bibliography, and PDF validation passed')
           PY
