@@ -60,6 +60,15 @@ Chen~\etal~extended passive NLOS pedestrian imaging to long-wave infrared sensin
 \noindent \textbf{Dual-spectral passive NLOS at the edge.}
 Shi~\etal~combined synchronized visible and long-wave-infrared relay observations with attention-based dual-branch fusion and INT8 inference~\cite{shiDualSpectralEdgeNLOS2026}. The CPU-oriented implementation reports 78.4~ms latency and sub-10~W power on an embedded Jetson platform. Although the conference study emphasizes deployment rather than a new light-transport inverse, it marks a useful systems trajectory: complementary spectral cues can be fused under strict latency and energy constraints instead of assuming a laboratory GPU and a single sensing band.
 
+
+\vspace{0.8mm}
+\noindent \textbf{Joint hidden thermal-source and environment recovery.}
+Most passive thermal NLOS methods assume that the relay geometry or its transport parameters are calibrated before reconstruction. Matsubara~\etal~instead represent a moving hidden infrared emitter as a set of three-dimensional luminous points and jointly optimize those points with unknown scene parameters from wall- and floor-reflected far-infrared images~\cite{matsubaraJointThermalNLOS2026}. A reprojection loss supplies self-supervision on real measurements, while synthetic scenes provide supervised geometric guidance. This work extends thermal NLOS from reconstructing through a learned but fixed relay model toward inverse rendering in which the hidden target and its environment are recovered together.
+
+\vspace{0.8mm}
+\noindent \textbf{Specular vehicle bodies as opportunistic NLOS mirrors.}
+Kozawa~\etal~use reflections on curved vehicle bodies to detect pedestrians hidden from an in-vehicle camera and estimate their three-dimensional road positions~\cite{kozawaVehicleReflectionNLOS2026}. A temporal detector first identifies strongly distorted human reflections; monocular depth supplies the reflection point and local surface normal, and a specular-reflection loss constrains the predicted hidden position to the physically valid reflected ray. Unlike diffuse-wall computational periscopy, this setting exploits uncontrolled glossy objects already present in traffic. The output is task-oriented passive NLOS localization rather than a complete hidden image or surface reconstruction.
+
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Interferometer}
 \subsubsection{Interferometer}
 Considering the limitations of intensity information, some studies employ interferometry to obtain phase information and use coherence to solve it, as illustrated in Tab.~\ref{tab:passive}. 
@@ -96,6 +105,8 @@ Passive methods based on speckle coherence have a special imaging model and reco
    Ref & Illumination & Sensor & Information and constraints & Task\\ %%%% Table body
    \hline
 
+   \cite{matsubaraJointThermalNLOS2026} & Hidden-object far-infrared emission & Thermal camera & Reprojection consistency; jointly estimated scene parameters; synthetic supervision & 3D reconstruction\\
+   \cite{kozawaVehicleReflectionNLOS2026} & Ambient visible illumination & In-vehicle RGB camera & Curved specular vehicle relay; monocular depth and reflection geometry & 3D localization\\
    \cite{boger-lombardPassiveOpticalTimeofflight2019} & Incoherent light source (object side) & Conventional camera & Temporal coherence &  Detection/ Tracking/ Identification\\%%%% Table body
    \cite{katz2014non} & Incoherent light source (object side) & Conventional camera & Speckle coherence &  2D reconstruction\\%%%% Table body
     \cite{zhouWhiteLightSpeckleNLOS2024,fuPhysicsEnhancedWhiteLightNLOS2025,zhouSingleShotSpeckleNLOS2025} & White light / coherent speckle & Conventional camera & Speckle statistics with physics-enhanced or single-shot inversion & 2D reconstruction\\%%%% Table body
