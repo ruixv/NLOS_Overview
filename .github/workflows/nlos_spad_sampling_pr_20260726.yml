@@ -63,7 +63,7 @@ jobs:
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
 
-      - name: Validate rebuilt PDF container and source synchronization
+      - name: Validate rebuilt PDF container and updater idempotence
         shell: bash
         run: |
           set -euo pipefail
@@ -73,9 +73,17 @@ jobs:
           test -n "$pages" && test "$pages" -gt 0
           pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
           test -s /tmp/bare_jrnl.txt
+          mkdir -p /tmp/nlos-source-snapshot/article
+          cp README.md index.html bare_jrnl.tex egbib_merged_20260711.bib /tmp/nlos-source-snapshot/
+          cp article/2active.tex article/0abstract.tex /tmp/nlos-source-snapshot/article/
           python tools/run_spad_sampling_integration_20260726.py
           python tools/synchronize_nlos_counts_20260726.py
-          git diff --exit-code -- README.md index.html article/2active.tex article/0abstract.tex bare_jrnl.tex egbib_merged_20260711.bib
+          cmp README.md /tmp/nlos-source-snapshot/README.md
+          cmp index.html /tmp/nlos-source-snapshot/index.html
+          cmp bare_jrnl.tex /tmp/nlos-source-snapshot/bare_jrnl.tex
+          cmp egbib_merged_20260711.bib /tmp/nlos-source-snapshot/egbib_merged_20260711.bib
+          cmp article/2active.tex /tmp/nlos-source-snapshot/article/2active.tex
+          cmp article/0abstract.tex /tmp/nlos-source-snapshot/article/0abstract.tex
 
       - name: Commit updates to pull-request branch
         shell: bash
