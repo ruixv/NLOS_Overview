@@ -4,6 +4,7 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+# Integration retry: 26 July 2026, after the SPAD timing/sampling batch merged.
 HERE = Path(__file__).resolve().parent
 SPEC = importlib.util.spec_from_file_location(
     "visapp_integrator", HERE / "integrate_visapp2026_passive_nlos.py"
