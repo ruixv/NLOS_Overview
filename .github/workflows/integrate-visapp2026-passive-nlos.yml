@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - scripts/integrate_visapp2026_passive_nlos.py
+      - scripts/integrate_spectral_polarization_nlos_lineage.py
       - scripts/run_visapp2026_passive_nlos.py
       - .github/workflows/integrate-visapp2026-passive-nlos.yml
   pull_request:
@@ -12,6 +13,7 @@ on:
     paths:
       - .github/nlos-july2026-citation-trace-trigger.md
       - scripts/integrate_visapp2026_passive_nlos.py
+      - scripts/integrate_spectral_polarization_nlos_lineage.py
       - scripts/run_visapp2026_passive_nlos.py
       - .github/workflows/integrate-visapp2026-passive-nlos.yml
   workflow_dispatch:
@@ -35,7 +37,7 @@ jobs:
       - name: Apply fail-closed source integration
         run: |
           python3 scripts/run_visapp2026_passive_nlos.py
-          python3 -m py_compile scripts/integrate_visapp2026_passive_nlos.py scripts/run_visapp2026_passive_nlos.py
+          python3 -m py_compile scripts/integrate_visapp2026_passive_nlos.py scripts/integrate_spectral_polarization_nlos_lineage.py scripts/run_visapp2026_passive_nlos.py
 
       - name: Add bookmark compatibility shim for current TeX Live
         run: |
@@ -104,6 +106,8 @@ jobs:
           records = {
               '10.5220/0014435000004084': ('matsubaraJointThermalNLOS2026', 'passive', 2),
               '10.5220/0014434900004084': ('kozawaVehicleReflectionNLOS2026', 'passive', 2),
+              '10.1364/OE.541410': ('weiMultispectralComponentSeparation2024', 'active', 2),
+              '10.1117/12.3093680': ('zhaoPolarizationComponentExtraction2025', 'active', 2),
               '10.1016/j.optlaseng.2026.109602': ('weiPolarizationSpatialMultiplexing2026', 'active', 2),
               '10.3390/s26144615': ('yangMiningRadarLiDARNLOS2026', 'modalities', 1),
           }
@@ -114,7 +118,7 @@ jobs:
               assert files['bib'].count('{' + key + ',') == 1, f'bibliography key mismatch: {key}'
               assert files[survey_file].count(key) >= minimum, f'{survey_file} missing {key}'
           bbl = Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore').lower()
-          for token in ('matsubara', 'kozawa', 'polarization-encoded', 'blind-spot complementary fusion'):
+          for token in ('matsubara', 'kozawa', 'multispectral', 'component extraction', 'polarization-encoded', 'blind-spot complementary fusion'):
               assert token in bbl or token in (files['active'] + files['passive'] + files['modalities']).lower(), f'missing compiled/source token: {token}'
           assert Path('bare_jrnl.pdf').stat().st_size > 100000, 'rebuilt PDF is unexpectedly small'
           print('Cross-artifact, bibliography, and PDF validation passed')
@@ -146,5 +150,5 @@ jobs:
             echo 'No source changes were necessary.'
             exit 0
           fi
-          git commit -m 'Integrate passive VISAPP, polarization, and mining-radar NLOS papers'
+          git commit -m 'Integrate passive, spectral-polarization, and mining-radar NLOS papers'
           git push origin HEAD:master
