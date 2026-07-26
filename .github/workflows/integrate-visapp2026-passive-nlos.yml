@@ -1,4 +1,4 @@
-name: Integrate VISAPP 2026 passive NLOS papers
+name: Integrate July 2026 NLOS citation-trace papers
 
 on:
   push:
@@ -35,6 +35,12 @@ jobs:
       - name: Apply fail-closed source integration
         run: python3 scripts/run_visapp2026_passive_nlos.py
 
+      - name: Verify the integrator is idempotent
+        run: |
+          python3 scripts/run_visapp2026_passive_nlos.py
+          git diff --exit-code -- README.md index.html article/0abstract.tex article/2active.tex \
+            article/3passive.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib
+
       - name: Clean-build survey PDF
         run: |
           rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
@@ -55,21 +61,26 @@ jobs:
           files = {
               'README': Path('README.md').read_text(encoding='utf-8'),
               'website': Path('index.html').read_text(encoding='utf-8'),
-              'survey': Path('article/3passive.tex').read_text(encoding='utf-8'),
+              'active': Path('article/2active.tex').read_text(encoding='utf-8'),
+              'passive': Path('article/3passive.tex').read_text(encoding='utf-8'),
+              'modalities': Path('article/5newscenes.tex').read_text(encoding='utf-8'),
               'bib': Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'),
           }
-          dois = ['10.5220/0014435000004084', '10.5220/0014434900004084']
-          for label in ('README', 'website', 'bib'):
-              for doi in dois:
+          records = {
+              '10.5220/0014435000004084': ('matsubaraJointThermalNLOS2026', 'passive'),
+              '10.5220/0014434900004084': ('kozawaVehicleReflectionNLOS2026', 'passive'),
+              '10.1016/j.optlaseng.2026.109602': ('weiPolarizationSpatialMultiplexing2026', 'active'),
+              '10.3390/s26144615': ('yangMiningRadarLiDARNLOS2026', 'modalities'),
+          }
+          for doi, (key, survey_file) in records.items():
+              for label in ('README', 'website', 'bib'):
                   assert doi in files[label], f'{label} missing {doi}'
-          for doi in dois:
               assert files['bib'].lower().count(doi.lower()) == 2, f'duplicate or incomplete DOI fields: {doi}'
-          for key in ['matsubaraJointThermalNLOS2026', 'kozawaVehicleReflectionNLOS2026']:
-              assert files['bib'].count('@inproceedings{' + key + ',') == 1
-              assert files['survey'].count(key) >= 2
+              assert files['bib'].count('{' + key + ',') == 1, f'bibliography key mismatch: {key}'
+              assert files[survey_file].count(key) >= 2 if survey_file == 'passive' else files[survey_file].count(key) >= 1
           pdf = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore')
           pdf = re.sub(r'\s+', ' ', pdf.replace('\u00ad', '').replace('-\n', '')).lower()
-          for token in ('matsubara', 'kozawa', 'opportunistic nlos mirrors'):
+          for token in ('matsubara', 'kozawa', 'polarization-encoded spatial multiplexing', 'blind-spot complementary fusion'):
               assert token in pdf, f'PDF text is missing {token}'
           print('Cross-artifact, bibliography, and PDF validation passed')
           PY
@@ -78,11 +89,11 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add README.md index.html article/0abstract.tex article/3passive.tex bare_jrnl.tex \
-            egbib_merged_20260711.bib bare_jrnl.pdf
+          git add README.md index.html article/0abstract.tex article/2active.tex article/3passive.tex \
+            article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf
           if git diff --cached --quiet; then
             echo 'No source changes were necessary.'
             exit 0
           fi
-          git commit -m 'Integrate passive thermal and specular-reflection NLOS sensing'
+          git commit -m 'Integrate passive VISAPP, polarization, and mining-radar NLOS papers'
           git push origin HEAD:master
