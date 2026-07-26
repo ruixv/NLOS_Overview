@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - "tools/integrate_spad_sampling_20260726.py"
+      - "tools/run_spad_sampling_integration_20260726.py"
       - "tools/synchronize_nlos_counts_20260726.py"
       - ".github/workflows/nlos_spad_sampling_20260726.yml"
       - ".github/nlos_spad_sampling_20260726.trigger"
@@ -34,7 +35,7 @@ jobs:
 
       - name: Integrate verified records
         run: |
-          python tools/integrate_spad_sampling_20260726.py
+          python tools/run_spad_sampling_integration_20260726.py
           python tools/synchronize_nlos_counts_20260726.py
 
       - name: Install LaTeX and PDF validation tools
@@ -76,7 +77,7 @@ jobs:
 
       - name: Verify updater is idempotent
         run: |
-          python tools/integrate_spad_sampling_20260726.py
+          python tools/run_spad_sampling_integration_20260726.py
           python tools/synchronize_nlos_counts_20260726.py
           git diff --exit-code -- README.md index.html article/2active.tex article/0abstract.tex bare_jrnl.tex egbib_merged_20260711.bib
 
