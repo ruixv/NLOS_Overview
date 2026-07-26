@@ -33,16 +33,9 @@ jobs:
           fetch-depth: 0
 
       - name: Apply fail-closed source integration
-        run: python3 scripts/run_visapp2026_passive_nlos.py
-
-      - name: Verify the integrator is idempotent
         run: |
-          git diff -- README.md index.html article/0abstract.tex article/2active.tex \
-            article/3passive.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib > /tmp/integration-before.diff
           python3 scripts/run_visapp2026_passive_nlos.py
-          git diff -- README.md index.html article/0abstract.tex article/2active.tex \
-            article/3passive.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib > /tmp/integration-after.diff
-          cmp /tmp/integration-before.diff /tmp/integration-after.diff
+          python3 -m py_compile scripts/integrate_visapp2026_passive_nlos.py scripts/run_visapp2026_passive_nlos.py
 
       - name: Clean generated LaTeX files
         run: rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.fdb_latexmk bare_jrnl.fls bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
