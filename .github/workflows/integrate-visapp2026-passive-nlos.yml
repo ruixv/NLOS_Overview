@@ -37,9 +37,12 @@ jobs:
 
       - name: Verify the integrator is idempotent
         run: |
+          git diff -- README.md index.html article/0abstract.tex article/2active.tex \
+            article/3passive.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib > /tmp/integration-before.diff
           python3 scripts/run_visapp2026_passive_nlos.py
-          git diff --exit-code -- README.md index.html article/0abstract.tex article/2active.tex \
-            article/3passive.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib
+          git diff -- README.md index.html article/0abstract.tex article/2active.tex \
+            article/3passive.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib > /tmp/integration-after.diff
+          cmp /tmp/integration-before.diff /tmp/integration-after.diff
 
       - name: Clean-build survey PDF
         run: |
@@ -67,17 +70,17 @@ jobs:
               'bib': Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'),
           }
           records = {
-              '10.5220/0014435000004084': ('matsubaraJointThermalNLOS2026', 'passive'),
-              '10.5220/0014434900004084': ('kozawaVehicleReflectionNLOS2026', 'passive'),
-              '10.1016/j.optlaseng.2026.109602': ('weiPolarizationSpatialMultiplexing2026', 'active'),
-              '10.3390/s26144615': ('yangMiningRadarLiDARNLOS2026', 'modalities'),
+              '10.5220/0014435000004084': ('matsubaraJointThermalNLOS2026', 'passive', 2),
+              '10.5220/0014434900004084': ('kozawaVehicleReflectionNLOS2026', 'passive', 2),
+              '10.1016/j.optlaseng.2026.109602': ('weiPolarizationSpatialMultiplexing2026', 'active', 2),
+              '10.3390/s26144615': ('yangMiningRadarLiDARNLOS2026', 'modalities', 1),
           }
-          for doi, (key, survey_file) in records.items():
+          for doi, (key, survey_file, minimum) in records.items():
               for label in ('README', 'website', 'bib'):
                   assert doi in files[label], f'{label} missing {doi}'
               assert files['bib'].lower().count(doi.lower()) == 2, f'duplicate or incomplete DOI fields: {doi}'
               assert files['bib'].count('{' + key + ',') == 1, f'bibliography key mismatch: {key}'
-              assert files[survey_file].count(key) >= 2 if survey_file == 'passive' else files[survey_file].count(key) >= 1
+              assert files[survey_file].count(key) >= minimum, f'{survey_file} missing {key}'
           pdf = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore')
           pdf = re.sub(r'\s+', ' ', pdf.replace('\u00ad', '').replace('-\n', '')).lower()
           for token in ('matsubara', 'kozawa', 'polarization-encoded spatial multiplexing', 'blind-spot complementary fusion'):
