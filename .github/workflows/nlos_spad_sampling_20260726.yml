@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - "tools/integrate_spad_sampling_20260726.py"
+      - "tools/synchronize_nlos_counts_20260726.py"
       - ".github/workflows/nlos_spad_sampling_20260726.yml"
       - ".github/nlos_spad_sampling_20260726.trigger"
   workflow_dispatch:
@@ -32,7 +33,9 @@ jobs:
           python-version: "3.12"
 
       - name: Integrate verified records
-        run: python tools/integrate_spad_sampling_20260726.py
+        run: |
+          python tools/integrate_spad_sampling_20260726.py
+          python tools/synchronize_nlos_counts_20260726.py
 
       - name: Install LaTeX and PDF validation tools
         run: |
@@ -67,10 +70,14 @@ jobs:
           grep -Fiq "10.1364/OE.584776" egbib_merged_20260711.bib
           grep -Fiq "10.1117/12.3091668" egbib_merged_20260711.bib
           grep -Fiq "10.1117/12.3094245" egbib_merged_20260711.bib
+          grep -Fq "Papers-210+-green" README.md
+          grep -Fq "210+ papers" article/0abstract.tex
+          grep -Fq "210+ papers" index.html
 
       - name: Verify updater is idempotent
         run: |
           python tools/integrate_spad_sampling_20260726.py
+          python tools/synchronize_nlos_counts_20260726.py
           git diff --exit-code -- README.md index.html article/2active.tex article/0abstract.tex bare_jrnl.tex egbib_merged_20260711.bib
 
       - name: Commit synchronized public artifacts and rebuilt PDF
