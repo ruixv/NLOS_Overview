@@ -1,0 +1,46 @@
+name: Diagnose SPAD timing and low-sampling integration
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".github/nlos_spad_sampling_diag_20260726.trigger"
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run integration and persist complete diagnostics
+        shell: bash
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set +e
+          {
+            echo "=== main synchronizer ==="
+            python tools/integrate_spad_sampling_20260726.py
+            echo "main_status=$?"
+            echo "=== count synchronizer ==="
+            python tools/synchronize_nlos_counts_20260726.py
+            echo "count_status=$?"
+            echo "=== git status ==="
+            git status --short
+          } > .github/nlos_spad_sampling_20260726.diagnostic.log 2>&1
+          cat .github/nlos_spad_sampling_20260726.diagnostic.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/nlos_spad_sampling_20260726.diagnostic.log
+          git commit -m "Record SPAD sampling synchronizer diagnostic" || true
+          git push origin HEAD:"$HEAD_BRANCH"
+          exit 0
