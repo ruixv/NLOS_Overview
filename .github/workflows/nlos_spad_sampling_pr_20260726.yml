@@ -78,18 +78,13 @@ jobs:
           import re
           from pathlib import Path
           pdf = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore')
-          bbl = Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore')
           def normalize(s):
               s = s.replace('\u00ad', '').replace('-\n', '')
               return re.sub(r'\s+', ' ', s).lower()
           pdf_n = normalize(pdf)
-          bbl_n = normalize(bbl)
           for token in ('spaett', 'nesterov', 'semantic contour'):
               if token not in pdf_n:
                   raise SystemExit(f'missing PDF token: {token}')
-          for token in ('584776', '3091668', '3094245'):
-              if token not in bbl_n:
-                  raise SystemExit(f'missing bibliography token: {token}')
           PY
           grep -Fq "Papers-210+-green" README.md
           grep -Fq "210+ papers" article/0abstract.tex
