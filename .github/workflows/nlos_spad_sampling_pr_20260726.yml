@@ -95,8 +95,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           rm -f .github/nlos_spad_sampling_20260726.failure.log
           git add README.md index.html article/2active.tex article/0abstract.tex \
-                  bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
-                  .github/nlos_spad_sampling_20260726.failure.log
+                  bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf
           if git diff --cached --quiet; then
             echo "No synchronized source or PDF changes were needed."
             exit 0
