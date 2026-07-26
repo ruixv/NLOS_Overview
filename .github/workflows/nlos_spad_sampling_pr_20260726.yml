@@ -27,8 +27,24 @@ jobs:
           python-version: "3.12"
 
       - name: Integrate verified records
+        shell: bash
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
-          python tools/integrate_spad_sampling_20260726.py
+          set +e
+          python tools/integrate_spad_sampling_20260726.py > /tmp/nlos-integration.log 2>&1
+          status=$?
+          cat /tmp/nlos-integration.log
+          if [ "$status" -ne 0 ]; then
+            cp /tmp/nlos-integration.log .github/nlos_spad_sampling_20260726.failure.log
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .github/nlos_spad_sampling_20260726.failure.log
+            git commit -m "Record SPAD sampling integration diagnostic"
+            git push origin HEAD:"$HEAD_BRANCH"
+            exit "$status"
+          fi
+          set -e
           python tools/synchronize_nlos_counts_20260726.py
 
       - name: Install LaTeX and PDF validation tools
@@ -79,8 +95,10 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/nlos_spad_sampling_20260726.failure.log
           git add README.md index.html article/2active.tex article/0abstract.tex \
-                  bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf
+                  bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
+                  .github/nlos_spad_sampling_20260726.failure.log
           if git diff --cached --quiet; then
             echo "No synchronized source or PDF changes were needed."
             exit 0
