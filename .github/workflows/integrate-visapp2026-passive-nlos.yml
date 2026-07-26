@@ -7,6 +7,13 @@ on:
       - scripts/integrate_visapp2026_passive_nlos.py
       - scripts/run_visapp2026_passive_nlos.py
       - .github/workflows/integrate-visapp2026-passive-nlos.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - .github/nlos-july2026-citation-trace-trigger.md
+      - scripts/integrate_visapp2026_passive_nlos.py
+      - scripts/run_visapp2026_passive_nlos.py
+      - .github/workflows/integrate-visapp2026-passive-nlos.yml
   workflow_dispatch:
 
 permissions:
