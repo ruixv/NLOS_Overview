@@ -32,7 +32,7 @@ jobs:
           HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           set +e
-          python tools/integrate_spad_sampling_20260726.py > /tmp/nlos-integration.log 2>&1
+          python tools/run_spad_sampling_integration_20260726.py > /tmp/nlos-integration.log 2>&1
           status=$?
           cat /tmp/nlos-integration.log
           if [ "$status" -ne 0 ]; then
@@ -83,7 +83,7 @@ jobs:
 
       - name: Verify updater is idempotent
         run: |
-          python tools/integrate_spad_sampling_20260726.py
+          python tools/run_spad_sampling_integration_20260726.py
           python tools/synchronize_nlos_counts_20260726.py
           git diff --exit-code -- README.md index.html article/2active.tex article/0abstract.tex bare_jrnl.tex egbib_merged_20260711.bib
 
