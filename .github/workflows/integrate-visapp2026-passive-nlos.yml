@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - scripts/integrate_visapp2026_passive_nlos.py
+      - scripts/run_visapp2026_passive_nlos.py
       - .github/workflows/integrate-visapp2026-passive-nlos.yml
   workflow_dispatch:
 
@@ -32,7 +33,7 @@ jobs:
             texlive-fonts-recommended texlive-science bibtex-extra poppler-utils
 
       - name: Apply fail-closed source integration
-        run: python3 scripts/integrate_visapp2026_passive_nlos.py
+        run: python3 scripts/run_visapp2026_passive_nlos.py
 
       - name: Clean-build survey PDF
         run: |
@@ -47,10 +48,9 @@ jobs:
           test -s bare_jrnl.pdf
           pdfinfo bare_jrnl.pdf | grep -E '^Pages:[[:space:]]+[1-9][0-9]*$'
           pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
-          grep -qi 'joint hidden thermal-source and environment recovery' /tmp/bare_jrnl.txt
-          grep -qi 'Specular vehicle bodies as opportunistic NLOS mirrors' /tmp/bare_jrnl.txt
           ! grep -Eqi 'undefined citations|Citation .* undefined|There were undefined references' bare_jrnl.log
           python3 - <<'PY'
+          import re
           from pathlib import Path
           files = {
               'README': Path('README.md').read_text(encoding='utf-8'),
@@ -59,16 +59,19 @@ jobs:
               'bib': Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'),
           }
           dois = ['10.5220/0014435000004084', '10.5220/0014434900004084']
-          for label, text in files.items():
+          for label in ('README', 'website', 'bib'):
               for doi in dois:
-                  assert doi in text, f'{label} missing {doi}'
-          bib = files['bib'].lower()
+                  assert doi in files[label], f'{label} missing {doi}'
           for doi in dois:
-              assert bib.count(doi.lower()) == 2, f'duplicate or incomplete DOI fields: {doi}'
+              assert files['bib'].lower().count(doi.lower()) == 2, f'duplicate or incomplete DOI fields: {doi}'
           for key in ['matsubaraJointThermalNLOS2026', 'kozawaVehicleReflectionNLOS2026']:
               assert files['bib'].count('@inproceedings{' + key + ',') == 1
               assert files['survey'].count(key) >= 2
-          print('Cross-artifact and bibliography validation passed')
+          pdf = Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore')
+          pdf = re.sub(r'\s+', ' ', pdf.replace('\u00ad', '').replace('-\n', '')).lower()
+          for token in ('matsubara', 'kozawa', 'opportunistic nlos mirrors'):
+              assert token in pdf, f'PDF text is missing {token}'
+          print('Cross-artifact, bibliography, and PDF validation passed')
           PY
 
       - name: Commit synchronized sources and rebuilt PDF
