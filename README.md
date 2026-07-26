@@ -5,7 +5,7 @@
 **A comprehensive, curated survey of Non-Line-of-Sight Imaging research**
 
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
-[![Papers](https://img.shields.io/badge/Papers-190+-green)]()
+[![Papers](https://img.shields.io/badge/Papers-210+-green)]()
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Last Updated](https://img.shields.io/badge/Last_Updated-July_2026-red)]()
@@ -68,6 +68,9 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | **Fast SPAD-array timing-error correction with time-referencing for non-line-of-sight imaging** | [Optics Express](https://doi.org/10.1364/OE.584776) | Corrects approximately 6% pixel-to-pixel mean-bin-width variation and 0.6% bin-level fluctuation in SPAD-array TCSPC data with a precomputed lookup table, then derives an absolute NLOS time reference from intrinsic diffraction-wave and lens-flare peaks; the calibration sharpens measured non-confocal and simulated confocal reconstructions without an external timing target. |
+| 2026 | **Fast NLOS imaging at low sampling rates based on Poisson modeling** | [Proc. SPIE / AOMATT 2025](https://doi.org/10.1117/12.3091668) | Formulates photon-limited transient inversion with a Poisson likelihood and a GPU-parallel Nesterov proximal-gradient solver; measured 64×64×4096 transients retain strong reconstruction quality at 1.56% sampling with roughly one-second processing per frame. |
+| 2026 | **Semantic-guided under sampling scanning for improving real-time performance of NLOS imaging** | [Proc. SPIE / CITA 2025](https://doi.org/10.1117/12.3094245) | Uses a semantic target contour to restrict the relay-wall scan to one quarter of the original area and then applies neighborhood sparse sampling, reducing density to one fifth while limiting the reported PSNR and SSIM degradation. |
 | 2026 | [Non-Line-of-Sight Target Recognition Method Based on Multi-Scale Feature Fusion](https://doi.org/10.12466/xhcl.2026.03.006) — Zeng et al. | Journal of Signal Processing 2026 | Uses a measured 15 GHz stepped-frequency radar, adaptive multi-scale convolutions and attention to fuse salient multipath and local-scattering cues, classifying four hidden target types with 99.6% accuracy; this is semantic recognition rather than hidden-shape reconstruction. |
 | 2026 | [Multipath Contrastive Learning for Non-line-of-sight Human Activity Recognition Using an Ultrawideband Radar](https://doi.org/10.12000/JR25241) — Zhong et al. | Journal of Radars 2026 (Online First) | MuPhyCoNet treats separated multipath time-frequency views as natural contrastive positives and adds observation/prediction physics constraints; on 19,500 measured UWB-radar spectrograms it reaches 94.32% six-action accuracy with only 10% labels. |
 | 2024 | [Speckle-correlation-based non-line-of-sight imaging under white-light illumination](https://doi.org/10.1016/j.optlastec.2023.110231) — Zhou et al. | Optics & Laser Technology 2024 | ZPF-SCI combines Zernike-polynomial envelope correction with low-pass filtering before speckle autocorrelation and phase retrieval, retaining reconstruction under ambient illumination and camera misalignment with an ordinary camera. |
@@ -351,6 +354,9 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Lai et al.: HoloRadar reconstructs complete LOS/NLOS 3D scenes with one mobile mmWave radar [NeurIPS]
    │     Cai et al.: ACTE-Net and equivariant adaptive-threshold unfolding introduce unsupervised and self-supervised measured mmWave inversion [IEEE TAP / TCI]
 2026 ── Yin et al.: Si-SPAD and phase-congruency regularization enable 200 m all-day active NLOS under 94,314 lx sunlight [Optics and Lasers in Engineering]
+   │     Spaett et al.: per-pixel SPAD-array timing correction and intrinsic LOS-peak time referencing prevent TCSPC aggregation blur in measured NLOS reconstruction [Optics Express]
+   │     Yang et al.: Poisson-likelihood Nesterov optimization approaches direct-method speed at 1.56% measured transient sampling [Proc. SPIE / AOMATT]
+   │     Wang et al.: semantic contours guide relay-wall scan-area and sampling-density reduction for faster active NLOS acquisition [Proc. SPIE / CITA]
 2026 ── Zhao et al.: PICL — SPAD-aware denoising cascaded with self-supervised differentiable-physics reconstruction [JOSA A]
    │     Ye et al.: NLOSFormer — real-time thermal NLOS through rough surfaces with explicit kernel estimation [ACM TOG]
    │     Yin et al.: all-day Si-SPAD NLOS — 200 m reconstruction under 94,314 lx ambient illumination [Optics and Lasers in Engineering]
