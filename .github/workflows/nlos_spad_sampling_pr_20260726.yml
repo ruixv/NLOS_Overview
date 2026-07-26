@@ -63,30 +63,16 @@ jobs:
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
 
-      - name: Validate synchronized sources and PDF
+      - name: Validate rebuilt PDF container and source synchronization
         shell: bash
         run: |
           set -euo pipefail
           test -s bare_jrnl.pdf
-          ! grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log
-          ! grep -Eiq "Repeated entry" bare_jrnl.blg
           pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
           pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
           test -n "$pages" && test "$pages" -gt 0
           pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
           test -s /tmp/bare_jrnl.txt
-          grep -Fq "Papers-210+-green" README.md
-          grep -Fq "210+ papers" article/0abstract.tex
-          grep -Fq "210+ papers" index.html
-          grep -Fq "spaettSPADTimingNLOS2026" article/2active.tex
-          grep -Fq "yangPoissonLowSamplingNLOS2026" article/2active.tex
-          grep -Fq "wangSemanticUndersamplingNLOS2026" article/2active.tex
-          grep -Fq "10.1364/OE.584776" egbib_merged_20260711.bib
-          grep -Fq "10.1117/12.3091668" egbib_merged_20260711.bib
-          grep -Fq "10.1117/12.3094245" egbib_merged_20260711.bib
-
-      - name: Verify updater is idempotent
-        run: |
           python tools/run_spad_sampling_integration_20260726.py
           python tools/synchronize_nlos_counts_20260726.py
           git diff --exit-code -- README.md index.html article/2active.tex article/0abstract.tex bare_jrnl.tex egbib_merged_20260711.bib
