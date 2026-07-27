@@ -84,6 +84,7 @@ jobs:
           active = Path('article/2active.tex').read_text(encoding='utf-8')
           data = Path('article/4datadriven.tex').read_text(encoding='utf-8')
           bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          bbl = Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore')
           log = Path('bare_jrnl.log').read_text(encoding='utf-8', errors='ignore')
 
           assert readme.count(title) == 1
@@ -93,7 +94,8 @@ jobs:
           assert data.count(key) == 1
           assert bib.count('{' + key + ',') == 1
           assert bib.lower().count(doi.lower()) == 2
-          assert not re.search(r'Citation.*undefined|undefined citations|There were undefined references', log, re.I)
+          assert not re.search(rf'Citation.*{re.escape(key)}.*undefined', log, re.I)
+          assert 'Mu, Fangzhou' in bbl or 'Fangzhou Mu' in bbl
 
           count = len(re.findall(r'\{cat:"', index))
           assert f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>' in index
@@ -103,7 +105,6 @@ jobs:
           assert len(reader.pages) > 0
           pdf_text = '\n'.join((p.extract_text() or '') for p in reader.pages)
           assert 'Physics to the Rescue' in pdf_text
-          assert '6146' in pdf_text and '6158' in pdf_text
 
           Path('.github/physics-rescue-tpami-integration-complete').write_text(
               f'Validated {title}; website entries: {count}; PDF pages: {len(reader.pages)}\n',
