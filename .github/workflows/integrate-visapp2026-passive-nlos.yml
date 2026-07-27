@@ -4,17 +4,15 @@ on:
   push:
     branches: [master]
     paths:
-      - scripts/integrate_visapp2026_passive_nlos.py
-      - scripts/integrate_spectral_polarization_nlos_lineage.py
-      - scripts/run_visapp2026_passive_nlos.py
+      - scripts/integrate_ris_nlos_doa.py
+      - scripts/run_ris_nlos_doa.py
       - .github/workflows/integrate-visapp2026-passive-nlos.yml
   pull_request:
     branches: [master]
     paths:
       - .github/nlos-july2026-citation-trace-trigger.md
-      - scripts/integrate_visapp2026_passive_nlos.py
-      - scripts/integrate_spectral_polarization_nlos_lineage.py
-      - scripts/run_visapp2026_passive_nlos.py
+      - scripts/integrate_ris_nlos_doa.py
+      - scripts/run_ris_nlos_doa.py
       - .github/workflows/integrate-visapp2026-passive-nlos.yml
   workflow_dispatch:
 
@@ -22,7 +20,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: integrate-visapp2026-passive-nlos
+  group: integrate-july2026-nlos-citation-trace
   cancel-in-progress: true
 
 jobs:
@@ -34,10 +32,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Apply fail-closed source integration
+      - name: Apply fail-closed RIS source integration
         run: |
-          python3 scripts/run_visapp2026_passive_nlos.py
-          python3 -m py_compile scripts/integrate_visapp2026_passive_nlos.py scripts/integrate_spectral_polarization_nlos_lineage.py scripts/run_visapp2026_passive_nlos.py
+          python3 scripts/run_ris_nlos_doa.py
+          python3 -m py_compile scripts/integrate_ris_nlos_doa.py scripts/run_ris_nlos_doa.py
 
       - name: Add bookmark compatibility shim for current TeX Live
         run: |
@@ -67,25 +65,25 @@ jobs:
           latexmk_use_xelatex: false
           args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
 
-      - name: Preserve failed-build diagnostics on the PR branch
+      - name: Preserve failed-build diagnostics
         if: steps.latex.outcome != 'success'
         run: |
           mkdir -p updates
           {
-            echo '# Combined NLOS survey build failure'
+            echo '# RIS-assisted NLOS survey build failure'
             echo
             echo 'The guarded source transformation completed, but the LaTeX build failed. Tail of bare_jrnl.log follows.'
             echo
             echo '```text'
             if test -f bare_jrnl.log; then tail -n 300 bare_jrnl.log; else echo 'bare_jrnl.log was not generated'; fi
             echo '```'
-          } > updates/2026-07-26_combined_nlos_build_failure.md
-          git diff -- README.md index.html article/0abstract.tex article/2active.tex article/3passive.tex article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib > updates/2026-07-26_combined_nlos_source.diff
+          } > updates/2026-07-27_ris_nlos_build_failure.md
+          git diff -- README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib > updates/2026-07-27_ris_nlos_source.diff
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add updates/2026-07-26_combined_nlos_build_failure.md updates/2026-07-26_combined_nlos_source.diff
-          git commit -m 'Record combined NLOS LaTeX build diagnostics' || true
-          git push origin HEAD:automation/july26-combined-nlos
+          git add updates/2026-07-27_ris_nlos_build_failure.md updates/2026-07-27_ris_nlos_source.diff
+          git commit -m 'Record RIS-assisted NLOS LaTeX build diagnostics' || true
+          git push origin HEAD:automation/july27-ris-nlos-doa
           exit 1
 
       - name: Validate citations, metadata, PDF, and cross-artifact coverage
@@ -98,30 +96,24 @@ jobs:
           files = {
               'README': Path('README.md').read_text(encoding='utf-8'),
               'website': Path('index.html').read_text(encoding='utf-8'),
-              'active': Path('article/2active.tex').read_text(encoding='utf-8'),
-              'passive': Path('article/3passive.tex').read_text(encoding='utf-8'),
               'modalities': Path('article/5newscenes.tex').read_text(encoding='utf-8'),
               'bib': Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'),
           }
           records = {
-              '10.5220/0014435000004084': ('matsubaraJointThermalNLOS2026', 'passive', 2),
-              '10.5220/0014434900004084': ('kozawaVehicleReflectionNLOS2026', 'passive', 2),
-              '10.1364/OE.541410': ('weiMultispectralComponentSeparation2024', 'active', 2),
-              '10.1117/12.3093680': ('zhaoPolarizationComponentExtraction2025', 'active', 2),
-              '10.1016/j.optlaseng.2026.109602': ('weiPolarizationSpatialMultiplexing2026', 'active', 2),
-              '10.3390/s26144615': ('yangMiningRadarLiDARNLOS2026', 'modalities', 1),
+              '10.1016/j.sigpro.2025.109934': 'yuanRISGridlessDoA2025',
+              '10.1016/j.sigpro.2026.110685': 'zhangRISMonostaticDOA2026',
           }
-          for doi, (key, survey_file, minimum) in records.items():
+          for doi, key in records.items():
               for label in ('README', 'website', 'bib'):
                   assert doi in files[label], f'{label} missing {doi}'
               assert files['bib'].lower().count(doi.lower()) == 2, f'duplicate or incomplete DOI fields: {doi}'
               assert files['bib'].count('{' + key + ',') == 1, f'bibliography key mismatch: {key}'
-              assert files[survey_file].count(key) >= minimum, f'{survey_file} missing {key}'
+              assert files['modalities'].count(key) >= 1, f'modalities survey missing {key}'
           bbl = Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore').lower()
-          for token in ('matsubara', 'kozawa', 'multispectral', 'component extraction', 'polarization-encoded', 'blind-spot complementary fusion'):
-              assert token in bbl or token in (files['active'] + files['passive'] + files['modalities']).lower(), f'missing compiled/source token: {token}'
+          for token in ('yuan', 'steering vector decoupling', 'root-music'):
+              assert token in bbl or token in files['modalities'].lower(), f'missing compiled/source token: {token}'
           assert Path('bare_jrnl.pdf').stat().st_size > 100000, 'rebuilt PDF is unexpectedly small'
-          print('Cross-artifact, bibliography, and PDF validation passed')
+          print('RIS cross-artifact, bibliography, and PDF validation passed')
           PY
 
       - name: Render first and last PDF pages for visual preflight
@@ -135,8 +127,6 @@ jobs:
             pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf /tmp/nlos_pdf_render/last
             test -s /tmp/nlos_pdf_render/first.png
             test -s /tmp/nlos_pdf_render/last.png
-          else
-            echo 'Poppler is not preinstalled; source, log, bibliography, and binary-size checks completed.'
           fi
 
       - name: Commit synchronized sources and rebuilt PDF
@@ -144,11 +134,11 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add README.md index.html article/0abstract.tex article/2active.tex article/3passive.tex \
-            article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
+            scripts/integrate_ris_nlos_doa.py scripts/run_ris_nlos_doa.py .github/workflows/integrate-visapp2026-passive-nlos.yml
           if git diff --cached --quiet; then
             echo 'No source changes were necessary.'
             exit 0
           fi
-          git commit -m 'Integrate passive, spectral-polarization, and mining-radar NLOS papers'
+          git commit -m 'Integrate RIS-assisted NLOS direction estimation'
           git push origin HEAD:master
