@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - updates/TRIGGER_2026-07-27_ADAPTIVE_WINDOWING.md
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/TRIGGER_2026-07-27_ADAPTIVE_WINDOWING.md
 
 permissions:
   contents: write
@@ -15,6 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: master
           fetch-depth: 0
 
       - name: Stop cleanly when trigger has already been removed
@@ -161,7 +166,6 @@ Updated README, website explorer and 2025 timeline, active-system table and lite
 
           doi = "10.1364/OE.575419"
           key = "miaoAdaptiveWindowingNLOS2025"
-          title = "Adaptive windowing for photon-efficient non-line-of-sight imaging under high ambient light"
           files = {
               "README": Path("README.md").read_text(encoding="utf-8"),
               "website": Path("index.html").read_text(encoding="utf-8"),
