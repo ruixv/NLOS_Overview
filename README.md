@@ -64,10 +64,12 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 26 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 27 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [Reconfigurable intelligent surface-enabled gridless DoA estimation system for NLoS scenarios](https://doi.org/10.1016/j.sigpro.2025.109934) — Yuan et al. | Signal Processing 2025 | Uses an RIS-created virtual-LOS path, covariance-domain denoising, atomic-norm minimization, and ADMM for gridless multi-target direction estimation with limited receive hardware; numerical validation only. |
+| 2026 | [RIS-aided monostatic radar for NLOS target DOA estimation based on steering vector decoupling](https://doi.org/10.1016/j.sigpro.2026.110685) — Zhang et al. | Signal Processing 2026 | Scans hidden directions with an RIS codebook, decouples the target steering-vector outer product from the composite monostatic echo, and applies Root-MUSIC for NLOS angle estimation; simulation-only, not hidden-shape reconstruction. |
 | 2024 | [Multispectral imaging through scattering media and around corners via spectral component separation](https://doi.org/10.1364/OE.541410) — Wei et al. | Optics Express 2024 | Builds a multispectral-speckle simplex from wavelength-decorrelated components and combines spectral intensity modulation, wavelength-count estimation, vertex-component initialization, constrained non-negative matrix factorization, and phase retrieval. Experiments recover up to six spectral channels and validate multispectral hidden-object imaging around a diffuse corner. |
 | 2025 | [Single-shot multitarget imaging beyond the OME range around the corner through polarization component extraction](https://doi.org/10.1117/12.3093680) — Zhao et al. | Proc. SPIE / OYSS 2025 | Introduces polarization-component extraction for one-shot recovery of multiple around-corner targets located in distinct optical-memory-effect regions. This short conference precursor establishes the polarization-separation idea later generalized into the 2026 spatial-multiplexing journal system. |
 | 2026 | [3D Reconstruction of Hidden Objects from Simultaneous Recovery of Light Source and Environment](https://doi.org/10.5220/0014435000004084) — Matsubara et al. | VISAPP 2026 | Uses far-infrared reflections from walls and floors to reconstruct moving hidden luminous objects while jointly estimating unknown scene parameters. Self-supervised reprojection on real measurements is combined with supervised synthetic training, extending passive thermal NLOS from known calibrated environments toward joint scene-and-target recovery. |
@@ -306,6 +308,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Chen et al.: learned NLOS feature embeddings — a shared physics-aware representation for reconstruction, detection, and recognition [SIGGRAPH Asia / TOG]
    │
 2025 ── Roueinfar & Salmanian: low-cost 808 nm steady-state NIR raster scanning [IEEE ICEE]
+     │     Yuan et al.: RIS-enabled covariance-domain gridless DoA uses atomic-norm recovery and ADMM for simulated multi-target NLOS angular sensing [Signal Processing]
    │     Isogawa et al.: C2NLOS transient sinograms — 1D circular confocal scanning with far fewer measurements [ECCV]
    │     Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
    │
@@ -362,6 +365,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Lai et al.: HoloRadar reconstructs complete LOS/NLOS 3D scenes with one mobile mmWave radar [NeurIPS]
    │     Cai et al.: ACTE-Net and equivariant adaptive-threshold unfolding introduce unsupervised and self-supervised measured mmWave inversion [IEEE TAP / TCI]
 2026 ── Yin et al.: Si-SPAD and phase-congruency regularization enable 200 m all-day active NLOS under 94,314 lx sunlight [Optics and Lasers in Engineering]
+     │     Zhang et al.: monostatic radar--RIS steering-vector decoupling and Root-MUSIC enable simulated NLOS target-angle estimation [Signal Processing]
    │     Matsubara et al.: joint hidden thermal-source and environment recovery combines real-image reprojection with supervised synthetic learning [VISAPP]
    │     Kozawa et al.: curved vehicle bodies become opportunistic mirrors for camera-only hidden-pedestrian 3D localization [VISAPP]
    │     Wei et al.: polarization-encoded spatial multiplexing demultiplexes multiple speckle regions for single-shot around-corner imaging beyond the optical memory-effect range [Optics and Lasers in Engineering]
