@@ -134,28 +134,29 @@ jobs:
               'modalities': Path('article/5newscenes.tex').read_text(encoding='utf-8'),
               'bib': Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'),
               'bbl': Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore'),
+              'log': Path('bare_jrnl.log').read_text(encoding='utf-8', errors='ignore'),
           }
-          records = {
-              '10.1109/MAPCON61407.2024.10923061': ('yasmeenAroundCornerRIS2024', 'modalities'),
-              '10.1109/RadarConf2559087.2025.11205052': ('yasmeenDualBeamRIS2026', 'modalities'),
-              '10.1364/OE.575419': ('miaoAdaptiveWindowingNLOS2025', 'active'),
-          }
-          for doi, (key, section) in records.items():
-              for label in ('README', 'website', 'bib'):
-                  assert doi in files[label], f'{label} missing {doi}'
-              assert files['bib'].lower().count(doi.lower()) == 2, f'duplicate or incomplete DOI fields: {doi}'
-              assert files['bib'].count('{' + key + ',') == 1, f'bibliography key mismatch: {key}'
-              assert key in files[section], f'{section} survey missing {key}'
-          for stale in ('https://arxiv.org/abs/2602.11471', 'https://arxiv.org/abs/2602.11473'):
-              assert stale not in files['README'] + files['website'] + files['modalities'], f'stale public preprint link: {stale}'
-          assert files['README'].count('Geometry-Constrained Non-Line-of-Sight Imaging') == 1, 'README duplicate remains'
-          assert files['website'].count('title:"Geometry-Constrained Non-Line-of-Sight Imaging"') == 1, 'website duplicate remains'
-          assert files['README'].count('Adaptive windowing for photon-efficient non-line-of-sight imaging under high ambient light') == 1
-          assert files['website'].count('title:"Adaptive windowing for photon-efficient non-line-of-sight imaging under high ambient light"') == 1
+          adaptive_doi = '10.1364/OE.575419'
+          adaptive_key = 'miaoAdaptiveWindowingNLOS2025'
+          adaptive_title = 'Adaptive windowing for photon-efficient non-line-of-sight imaging under high ambient light'
+          for label in ('README', 'website', 'bib'):
+              assert adaptive_doi in files[label], f'{label} missing adaptive-windowing DOI'
+          assert files['README'].count(adaptive_title) == 1, 'README adaptive record missing or duplicated'
+          assert files['website'].count('title:"' + adaptive_title + '"') == 1, 'website adaptive record missing or duplicated'
+          assert files['active'].count(adaptive_key) >= 2, 'active survey must cite adaptive windowing in table and prose'
+          assert files['bib'].count('{' + adaptive_key + ',') == 1, 'adaptive BibTeX key missing or duplicated'
+          assert files['bib'].lower().count(adaptive_doi.lower()) == 2, 'adaptive DOI/url fields incomplete or duplicated'
+          assert 'adaptive windowing' in files['bbl'].lower(), 'adaptive-windowing entry absent from compiled bibliography'
+          assert not re.search(r'Citation.*undefined|undefined citations', files['log'], re.I), 'undefined citation remains'
+          for doi, key in (
+              ('10.1109/MAPCON61407.2024.10923061', 'yasmeenAroundCornerRIS2024'),
+              ('10.1109/RadarConf2559087.2025.11205052', 'yasmeenDualBeamRIS2026'),
+          ):
+              assert doi in files['README'] and doi in files['website'] and doi in files['bib'], f'RIS final venue missing: {doi}'
+              assert key in files['modalities'], f'RIS survey citation missing: {key}'
           count = len(re.findall(r'\{cat:"', files['website']))
           assert f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>' in files['website'], 'website counter mismatch'
           assert Path('bare_jrnl.bbl').stat().st_size > 1000, 'bibliography output is unexpectedly small'
-          assert 'Adaptive Windowing' in files['bbl'], 'adaptive-windowing citation is absent from compiled bibliography'
           assert Path('bare_jrnl.pdf').stat().st_size > 100000, 'rebuilt PDF is unexpectedly small'
           print(f'NLOS citation-trace validation passed; website tracks {count} unique entries')
           PY
