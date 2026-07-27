@@ -6,6 +6,7 @@ on:
     paths:
       - updates/TRIGGER_2026-07-28_PHYSICS_RESCUE.md
       - scripts/run_physics_rescue_tpami.py
+      - scripts/run_physics_rescue_tpami_v2.py
       - .github/workflows/integrate_physics_rescue_tpami.yml
   workflow_dispatch:
 
@@ -38,8 +39,8 @@ jobs:
         if: steps.guard.outputs.run == 'true'
         shell: bash
         run: |
-          python3 scripts/run_physics_rescue_tpami.py
-          python3 -m py_compile scripts/run_physics_rescue_tpami.py
+          python3 scripts/run_physics_rescue_tpami_v2.py
+          python3 -m py_compile scripts/run_physics_rescue_tpami.py scripts/run_physics_rescue_tpami_v2.py
           python3 - <<'PY'
           from pathlib import Path
           path = Path('bare_jrnl.tex')
@@ -120,7 +121,7 @@ jobs:
           git add README.md index.html article/2active.tex article/4datadriven.tex bare_jrnl.tex \
             egbib_20260728_physics_rescue.bib egbib_merged_20260711.bib bare_jrnl.pdf \
             updates/2026-07-28-physics-rescue-tpami.md scripts/run_physics_rescue_tpami.py \
-            .github/physics-rescue-tpami-integration-complete
+            scripts/run_physics_rescue_tpami_v2.py .github/physics-rescue-tpami-integration-complete
           git commit -m 'Integrate Physics to the Rescue final TPAMI record'
           target_branch="${GITHUB_HEAD_REF}"
           test -n "$target_branch"
