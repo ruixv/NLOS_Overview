@@ -1,0 +1,120 @@
+name: Integrate adaptive-windowing NLOS paper reliably
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/TRIGGER_2026-07-27_ADAPTIVE_WINDOWING.md
+      - scripts/run_adaptive_windowing_nlos.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: adaptive-windowing-nlos-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Guard completed integration
+        id: guard
+        shell: bash
+        run: |
+          if [[ -f .github/adaptive-windowing-integration-complete ]]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Apply idempotent source synchronization
+        if: steps.guard.outputs.run == 'true'
+        shell: bash
+        run: |
+          python3 scripts/run_ris_nlos_doa.py
+          python3 scripts/run_adaptive_windowing_nlos.py
+          python3 -m py_compile scripts/run_adaptive_windowing_nlos.py
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('bare_jrnl.tex')
+          text = path.read_text(encoding='utf-8')
+          shim = "\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          if shim not in text:
+              anchor = "\\usepackage{hyperref}\n"
+              if text.count(anchor) != 1:
+                  raise RuntimeError('hyperref package anchor is not unique')
+              path.write_text(text.replace(anchor, anchor + shim, 1), encoding='utf-8')
+          PY
+
+      - name: Clean generated files
+        if: steps.guard.outputs.run == 'true'
+        run: rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.fdb_latexmk bare_jrnl.fls bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+
+      - name: Build survey PDF
+        if: steps.guard.outputs.run == 'true'
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Validate source and rendered PDF
+        if: steps.guard.outputs.run == 'true'
+        shell: bash
+        run: |
+          python3 -m pip install --quiet pypdf
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          from pypdf import PdfReader
+
+          title = 'Adaptive windowing for photon-efficient non-line-of-sight imaging under high ambient light'
+          doi = '10.1364/OE.575419'
+          key = 'miaoAdaptiveWindowingNLOS2025'
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          active = Path('article/2active.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          log = Path('bare_jrnl.log').read_text(encoding='utf-8', errors='ignore')
+          assert readme.count(title) == 1
+          assert index.count('title:"' + title + '"') == 1
+          assert doi in readme and doi in index and doi in bib
+          assert active.count(key) >= 2
+          assert bib.count('{' + key + ',') == 1
+          assert not re.search(r'Citation.*undefined|undefined citations', log, re.I)
+          count = len(re.findall(r'\{cat:"', index))
+          assert f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>' in index
+          pdf = Path('bare_jrnl.pdf')
+          assert pdf.stat().st_size > 100000
+          reader = PdfReader(str(pdf))
+          assert len(reader.pages) > 0
+          text = '\n'.join((p.extract_text() or '') for p in reader.pages)
+          assert 'Adaptive photon-arrival windowing' in text
+          Path('.github/adaptive-windowing-integration-complete').write_text(
+              f'Validated {title}; website entries: {count}; PDF pages: {len(reader.pages)}\n',
+              encoding='utf-8',
+          )
+          print(f'Validated adaptive-windowing integration: {count} entries, {len(reader.pages)} PDF pages')
+          PY
+
+      - name: Commit synchronized artifacts to PR branch
+        if: steps.guard.outputs.run == 'true'
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/2active.tex article/5newscenes.tex bare_jrnl.tex \
+            egbib_20260727_adaptive_windowing.bib egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-07-27-adaptive-windowing-nlos.md scripts/run_adaptive_windowing_nlos.py \
+            .github/adaptive-windowing-integration-complete
+          git commit -m 'Integrate adaptive-windowing NLOS under ambient light'
+          target_branch="${GITHUB_HEAD_REF}"
+          test -n "$target_branch"
+          git push origin "HEAD:${target_branch}"
