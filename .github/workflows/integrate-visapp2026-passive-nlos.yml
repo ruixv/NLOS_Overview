@@ -33,11 +33,33 @@ jobs:
           fetch-depth: 0
 
       - name: Apply fail-closed RIS source integration
+        id: integrate
+        continue-on-error: true
         run: |
-          python3 scripts/run_ris_nlos_doa.py
+          set -o pipefail
+          python3 scripts/run_ris_nlos_doa.py 2>&1 | tee /tmp/ris_nlos_integration.log
           python3 -m py_compile scripts/integrate_ris_nlos_doa.py scripts/run_ris_nlos_doa.py
 
+      - name: Preserve source-integration diagnostics
+        if: steps.integrate.outcome != 'success'
+        run: |
+          mkdir -p updates
+          {
+            echo '# RIS-assisted NLOS source-integration failure'
+            echo
+            echo '```text'
+            cat /tmp/ris_nlos_integration.log
+            echo '```'
+          } > updates/2026-07-27_ris_nlos_integration_failure.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add updates/2026-07-27_ris_nlos_integration_failure.md
+          git commit -m 'Record RIS-assisted NLOS integration diagnostics' || true
+          git push origin HEAD:automation/july27-ris-nlos-doa
+          exit 1
+
       - name: Add bookmark compatibility shim for current TeX Live
+        if: steps.integrate.outcome == 'success'
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -53,9 +75,11 @@ jobs:
           PY
 
       - name: Clean generated LaTeX files
+        if: steps.integrate.outcome == 'success'
         run: rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.fdb_latexmk bare_jrnl.fls bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
 
       - name: Build survey with TeX Live container
+        if: steps.integrate.outcome == 'success'
         id: latex
         continue-on-error: true
         uses: xu-cheng/latex-action@v3
@@ -66,7 +90,7 @@ jobs:
           args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
 
       - name: Preserve failed-build diagnostics
-        if: steps.latex.outcome != 'success'
+        if: steps.integrate.outcome == 'success' && steps.latex.outcome != 'success'
         run: |
           mkdir -p updates
           {
