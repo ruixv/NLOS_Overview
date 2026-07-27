@@ -38,4 +38,12 @@ lineage.patch_bib()
 lineage.patch_master()
 lineage.validate()
 
+ris = load_module("ris_nlos_doa_integrator", "integrate_ris_nlos_doa.py")
+ris.patch_readme()
+ris.patch_index()
+ris.patch_modalities()
+ris.patch_bib()
+ris.patch_master()
+ris.validate()
+
 print("Combined July 2026 NLOS citation-trace integration completed and validated")
