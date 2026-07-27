@@ -160,7 +160,7 @@ Cui~\etal~proposed Virtual Scanning~\cite{cuiVirtualScanning2024}, an unsupervis
 
 \vspace{0.8mm}
 \noindent \textbf{Aperture-limited diffusion and physics-guided high-speed reconstruction.}
-TransDiff~\cite{cuiTransDiffTIP2025} extends unsupervised transient completion to aperture-limited relay surfaces using a latent diffusion prior constrained by the measured transients. In parallel, Physics to the Rescue~\cite{muPhysicsRescueTPAMI2025} embeds wave-propagation and volume-rendering priors into a neural reconstruction pipeline, improving robustness when high-speed acquisition requires approximate light-transport models. Together, these methods mark a shift from purely data-driven inversion toward learned solvers whose latent completion is explicitly checked against transient physics.
+TransDiff~\cite{cuiTransDiffTIP2025} extends unsupervised transient completion to aperture-limited relay surfaces using a latent diffusion prior constrained by the measured transients. In parallel, Physics to the Rescue~\cite{muPhysicsRescueTPAMI2025} embeds complementary wave-propagation and volume-rendering priors into a feed-forward reconstruction model, improving robustness when a 5~Hz non-confocal acquisition system requires approximate light transport. Its flexible intensity- or raw-transient supervision and synthetic-to-real intensity/depth inference connect high-speed capture to later physics-constrained neural fields and differentiable transient rendering.
 
 \vspace{0.8mm}
 \noindent \textbf{Untrained network priors.}
