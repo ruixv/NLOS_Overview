@@ -4,14 +4,6 @@ on:
   push:
     branches: [master]
     paths:
-      - scripts/integrate_ris_nlos_doa.py
-      - scripts/run_ris_nlos_doa.py
-      - .github/workflows/integrate-visapp2026-passive-nlos.yml
-  pull_request:
-    branches: [master]
-    paths:
-      - .github/nlos-july2026-citation-trace-trigger.md
-      - scripts/integrate_ris_nlos_doa.py
       - scripts/run_ris_nlos_doa.py
       - .github/workflows/integrate-visapp2026-passive-nlos.yml
   workflow_dispatch:
@@ -32,30 +24,30 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Apply fail-closed RIS source integration
+      - name: Apply fail-closed RIS final-venue correction
         id: integrate
         continue-on-error: true
         run: |
           set -o pipefail
           python3 scripts/run_ris_nlos_doa.py 2>&1 | tee /tmp/ris_nlos_integration.log
-          python3 -m py_compile scripts/integrate_ris_nlos_doa.py scripts/run_ris_nlos_doa.py
+          python3 -m py_compile scripts/run_ris_nlos_doa.py
 
       - name: Preserve source-integration diagnostics
         if: steps.integrate.outcome != 'success'
         run: |
           mkdir -p updates
           {
-            echo '# RIS-assisted NLOS source-integration failure'
+            echo '# RIS final-venue source-integration failure'
             echo
             echo '```text'
             cat /tmp/ris_nlos_integration.log
             echo '```'
-          } > updates/2026-07-27_ris_nlos_integration_failure.md
+          } > updates/2026-07-27_ris_final_venue_failure.md
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add updates/2026-07-27_ris_nlos_integration_failure.md
-          git commit -m 'Record RIS-assisted NLOS integration diagnostics' || true
-          git push origin HEAD:automation/july27-ris-nlos-doa
+          git add updates/2026-07-27_ris_final_venue_failure.md
+          git commit -m 'Record RIS final-venue integration diagnostics' || true
+          git push origin HEAD:automation/july27-ris-final-venues
           exit 1
 
       - name: Add bookmark compatibility shim for current TeX Live
@@ -94,46 +86,58 @@ jobs:
         run: |
           mkdir -p updates
           {
-            echo '# RIS-assisted NLOS survey build failure'
+            echo '# RIS final-venue survey build failure'
             echo
-            echo 'The guarded source transformation completed, but the LaTeX build failed. Tail of bare_jrnl.log follows.'
+            echo 'The source transformation completed, but the LaTeX build failed.'
             echo
             echo '```text'
             if test -f bare_jrnl.log; then tail -n 300 bare_jrnl.log; else echo 'bare_jrnl.log was not generated'; fi
             echo '```'
-          } > updates/2026-07-27_ris_nlos_build_failure.md
-          git diff -- README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib > updates/2026-07-27_ris_nlos_source.diff
+          } > updates/2026-07-27_ris_final_venue_build_failure.md
+          git diff -- README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib > updates/2026-07-27_ris_final_venue_source.diff
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add updates/2026-07-27_ris_nlos_build_failure.md updates/2026-07-27_ris_nlos_source.diff
-          git commit -m 'Record RIS-assisted NLOS LaTeX build diagnostics' || true
-          git push origin HEAD:automation/july27-ris-nlos-doa
+          git add updates/2026-07-27_ris_final_venue_build_failure.md updates/2026-07-27_ris_final_venue_source.diff
+          git commit -m 'Record RIS final-venue LaTeX build diagnostics' || true
+          git push origin HEAD:automation/july27-ris-final-venues
           exit 1
 
-      - name: Validate metadata, rebuilt PDF, and cross-artifact coverage
+      - name: Validate metadata, citations, PDF, and cross-artifact coverage
         if: steps.latex.outcome == 'success'
         run: |
           test -s bare_jrnl.pdf
           python3 - <<'PY'
+          import re
           from pathlib import Path
           files = {
               'README': Path('README.md').read_text(encoding='utf-8'),
               'website': Path('index.html').read_text(encoding='utf-8'),
               'modalities': Path('article/5newscenes.tex').read_text(encoding='utf-8'),
               'bib': Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'),
+              'bbl': Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore'),
+              'log': Path('bare_jrnl.log').read_text(encoding='utf-8', errors='ignore'),
           }
           records = {
-              '10.1016/j.sigpro.2025.109934': 'yuanRISGridlessDoA2025',
-              '10.1016/j.sigpro.2026.110685': 'zhangRISMonostaticDOA2026',
+              '10.1109/MAPCON61407.2024.10923061': 'yasmeenAroundCornerRIS2024',
+              '10.1109/RadarConf2559087.2025.11205052': 'yasmeenDualBeamRIS2026',
           }
           for doi, key in records.items():
               for label in ('README', 'website', 'bib'):
                   assert doi in files[label], f'{label} missing {doi}'
               assert files['bib'].lower().count(doi.lower()) == 2, f'duplicate or incomplete DOI fields: {doi}'
               assert files['bib'].count('{' + key + ',') == 1, f'bibliography key mismatch: {key}'
-              assert files['modalities'].count(key) >= 1, f'modalities survey missing {key}'
-          assert Path('bare_jrnl.pdf').stat().st_size > 100000, 'rebuilt PDF is unexpectedly small'
-          print('RIS cross-artifact, bibliography, and PDF validation passed')
+              assert key in files['modalities'], f'modalities survey missing {key}'
+          for stale in ('https://arxiv.org/abs/2602.11471', 'https://arxiv.org/abs/2602.11473'):
+              assert stale not in files['README'] + files['website'] + files['modalities'], f'stale public preprint link: {stale}'
+          assert files['README'].count('Geometry-Constrained Non-Line-of-Sight Imaging') == 1
+          assert files['website'].count('title:"Geometry-Constrained Non-Line-of-Sight Imaging"') == 1
+          count = len(re.findall(r'\{cat:"', files['website']))
+          assert f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>' in files['website']
+          assert 'Around-the-Corner Radar Sensing' in files['bbl']
+          assert 'Dual-Beam Reconfigurable Intelligent Surface' in files['bbl']
+          assert not re.search(r'Citation.*undefined|undefined citations', files['log'], re.I)
+          assert Path('bare_jrnl.pdf').stat().st_size > 100000
+          print(f'RIS final-venue validation passed; website tracks {count} unique entries')
           PY
 
       - name: Render first and last PDF pages for visual preflight
@@ -154,11 +158,10 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
-            scripts/integrate_ris_nlos_doa.py scripts/run_ris_nlos_doa.py .github/workflows/integrate-visapp2026-passive-nlos.yml
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf scripts/run_ris_nlos_doa.py .github/workflows/integrate-visapp2026-passive-nlos.yml
           if git diff --cached --quiet; then
             echo 'No source changes were necessary.'
             exit 0
           fi
-          git commit -m 'Integrate RIS-assisted NLOS direction estimation'
+          git commit -m 'Correct RIS radar papers to final IEEE venues'
           git push origin HEAD:master
