@@ -6,6 +6,12 @@ on:
     paths:
       - scripts/run_ris_nlos_doa.py
       - .github/workflows/integrate-visapp2026-passive-nlos.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - .github/nlos-ris-final-venue-trigger.md
+      - scripts/run_ris_nlos_doa.py
+      - .github/workflows/integrate-visapp2026-passive-nlos.yml
   workflow_dispatch:
 
 permissions:
@@ -164,4 +170,5 @@ jobs:
             exit 0
           fi
           git commit -m 'Correct RIS radar papers to final IEEE venues'
-          git push origin HEAD:master
+          target_branch="${GITHUB_HEAD_REF:-master}"
+          git push origin "HEAD:${target_branch}"
