@@ -19,7 +19,7 @@ KEY = "miaoAdaptiveWindowingNLOS2025"
 
 BIB_ENTRY = r"""@article{miaoAdaptiveWindowingNLOS2025,
   author = {Miao, Jinye and Cai, Fuyao and Qin, Taotao and Bai, Lianfa and Guo, Enlai and Shi, Yingjie and Han, Jing},
-  title = {Adaptive Windowing for Photon-Efficient Non-Line-of-Sight Imaging under High Ambient Light},
+  title = {{Adaptive Windowing} for Photon-Efficient Non-Line-of-Sight Imaging under High Ambient Light},
   journal = {Optics Express},
   volume = {33},
   number = {21},
@@ -114,6 +114,7 @@ def patch_bibliography() -> None:
         source = SOURCE_BIB.read_text(encoding="utf-8")
         if KEY not in source or DOI not in source:
             die("dated bibliography supplement conflicts with the verified record")
+        SOURCE_BIB.write_text(BIB_ENTRY, encoding="utf-8")
     else:
         SOURCE_BIB.write_text(BIB_ENTRY, encoding="utf-8")
 
