@@ -64,10 +64,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 27 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 28 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [Physics to the Rescue: Deep Non-Line-of-Sight Reconstruction for High-Speed Imaging](https://doi.org/10.1109/TPAMI.2022.3203383) — Mu et al. | IEEE TPAMI 2025 | Embeds complementary wave-propagation and volume-rendering priors in a feed-forward model for high-speed non-confocal transient NLOS. The model is trained on synthetic data with intensity or raw-transient supervision, generalizes to measured captures, and reconstructs intensity and depth at more than 5 captures per second. |
 | 2025 | [Reconfigurable intelligent surface-enabled gridless DoA estimation system for NLoS scenarios](https://doi.org/10.1016/j.sigpro.2025.109934) — Yuan et al. | Signal Processing 2025 | Uses an RIS-created virtual-LOS path, covariance-domain denoising, atomic-norm minimization, and ADMM for gridless multi-target direction estimation with limited receive hardware; numerical validation only. |
 | 2026 | [RIS-aided monostatic radar for NLOS target DOA estimation based on steering vector decoupling](https://doi.org/10.1016/j.sigpro.2026.110685) — Zhang et al. | Signal Processing 2026 | Scans hidden directions with an RIS codebook, decouples the target steering-vector outer product from the composite monostatic echo, and applies Root-MUSIC for NLOS angle estimation; simulation-only, not hidden-shape reconstruction. |
 | 2024 | [Multispectral imaging through scattering media and around corners via spectral component separation](https://doi.org/10.1364/OE.541410) — Wei et al. | Optics Express 2024 | Builds a multispectral-speckle simplex from wavelength-decorrelated components and combines spectral intensity modulation, wavelength-count estimation, vertex-component initialization, constrained non-negative matrix factorization, and phase retrieval. Experiments recover up to six spectral channels and validate multispectral hidden-object imaging around a diffuse corner. |
@@ -365,6 +366,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Lai et al.: HoloRadar reconstructs complete LOS/NLOS 3D scenes with one mobile mmWave radar [NeurIPS]
    │     Cai et al.: ACTE-Net and equivariant adaptive-threshold unfolding introduce unsupervised and self-supervised measured mmWave inversion [IEEE TAP / TCI]
    │     Miao et al.: adaptive photon-arrival windowing suppresses overwhelming daylight background before TV-regularized transient reconstruction [Optics Express]
+   │     Mu et al.: wave-propagation and volume-rendering priors enable feed-forward high-speed non-confocal NLOS reconstruction [IEEE TPAMI]
 2026 ── Yin et al.: Si-SPAD and phase-congruency regularization enable 200 m all-day active NLOS under 94,314 lx sunlight [Optics and Lasers in Engineering]
      │     Zhang et al.: monostatic radar--RIS steering-vector decoupling and Root-MUSIC enable simulated NLOS target-angle estimation [Signal Processing]
    │     Matsubara et al.: joint hidden thermal-source and environment recovery combines real-image reprojection with supervised synthetic learning [VISAPP]
