@@ -70,4 +70,4 @@ Add a trace marker near the existing July 2026 integration comments, compile wit
 
 ## Current repository state
 
-The DOI-verified bibliography supplement and this precise integration note are committed. The repository also contains a previously staged single-paper integration workflow for the 2026 IATSS paper, but no subsequent source/PDF integration commit was visible at the end of this run. Therefore README, index.html, the consolidated bibliography, survey source, and `bare_jrnl.pdf` are **not claimed as synchronized yet**. Large public files were not overwritten from a stale or partial snapshot.
+README, the website explorer and timeline, passive-survey prose, and the consolidated bibliography are now synchronized for all four records. PDF compilation is staged separately and is not claimed by this source-integration commit.
