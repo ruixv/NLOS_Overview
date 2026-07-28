@@ -15,3 +15,7 @@ The controlled NLOS experiments combine engineered features from laser and acous
 - Add a trace marker to `bare_jrnl.tex`, compile the survey, verify that the citation resolves in `bare_jrnl.bbl`, and commit the regenerated `bare_jrnl.pdf`.
 
 The guarded workflow commits public-source and PDF changes only after title/DOI uniqueness, website-count, bibliography-key, LaTeX, and PDF checks all pass.
+
+## Integration status
+
+README, website explorer/timeline, acoustic-survey prose, and the consolidated bibliography were synchronized by the guarded workflow. The workflow commits these sources together with the regenerated survey PDF only after the citation resolves and all validation checks pass.
