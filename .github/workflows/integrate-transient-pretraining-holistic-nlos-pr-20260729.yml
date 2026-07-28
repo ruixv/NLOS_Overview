@@ -56,12 +56,9 @@ jobs:
           test "$(grep -F -c 'Real-Time and High-Fidelity Non-Line-of-Sight Imaging' index.html)" -eq 1
           test "$(grep -F -c 'MARMOT: Masked Autoencoder for Modeling Transient Imaging' index.html)" -eq 1
           test "$(grep -F -c 'HOLI-1-to-3: Transient-Enhanced Holistic Image-to-3D Generation' index.html)" -eq 1
-          for doi in \
-            10.21203/rs.3.rs-8336286/v1 \
-            10.48550/arXiv.2506.08470 \
-            10.1109/TPAMI.2024.3463875; do
-            test "$(grep -F -c "$doi" egbib_merged_20260711.bib)" -eq 2
-          done
+          test "$(grep -F -c '10.21203/rs.3.rs-8336286/v1' egbib_merged_20260711.bib)" -eq 2
+          test "$(grep -F -c '10.48550/arXiv.2506.08470' egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -F -c '10.1109/TPAMI.2024.3463875' egbib_merged_20260711.bib)" -eq 2
           for key in jiUnifiedRealTimeNLOS2026 shenMARMOT2025 shenHOLI1to3TPAMI2025; do
             test "$(grep -E -c "^@(article|misc)\\{$key," egbib_merged_20260711.bib)" -eq 1
             grep -F -q "$key" bare_jrnl.aux
