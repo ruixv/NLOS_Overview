@@ -46,7 +46,7 @@ jobs:
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             texlive-latex-base texlive-latex-recommended texlive-latex-extra \
-            texlive-fonts-recommended texlive-science texlive-pictures \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
             ghostscript poppler-utils
 
       - name: Cleanly rebuild survey PDF
@@ -93,6 +93,7 @@ jobs:
           rm -f scripts/run_vector_optics_nlos_20260729_v2.py
           rm -f .github/workflows/integrate-vector-optics-nlos-20260729.yml
           rm -f .github/workflows/integrate-vector-optics-nlos-pr-20260729.yml
+          rm -f .github/workflows/diagnose-vector-optics-build-20260729.yml
           rm -f updates/vector_optics_nlos_20260729.trigger
 
       - name: Commit synchronized sources and rebuilt PDF to master
