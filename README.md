@@ -64,10 +64,13 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 28 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 29 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [Vectorial Digitelligent Optics for High-Resolution Non-Line-of-Sight Imaging](https://doi.org/10.1016/j.eng.2024.11.013) — Guo et al. | Engineering 45, 70–78 (2025) | Jointly optimizes wavefront phase and polarization through a scattering relay wall, then raster-scans the optimized focus inside the optical-memory-effect range. The measured system reaches 0.40 mm resolution at 0.35 m, moving part of high-resolution NLOS inversion into closed-loop physical illumination control. |
+| 2024 | [Vectorial-Optics-Enabled Multi-View Non-Line-of-Sight Imaging with High Signal-to-Noise Ratio](https://doi.org/10.1002/lpor.202300909) — Wang et al. | Laser & Photonics Reviews 18(6), 2300909 (2024) | Uses a vector-optical relay-reflection model to select illumination angle plus incident and received polarization, creating complementary high-SNR views for hidden-object reconstruction and recognition under weak returns. |
+| 2024 | [High-Resolution Non-Line-of-Sight Imaging Based on Liquid Crystal Planar Optical Elements](https://doi.org/10.1515/nanoph-2023-0655) — Zhao et al. | Nanophotonics 13(12), 2161–2172 (2024) | Inserts a liquid-crystal planar angle magnifier to enlarge the effective transient relay-wall aperture; measurement-correlation-aware sparse scanning reduces acquisition time by more than 20% while retaining the demonstrated resolution. |
 | 2026 | [Early fusion of laser and acoustic features for human orientation detection in non-line-of-sight environments](https://doi.org/10.1038/s41598-026-52682-6) — Doğan | Scientific Reports 2026 | Fuses 21 laser-chirp and 21 acoustic-chirp features into a 42-feature representation and evaluates conventional classifiers, LAO-Net, and explainable-AI analysis for four hidden-person orientations in controlled NLOS experiments. This is multimodal semantic NLOS sensing, not hidden-image or 3D-geometry reconstruction. |
 | 2025 | [Physics to the Rescue: Deep Non-Line-of-Sight Reconstruction for High-Speed Imaging](https://doi.org/10.1109/TPAMI.2022.3203383) — Mu et al. | IEEE TPAMI 2025 | Embeds complementary wave-propagation and volume-rendering priors in a feed-forward model for high-speed non-confocal transient NLOS. The model is trained on synthetic data with intensity or raw-transient supervision, generalizes to measured captures, and reconstructs intensity and depth at more than 5 captures per second. |
 | 2025 | [Reconfigurable intelligent surface-enabled gridless DoA estimation system for NLoS scenarios](https://doi.org/10.1016/j.sigpro.2025.109934) — Yuan et al. | Signal Processing 2025 | Uses an RIS-created virtual-LOS path, covariance-domain denoising, atomic-norm minimization, and ADMM for gridless multi-target direction estimation with limited receive hardware; numerical validation only. |
@@ -315,6 +318,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Chen et al.: learned NLOS feature embeddings — a shared physics-aware representation for reconstruction, detection, and recognition [SIGGRAPH Asia / TOG]
    │
 2025 ── Roueinfar & Salmanian: low-cost 808 nm steady-state NIR raster scanning [IEEE ICEE]
+     │     Guo et al.: vectorial digitelligent optics jointly optimizes phase and polarization to refocus through a rough relay wall and attain near-diffraction-limited 0.40-mm NLOS imaging [Engineering]
    │     Oyama and Takatori: painted-surface reflections support semantic NLOS obstacle detection after reflection-aware appearance normalization [IEEE ITSC]
      │     Yuan et al.: RIS-enabled covariance-domain gridless DoA uses atomic-norm recovery and ADMM for simulated multi-target NLOS angular sensing [Signal Processing]
    │     Isogawa et al.: C2NLOS transient sinograms — 1D circular confocal scanning with far fewer measurements [ECCV]
@@ -340,6 +344,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Royo et al.: virtual mirrors — higher-order phasor transport and two-corner NLOS [SIGGRAPH / TOG]
    │
 2024 ── Li et al.: ST-Mamba — state-space temporal modeling and phasor-domain wave supervision for consistent dynamic NLOS video [NeurIPS]
+   │     Zhao et al.: liquid-crystal planar angle magnification enlarges the effective relay aperture while correlation-aware sparse scanning cuts acquisition time [Nanophotonics]
+   │     Wang et al.: vector-optical-field modeling turns illumination angle and polarization into multi-view, low-SNR NLOS measurement degrees of freedom [Laser & Photonics Reviews]
    │     Wei et al.: multispectral speckle component separation recovers up to six wavelength channels and validates spectral hidden-object imaging around corners [Optics Express]
    │     Pueyo-Ciutad et al.: time-gated polarization — picosecond polarimetric transport reduces the missing cone and recovers directionally ambiguous hidden surfaces [SIGGRAPH Asia]
    │     Zhu et al.: computational neuromorphic NLOS tracking — event streams isolate motion-induced speckle changes for direct hidden-target motion estimation [Optics Letters]
