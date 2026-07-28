@@ -27,7 +27,7 @@ jobs:
       - name: Apply guarded source integration
         run: |
           set +e
-          python3 scripts/integrate_vector_optics_nlos_20260729.py > vector_optics_integration.log 2>&1
+          python3 scripts/run_vector_optics_nlos_20260729_v2.py > vector_optics_integration.log 2>&1
           status=$?
           cat vector_optics_integration.log
           exit $status
@@ -90,6 +90,7 @@ jobs:
       - name: Remove one-run integration tooling
         run: |
           rm -f scripts/integrate_vector_optics_nlos_20260729.py
+          rm -f scripts/run_vector_optics_nlos_20260729_v2.py
           rm -f .github/workflows/integrate-vector-optics-nlos-20260729.yml
           rm -f .github/workflows/integrate-vector-optics-nlos-pr-20260729.yml
           rm -f updates/vector_optics_nlos_20260729.trigger
