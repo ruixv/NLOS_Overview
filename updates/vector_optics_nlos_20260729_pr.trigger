@@ -1,1 +1,1 @@
-PR event trigger for the guarded vector and planar optics NLOS integration workflow. Corrected timeline anchor attempt 3.
+PR event trigger for the guarded vector and planar optics NLOS integration workflow. LaTeX diagnostic attempt 4.
