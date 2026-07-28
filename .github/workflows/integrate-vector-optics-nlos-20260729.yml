@@ -21,17 +21,32 @@ jobs:
       - name: Check out current master
         uses: actions/checkout@v4
         with:
+          ref: master
           fetch-depth: 0
 
       - name: Apply guarded source integration
-        run: python3 scripts/integrate_vector_optics_nlos_20260729.py
+        run: |
+          set +e
+          python3 scripts/run_vector_optics_nlos_20260729_v3.py > vector_optics_integration.log 2>&1
+          status=$?
+          cat vector_optics_integration.log
+          exit $status
+
+      - name: Upload integration diagnostic
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vector-optics-integration-diagnostic
+          path: vector_optics_integration.log
+          if-no-files-found: error
+          retention-days: 2
 
       - name: Install LaTeX and PDF validation tools
         run: |
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             texlive-latex-base texlive-latex-recommended texlive-latex-extra \
-            texlive-fonts-recommended texlive-science texlive-pictures \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
             ghostscript poppler-utils
 
       - name: Cleanly rebuild survey PDF
@@ -42,50 +57,83 @@ jobs:
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
 
-      - name: Validate citations and public artifacts
+      - name: Validate citations, PDF, and public artifacts
         shell: bash
         run: |
-          set -euo pipefail
-          for doi in \
-            10.1515/nanoph-2023-0655 \
-            10.1002/lpor.202300909 \
-            10.1016/j.eng.2024.11.013; do
-            test "$(grep -F -c "$doi" README.md)" -eq 1
-            test "$(grep -F -c "$doi" index.html)" -eq 1
-            test "$(grep -F -c "$doi" egbib_merged_20260711.bib)" -eq 1
+          set -u
+          : > vector_optics_validation.log
+          errors=0
+          check_count() {
+            local expected="$1" actual="$2" label="$3"
+            printf '%s: expected=%s actual=%s\n' "$label" "$expected" "$actual" | tee -a vector_optics_validation.log
+            if [ "$actual" -ne "$expected" ]; then errors=$((errors+1)); fi
+          }
+          for doi in 10.1515/nanoph-2023-0655 10.1002/lpor.202300909 10.1016/j.eng.2024.11.013; do
+            check_count 1 "$(grep -F -c "$doi" README.md || true)" "README $doi"
+            check_count 1 "$(grep -F -c "$doi" index.html || true)" "index $doi"
+            check_count 1 "$(grep -F -c "$doi" egbib_merged_20260711.bib || true)" "bib $doi"
           done
-          for key in \
-            zhaoLCPlanarNLOS2024 \
-            wangVectorialMultiviewNLOS2024 \
-            guoVectorialDigitelligentNLOS2025; do
-            test "$(grep -F -c "$key" article/2active.tex)" -eq 2
-            test "$(grep -F -c "@article{$key," egbib_merged_20260711.bib)" -eq 1
-            grep -F -q "$key" bare_jrnl.aux
+          for key in zhaoLCPlanarNLOS2024 wangVectorialMultiviewNLOS2024 guoVectorialDigitelligentNLOS2025; do
+            check_count 2 "$(grep -F -c "$key" article/2active.tex || true)" "active $key"
+            check_count 1 "$(grep -F -c "@article{$key," egbib_merged_20260711.bib || true)" "bibkey $key"
+            if grep -F -q "$key" bare_jrnl.aux; then echo "aux $key: resolved" | tee -a vector_optics_validation.log; else echo "aux $key: missing" | tee -a vector_optics_validation.log; errors=$((errors+1)); fi
           done
-          test "$(grep -o '{cat:' index.html | wc -l)" -eq 235
-          grep -F -q '**Update run: 29 July 2026.**' README.md
-          grep -F -q 'Last updated: 29 July 2026' index.html
-          ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
-          pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
-          pdftotext bare_jrnl.pdf bare_jrnl.txt
-          grep -F -q 'Vectorial Digitelligent Optics' bare_jrnl.txt
-          grep -F -q 'Liquid Crystal Planar Optical Elements' bare_jrnl.txt
-          grep -F -q 'Vectorial-Optics-Enabled Multi-View' bare_jrnl.txt
+          actual=$(grep -o '{cat:' index.html | wc -l)
+          declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
+          printf 'website entries: declared=%s actual=%s\n' "$declared" "$actual" | tee -a vector_optics_validation.log
+          if [ "$declared" -ne "$actual" ]; then errors=$((errors+1)); fi
+          if grep -F -q '**Update run: 29 July 2026.**' README.md; then echo 'README date: ok' | tee -a vector_optics_validation.log; else echo 'README date: missing' | tee -a vector_optics_validation.log; errors=$((errors+1)); fi
+          if grep -F -q 'Last updated: 29 July 2026' index.html; then echo 'website date: ok' | tee -a vector_optics_validation.log; else echo 'website date: missing' | tee -a vector_optics_validation.log; errors=$((errors+1)); fi
+          if grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log; then echo 'LaTeX citation diagnostics: failed' | tee -a vector_optics_validation.log; errors=$((errors+1)); else echo 'LaTeX citation diagnostics: clean' | tee -a vector_optics_validation.log; fi
+          if ! pdfinfo bare_jrnl.pdf | grep -q '^Pages:'; then echo 'PDF structure: failed' | tee -a vector_optics_validation.log; errors=$((errors+1)); else echo 'PDF structure: ok' | tee -a vector_optics_validation.log; fi
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY' || errors=$((errors+1))
+          from pathlib import Path
+          text = ' '.join(Path('bare_jrnl.txt').read_text(errors='ignore').split())
+          phrases = [
+              'Vectorial Digitelligent Optics',
+              'Liquid Crystal Planar Optical Elements',
+              'Vectorial-Optics-Enabled Multi-View',
+          ]
+          missing = [p for p in phrases if p not in text]
+          print('PDF title checks:', 'ok' if not missing else f'missing {missing}')
+          if missing:
+              raise SystemExit(1)
+          PY
           pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
           mkdir -p .pdf_render_check
           pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
           pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
-          test -s .pdf_render_check/first.png
-          test -s .pdf_render_check/last.png
-          rm -rf .pdf_render_check bare_jrnl.txt
+          if [ ! -s .pdf_render_check/first.png ] || [ ! -s .pdf_render_check/last.png ]; then echo 'PDF render: failed' | tee -a vector_optics_validation.log; errors=$((errors+1)); else echo 'PDF render: ok' | tee -a vector_optics_validation.log; fi
+          rm -rf .pdf_render_check bare_jrnl.txt vector_optics_integration.log
+          echo "validation errors=$errors" | tee -a vector_optics_validation.log
+          exit "$errors"
+
+      - name: Upload validation diagnostic
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vector-optics-validation-diagnostic
+          path: |
+            vector_optics_validation.log
+            bare_jrnl.log
+            bare_jrnl.blg
+          if-no-files-found: warn
+          retention-days: 2
 
       - name: Remove one-run integration tooling
         run: |
           rm -f scripts/integrate_vector_optics_nlos_20260729.py
+          rm -f scripts/run_vector_optics_nlos_20260729_v2.py
+          rm -f scripts/run_vector_optics_nlos_20260729_v3.py
           rm -f .github/workflows/integrate-vector-optics-nlos-20260729.yml
+          rm -f .github/workflows/integrate-vector-optics-nlos-pr-20260729.yml
+          rm -f .github/workflows/diagnose-vector-optics-build-20260729.yml
           rm -f updates/vector_optics_nlos_20260729.trigger
+          rm -f updates/vector_optics_nlos_20260729_pr.trigger
+          rm -f vector_optics_validation.log
 
-      - name: Commit synchronized sources and rebuilt PDF
+      - name: Commit synchronized sources and rebuilt PDF to master
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
