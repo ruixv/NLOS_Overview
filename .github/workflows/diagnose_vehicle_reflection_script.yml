@@ -1,0 +1,34 @@
+name: Diagnose vehicle-reflection script execution
+on:
+  push:
+    branches: [master]
+    paths:
+      - updates/TRIGGER_2026-07-28_VEHICLE_REFLECTION_SCRIPT_DIAGNOSTIC.md
+permissions:
+  contents: write
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - shell: bash
+        run: |
+          set +e
+          python -m py_compile scripts/integrate_vehicle_reflection_obstacle.py > /tmp/compile.out 2>&1
+          compile_status=$?
+          python scripts/integrate_vehicle_reflection_obstacle.py > /tmp/run.out 2>&1
+          run_status=$?
+          git reset --hard HEAD
+          {
+            echo "compile_status=$compile_status"
+            cat /tmp/compile.out
+            echo "run_status=$run_status"
+            cat /tmp/run.out
+          } > updates/2026-07-28-vehicle-reflection-script-diagnostic.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add updates/2026-07-28-vehicle-reflection-script-diagnostic.txt
+          git commit -m "Record vehicle-reflection script diagnostic"
+          git push origin master
