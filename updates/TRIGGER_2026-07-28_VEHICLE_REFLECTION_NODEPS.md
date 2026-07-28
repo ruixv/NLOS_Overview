@@ -1,1 +1,1 @@
-Apply the verified vehicle-reflection NLOS source update and append its canonical BibTeX without external package installation.
+Retrigger the verified vehicle-reflection NLOS source update now that the dependency-free workflow is present on master. Append canonical BibTeX and validate all source artifacts without external package installation.
