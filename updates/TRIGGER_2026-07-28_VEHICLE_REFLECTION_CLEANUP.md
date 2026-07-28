@@ -1,1 +1,0 @@
-Remove the completed one-shot workflows, triggers, temporary scripts, and diagnostics while preserving the integrated public artifacts, canonical lineage bibliography, update note, validation record, and rebuilt survey PDF.
