@@ -1,0 +1,1 @@
+Run the guarded four-paper automotive vehicle-reflection NLOS lineage integration across README, website, survey source, bibliography, and regenerated PDF, then validate and clean up the one-shot tooling.
