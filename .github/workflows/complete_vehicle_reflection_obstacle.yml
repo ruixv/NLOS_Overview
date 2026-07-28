@@ -1,0 +1,104 @@
+name: Complete vehicle-reflection NLOS obstacle localization
+on:
+  push:
+    branches: [master]
+    paths:
+      - updates/TRIGGER_2026-07-28_VEHICLE_REFLECTION_COMPLETE.md
+permissions:
+  contents: write
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install build dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install bibtexparser
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-bibtex-extra poppler-utils
+      - name: Integrate sources and bibliography
+        shell: bash
+        run: |
+          python scripts/integrate_vehicle_reflection_obstacle.py
+          python scripts/merge_nlos_bibliography.py
+          git checkout -- updates/2026-07-11-bibliography-deduplication.md || true
+      - name: Rebuild PDF
+        shell: bash
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+      - name: Validate sources and PDF
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, subprocess
+          doi='10.1016/j.iatssr.2026.02.007'
+          key='shengVehicleReflectionObstacle2026'
+          readme=Path('README.md').read_text(encoding='utf-8')
+          index=Path('index.html').read_text(encoding='utf-8')
+          passive=Path('article/3passive.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          bbl=Path('bare_jrnl.bbl').read_text(encoding='utf-8',errors='ignore')
+          log=Path('bare_jrnl.log').read_text(encoding='utf-8',errors='ignore')
+          assert readme.count(doi)==1
+          assert index.count(doi)==1
+          assert passive.count(key)==1
+          assert bib.count(doi)==1
+          assert key in bbl
+          assert not re.search(r'Citation.*undefined|undefined citations',log,re.I)
+          count=len(re.findall(r'\{cat:"',index))
+          assert f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>' in index
+          assert Path('bare_jrnl.pdf').stat().st_size>100000
+          info=subprocess.check_output(['pdfinfo','bare_jrnl.pdf'],text=True)
+          pages=int(re.search(r'Pages:\s+(\d+)',info).group(1))
+          subprocess.run(['pdftotext','bare_jrnl.pdf','bare_jrnl.txt'],check=True)
+          text=Path('bare_jrnl.txt').read_text(encoding='utf-8',errors='ignore')
+          assert 'Stereo vehicle-reflection obstacle localization' in text
+          assert 'Feasibility Study of Non-Line-of-Sight Obstacle' in text or 'Feasibility study of non-line-of-sight obstacle' in text
+          Path('_renders').mkdir(exist_ok=True)
+          subprocess.run(['pdftoppm','-f','1','-singlefile','-png','-r','110','bare_jrnl.pdf','_renders/first'],check=True)
+          subprocess.run(['pdftoppm','-f',str(pages),'-singlefile','-png','-r','110','bare_jrnl.pdf','_renders/last'],check=True)
+          assert Path('_renders/first.png').stat().st_size>10000
+          assert Path('_renders/last.png').stat().st_size>10000
+          Path('updates/2026-07-28-vehicle-reflection-validation.txt').write_text(f'Validated vehicle-reflection NLOS localization; website entries: {count}; PDF pages: {pages}\n',encoding='utf-8')
+          PY
+          rm -rf _renders bare_jrnl.txt
+      - name: Commit synchronized sources and regenerated PDF
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/3passive.tex bare_jrnl.tex \
+            egbib_20260728_vehicle_reflection_obstacle.bib egbib_merged_20260711.bib \
+            updates/2026-07-28-vehicle-reflection-obstacle-localization.md \
+            updates/2026-07-28-vehicle-reflection-validation.txt bare_jrnl.pdf
+          git commit -m "Integrate vehicle-reflection NLOS obstacle localization"
+          git push origin master
+      - name: Remove completed workflows, triggers, scripts, and diagnostics
+        shell: bash
+        run: |
+          git pull --ff-only origin master
+          git rm -f \
+            updates/TRIGGER_2026-07-28_VEHICLE_REFLECTION_COMPLETE.md \
+            updates/TRIGGER_2026-07-28_VEHICLE_REFLECTION_RECOVERY.md \
+            updates/TRIGGER_2026-07-28_VEHICLE_REFLECTION_OBSTACLE.md \
+            updates/TRIGGER_2026-07-28_VEHICLE_REFLECTION_DIAGNOSTIC.md \
+            updates/TRIGGER_2026-07-28_VEHICLE_REFLECTION_PREFLIGHT.md \
+            updates/2026-07-28-vehicle-reflection-workflow-diagnostic.txt \
+            updates/2026-07-28-vehicle-reflection-preflight-diagnostic.txt \
+            scripts/integrate_vehicle_reflection_obstacle.py \
+            .github/workflows/complete_vehicle_reflection_obstacle.yml \
+            .github/workflows/recover_vehicle_reflection_obstacle.yml \
+            .github/workflows/integrate_vehicle_reflection_obstacle.yml \
+            .github/workflows/test_vehicle_reflection_trigger.yml \
+            .github/workflows/diagnose_vehicle_reflection_integration.yml
+          git commit -m "Remove completed vehicle-reflection integration tooling"
+          git push origin master
