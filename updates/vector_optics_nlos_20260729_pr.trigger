@@ -1,0 +1,1 @@
+Run the guarded vector and planar optics NLOS integration against current master, rebuild the survey PDF, validate citations and public artifacts, then commit the synchronized result to master.
