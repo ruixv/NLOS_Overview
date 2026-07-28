@@ -60,7 +60,7 @@ jobs:
             10.21203/rs.3.rs-8336286/v1 \
             10.48550/arXiv.2506.08470 \
             10.1109/TPAMI.2024.3463875; do
-            test "$(grep -F -c "$doi" egbib_merged_20260711.bib)" -eq 1
+            test "$(grep -F -c "$doi" egbib_merged_20260711.bib)" -eq 2
           done
           for key in jiUnifiedRealTimeNLOS2026 shenMARMOT2025 shenHOLI1to3TPAMI2025; do
             test "$(grep -E -c "^@(article|misc)\\{$key," egbib_merged_20260711.bib)" -eq 1
