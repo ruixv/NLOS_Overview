@@ -25,7 +25,21 @@ jobs:
           fetch-depth: 0
 
       - name: Apply guarded source integration
-        run: python3 scripts/integrate_vector_optics_nlos_20260729.py
+        run: |
+          set +e
+          python3 scripts/integrate_vector_optics_nlos_20260729.py > vector_optics_integration.log 2>&1
+          status=$?
+          cat vector_optics_integration.log
+          exit $status
+
+      - name: Upload integration diagnostic
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vector-optics-integration-diagnostic
+          path: vector_optics_integration.log
+          if-no-files-found: error
+          retention-days: 2
 
       - name: Install LaTeX and PDF validation tools
         run: |
@@ -71,7 +85,7 @@ jobs:
           pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
           test -s .pdf_render_check/first.png
           test -s .pdf_render_check/last.png
-          rm -rf .pdf_render_check bare_jrnl.txt
+          rm -rf .pdf_render_check bare_jrnl.txt vector_optics_integration.log
 
       - name: Remove one-run integration tooling
         run: |
