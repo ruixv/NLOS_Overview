@@ -27,7 +27,7 @@ jobs:
       - name: Apply guarded source integration
         run: |
           set +e
-          python3 scripts/run_vector_optics_nlos_20260729_v3.py > vector_optics_integration.log 2>&1
+          python3 scripts/run_vector_optics_nlos_20260729_v4.py > vector_optics_integration.log 2>&1
           status=$?
           cat vector_optics_integration.log
           exit $status
@@ -71,32 +71,37 @@ jobs:
           for doi in 10.1515/nanoph-2023-0655 10.1002/lpor.202300909 10.1016/j.eng.2024.11.013; do
             check_count 1 "$(grep -F -c "$doi" README.md || true)" "README $doi"
             check_count 1 "$(grep -F -c "$doi" index.html || true)" "index $doi"
-            check_count 1 "$(grep -F -c "$doi" egbib_merged_20260711.bib || true)" "bib $doi"
+            check_count 2 "$(grep -F -c "$doi" egbib_merged_20260711.bib || true)" "bib DOI+URL $doi"
           done
           for key in zhaoLCPlanarNLOS2024 wangVectorialMultiviewNLOS2024 guoVectorialDigitelligentNLOS2025; do
             check_count 2 "$(grep -F -c "$key" article/2active.tex || true)" "active $key"
             check_count 1 "$(grep -F -c "@article{$key," egbib_merged_20260711.bib || true)" "bibkey $key"
             if grep -F -q "$key" bare_jrnl.aux; then echo "aux $key: resolved" | tee -a vector_optics_validation.log; else echo "aux $key: missing" | tee -a vector_optics_validation.log; errors=$((errors+1)); fi
           done
+          check_count 1 "$(grep -F -c '@article{zhuEfficientNeuromorphicNLOSTracking2024,' egbib_merged_20260711.bib || true)" "neuromorphic bib key"
+          check_count 2 "$(grep -F -c '10.1364/OL.530066' egbib_merged_20260711.bib || true)" "neuromorphic DOI+URL"
+          if grep -F -q 'zhuEfficientNeuromorphicNLOSTracking2024' bare_jrnl.aux; then echo 'aux neuromorphic tracking: resolved' | tee -a vector_optics_validation.log; else echo 'aux neuromorphic tracking: missing' | tee -a vector_optics_validation.log; errors=$((errors+1)); fi
           actual=$(grep -o '{cat:' index.html | wc -l)
           declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
           printf 'website entries: declared=%s actual=%s\n' "$declared" "$actual" | tee -a vector_optics_validation.log
           if [ "$declared" -ne "$actual" ]; then errors=$((errors+1)); fi
           if grep -F -q '**Update run: 29 July 2026.**' README.md; then echo 'README date: ok' | tee -a vector_optics_validation.log; else echo 'README date: missing' | tee -a vector_optics_validation.log; errors=$((errors+1)); fi
           if grep -F -q 'Last updated: 29 July 2026' index.html; then echo 'website date: ok' | tee -a vector_optics_validation.log; else echo 'website date: missing' | tee -a vector_optics_validation.log; errors=$((errors+1)); fi
-          if grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log; then echo 'LaTeX citation diagnostics: failed' | tee -a vector_optics_validation.log; errors=$((errors+1)); else echo 'LaTeX citation diagnostics: clean' | tee -a vector_optics_validation.log; fi
+          if grep -E -qi 'undefined citation|undefined citations|undefined reference|undefined references|Citation .* undefined|There were undefined|Repeated entry' bare_jrnl.log bare_jrnl.blg; then
+            echo 'LaTeX/BibTeX citation diagnostics: failed' | tee -a vector_optics_validation.log
+            grep -E -i 'undefined citation|undefined citations|undefined reference|undefined references|Citation .* undefined|There were undefined|Repeated entry' bare_jrnl.log bare_jrnl.blg | tail -n 30 | tee -a vector_optics_validation.log || true
+            errors=$((errors+1))
+          else
+            echo 'LaTeX/BibTeX citation diagnostics: clean' | tee -a vector_optics_validation.log
+          fi
           if ! pdfinfo bare_jrnl.pdf | grep -q '^Pages:'; then echo 'PDF structure: failed' | tee -a vector_optics_validation.log; errors=$((errors+1)); else echo 'PDF structure: ok' | tee -a vector_optics_validation.log; fi
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
           python3 - <<'PY' || errors=$((errors+1))
           from pathlib import Path
-          text = ' '.join(Path('bare_jrnl.txt').read_text(errors='ignore').split())
-          phrases = [
-              'Vectorial Digitelligent Optics',
-              'Liquid Crystal Planar Optical Elements',
-              'Vectorial-Optics-Enabled Multi-View',
-          ]
+          text = ' '.join(Path('bare_jrnl.txt').read_text(errors='ignore').lower().split())
+          phrases = ['digitelligent optics', 'liquid-crystal planar', 'vector-optical-field reflection']
           missing = [p for p in phrases if p not in text]
-          print('PDF title checks:', 'ok' if not missing else f'missing {missing}')
+          print('PDF prose checks:', 'ok' if not missing else f'missing {missing}')
           if missing:
               raise SystemExit(1)
           PY
@@ -126,6 +131,7 @@ jobs:
           rm -f scripts/integrate_vector_optics_nlos_20260729.py
           rm -f scripts/run_vector_optics_nlos_20260729_v2.py
           rm -f scripts/run_vector_optics_nlos_20260729_v3.py
+          rm -f scripts/run_vector_optics_nlos_20260729_v4.py
           rm -f .github/workflows/integrate-vector-optics-nlos-20260729.yml
           rm -f .github/workflows/integrate-vector-optics-nlos-pr-20260729.yml
           rm -f .github/workflows/diagnose-vector-optics-build-20260729.yml
