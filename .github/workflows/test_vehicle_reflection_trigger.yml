@@ -1,0 +1,23 @@
+name: Vehicle-reflection workflow diagnostic
+on:
+  push:
+    branches: [master]
+    paths:
+      - updates/TRIGGER_2026-07-28_VEHICLE_REFLECTION_DIAGNOSTIC.md
+permissions:
+  contents: write
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          printf 'Vehicle-reflection workflow trigger executed successfully.\n' > updates/2026-07-28-vehicle-reflection-workflow-diagnostic.txt
+          git add updates/2026-07-28-vehicle-reflection-workflow-diagnostic.txt
+          git commit -m "Confirm vehicle-reflection workflow execution"
+          git push origin master
