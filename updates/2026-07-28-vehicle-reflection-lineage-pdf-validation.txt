@@ -1,0 +1,1 @@
+LaTeX action succeeded; all four lineage citation keys resolved in the generated bibliography.

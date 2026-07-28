@@ -70,4 +70,4 @@ Add a trace marker near the existing July 2026 integration comments, compile wit
 
 ## Current repository state
 
-README, the website explorer and timeline, passive-survey prose, and the consolidated bibliography are now synchronized for all four records. PDF compilation is staged separately and is not claimed by this source-integration commit.
+README, the website explorer and timeline, passive-survey prose, and the consolidated bibliography are now synchronized for all four records. `bare_jrnl.pdf` was rebuilt after all four automotive vehicle-reflection citation keys resolved.
