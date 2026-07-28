@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - updates/vector_optics_nlos_20260728.trigger
+      - .github/workflows/integrate-vector-optics-nlos-20260728.yml
 
 permissions:
   contents: write
