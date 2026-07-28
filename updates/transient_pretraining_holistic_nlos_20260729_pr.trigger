@@ -1,0 +1,1 @@
+Run the guarded integration of unified NLOS reconstruction, MARMOT masked transient pretraining, and HOLI-1-to-3; rebuild and validate bare_jrnl.pdf and commit synchronized artifacts to master.
