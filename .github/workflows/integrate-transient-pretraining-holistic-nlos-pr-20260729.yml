@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
 
       - name: Apply guarded source integration
-        run: python3 scripts/integrate_transient_pretraining_holistic_nlos_20260729.py
+        run: python3 scripts/run_transient_pretraining_holistic_nlos_20260729.py
 
       - name: Install LaTeX and PDF validation tools
         run: |
@@ -101,6 +101,7 @@ jobs:
       - name: Remove one-run integration tooling
         run: |
           rm -f scripts/integrate_transient_pretraining_holistic_nlos_20260729.py
+          rm -f scripts/run_transient_pretraining_holistic_nlos_20260729.py
           rm -f .github/workflows/integrate-transient-pretraining-holistic-nlos-20260729.yml
           rm -f .github/workflows/integrate-transient-pretraining-holistic-nlos-pr-20260729.yml
           rm -f updates/transient_pretraining_holistic_nlos_20260729.trigger
