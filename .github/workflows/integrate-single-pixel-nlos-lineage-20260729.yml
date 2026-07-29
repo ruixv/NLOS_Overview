@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - updates/single_pixel_nlos_lineage_20260729.trigger
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/single_pixel_nlos_lineage_20260729.pr-trigger
 
 permissions:
   contents: write
@@ -95,6 +99,7 @@ jobs:
           rm -f scripts/integrate_single_pixel_nlos_lineage_20260729.py
           rm -f .github/workflows/integrate-single-pixel-nlos-lineage-20260729.yml
           rm -f updates/single_pixel_nlos_lineage_20260729.trigger
+          rm -f updates/single_pixel_nlos_lineage_20260729.pr-trigger
 
       - name: Commit synchronized sources and rebuilt PDF
         run: |
