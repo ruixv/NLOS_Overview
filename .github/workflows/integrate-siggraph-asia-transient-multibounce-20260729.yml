@@ -1,0 +1,120 @@
+name: Integrate SIGGRAPH Asia transient and multi-bounce papers
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - updates/siggraph_asia_transient_multibounce_20260729.trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-siggraph-asia-transient-multibounce-20260729
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out current master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Repair DOI occurrence guard and apply source integration
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/integrate_siggraph_asia_transient_multibounce_20260729.py')
+          s = p.read_text(encoding='utf-8')
+          old = '"egbib_merged_20260711.bib": ["10.1145/3757377.3763945", "10.1145/3757377.3763911"],'
+          new = '"egbib_merged_20260711.bib": ["@inproceedings{klinghofferShootBounce3D2025,", "@inproceedings{scheubleTransientLASSO2025,"],'
+          if s.count(old) != 1:
+              raise SystemExit('expected DOI guard anchor exactly once')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+          python3 scripts/integrate_siggraph_asia_transient_multibounce_20260729.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Cleanly rebuild survey PDF
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate synchronized sources, citations, website, and PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          for title in \
+            'Shoot-Bounce-3D: Single-Shot Occlusion-Aware 3D from Lidar by Decomposing Two-Bounce Light' \
+            'Transient LASSO: Transient Large-Scale Scene Reconstruction'; do
+            test "$(grep -F -c "$title" README.md)" -eq 1
+            test "$(grep -F -c "$title" index.html)" -eq 1
+          done
+          for key in klinghofferShootBounce3D2025 scheubleTransientLASSO2025; do
+            test "$(grep -E -c "^@inproceedings\\{$key," egbib_merged_20260711.bib)" -eq 1
+            grep -F -q "$key" article/4datadriven.tex
+            grep -F -q "$key" bare_jrnl.aux
+          done
+          test "$(grep -F -c '10.1145/3757377.3763945' egbib_merged_20260711.bib)" -eq 2
+          test "$(grep -F -c '10.1145/3757377.3763911' egbib_merged_20260711.bib)" -eq 2
+          actual=$(grep -o '{cat:' index.html | wc -l)
+          declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
+          test "$declared" -eq "$actual"
+          test "$actual" -eq 239
+          grep -F -q '**Update run: 29 July 2026.**' README.md
+          grep -F -q 'Last updated: 29 July 2026' index.html
+          ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
+          needles = [
+              'shootbounce3d',
+              'transientlasso',
+              'multibounceandoutdoortransient',
+          ]
+          missing = [n for n in needles if n not in text]
+          print('PDF semantic checks:', 'ok' if not missing else f'missing {missing}')
+          if missing:
+              raise SystemExit(1)
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Remove one-run integration tooling
+        run: |
+          rm -f scripts/integrate_siggraph_asia_transient_multibounce_20260729.py
+          rm -f .github/workflows/integrate-siggraph-asia-transient-multibounce-20260729.yml
+          rm -f updates/siggraph_asia_transient_multibounce_20260729.trigger
+
+      - name: Commit synchronized sources and rebuilt PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 1
+          fi
+          git commit -m "Integrate multi-bounce and outdoor transient reconstruction"
+          git push origin HEAD:master
