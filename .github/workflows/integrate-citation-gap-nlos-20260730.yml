@@ -1,0 +1,117 @@
+name: Integrate citation-traced NLOS gaps
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - updates/citation_gap_nlos_20260730.trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-citation-gap-nlos-20260730
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out current master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Apply synchronized source integration
+        run: |
+          sed -i 's/encoding="utf-8")n$/encoding="utf-8")/' scripts/integrate_citation_gap_nlos_20260730.py
+          python3 -m py_compile scripts/integrate_citation_gap_nlos_20260730.py
+          python3 scripts/integrate_citation_gap_nlos_20260730.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Cleanly rebuild survey PDF
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate synchronized sources, citations, website, and PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          for title in \
+            'Non-line-of-sight imaging based on an untrained deep decoder network' \
+            'Compressive Non-Line-of-Sight Imaging with Deep Learning' \
+            'Enhancing the spatial resolution of time-of-flight based non-line-of-sight imaging via instrument response function deconvolution'; do
+            test "$(grep -F -c "$title" README.md)" -eq 1
+            test "$(grep -F -c "$title" index.html)" -eq 1
+          done
+          for key in wuUntrainedDeepDecoderNLOS2022 zhuCompressiveNLOSDeepLearning2023 wangIRFDeconvolutionNLOS2024; do
+            test "$(grep -E -c "^@article\\{$key," egbib_merged_20260711.bib)" -eq 1
+            grep -R -F -q "$key" article
+            grep -F -q "$key" bare_jrnl.aux
+          done
+          grep -F -q 'wuUntrainedDeepDecoderNLOS2022' article/3passive.tex
+          grep -F -q 'zhuCompressiveNLOSDeepLearning2023' article/4datadriven.tex
+          grep -F -q 'wangIRFDeconvolutionNLOS2024' article/2active.tex
+          actual=$(grep -o '{cat:' index.html | wc -l)
+          declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
+          test "$declared" -eq "$actual"
+          test "$actual" -eq 245
+          grep -F -q '**Update run: 30 July 2026.**' README.md
+          grep -F -q 'Last updated: 30 July 2026' index.html
+          grep -F -q '30 July 2026 core-citation trace' bare_jrnl.tex
+          ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
+          needles = [
+              'untrainedneuralpriorsforoccluderaidedpassivenlos',
+              'compressivesimulationtorealtransientlearning',
+              'detectorresponseinversionandcompressivetransientsampling',
+              'instrumentresponsefunctiondeconvolution',
+          ]
+          missing = [n for n in needles if n not in text]
+          print('PDF semantic checks:', 'ok' if not missing else f'missing {missing}')
+          if missing:
+              raise SystemExit(1)
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Remove one-run integration tooling
+        run: |
+          rm -f scripts/integrate_citation_gap_nlos_20260730.py
+          rm -f .github/workflows/integrate-citation-gap-nlos-20260730.yml
+          rm -f updates/citation_gap_nlos_20260730.trigger
+
+      - name: Commit synchronized sources and rebuilt PDF
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 1
+          fi
+          git commit -m "Integrate citation-traced passive and transient NLOS gaps"
+          git push origin HEAD:master
