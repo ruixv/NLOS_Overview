@@ -1,1 +1,1 @@
-Trigger the guarded integration workflow from a same-repository pull request.
+Retry the guarded integration workflow with an alternate Ubuntu package mirror and extended build timeout.
