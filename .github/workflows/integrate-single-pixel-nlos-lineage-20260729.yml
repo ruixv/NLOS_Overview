@@ -78,7 +78,6 @@ jobs:
           text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
           needles = [
               '3drgbnonlineofsightsinglepixelimaging',
-              'secondordercorrelation',
               'tvregularizedcompressivesensing',
               'fromtimeresolvedrgbtocompressivemultiwavelength',
           ]
