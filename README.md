@@ -68,6 +68,9 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2024 | [Multi-wavelength single-pixel non-line-of-sight imaging with a compressive sensing measurement matrix](https://doi.org/10.1007/s00340-024-08265-2) — Li et al. | Applied Physics B 130(7), 127 (2024) | Extends patterned single-pixel NLOS from monochrome spatial recovery to RGB hidden-scene imaging. Multi-wavelength measurements and TV-regularized compressive reconstruction recover colour and spatial detail at a reported 29% compression rate. |
+| 2023 | [Active mode single-pixel non-line-of-sight imaging system based on second-order correlation and diffraction](https://doi.org/10.1088/2040-8986/ac9cec) — Li et al. | Journal of Optics 25(1), 015702 (2023) | Combines patterned active illumination and second-order correlation with Fourier-domain inverse diffraction. Hadamard coding improves measured hidden-image recovery and reaches a reported SSIM of 0.9286 at full sampling. |
+| 2019 | [3D RGB Non-Line-of-Sight single-pixel imaging](https://doi.org/10.1364/ISA.2019.IM2B.5) — Musarra et al. | Imaging Systems and Applications / OSA Technical Digest 2019, IM2B.5 | Demonstrates sub-second full-colour 3D hidden-scene acquisition with a high-efficiency time-resolved single-pixel camera, establishing an early bridge between transient depth and RGB single-pixel NLOS. |
 | 2025 | [Shoot-Bounce-3D: Single-Shot Occlusion-Aware 3D from Lidar by Decomposing Two-Bounce Light](https://doi.org/10.1145/3757377.3763945) — Klinghoffer et al. | SIGGRAPH Asia 2025 | Uses multiplexed single-shot single-photon LiDAR and a learned decomposition of two-bounce transport, trained on roughly 100,000 simulated transients, to recover dense depth plus occluded and mirror-mediated geometry from one view. Real captures validate the demultiplexing; this is tightly adjacent multi-bounce NLOS reconstruction rather than the conventional relay-wall configuration. |
 | 2025 | [Transient LASSO: Transient Large-Scale Scene Reconstruction](https://doi.org/10.1145/3757377.3763911) — Scheuble et al. | SIGGRAPH Asia 2025 | Fits a neural scene representation directly to posed raw outdoor transient-LiDAR measurements while explicitly modeling back-reflected light, ambient illumination, and high-flux sensor behavior. It disentangles dense geometry and normals from reflectivity, retroreflectivity, and ambient light, extending transient inverse rendering to in-the-wild urban scenes. |
 | 2026 | [Real-Time and High-Fidelity Non-Line-of-Sight Imaging](https://doi.org/10.21203/rs.3.rs-8336286/v1) — Ji et al. | Research Square preprint 2026 | Introduces a unified inverse framework for both see-through-scattering-media and see-around-corner NLOS. Scale modulation and joint regularization recover hidden albedo and depth across diverse measurement settings; no final journal or conference venue was verified. |
@@ -313,6 +316,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Liu et al.: phasor field — NLOS as virtual LOS wave propagation
    │
 2019 ── Tsai et al.: Beyond Volumetric Albedo — direct hidden-surface and reflectance optimization [CVPR]
+   │     Musarra et al.: time-resolved single-pixel capture demonstrates sub-second full-colour 3D NLOS imaging [OSA Imaging Systems and Applications]
    │     Dove and Shapiro: paraxial phasor-field theory — TFSWD propagation formalizes occlusions and specular transport beyond the P-field alone [Optics Express]
    │     Reza et al.: experimental phasor-field waves — interference and independent optical/P-field focusing validate the virtual-wave picture [Optics Express]
    │
@@ -338,6 +342,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │
    │     Wei et al.: measured 77 GHz mmWave NLOS 3D imaging establishes mirror-symmetry backprojection and relay-phase compensation [IEEE TGRS]
 2023 ── Wang et al.: Signal Superresolution Network — plug-and-play 16× sparse-scan acceleration [CVPR]
+   │     Li et al.: patterned active single-pixel correlation plus inverse diffraction improves hidden-image recovery [Journal of Optics]
    │     Liu et al.: SSCR — mixed-dimensional regularization from 5×5 confocal measurements [CVPR]
    │     Li et al.: deep under-scanning reconstruction — learned transient recovery plus physics-aware volumetric inversion from grids as sparse as 8×8 [NeurIPS]
    │     Yu et al.: learnable inverse kernel and attention — system-aware transient inversion for hidden intensity and depth [ICCV]
@@ -348,6 +353,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Royo et al.: virtual mirrors — higher-order phasor transport and two-corner NLOS [SIGGRAPH / TOG]
    │
 2024 ── Li et al.: ST-Mamba — state-space temporal modeling and phasor-domain wave supervision for consistent dynamic NLOS video [NeurIPS]
+   │     Li et al.: multi-wavelength compressive single-pixel NLOS adds RGB colour recovery at 29% sampling [Applied Physics B]
    │     Zhao et al.: liquid-crystal planar angle magnification enlarges the effective relay aperture while correlation-aware sparse scanning cuts acquisition time [Nanophotonics]
    │     Wang et al.: vector-optical-field modeling turns illumination angle and polarization into multi-view, low-SNR NLOS measurement degrees of freedom [Laser & Photonics Reviews]
    │     Wei et al.: multispectral speckle component separation recovers up to six wavelength channels and validates spectral hidden-object imaging around corners [Optics Express]
