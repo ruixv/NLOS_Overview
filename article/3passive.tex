@@ -24,6 +24,10 @@ Recent ordinary-camera methods increasingly encode the relay-wall transport stru
 
 \vspace{0.8mm}
 \vspace{0.8mm}
+\noindent \textbf{Untrained neural priors for occluder-aided passive NLOS.}
+Wu~\etal~combined the calibrated occluder-aided forward model with an untrained deep decoder whose weights are optimized separately for each observed wall image~\cite{wuUntrainedDeepDecoderNLOS2022}. The network therefore acts as an implicit image prior rather than a supervised mapping and requires neither paired hidden scenes nor a pre-collected training corpus. Simulated and measured results under strong ambient illumination improve detail and robustness over conventional inversion. This work supplies an early zero-shot bridge between ordinary-camera computational periscopy and later physics-guided passive networks: the light-transport operator enforces measurement consistency, while network architecture regularizes the hidden image.
+
+\vspace{0.8mm}
 \noindent \textbf{From separable soft-shadow inversion to diffusion.}
 Raji and Murray-Bruce generalized ordinary-camera computational periscopy from low-dimensional hidden images to joint three-dimensional occluder geometry and two-dimensional non-occluding radiosity. Their ICASSP formulation separates these unknowns into a nonlinear least-squares block and a conditionally linear block, enabling alternating optimization from a single soft-shadow photograph~\cite{rajiSNLLSComputationalPersicopy2024}. The subsequent Soft Shadow Diffusion framework retains this transport decomposition but learns a physics-inspired solver from simulation, transferring to unseen simulated classes and real measurements while remaining robust to ambient illumination and noise~\cite{rajiSoftShadowDiffusion2024}. Together, these works provide the methodological bridge from computational periscopy to the later multimodal MDUNet architecture.
 

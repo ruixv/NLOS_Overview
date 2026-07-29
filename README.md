@@ -64,10 +64,13 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 29 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 30 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2024 | [Enhancing the spatial resolution of time-of-flight based non-line-of-sight imaging via instrument response function deconvolution](https://doi.org/10.1364/OE.518767) — Wang et al. | Optics Express 32(7), 12303–12317 (2024) | Models measured transients as a Poisson convolution with the calibrated instrument response and deconvolves timing blur before LCT or f-k migration. Simulations and experiments show that reconstruction remains viable with total timing jitter up to 1200 ps, linking detector calibration directly to recoverable spatial resolution. |
+| 2023 | [Compressive Non-Line-of-Sight Imaging with Deep Learning](https://doi.org/10.1103/PhysRevApplied.19.034090) — Zhu et al. | Physical Review Applied 19(3), 034090 (2023) | Reconstructs 32×32 hidden images from only 8×8 transient scan points using a CNN trained entirely on simulation and transferred to measured data. The 6.25% spatial sampling regime is an early direct precursor to later learned under-scanning and transient-completion methods. |
+| 2022 | [Non-line-of-sight imaging based on an untrained deep decoder network](https://doi.org/10.1364/OL.471319) — Wu et al. | Optics Letters 47(19), 5056–5059 (2022) | Couples an untrained deep decoder with the passive occluder-aided forward model, optimizing network weights per measurement without paired training data. It improves hidden-image detail and robustness under strong ambient light, bridging computational periscopy and zero-shot physics-guided neural priors. |
 | 2024 | [Multi-wavelength single-pixel non-line-of-sight imaging with a compressive sensing measurement matrix](https://doi.org/10.1007/s00340-024-08265-2) — Li et al. | Applied Physics B 130(7), 127 (2024) | Extends patterned single-pixel NLOS from monochrome spatial recovery to RGB hidden-scene imaging. Multi-wavelength measurements and TV-regularized compressive reconstruction recover colour and spatial detail at a reported 29% compression rate. |
 | 2023 | [Active mode single-pixel non-line-of-sight imaging system based on second-order correlation and diffraction](https://doi.org/10.1088/2040-8986/ac9cec) — Li et al. | Journal of Optics 25(1), 015702 (2023) | Combines patterned active illumination and second-order correlation with Fourier-domain inverse diffraction. Hadamard coding improves measured hidden-image recovery and reaches a reported SSIM of 0.9286 at full sampling. |
 | 2019 | [3D RGB Non-Line-of-Sight single-pixel imaging](https://doi.org/10.1364/ISA.2019.IM2B.5) — Musarra et al. | Imaging Systems and Applications / OSA Technical Digest 2019, IM2B.5 | Demonstrates sub-second full-colour 3D hidden-scene acquisition with a high-efficiency time-resolved single-pixel camera, establishing an early bridge between transient depth and RGB single-pixel NLOS. |
@@ -336,12 +339,14 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Peng et al.: NLOS photography — direct high-resolution hidden-view image synthesis from transients [arXiv]
    │
 2022 ── Grau et al.: Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes [arXiv]
+   │     Wu et al.: an untrained deep decoder is optimized through the passive occluder-aided forward model, avoiding paired training data under strong ambient light [Optics Letters]
    │     Nakamura and Takatori: transparent reflective surfaces extend automotive virtual-image localization with parallax and polarization considerations [IEEE ITSC]
    │     Li et al.: time-sequential first-photon stamping — detection-aware acquisition reduces photon collection time for active transient NLOS [Optics Letters]
    │     Luesia et al.: scattering-media phasor fields — virtual-wave reconstruction remains effective for hidden scenes immersed in thick volumetric scattering [Optics Letters]
    │
    │     Wei et al.: measured 77 GHz mmWave NLOS 3D imaging establishes mirror-symmetry backprojection and relay-phase compensation [IEEE TGRS]
 2023 ── Wang et al.: Signal Superresolution Network — plug-and-play 16× sparse-scan acceleration [CVPR]
+   │     Zhu et al.: simulation-trained compressive learning reconstructs 32×32 hidden images from 8×8 transient scans [Physical Review Applied]
    │     Li et al.: patterned active single-pixel correlation plus inverse diffraction improves hidden-image recovery [Journal of Optics]
    │     Liu et al.: SSCR — mixed-dimensional regularization from 5×5 confocal measurements [CVPR]
    │     Li et al.: deep under-scanning reconstruction — learned transient recovery plus physics-aware volumetric inversion from grids as sparse as 8×8 [NeurIPS]
@@ -353,6 +358,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Royo et al.: virtual mirrors — higher-order phasor transport and two-corner NLOS [SIGGRAPH / TOG]
    │
 2024 ── Li et al.: ST-Mamba — state-space temporal modeling and phasor-domain wave supervision for consistent dynamic NLOS video [NeurIPS]
+   │     Wang et al.: instrument-response deconvolution removes TCSPC timing blur before LCT or f-k reconstruction, converting hardware jitter into an explicit inverse problem [Optics Express]
    │     Li et al.: multi-wavelength compressive single-pixel NLOS adds RGB colour recovery at 29% sampling [Applied Physics B]
    │     Zhao et al.: liquid-crystal planar angle magnification enlarges the effective relay aperture while correlation-aware sparse scanning cuts acquisition time [Nanophotonics]
    │     Wang et al.: vector-optical-field modeling turns illumination angle and polarization into multi-view, low-SNR NLOS measurement degrees of freedom [Laser & Photonics Reviews]
