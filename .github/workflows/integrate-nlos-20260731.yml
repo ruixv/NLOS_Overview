@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - updates/nlos_20260731.trigger
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/nlos_20260731.pr-trigger
 
 permissions:
   contents: write
@@ -45,7 +49,6 @@ jobs:
       - name: Cleanly rebuild survey PDF
         run: |
           old_hash=$(git hash-object bare_jrnl.pdf)
-          echo "$old_hash" > /tmp/old_pdf_hash
           rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           bibtex bare_jrnl
@@ -110,6 +113,7 @@ jobs:
           rm -f scripts/integrate_nlos_20260731.py
           rm -f .github/workflows/integrate-nlos-20260731.yml
           rm -f updates/nlos_20260731.trigger
+          rm -f updates/nlos_20260731.pr-trigger
 
       - name: Commit synchronized sources and rebuilt PDF
         run: |
