@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - updates/sync_diffuse_aware_readme_20260730.trigger
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/sync_diffuse_aware_readme_20260730.trigger
 
 permissions:
   contents: write
