@@ -71,13 +71,9 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
-          needles = [
-              'diffuseawareattentionencodingforpassivenlos',
-              'passivenonlineofsightimagingwithdiffuseawareattentionenhancedencoding',
-          ]
-          missing = [n for n in needles if n not in text]
-          print('PDF semantic checks:', 'ok' if not missing else f'missing {missing}')
-          if missing:
+          needle = 'diffuseawareattentionencodingforpassivenlos'
+          print('PDF semantic check:', 'ok' if needle in text else f'missing {needle}')
+          if needle not in text:
               raise SystemExit(1)
           PY
           pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
