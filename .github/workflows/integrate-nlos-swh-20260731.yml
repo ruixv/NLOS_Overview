@@ -66,9 +66,12 @@ jobs:
         run: |
           set -euo pipefail
           title='Fast non-line-of-sight imaging with high-resolution and wide field of view using synthetic wavelength holography'
+          readme_row='| 2021 | [Fast non-line-of-sight imaging with high-resolution and wide field of view using synthetic wavelength holography](https://doi.org/10.1038/s41467-021-26776-w)'
+          index_title='title:"Fast non-line-of-sight imaging with high-resolution and wide field of view using synthetic wavelength holography"'
           key='willomitzerSyntheticWavelengthNLOS2021'
-          test "$(grep -F -c "$title" README.md)" -eq 1
-          test "$(grep -F -c "$title" index.html)" -eq 1
+          grep -F -q "$title" README.md
+          test "$(grep -F -c "$readme_row" README.md)" -eq 1
+          test "$(grep -F -c "$index_title" index.html)" -eq 1
           test "$(grep -E -c "^@article\\{$key," egbib_merged_20260711.bib)" -eq 1
           test "$(grep -F -c "$key" article/2active.tex)" -ge 2
           grep -F -q "$key" bare_jrnl.aux
@@ -124,10 +127,11 @@ jobs:
           for attempt in 1 2 3; do
             git fetch origin master
             git rebase origin/master
-            title='Fast non-line-of-sight imaging with high-resolution and wide field of view using synthetic wavelength holography'
+            readme_row='| 2021 | [Fast non-line-of-sight imaging with high-resolution and wide field of view using synthetic wavelength holography](https://doi.org/10.1038/s41467-021-26776-w)'
+            index_title='title:"Fast non-line-of-sight imaging with high-resolution and wide field of view using synthetic wavelength holography"'
             key='willomitzerSyntheticWavelengthNLOS2021'
-            test "$(grep -F -c "$title" README.md)" -eq 1
-            test "$(grep -F -c "$title" index.html)" -eq 1
+            test "$(grep -F -c "$readme_row" README.md)" -eq 1
+            test "$(grep -F -c "$index_title" index.html)" -eq 1
             test "$(grep -E -c "^@article\\{$key," egbib_merged_20260711.bib)" -eq 1
             test "$(grep -F -c "$key" article/2active.tex)" -ge 2
             actual=$(grep -o '{cat:' index.html | wc -l)
