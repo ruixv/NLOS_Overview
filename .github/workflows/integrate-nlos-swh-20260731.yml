@@ -109,8 +109,10 @@ jobs:
           rm -f updates/nlos_swh_20260731.trigger
           rm -f updates/nlos_swh_20260731.pr-trigger
 
-      - name: Commit synchronized sources and rebuilt PDF
+      - name: Commit, rebase, and push synchronized artifacts
+        shell: bash
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
@@ -119,4 +121,22 @@ jobs:
             exit 1
           fi
           git commit -m "Integrate synthetic-wavelength holography NLOS milestone"
-          git push origin HEAD:master
+          for attempt in 1 2 3; do
+            git fetch origin master
+            git rebase origin/master
+            title='Fast non-line-of-sight imaging with high-resolution and wide field of view using synthetic wavelength holography'
+            key='willomitzerSyntheticWavelengthNLOS2021'
+            test "$(grep -F -c "$title" README.md)" -eq 1
+            test "$(grep -F -c "$title" index.html)" -eq 1
+            test "$(grep -E -c "^@article\\{$key," egbib_merged_20260711.bib)" -eq 1
+            test "$(grep -F -c "$key" article/2active.tex)" -ge 2
+            actual=$(grep -o '{cat:' index.html | wc -l)
+            declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
+            test "$declared" -eq "$actual"
+            if git push origin HEAD:master; then
+              exit 0
+            fi
+            echo "Push raced with another master update; retrying after rebase ($attempt/3)."
+            sleep 5
+          done
+          exit 1
