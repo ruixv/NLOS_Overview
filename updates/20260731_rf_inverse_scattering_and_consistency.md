@@ -167,3 +167,7 @@ Not claimed as synchronized in this run:
 - `bare_jrnl.tex`
 - `egbib_merged_20260711.bib`
 - `bare_jrnl.pdf`
+
+## Integration completed
+
+The pending records in this note were synchronized across README, website, semantically appropriate survey sections, the consolidated bibliography, and the rebuilt survey PDF on 31 July 2026. The final integration also includes the RF inverse-scattering lineage and the final IEEE TVCG venue for Geometry-Constrained Non-Line-of-Sight Imaging.

@@ -1,1 +1,0 @@
-The diagnostic workflow confirmed that pdflatex, BibTeX, and both subsequent pdflatex passes complete successfully. This marker requests a fresh PR validation run.
