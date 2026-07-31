@@ -1,0 +1,120 @@
+name: Integrate acoustic NLOS localization citation trace
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - updates/acoustic_localization_20260801.trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-acoustic-localization-20260801
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out current master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Install Python bibliography dependency
+        run: python3 -m pip install --user bibtexparser
+
+      - name: Apply synchronized source integration
+        run: |
+          python3 -m py_compile scripts/integrate_acoustic_localization_20260801.py
+          python3 scripts/integrate_acoustic_localization_20260801.py
+          python3 scripts/merge_nlos_bibliography.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Cleanly rebuild survey PDF
+        run: |
+          old_hash=$(git hash-object bare_jrnl.pdf)
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          new_hash=$(git hash-object bare_jrnl.pdf)
+          echo "PDF blob: $old_hash -> $new_hash"
+          test "$old_hash" != "$new_hash"
+
+      - name: Validate synchronized sources, citations, website, and PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          vehicle='Non-Line-of-Sight Vehicle Localization Based on Sound'
+          edge='Localizing acoustic sources in non-line-of-sight scenarios using irregular-grid beamforming and first-order edge diffraction'
+          vkey='jeonSoundVehicleNLOS2025'
+          ekey='zhaiIrregularGridAcousticNLOS2025'
+          test "$(grep -F -c "$vehicle" README.md)" -eq 1
+          test "$(grep -F -c "$edge" README.md)" -eq 1
+          test "$(grep -F -c "title:\"$vehicle\"" index.html)" -eq 1
+          test "$(grep -F -c "title:\"$edge\"" index.html)" -eq 1
+          test "$(grep -E -c "^@article\\{$vkey," egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -E -c "^@article\\{$ekey," egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -F -c "$vkey" article/5newscenes.tex)" -ge 1
+          test "$(grep -F -c "$ekey" article/5newscenes.tex)" -ge 1
+          grep -F -q "$vkey" bare_jrnl.aux
+          grep -F -q "$ekey" bare_jrnl.aux
+          grep -F -q "$vkey" bare_jrnl.bbl
+          grep -F -q "$ekey" bare_jrnl.bbl
+          grep -F -q 'passive acoustic vehicle tracking and edge-diffraction localization synchronized' bare_jrnl.tex
+          grep -F -q 'ASPLE particle filtering tracks hidden vehicles' index.html
+          actual=$(grep -o '{cat:' index.html | wc -l)
+          declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
+          test "$declared" -eq "$actual"
+          ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
+          needles = [
+              'nonlineofsightvehiclelocalizationbasedonsound',
+              'irregulargridbeamforming',
+              'biottolstoymedwin',
+          ]
+          missing = [needle for needle in needles if needle not in text]
+          print('PDF semantic checks:', 'ok' if not missing else f'missing {missing}')
+          if missing:
+              raise SystemExit(1)
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Commit and push validated public artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex \
+            egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-08-01-acoustic-nlos-localization.md
+          if git diff --cached --quiet; then
+            echo "No generated public-artifact changes to commit"
+            exit 1
+          fi
+          git commit -m "Integrate acoustic NLOS localization citation trace"
+          git push origin HEAD:master
