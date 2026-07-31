@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 85 source files and keeps one highest-priority record for each of 501 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 86 source files and keeps one highest-priority record for each of 501 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 1006
-- Case-insensitive duplicate replacements: 505
+- Parsed source records: 1014
+- Case-insensitive duplicate replacements: 513
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -498,7 +498,9 @@ This update generates `egbib_merged_20260711.bib` from 85 source files and keeps
 - `luesiaScatteringPhasor2023` / `luesiaScatteringPhasor2023`: `egbib_20260703_updates.bib` → `egbib_20260723_zz_phasor_lineage.bib`
 - `liangHybridPerceptronSteadyState2025` / `liangHybridPerceptronSteadyState2025`: `egbib_merged_20260711.bib` → `egbib_20260723_zzz_hybrid_perceptron.bib`
 - `liuPtychographyCorrelographyNLOS2026` / `liuPtychographyCorrelographyNLOS2026`: `egbib_20260719_ptycho_venue_updates.bib` → `egbib_20260724_ptychography_correlography.bib`
+- `yeThermalRoughNLOS2026` / `yeThermalRoughNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
 - `albertEyeSafeNLOS2026` / `albertEyeSafeNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
+- `roueinfarNIRRasterNLOS2025` / `roueinfarNIRRasterNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
 - `marcoComprehensiveToFNLOS2026` / `marcoComprehensiveToFNLOS2026`: `egbib_2026_updates.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
 - `zhangNeuralIlluminationFields2026` / `zhangNeuralIlluminationFields2026`: `egbib_20260711_run15_updates.bib` → `egbib_20260725_nif_scisa.bib`
 - `daiSCISANet2026` / `daiSCISANet2026`: `egbib_merged_20260711.bib` → `egbib_20260725_nif_scisa.bib`
@@ -517,6 +519,12 @@ This update generates `egbib_merged_20260711.bib` from 85 source files and keeps
 - `jiUnifiedRealTimeNLOS2026` / `jiUnifiedRealTimeNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260729_transient_pretraining_holistic_nlos.bib`
 - `shenMARMOT2025` / `shenMARMOT2025`: `egbib_2026_updates.bib` → `egbib_20260729_transient_pretraining_holistic_nlos.bib`
 - `shenHOLI1to3TPAMI2025` / `shenHOLI1to3TPAMI2025`: `egbib_merged_20260711.bib` → `egbib_20260729_transient_pretraining_holistic_nlos.bib`
+- `linCASlotNetNLOS2025` / `linCASlotNetNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260730_ca_slotnet.bib`
+- `chenLightweightMultiScalePassiveNLOS2025` / `chenLightweightMultiScalePassiveNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260731_passive_learning_trace.bib`
+- `jinMSPDiffPassiveNLOS2025` / `jinMSPDiffPassiveNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260731_passive_learning_trace.bib`
+- `suenobuPhysicalOpticsNLOS2024` / `suenobuPhysicalOpticsNLOS2024`: `egbib_merged_20260711.bib` → `egbib_20260731_rf_inverse_scattering_trace.bib`
+- `suenobuMultipathInverseScatteringNLOS2025` / `suenobuMultipathInverseScatteringNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260731_rf_inverse_scattering_trace.bib`
+- `choLEAP2024` / `choLEAP2024`: `egbib_20260703_updates.bib` → `egbib_20260731_zz_leap_final_venue.bib`
 
 ## Citation-key spellings normalized
 
