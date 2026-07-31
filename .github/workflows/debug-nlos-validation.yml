@@ -1,0 +1,62 @@
+name: Diagnose NLOS integration validation
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - run: python3 -m pip install --user bibtexparser
+      - name: Apply integration and bibliography merge
+        run: |
+          python3 scripts/integrate_nlos_20260731_complete.py
+          python3 scripts/merge_nlos_bibliography.py
+      - name: Record every source-level validation predicate
+        shell: bash
+        run: |
+          set +e
+          report=updates/nlos-validation-report.txt
+          : > "$report"
+          echo '=== title counts ===' >> "$report"
+          for title in \
+            'Contrast Adaptive Slot-Attention Network for NLoS Classification Under Temporal Truncation' \
+            'Enhanced passive non-line-of-sight imaging via multi-scale polarization-guided diffusion model' \
+            'Lightweight multi-scale feature fusion with attention guidance for passive non-line-of-sight imaging' \
+            'Multipath Exploitation-Based Linearized Inverse Scattering Method for Non-Line-of-Sight Indoor Imaging of PEC Objects' \
+            'Non-Line-of-Sight Imaging by Linearized Inverse Scattering Method Based on Physical Optics'; do
+            printf 'README %s :: %s\n' "$(grep -F -c "$title" README.md)" "$title" >> "$report"
+            printf 'INDEX  %s :: %s\n' "$(grep -F -c "$title" index.html)" "$title" >> "$report"
+          done
+          echo '=== key counts ===' >> "$report"
+          for key in linCASlotNetNLOS2025 chenLightweightMultiScalePassiveNLOS2025 jinMSPDiffPassiveNLOS2025 suenobuPhysicalOpticsNLOS2024 suenobuMultipathInverseScatteringNLOS2025; do
+            printf '%s bib=%s article=%s\n' "$key" "$(grep -Ei -c "^@(article|inproceedings)\\{$key," egbib_merged_20260711.bib)" "$(grep -R -F -l "$key" article | wc -l)" >> "$report"
+          done
+          echo '=== markers ===' >> "$report"
+          printf 'README date=%s\n' "$(grep -F -c '**Update run: 31 July 2026.**' README.md)" >> "$report"
+          printf 'INDEX date=%s\n' "$(grep -F -c 'Last updated: 31 July 2026' index.html)" >> "$report"
+          printf 'TEX marker=%s\n' "$(grep -F -c '31 July 2026 citation trace' bare_jrnl.tex)" >> "$report"
+          printf 'TVCG DOI=%s\n' "$(grep -F -c '10.1109/TVCG.2026.3684832' egbib_merged_20260711.bib)" >> "$report"
+          printf 'TVCG venue=%s\n' "$(grep -F -c 'IEEE Transactions on Visualization and Computer Graphics' egbib_merged_20260711.bib)" >> "$report"
+          echo '=== website count ===' >> "$report"
+          actual=$(grep -o '{cat:' index.html | wc -l)
+          declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
+          printf 'actual=%s declared=%s\n' "$actual" "$declared" >> "$report"
+          echo '=== bibliography audit ===' >> "$report"
+          grep -A1000 '## Truly missing citation keys and source locations' updates/2026-07-11-bibliography-deduplication.md >> "$report" || true
+          echo '=== diff stat ===' >> "$report"
+          git diff --stat >> "$report"
+          cat "$report"
+      - name: Upload validation report
+        uses: actions/upload-artifact@v4
+        with:
+          name: nlos-validation-report
+          path: updates/nlos-validation-report.txt
+          retention-days: 1
