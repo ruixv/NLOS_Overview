@@ -1,1 +1,1 @@
-Run the guarded integration from current master; accept a byte-identical PDF only after clean compilation, resolved citations, semantic extraction, and rendering checks all pass.
+Run the guarded integration from current master, then rebase and retry safely if master advances before the validated artifact commit is pushed.
