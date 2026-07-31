@@ -1,9 +1,6 @@
 name: Fix NLOS public final venues
 
 on:
-  push:
-    branches: [automation/nlos-20260731-final-venues]
-    paths: [updates/nlos_final_venue_consistency.trigger]
   pull_request:
     branches: [master]
 
@@ -11,20 +8,35 @@ permissions:
   contents: write
 
 jobs:
-  patch-and-validate:
+  patch-build-validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || 'automation/nlos-20260731-final-venues' }}
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
-      - name: Apply bounded public-label corrections
-        run: python3 scripts/fix_nlos_final_venues_20260731.py
-      - name: Install PDF text utility
+      - name: Install bibliography dependency
+        run: python3 -m pip install --user bibtexparser
+      - name: Apply public-label corrections and regenerate bibliography
+        run: |
+          python3 scripts/fix_nlos_final_venues_20260731.py
+          python3 scripts/merge_nlos_bibliography.py
+      - name: Install LaTeX and PDF tools
         run: |
           sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
           sudo apt-get -o Acquire::Retries=5 update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends poppler-utils
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers poppler-utils
+      - name: Rebuild survey PDF
+        run: |
+          old_hash=$(git hash-object bare_jrnl.pdf)
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          new_hash=$(git hash-object bare_jrnl.pdf)
+          test "$new_hash" != "$old_hash"
       - name: Validate cross-artifact final venues
         shell: bash
         run: |
@@ -37,13 +49,17 @@ jobs:
           grep -F -q '10.1038/s41467-026-75177-4' README.md
           grep -F -q 'venue:"Nature Communications 2026"' index.html
           grep -F -q '10.1038/s41467-026-75177-4' index.html
-          grep -F -q '10.1007/978-3-031-72775-7_5' egbib_merged_20260711.bib
-          grep -F -q '10.1038/s41467-026-75177-4' egbib_merged_20260711.bib
+          test "$(grep -F -c '10.1007/978-3-031-72775-7_5' egbib_merged_20260711.bib)" -ge 1
+          test "$(grep -F -c '10.1038/s41467-026-75177-4' egbib_merged_20260711.bib)" -ge 1
+          grep -F -q 'choLEAP2024' bare_jrnl.bbl
+          grep -F -q 'sultanIteratingTLTM2026' bare_jrnl.bbl
+          ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
           pdftotext -raw bare_jrnl.pdf /tmp/nlos-survey.txt
           test -s /tmp/nlos-survey.txt
           test "$(grep -F -c 'Learning to Enhance Aperture Phasor Field for Non-Line-of-Sight Imaging' README.md)" -eq 1
           test "$(grep -F -c 'Learning to Enhance Aperture Phasor Field for Non-Line-of-Sight Imaging' index.html)" -eq 1
-      - name: Commit corrected public artifacts
+      - name: Commit corrected public artifacts and rebuilt PDF
         run: |
           rm -f scripts/fix_nlos_final_venues_20260731.py
           rm -f .github/workflows/fix-nlos-final-venues-20260731.yml
@@ -52,4 +68,4 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
           git commit -m 'Correct public final venues for LEAP and TLTM'
-          git push origin HEAD:${GITHUB_HEAD_REF:-automation/nlos-20260731-final-venues}
+          git push origin HEAD:${GITHUB_HEAD_REF}
