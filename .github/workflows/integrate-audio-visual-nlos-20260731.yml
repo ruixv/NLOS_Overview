@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - updates/audio_visual_nlos_20260731.trigger
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/audio_visual_nlos_20260731.pr-trigger
 
 permissions:
   contents: write
@@ -103,6 +107,7 @@ jobs:
           rm -f scripts/integrate_audio_visual_nlos_20260731.py
           rm -f .github/workflows/integrate-audio-visual-nlos-20260731.yml
           rm -f updates/audio_visual_nlos_20260731.trigger
+          rm -f updates/audio_visual_nlos_20260731.pr-trigger
 
       - name: Commit, rebase, and push synchronized artifacts
         shell: bash
