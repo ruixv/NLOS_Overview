@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - updates/acoustic_localization_20260801.trigger
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/acoustic_localization_20260801.pr-trigger
 
 permissions:
   contents: write
