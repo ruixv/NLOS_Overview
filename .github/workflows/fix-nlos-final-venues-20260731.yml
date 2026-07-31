@@ -1,0 +1,59 @@
+name: Fix NLOS public final venues
+
+on:
+  push:
+    branches: [automation/nlos-20260731-final-venues]
+    paths: [updates/nlos_final_venue_consistency.trigger]
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: automation/nlos-20260731-final-venues
+          fetch-depth: 0
+      - name: Apply bounded public-label corrections
+        run: python3 scripts/fix_nlos_final_venues_20260731.py
+      - name: Install PDF text utility
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends poppler-utils
+      - name: Validate cross-artifact final venues
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F -q 'ECCV 2024, LNCS 15101, 72–89' README.md
+          grep -F -q '10.1007/978-3-031-72775-7_5' README.md
+          grep -F -q 'venue:"ECCV 2024"' index.html
+          grep -F -q '10.1007/978-3-031-72775-7_5' index.html
+          grep -F -q 'Nature Communications 2026' README.md
+          grep -F -q '10.1038/s41467-026-75177-4' README.md
+          grep -F -q 'venue:"Nature Communications 2026"' index.html
+          grep -F -q '10.1038/s41467-026-75177-4' index.html
+          grep -F -q '10.1007/978-3-031-72775-7_5' egbib_merged_20260711.bib
+          grep -F -q '10.1038/s41467-026-75177-4' egbib_merged_20260711.bib
+          pdftotext -raw bare_jrnl.pdf /tmp/nlos-survey.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text=''.join(c for c in Path('/tmp/nlos-survey.txt').read_text(errors='ignore').lower() if c.isalnum())
+          for marker in ('learningtoenhanceaperturephasorfield','iteratingthetransientlighttransportmatrix'):
+              if marker not in text:
+                  raise SystemExit(f'missing PDF title marker: {marker}')
+          PY
+          test "$(grep -F -c 'Learning to Enhance Aperture Phasor Field for Non-Line-of-Sight Imaging' README.md)" -eq 1
+          test "$(grep -F -c 'Learning to Enhance Aperture Phasor Field for Non-Line-of-Sight Imaging' index.html)" -eq 1
+      - name: Commit corrected public artifacts
+        run: |
+          rm -f scripts/fix_nlos_final_venues_20260731.py
+          rm -f .github/workflows/fix-nlos-final-venues-20260731.yml
+          rm -f updates/nlos_final_venue_consistency.trigger
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Correct public final venues for LEAP and TLTM'
+          git push origin HEAD:automation/nlos-20260731-final-venues
