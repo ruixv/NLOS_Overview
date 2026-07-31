@@ -1,1 +1,1 @@
-Run the guarded integration from current master after the TeX-safe relay-aperture wording fix; rebuild and validate all synchronized source and PDF artifacts.
+Run the guarded integration from current master; accept a byte-identical PDF only after clean compilation, resolved citations, semantic extraction, and rendering checks all pass.
