@@ -1,1 +1,1 @@
-Run the guarded integration from the current master snapshot and push the validated source/PDF update back to master.
+Run the guarded integration from current master after the TeX-safe relay-aperture wording fix; rebuild and validate all synchronized source and PDF artifacts.
