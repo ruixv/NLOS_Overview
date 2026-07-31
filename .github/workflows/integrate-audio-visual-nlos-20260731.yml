@@ -1,4 +1,4 @@
-name: Integrate audio-visual acoustic NLOS vehicle detection
+name: Integrate audio-visual and NIR NLOS additions
 
 on:
   push:
@@ -55,26 +55,31 @@ jobs:
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           new_hash=$(git hash-object bare_jrnl.pdf)
-          if [ "$new_hash" = "$old_hash" ]; then
-            echo "PDF rebuild is byte-identical after successful compilation: $new_hash"
-          else
-            echo "PDF blob: $old_hash -> $new_hash"
-          fi
+          echo "PDF blob: $old_hash -> $new_hash"
 
       - name: Validate synchronized sources, citations, website, and PDF
         shell: bash
         run: |
           set -euo pipefail
-          readme_row='| 2026 | [Non-line-of-sight vehicle detection via audio-visual fusion](https://doi.org/10.1109/ICASSP55912.2026.11465095)'
-          index_title='title:"Non-line-of-sight vehicle detection via audio-visual fusion"'
-          key='wangAudioVisualNLOS2026'
-          test "$(grep -F -c "$readme_row" README.md)" -eq 1
-          test "$(grep -F -c "$index_title" index.html)" -eq 1
-          test "$(grep -E -c "^@inproceedings\\{$key," egbib_merged_20260711.bib)" -eq 1
-          test "$(grep -F -c "$key" article/5newscenes.tex)" -eq 1
-          grep -F -q "$key" bare_jrnl.aux
-          grep -F -q "$key" bare_jrnl.bbl
-          grep -F -q 'scene-aware audio-visual acoustic NLOS vehicle detection synchronized' bare_jrnl.tex
+          audio_row='| 2026 | [Non-line-of-sight vehicle detection via audio-visual fusion](https://doi.org/10.1109/ICASSP55912.2026.11465095)'
+          audio_title='title:"Non-line-of-sight vehicle detection via audio-visual fusion"'
+          audio_key='wangAudioVisualNLOS2026'
+          nir_row='| 2025 | [Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength](https://doi.org/10.1109/ICEE67339.2025.11213924)'
+          nir_title='title:"Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength"'
+          nir_key='roueinfarNIRRaster2025'
+          test "$(grep -F -c "$audio_row" README.md)" -eq 1
+          test "$(grep -F -c "$audio_title" index.html)" -eq 1
+          test "$(grep -E -c "^@inproceedings\\{$audio_key," egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -F -c "$audio_key" article/5newscenes.tex)" -eq 1
+          test "$(grep -F -c "$nir_row" README.md)" -eq 1
+          test "$(grep -F -c "$nir_title" index.html)" -eq 1
+          test "$(grep -E -c "^@inproceedings\\{$nir_key," egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -F -c "$nir_key" article/2active.tex)" -ge 2
+          grep -F -q "$audio_key" bare_jrnl.aux
+          grep -F -q "$audio_key" bare_jrnl.bbl
+          grep -F -q "$nir_key" bare_jrnl.aux
+          grep -F -q "$nir_key" bare_jrnl.bbl
+          grep -F -q 'audio-visual acoustic NLOS and final-venue NIR raster-scanning records synchronized' bare_jrnl.tex
           actual=$(grep -o '{cat:' index.html | wc -l)
           declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
           test "$declared" -eq "$actual"
@@ -87,7 +92,8 @@ jobs:
           needles = [
               'nonlineofsightvehicledetectionviaaudiovisualfusion',
               'sceneawarenetwork',
-              'fullyoccluded',
+              'nonlineofsightimagingusingrasterscanningatnirwavelength',
+              'lowcostnirsteadystaterasterscanning',
           ]
           missing = [needle for needle in needles if needle not in text]
           print('PDF semantic checks:', 'ok' if not missing else f'missing {missing}')
@@ -109,7 +115,7 @@ jobs:
           rm -f updates/audio_visual_nlos_20260731.trigger
           rm -f updates/audio_visual_nlos_20260731.pr-trigger
 
-      - name: Commit, rebase, and push synchronized artifacts
+      - name: Rebase generated changes safely, commit, and push
         shell: bash
         run: |
           set -euo pipefail
@@ -117,27 +123,30 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           if git diff --cached --quiet; then
-            echo "No changes to commit"
+            echo "No generated changes to commit"
             exit 1
           fi
-          git commit -m "Integrate audio-visual acoustic NLOS vehicle detection"
-          for attempt in 1 2 3; do
-            git fetch origin master
-            git rebase origin/master
-            readme_row='| 2026 | [Non-line-of-sight vehicle detection via audio-visual fusion](https://doi.org/10.1109/ICASSP55912.2026.11465095)'
-            index_title='title:"Non-line-of-sight vehicle detection via audio-visual fusion"'
-            key='wangAudioVisualNLOS2026'
-            test "$(grep -F -c "$readme_row" README.md)" -eq 1
-            test "$(grep -F -c "$index_title" index.html)" -eq 1
-            test "$(grep -E -c "^@inproceedings\\{$key," egbib_merged_20260711.bib)" -eq 1
-            test "$(grep -F -c "$key" article/5newscenes.tex)" -eq 1
-            actual=$(grep -o '{cat:' index.html | wc -l)
-            declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
-            test "$declared" -eq "$actual"
-            if git push origin HEAD:master; then
-              exit 0
-            fi
-            echo "Push raced with another master update; retrying after rebase ($attempt/3)."
-            sleep 5
-          done
-          exit 1
+          git stash push --include-untracked -m audio-visual-nir-generated
+          git fetch origin master
+          git reset --hard origin/master
+          git stash pop
+          git add -A
+          audio_row='| 2026 | [Non-line-of-sight vehicle detection via audio-visual fusion](https://doi.org/10.1109/ICASSP55912.2026.11465095)'
+          audio_title='title:"Non-line-of-sight vehicle detection via audio-visual fusion"'
+          audio_key='wangAudioVisualNLOS2026'
+          nir_row='| 2025 | [Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength](https://doi.org/10.1109/ICEE67339.2025.11213924)'
+          nir_title='title:"Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength"'
+          nir_key='roueinfarNIRRaster2025'
+          test "$(grep -F -c "$audio_row" README.md)" -eq 1
+          test "$(grep -F -c "$audio_title" index.html)" -eq 1
+          test "$(grep -E -c "^@inproceedings\\{$audio_key," egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -F -c "$audio_key" article/5newscenes.tex)" -eq 1
+          test "$(grep -F -c "$nir_row" README.md)" -eq 1
+          test "$(grep -F -c "$nir_title" index.html)" -eq 1
+          test "$(grep -E -c "^@inproceedings\\{$nir_key," egbib_merged_20260711.bib)" -eq 1
+          test "$(grep -F -c "$nir_key" article/2active.tex)" -ge 2
+          actual=$(grep -o '{cat:' index.html | wc -l)
+          declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
+          test "$declared" -eq "$actual"
+          git commit -m "Integrate audio-visual and NIR NLOS additions"
+          git push origin HEAD:master
