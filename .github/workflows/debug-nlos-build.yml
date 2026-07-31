@@ -1,0 +1,65 @@
+name: Diagnose NLOS survey build
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 1
+      - run: python3 -m pip install --user bibtexparser
+      - name: Apply pending integration
+        run: |
+          python3 scripts/integrate_nlos_20260731_complete.py
+          python3 scripts/merge_nlos_bibliography.py
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers ghostscript poppler-utils
+      - name: Run build and capture diagnostics
+        id: build
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          {
+            echo '=== pdflatex pass 1 ==='
+            pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+            s=$?; echo "status=$s"; test "$s" -eq 0 || exit "$s"
+            echo '=== bibtex ==='
+            bibtex bare_jrnl
+            s=$?; echo "status=$s"; test "$s" -eq 0 || exit "$s"
+            echo '=== pdflatex pass 2 ==='
+            pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+            s=$?; echo "status=$s"; test "$s" -eq 0 || exit "$s"
+            echo '=== pdflatex pass 3 ==='
+            pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+            s=$?; echo "status=$s"; exit "$s"
+          } > nlos-build-console.log 2>&1
+      - name: Collect diagnostics
+        if: always()
+        run: |
+          mkdir -p nlos-build-diagnostics
+          cp nlos-build-console.log nlos-build-diagnostics/ 2>/dev/null || true
+          cp bare_jrnl.log bare_jrnl.blg bare_jrnl.aux bare_jrnl.bbl nlos-build-diagnostics/ 2>/dev/null || true
+          git diff --stat > nlos-build-diagnostics/git-diff-stat.txt || true
+          git status --short > nlos-build-diagnostics/git-status.txt || true
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nlos-build-diagnostics
+          path: nlos-build-diagnostics
+          if-no-files-found: error
+          retention-days: 1
