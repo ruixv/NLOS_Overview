@@ -14,7 +14,6 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 TITLE = "Non-line-of-sight vehicle detection via audio-visual fusion"
 KEY = "wangAudioVisualNLOS2026"
-DOI = "10.1109/ICASSP55912.2026.11465095"
 
 
 def require_once(text: str, needle: str, label: str) -> None:
@@ -43,26 +42,18 @@ def update_readme() -> None:
     )
     text = text.replace(table_anchor, table_anchor + row, 1)
 
-    timeline_anchor = "## Milestone Timeline\n"
-    require_once(text, timeline_anchor, "Milestone Timeline heading")
-    timeline = (
-        "\n- **2026 — Scene-aware audio-visual acoustic NLOS detection:** Wang et al. "
-        "combine BEV scene structure with acoustic time-frequency and spatiotemporal "
-        "features, moving hidden-vehicle sensing beyond audio-only localization toward "
-        "multimodal semantic detection under occlusion.\n"
+    timeline_anchor = (
+        "   │     Doğan: laser–acoustic early fusion and LAO-Net extend hidden-human "
+        "NLOS sensing from localization/reconstruction toward four-class orientation "
+        "inference [Scientific Reports]\n"
     )
-    text = text.replace(timeline_anchor, timeline_anchor + timeline, 1)
-
-    category_anchor = "## New NLOS Scenes and Modalities\n"
-    require_once(text, category_anchor, "New NLOS Scenes and Modalities heading")
-    category = (
-        "\n- **Audio-visual acoustic perception:** [Wang et al., ICASSP 2026]"
-        "(https://doi.org/10.1109/ICASSP55912.2026.11465095) fuse visual BEV scene "
-        "geometry with acoustic spectra for semantic detection of vehicles that are "
-        "outside the camera's line of sight; this is task-level NLOS sensing rather "
-        "than hidden-image or hidden-shape reconstruction.\n"
+    require_once(text, timeline_anchor, "2026 acoustic milestone")
+    timeline_line = (
+        "   │     Wang et al.: scene-aware audio–visual fusion conditions acoustic "
+        "spectra on BEV geometry for semantic detection of fully occluded vehicles "
+        "[IEEE ICASSP]\n"
     )
-    text = text.replace(category_anchor, category_anchor + category, 1)
+    text = text.replace(timeline_anchor, timeline_anchor + timeline_line, 1)
     path.write_text(text, encoding="utf-8")
 
 
