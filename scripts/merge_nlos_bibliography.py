@@ -9,6 +9,11 @@ files by case-folded key, gives later supplements priority, renames each final
 record to the exact spelling used by the survey when unambiguous, audits truly
 missing references with source locations, and points ``bare_jrnl.tex`` to the
 consolidated database.
+
+The existing consolidated database is loaded first as a compatibility snapshot.
+This preserves historical records that were previously added directly to the
+merged file before source-supplement enforcement; canonical source files and
+later dated corrections still override that snapshot deterministically.
 """
 from __future__ import annotations
 
@@ -32,6 +37,11 @@ def source_files() -> list[Path]:
     base = ROOT / "egbib.bib"
     broad = ROOT / "egbib_2026_updates.bib"
     ordered: list[Path] = []
+    # Lowest-priority compatibility snapshot: retain records that exist only in
+    # the historical merged database, while allowing every canonical source
+    # file below to supersede them.
+    if OUTPUT.exists():
+        ordered.append(OUTPUT)
     for preferred in (base, broad):
         if preferred in all_files:
             ordered.append(preferred)
@@ -159,7 +169,7 @@ def main() -> None:
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from {len(sources)} source files and keeps one highest-priority record for each of {len(final_entries)} case-insensitively unique keys. Priority is deterministic: `egbib.bib`, then `egbib_2026_updates.bib`, followed by dated supplements in chronological filename order, so later corrections override older records. The selected records are then renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from {len(sources)} source files and keeps one highest-priority record for each of {len(final_entries)} case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
 - Parsed source records: {parsed_total}
 - Case-insensitive duplicate replacements: {len(replacements)}
@@ -183,7 +193,7 @@ This update generates `egbib_merged_20260711.bib` from {len(sources)} source fil
 
 {missing_lines}
 
-The CI workflow performs a clean LaTeX/BibTeX build, rejects undefined citations or repeated entries, validates the PDF with `pdfinfo` and `pdftotext`, and verifies that the newly integrated X-band radar and Neural Illumination Fields records appear in the generated bibliography.
+The CI workflow performs a clean LaTeX/BibTeX build, rejects undefined citations or repeated entries, validates the PDF with `pdfinfo` and `pdftotext`, and verifies that newly integrated records appear in the generated bibliography.
 """
     NOTE.parent.mkdir(parents=True, exist_ok=True)
     NOTE.write_text(note, encoding="utf-8")
