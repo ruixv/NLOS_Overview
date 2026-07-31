@@ -113,13 +113,15 @@ new_sentences = (
     r"optical wavelengths into a longer synthetic-wavelength hologram, preserving phase information after diffuse scattering "
     r"without relay-wall raster scanning. The demonstrated system reconstructs around-corner and through-scattering scenes "
     r"with sub-millimeter resolution over a nearly hemispheric angular field of view, records the complete object field in "
-    r"46~ms, and probes only a $58\times58$~mm relay region. This result complements transient ToF and phasor-field methods "
+    r"46~ms, and probes only a 58-by-58~mm relay region. This result complements transient ToF and phasor-field methods "
     r"by exchanging picosecond timing and large apertures for wavelength diversity and coherent full-field acquisition."
 )
 if "Their subsequent full-field system matured this coherent lineage" not in active:
     if active.count(old_sentence) != 1:
         raise RuntimeError("interferometry prose anchor not found uniquely")
     active = active.replace(old_sentence, new_sentences, 1)
+# Guard against a literal Unicode multiplication sign in TeX sources.
+active = active.replace("58×58", "58-by-58")
 write("article/2active.tex", active)
 
 
