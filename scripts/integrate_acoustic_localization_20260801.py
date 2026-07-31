@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Synchronize two verified acoustic NLOS localization papers.
 
-The edits are bounded, idempotent, and intentionally fail when a structural
-anchor is ambiguous. Bibliography consolidation and PDF rebuilding are handled
-by the companion GitHub Actions workflow.
+Edits are bounded and idempotent. The companion workflow consolidates the
+bibliography, rebuilds the PDF, and validates every public artifact.
 """
 from __future__ import annotations
 
@@ -11,7 +10,6 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-
 VEHICLE_TITLE = "Non-Line-of-Sight Vehicle Localization Based on Sound"
 VEHICLE_KEY = "jeonSoundVehicleNLOS2025"
 EDGE_TITLE = (
@@ -42,8 +40,7 @@ def insert_after_unique_line(text: str, marker: str, addition: str, label: str) 
     matches = [i for i, line in enumerate(lines) if marker in line]
     if len(matches) != 1:
         raise RuntimeError(f"Expected exactly one {label}, found {len(matches)}")
-    idx = matches[0]
-    lines.insert(idx + 1, addition)
+    lines.insert(matches[0] + 1, addition)
     return "".join(lines)
 
 
@@ -66,13 +63,12 @@ def append_timeline_sentence(text: str, year: int, sentence: str, marker: str) -
     match = pattern.search(text)
     if not match:
         raise RuntimeError(f"Could not locate the {year} website timeline entry")
-    return text[: match.start(2)] + match.group(2) + sentence + text[match.end(2) :]
+    return text[:match.start(2)] + match.group(2) + sentence + text[match.end(2):]
 
 
 def update_readme() -> None:
     path = ROOT / "README.md"
     text = path.read_text(encoding="utf-8")
-
     vehicle_row = (
         "| 2025 | [Non-Line-of-Sight Vehicle Localization Based on Sound]"
         "(https://doi.org/10.1109/TITS.2024.3510582) — Jeon et al. | "
@@ -94,10 +90,6 @@ def update_readme() -> None:
     )
     text = insert_latest_row(text, VEHICLE_TITLE, vehicle_row)
     text = insert_latest_row(text, EDGE_TITLE, edge_row)
-
-    timeline_marker = (
-        "Wang et al.: scene-aware audio–visual fusion conditions acoustic"
-    )
     timeline_lines = (
         "   │     Jeon et al.: ASPLE particle filtering and the ARIL/OVAD datasets "
         "bring passive acoustic NLOS vehicle localization into road-safety tracking "
@@ -108,9 +100,9 @@ def update_readme() -> None:
     )
     text = insert_after_unique_line(
         text,
-        timeline_marker,
+        "Doğan: laser–acoustic early fusion and LAO-Net",
         timeline_lines,
-        "audio-visual acoustic timeline milestone",
+        "Scientific Reports acoustic timeline milestone",
     )
     path.write_text(text, encoding="utf-8")
 
@@ -118,7 +110,6 @@ def update_readme() -> None:
 def update_index() -> None:
     path = ROOT / "index.html"
     text = path.read_text(encoding="utf-8")
-
     vehicle_record = (
         '      {cat:"latest modality acoustic passive localization tracking vehicle '
         'autonomous-driving dataset",title:"Non-Line-of-Sight Vehicle Localization '
@@ -140,7 +131,6 @@ def update_index() -> None:
     )
     text = insert_paper_record(text, VEHICLE_TITLE, vehicle_record)
     text = insert_paper_record(text, EDGE_TITLE, edge_record)
-
     text = append_timeline_sentence(
         text,
         2025,
@@ -150,15 +140,14 @@ def update_index() -> None:
         "localizes sources behind finite obstacle edges.",
         "ASPLE particle filtering tracks hidden vehicles",
     )
-
     actual = text.count("{cat:")
-    text, n = re.subn(
+    text, count = re.subn(
         r'<b>\d+</b><span>tracked latest entries</span>',
         f'<b>{actual}</b><span>tracked latest entries</span>',
         text,
         count=1,
     )
-    if n != 1:
+    if count != 1:
         raise RuntimeError("website tracked-entry count anchor not found")
     path.write_text(text, encoding="utf-8")
 
@@ -192,7 +181,6 @@ def update_survey() -> None:
         )
         text = text[:next_section].rstrip() + paragraph + "\n" + text[next_section:]
         path.write_text(text, encoding="utf-8")
-
     main = ROOT / "bare_jrnl.tex"
     main_text = main.read_text(encoding="utf-8")
     marker = (
@@ -202,8 +190,7 @@ def update_survey() -> None:
     if marker not in main_text:
         anchor = "%% bare_jrnl.tex\n"
         require_once(main_text, anchor, "bare_jrnl header")
-        main_text = main_text.replace(anchor, anchor + marker, 1)
-        main.write_text(main_text, encoding="utf-8")
+        main.write_text(main_text.replace(anchor, anchor + marker, 1), encoding="utf-8")
 
 
 def update_note() -> None:
