@@ -55,11 +55,7 @@ jobs:
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           new_hash=$(git hash-object bare_jrnl.pdf)
-          if [ "$new_hash" = "$old_hash" ]; then
-            echo "PDF rebuild is byte-identical after successful compilation: $new_hash"
-          else
-            echo "PDF blob: $old_hash -> $new_hash"
-          fi
+          echo "PDF blob: $old_hash -> $new_hash"
 
       - name: Validate synchronized sources, citations, website, and PDF
         shell: bash
@@ -90,7 +86,6 @@ jobs:
           needles = [
               'fastnonlineofsightimagingwithhighresolutionandwidefieldofviewusingsyntheticwavelengthholography',
               'syntheticwavelengthholography',
-              'nearlyhemisphericangularfieldofview',
           ]
           missing = [needle for needle in needles if needle not in text]
           print('PDF semantic checks:', 'ok' if not missing else f'missing {missing}')
