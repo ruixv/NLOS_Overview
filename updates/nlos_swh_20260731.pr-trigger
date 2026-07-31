@@ -1,2 +1,2 @@
 Trigger the guarded synthetic-wavelength holography integration from a pull-request event.
-Retry after correcting the PDF semantic validation on 2026-07-31.
+Retry after correcting the PDF semantic validation and generated-change rebase on 2026-07-31.
