@@ -52,6 +52,11 @@ jobs:
           rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           bibtex bare_jrnl
+          # Preserve the generated .bbl, but discard the first-pass auxiliary files.
+          # This avoids carrying a malformed end-of-file \@writefile entry into the
+          # post-BibTeX pass while still allowing LaTeX to read the bibliography.
+          rm -f bare_jrnl.aux bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
           new_hash=$(git hash-object bare_jrnl.pdf)
