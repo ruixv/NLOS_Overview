@@ -100,7 +100,7 @@ def update_readme() -> None:
     )
     text = insert_after_unique_line(
         text,
-        "2025 ──",
+        "2025 ── Roueinfar & Salmanian",
         "   │     Tian et al.: deconvolution and virtual modulated range migration "
         "recover 50× super-resolution histograms from nanosecond-resolution ToF data "
         "[Optics Letters]\n",
