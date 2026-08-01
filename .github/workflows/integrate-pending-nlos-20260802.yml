@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - .github/workflows/integrate-pending-nlos-20260802.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/pending_nlos_20260802_pr.trigger
 
 permissions:
   contents: write
