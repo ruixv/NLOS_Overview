@@ -117,4 +117,13 @@ jobs:
             exit 1
           fi
           git commit -m "Integrate pending NLOS citation traces"
-          git push origin HEAD:master
+          for attempt in 1 2 3; do
+            git fetch origin master
+            git rebase origin/master
+            if git push origin HEAD:master; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Unable to push regenerated artifacts after three rebased attempts" >&2
+          exit 1
