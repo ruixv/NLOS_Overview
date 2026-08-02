@@ -89,7 +89,7 @@ jobs:
                   "title": "Non-line-of-sight virtual modulated range migration imaging based on super-resolution histograms",
                   "key": "tianVirtualRMAHistograms2025",
                   "section": "article/2active.tex",
-                  "pdf_terms": ["virtualmodulatedrangemigration", "superresolutionhistograms"],
+                  "pdf_terms": ["virtualmodulatedrangemigration"],
               },
           ]
 
