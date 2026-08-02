@@ -29,11 +29,9 @@ jobs:
           python3 -m pip install --user bibtexparser
           python3 -m py_compile scripts/integrate_audio_visual_nlos_20260731.py
           python3 -m py_compile scripts/integrate_frequency_domain_reconstruction_20260801.py
-          python3 -m py_compile scripts/integrate_geraf2_public_artifacts_20260802.py
           python3 scripts/integrate_audio_visual_nlos_20260731.py
           python3 scripts/integrate_frequency_domain_reconstruction_20260801.py
           python3 scripts/merge_nlos_bibliography.py
-          python3 scripts/integrate_geraf2_public_artifacts_20260802.py
 
       - name: Install LaTeX and PDF tools
         run: |
@@ -92,12 +90,6 @@ jobs:
                   "key": "tianVirtualRMAHistograms2025",
                   "section": "article/2active.tex",
                   "pdf_terms": ["virtualmodulatedrangemigration", "superresolutionhistograms"],
-              },
-              {
-                  "title": "Seeing through boxes: Non-Line-of-Sight 3D Reconstruction from Radar Signals",
-                  "key": "luSeeingThroughBoxes2026",
-                  "section": "article/5newscenes.tex",
-                  "pdf_terms": ["seeingthroughboxes"],
               },
           ]
 
@@ -160,8 +152,7 @@ jobs:
           git add README.md index.html article/2active.tex article/5newscenes.tex \
             bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
             updates/2026-07-31-audio-visual-and-nir-nlos.md \
-            updates/2026-08-01-frequency-domain-reconstruction.md \
-            updates/2026-08-02-geraf2-public-sync.md
+            updates/2026-08-01-frequency-domain-reconstruction.md
           if git diff --cached --quiet; then
             echo "No public-artifact changes were generated"
             exit 1
