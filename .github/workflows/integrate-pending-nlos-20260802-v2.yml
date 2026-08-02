@@ -60,41 +60,82 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          audio='Non-line-of-sight vehicle detection via audio-visual fusion'
-          product='Fast non-line-of-sight imaging based on product-convolution expansions'
-          rma='Non-line-of-sight virtual modulated range migration imaging based on super-resolution histograms'
-          for title in "$audio" "$product" "$rma"; do
-            grep -F -q "$title" README.md
-            grep -F -q "$title" index.html
-          done
-          for key in wangAudioVisualNLOS2026 xuProductConvolutionNLOS2022 tianVirtualRMAHistograms2025; do
-            test "$(grep -E -c "^@(article|inproceedings)\\{$key," egbib_merged_20260711.bib)" -eq 1
-            grep -F -q "$key" bare_jrnl.aux
-            grep -F -q "$key" bare_jrnl.bbl
-          done
-          grep -F -q 'wangAudioVisualNLOS2026' article/5newscenes.tex
-          grep -F -q 'xuProductConvolutionNLOS2022' article/2active.tex
-          grep -F -q 'tianVirtualRMAHistograms2025' article/2active.tex
-          ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
-          actual=$(grep -o '{cat:' index.html | wc -l)
-          declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
-          test "$declared" -eq "$actual"
-          pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
+          pdfinfo bare_jrnl.pdf | tee /tmp/bare_jrnl_pdfinfo.txt
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
           python3 - <<'PY'
           from pathlib import Path
-          text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
-          needles = [
-              'nonlineofsightvehicledetectionviaaudiovisualfusion',
-              'fastnonlineofsightimagingbasedonproductconvolutionexpansions',
-              'virtualmodulatedrangemigration',
-              'superresolutionhistograms',
+          import re
+
+          records = [
+              {
+                  "title": "Non-line-of-sight vehicle detection via audio-visual fusion",
+                  "key": "wangAudioVisualNLOS2026",
+                  "section": "article/5newscenes.tex",
+                  "pdf_terms": ["audiovisualfusion"],
+              },
+              {
+                  "title": "Non-Line-of-Sight imaging using raster scanning at NIR wavelength",
+                  "key": "roueinfarNIRRasterScanningNLOS2025",
+                  "section": "article/2active.tex",
+                  "pdf_terms": ["rasterscanningatnirwavelength"],
+              },
+              {
+                  "title": "Fast non-line-of-sight imaging based on product-convolution expansions",
+                  "key": "xuProductConvolutionNLOS2022",
+                  "section": "article/2active.tex",
+                  "pdf_terms": ["productconvolutionexpansions"],
+              },
+              {
+                  "title": "Non-line-of-sight virtual modulated range migration imaging based on super-resolution histograms",
+                  "key": "tianVirtualRMAHistograms2025",
+                  "section": "article/2active.tex",
+                  "pdf_terms": ["virtualmodulatedrangemigration", "superresolutionhistograms"],
+              },
           ]
-          missing = [needle for needle in needles if needle not in text]
-          if missing:
-              raise SystemExit(f'PDF semantic checks missing: {missing}')
+
+          readme = Path("README.md").read_text(errors="ignore")
+          html = Path("index.html").read_text(errors="ignore")
+          bib = Path("egbib_merged_20260711.bib").read_text(errors="ignore")
+          aux = Path("bare_jrnl.aux").read_text(errors="ignore")
+          bbl = Path("bare_jrnl.bbl").read_text(errors="ignore")
+          log = Path("bare_jrnl.log").read_text(errors="ignore")
+          pdf = "".join(ch for ch in Path("bare_jrnl.txt").read_text(errors="ignore").lower() if ch.isalnum())
+
+          failures = []
+          for record in records:
+              title, key = record["title"], record["key"]
+              for label, text in (("README", readme), ("website", html)):
+                  if title not in text:
+                      failures.append(f"{label} missing title: {title}")
+              entry_count = len(re.findall(rf"@\w+\s*\{{\s*{re.escape(key)}\s*,", bib, flags=re.I))
+              if entry_count != 1:
+                  failures.append(f"merged bibliography has {entry_count} entries for {key}")
+              for label, text in (("AUX", aux), ("BBL", bbl)):
+                  if key not in text:
+                      failures.append(f"{label} missing citation key: {key}")
+              section = Path(record["section"]).read_text(errors="ignore")
+              if key not in section:
+                  failures.append(f"{record['section']} missing citation key: {key}")
+              for term in record["pdf_terms"]:
+                  if term not in pdf:
+                      failures.append(f"PDF text missing semantic term: {term}")
+
+          if re.search(r"Citation .* undefined|There were undefined citations|Repeated entry", log):
+              failures.append("LaTeX log contains unresolved or repeated citations")
+
+          actual = html.count("{cat:")
+          declared = re.findall(r"<b>(\d+)</b><span>tracked latest entries</span>", html)
+          if len(declared) != 1:
+              failures.append(f"website entry counter matched {len(declared)} times")
+          elif int(declared[0]) != actual:
+              failures.append(f"website entry counter says {declared[0]} but explorer contains {actual}")
+
+          if failures:
+              raise SystemExit("Artifact validation failed:\n- " + "\n- ".join(failures))
+          print(f"Validated {len(records)} synchronized papers and {actual} website entries")
           PY
-          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/bare_jrnl_pdfinfo.txt)
+          test -n "$pages"
           mkdir -p .pdf_render_check
           pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
           pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
