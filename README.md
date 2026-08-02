@@ -8,7 +8,7 @@
 [![Papers](https://img.shields.io/badge/Papers-210+-green)]()
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Last Updated](https://img.shields.io/badge/Last_Updated-July_2026-red)]()
+[![Last Updated](https://img.shields.io/badge/Last_Updated-August_2026-red)]()
 
 *Authors: Ruixu Geng · Yang Hu · Yan Chen*
 
@@ -64,10 +64,13 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 31 July 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 1 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [Non-line-of-sight virtual modulated range migration imaging based on super-resolution histograms](https://doi.org/10.1364/OL.542897) — Tian et al. | Optics Letters 50(2), 519–522 (2025) | Combines deconvolution-modified iterative backprojection with virtual modulated range migration, recovering 50× super-resolved histograms from 1 ns measurements before high-resolution confocal or non-confocal reconstruction. It targets inexpensive low-time-resolution NLOS systems and reduces the required data volume. |
+| 2022 | [Fast non-line-of-sight imaging based on product-convolution expansions](https://doi.org/10.1364/OL.469719) — Xu et al. | Optics Letters 47(18), 4680–4683 (2022) | Approximates the shift-variant non-confocal ellipsoidal forward operator and its adjoint by local convolutions, then uses FFTs and low-rank matrix decompositions for fast iterative reconstruction. Public transient datasets show phasor-field-like quality with substantially lower runtime. |
+| 2026 | [Non-line-of-sight vehicle detection via audio-visual fusion](https://doi.org/10.1109/ICASSP55912.2026.11465095) — Wang et al. | IEEE ICASSP 2026, 11807–11811 | Uses bird's-eye-view scene geometry together with time-frequency and spatiotemporal acoustic spectra in a CNN–LSTM–Conformer network for detecting fully occluded vehicles. The published experiments report 94.1% and 97.0% accuracy on the OVAD and AOVD datasets, extending acoustic NLOS from localization and reconstruction toward scene-conditioned semantic perception. |
 | 2025 | [Localizing acoustic sources in non-line-of-sight scenarios using irregular-grid beamforming and first-order edge diffraction](https://doi.org/10.1016/j.measurement.2025.117944) — Zhai et al. | Measurement 256, 117944 (2025) | Builds a non-free-field steering vector from the Biot–Tolstoy–Medwin first-order edge-diffraction response and combines it with irregular-grid frequency-domain beamforming. Simulations and a 32-channel array experiment localize hidden acoustic sources while limiting main-lobe deformation behind finite obstacle edges. |
 | 2025 | [Non-Line-of-Sight Vehicle Localization Based on Sound](https://doi.org/10.1109/TITS.2024.3510582) — Jeon et al. | IEEE Transactions on Intelligent Transportation Systems 26(2), 2321–2338 (2025) | Introduces an Acoustic-Spatial Pseudo-Likelihood particle filter for tracking vehicles approaching from fully occluded road regions. ARIL supplies BEV ground-truth positions and, together with OVAD, validates a practical passive acoustic NLOS localization branch for collision avoidance. |
 | 2025 | [Contrast Adaptive Slot-Attention Network for NLoS Classification Under Temporal Truncation](https://doi.org/10.1109/EICARS68214.2025.11320161) — Lin et al. | IEEE EICARS 2025, 140–143 | Uses CLAHE/Sobel-guided contrast modulation and physically guided slot regularization to stabilize object-centric attention on temporally truncated, photon-sparse NLOS signals. It extends the learned-transient branch from reconstruction toward robust semantic classification under incomplete time-series measurements. |
@@ -336,6 +339,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Chen et al.: learned NLOS feature embeddings — a shared physics-aware representation for reconstruction, detection, and recognition [SIGGRAPH Asia / TOG]
    │
 2025 ── Roueinfar & Salmanian: low-cost 808 nm steady-state NIR raster scanning [IEEE ICEE]
+   │     Tian et al.: deconvolution and virtual modulated range migration recover 50× super-resolution histograms from nanosecond-resolution ToF data [Optics Letters]
      │     Guo et al.: vectorial digitelligent optics jointly optimizes phase and polarization to refocus through a rough relay wall and attain near-diffraction-limited 0.40-mm NLOS imaging [Engineering]
    │     Oyama and Takatori: painted-surface reflections support semantic NLOS obstacle detection after reflection-aware appearance normalization [IEEE ITSC]
      │     Yuan et al.: RIS-enabled covariance-domain gridless DoA uses atomic-norm recovery and ADMM for simulated multi-target NLOS angular sensing [Signal Processing]
@@ -346,6 +350,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Peng et al.: NLOS photography — direct high-resolution hidden-view image synthesis from transients [arXiv]
    │
 2022 ── Grau et al.: Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes [arXiv]
+   │     Xu et al.: product-convolution expansions turn the shift-variant non-confocal ellipsoidal operator into FFT-accelerated local convolutions [Optics Letters]
    │     Wu et al.: an untrained deep decoder is optimized through the passive occluder-aided forward model, avoiding paired training data under strong ambient light [Optics Letters]
    │     Nakamura and Takatori: transparent reflective surfaces extend automotive virtual-image localization with parallax and polarization considerations [IEEE ITSC]
    │     Li et al.: time-sequential first-photon stamping — detection-aware acquisition reduces photon collection time for active transient NLOS [Optics Letters]
@@ -415,6 +420,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Mu et al.: wave-propagation and volume-rendering priors enable feed-forward high-speed non-confocal NLOS reconstruction [IEEE TPAMI]
 2026 ── Yin et al.: Si-SPAD and phase-congruency regularization enable 200 m all-day active NLOS under 94,314 lx sunlight [Optics and Lasers in Engineering]
    │     Doğan: laser–acoustic early fusion and LAO-Net extend hidden-human NLOS sensing from localization/reconstruction toward four-class orientation inference [Scientific Reports]
+   │     Wang et al.: scene-aware audio–visual fusion conditions acoustic spectra on BEV geometry for semantic detection of fully occluded vehicles [IEEE ICASSP]
    │     Jeon et al.: ASPLE particle filtering and the ARIL/OVAD datasets bring passive acoustic NLOS vehicle localization into road-safety tracking [IEEE T-ITS]
    │     Zhai et al.: Biot–Tolstoy–Medwin edge diffraction supplies a physics-aware steering vector for irregular-grid hidden-source beamforming [Measurement]
      │     Zhang et al.: monostatic radar--RIS steering-vector decoupling and Root-MUSIC enable simulated NLOS target-angle estimation [Signal Processing]
