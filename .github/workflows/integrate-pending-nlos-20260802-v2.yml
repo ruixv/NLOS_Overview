@@ -74,8 +74,8 @@ jobs:
                   "pdf_terms": ["audiovisualfusion"],
               },
               {
-                  "title": "Non-Line-of-Sight imaging using raster scanning at NIR wavelength",
-                  "key": "roueinfarNIRRasterScanningNLOS2025",
+                  "title": "Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength",
+                  "key": "roueinfarNIRRaster2025",
                   "section": "article/2active.tex",
                   "pdf_terms": ["rasterscanningatnirwavelength"],
               },
