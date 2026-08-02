@@ -67,14 +67,14 @@ jobs:
             grep -F -q "$title" README.md
             grep -F -q "$title" index.html
           done
-          for key in wangXuAudioVisualVehicleNLOS2026 redgraveProductConvolutionNLOS2022 xueVirtualModulatedRNLOS2025; do
+          for key in wangAudioVisualNLOS2026 xuProductConvolutionNLOS2022 tianVirtualRMAHistograms2025; do
             test "$(grep -E -c "^@(article|inproceedings)\\{$key," egbib_merged_20260711.bib)" -eq 1
             grep -F -q "$key" bare_jrnl.aux
             grep -F -q "$key" bare_jrnl.bbl
           done
-          grep -F -q 'wangXuAudioVisualVehicleNLOS2026' article/5newscenes.tex
-          grep -F -q 'redgraveProductConvolutionNLOS2022' article/2active.tex
-          grep -F -q 'xueVirtualModulatedRNLOS2025' article/2active.tex
+          grep -F -q 'wangAudioVisualNLOS2026' article/5newscenes.tex
+          grep -F -q 'xuProductConvolutionNLOS2022' article/2active.tex
+          grep -F -q 'tianVirtualRMAHistograms2025' article/2active.tex
           ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
           actual=$(grep -o '{cat:' index.html | wc -l)
           declared=$(grep -oP '<b>\K[0-9]+(?=</b><span>tracked latest entries</span>)' index.html)
