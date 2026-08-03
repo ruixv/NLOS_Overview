@@ -64,10 +64,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 1 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 3 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [Material Classification from Non-Line-of-Sight Acoustic Echoes Using Wavelet-Acoustic Hybrid Feature Fusion](https://doi.org/10.3390/s26051577) — Alakuş and Türkoğlu | Sensors 26(5), 1577 (2026) | Uses chirp echoes reaching nine hidden materials only through wall-mediated acoustic paths. A 70-dimensional fusion of classical acoustic and multi-scale wavelet features, classified by recurrent networks, reaches 0.99 balanced accuracy and macro-F1; SHAP links predictions to interpretable material properties. This is semantic acoustic NLOS sensing rather than hidden geometry reconstruction. |
 | 2025 | [Non-line-of-sight virtual modulated range migration imaging based on super-resolution histograms](https://doi.org/10.1364/OL.542897) — Tian et al. | Optics Letters 50(2), 519–522 (2025) | Combines deconvolution-modified iterative backprojection with virtual modulated range migration, recovering 50× super-resolved histograms from 1 ns measurements before high-resolution confocal or non-confocal reconstruction. It targets inexpensive low-time-resolution NLOS systems and reduces the required data volume. |
 | 2022 | [Fast non-line-of-sight imaging based on product-convolution expansions](https://doi.org/10.1364/OL.469719) — Xu et al. | Optics Letters 47(18), 4680–4683 (2022) | Approximates the shift-variant non-confocal ellipsoidal forward operator and its adjoint by local convolutions, then uses FFTs and low-rank matrix decompositions for fast iterative reconstruction. Public transient datasets show phasor-field-like quality with substantially lower runtime. |
 | 2026 | [Non-line-of-sight vehicle detection via audio-visual fusion](https://doi.org/10.1109/ICASSP55912.2026.11465095) — Wang et al. | IEEE ICASSP 2026, 11807–11811 | Uses bird's-eye-view scene geometry together with time-frequency and spatiotemporal acoustic spectra in a CNN–LSTM–Conformer network for detecting fully occluded vehicles. The published experiments report 94.1% and 97.0% accuracy on the OVAD and AOVD datasets, extending acoustic NLOS from localization and reconstruction toward scene-conditioned semantic perception. |
@@ -421,6 +422,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
 2026 ── Yin et al.: Si-SPAD and phase-congruency regularization enable 200 m all-day active NLOS under 94,314 lx sunlight [Optics and Lasers in Engineering]
    │     Doğan: laser–acoustic early fusion and LAO-Net extend hidden-human NLOS sensing from localization/reconstruction toward four-class orientation inference [Scientific Reports]
    │     Wang et al.: scene-aware audio–visual fusion conditions acoustic spectra on BEV geometry for semantic detection of fully occluded vehicles [IEEE ICASSP]
+   │     Alakuş and Türkoğlu: wall-mediated chirp echoes and wavelet–acoustic feature fusion enable interpretable nine-class hidden-material recognition [Sensors]
    │     Jeon et al.: ASPLE particle filtering and the ARIL/OVAD datasets bring passive acoustic NLOS vehicle localization into road-safety tracking [IEEE T-ITS]
    │     Zhai et al.: Biot–Tolstoy–Medwin edge diffraction supplies a physics-aware steering vector for irregular-grid hidden-source beamforming [Measurement]
      │     Zhang et al.: monostatic radar--RIS steering-vector decoupling and Root-MUSIC enable simulated NLOS target-angle estimation [Signal Processing]

@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 86 source files and keeps one highest-priority record for each of 501 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 91 source files and keeps one highest-priority record for each of 508 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 1014
-- Case-insensitive duplicate replacements: 513
+- Parsed source records: 1028
+- Case-insensitive duplicate replacements: 520
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -520,11 +520,18 @@ This update generates `egbib_merged_20260711.bib` from 86 source files and keeps
 - `shenMARMOT2025` / `shenMARMOT2025`: `egbib_2026_updates.bib` → `egbib_20260729_transient_pretraining_holistic_nlos.bib`
 - `shenHOLI1to3TPAMI2025` / `shenHOLI1to3TPAMI2025`: `egbib_merged_20260711.bib` → `egbib_20260729_transient_pretraining_holistic_nlos.bib`
 - `linCASlotNetNLOS2025` / `linCASlotNetNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260730_ca_slotnet.bib`
+- `wangAudioVisualNLOS2026` / `wangAudioVisualNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260731_audio_visual_nlos.bib`
+- `roueinfarNIRRaster2025` / `roueinfarNIRRaster2025`: `egbib_20260709_updates.bib` → `egbib_20260731_audio_visual_nlos.bib`
 - `chenLightweightMultiScalePassiveNLOS2025` / `chenLightweightMultiScalePassiveNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260731_passive_learning_trace.bib`
 - `jinMSPDiffPassiveNLOS2025` / `jinMSPDiffPassiveNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260731_passive_learning_trace.bib`
 - `suenobuPhysicalOpticsNLOS2024` / `suenobuPhysicalOpticsNLOS2024`: `egbib_merged_20260711.bib` → `egbib_20260731_rf_inverse_scattering_trace.bib`
 - `suenobuMultipathInverseScatteringNLOS2025` / `suenobuMultipathInverseScatteringNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260731_rf_inverse_scattering_trace.bib`
+- `willomitzerSyntheticWavelengthNLOS2021` / `willomitzerSyntheticWavelengthNLOS2021`: `egbib_merged_20260711.bib` → `egbib_20260731_synthetic_wavelength_holography.bib`
 - `choLEAP2024` / `choLEAP2024`: `egbib_20260703_updates.bib` → `egbib_20260731_zz_leap_final_venue.bib`
+- `xuProductConvolutionNLOS2022` / `xuProductConvolutionNLOS2022`: `egbib_merged_20260711.bib` → `egbib_20260801_frequency_domain.bib`
+- `tianVirtualRMAHistograms2025` / `tianVirtualRMAHistograms2025`: `egbib_merged_20260711.bib` → `egbib_20260801_frequency_domain.bib`
+- `jeonSoundVehicleNLOS2025` / `jeonSoundVehicleNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
+- `zhaiIrregularGridAcousticNLOS2025` / `zhaiIrregularGridAcousticNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
 
 ## Citation-key spellings normalized
 
