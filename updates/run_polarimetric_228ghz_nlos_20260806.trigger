@@ -3,3 +3,4 @@ Retried after the guarded workflow was confirmed on the default branch.
 Pull-request validation trigger.
 Retried with robust PDF text validation.
 Persist validated artifacts on this pull-request branch.
+Final validation retry after PR-branch persistence workflow.
