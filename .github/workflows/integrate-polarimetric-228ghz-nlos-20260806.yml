@@ -100,8 +100,7 @@ jobs:
               if key not in text:
                   failures.append(f"{label} missing citation key {key}")
           for semantic in (
-              "polarimetricsubterahertzcorridorimaging",
-              "measuredcopolarizedreflectioncoefficients",
+              "222228ghz",
               "polarizationdiscrimination",
               "mirrortransformation",
           ):
