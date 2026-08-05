@@ -2,3 +2,4 @@ Triggered 6 August 2026 after DOI, IEEE/DBLP/ORCID metadata, modality relevance,
 Retried after the guarded workflow was confirmed on the default branch.
 Pull-request validation trigger.
 Retried with robust PDF text validation.
+Persist validated artifacts on this pull-request branch.
