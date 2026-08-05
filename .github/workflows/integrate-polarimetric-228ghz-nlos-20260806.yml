@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - updates/run_polarimetric_228ghz_nlos_20260806.trigger
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/run_polarimetric_228ghz_nlos_20260806.trigger
 
 permissions:
   contents: write
@@ -99,7 +103,7 @@ jobs:
               "polarimetricsubterahertzcorridorimaging",
               "measuredcopolarizedreflectioncoefficients",
               "polarizationdiscrimination",
-              "mirrort ransformation".replace(" ", ""),
+              "mirrortransformation",
           ):
               if semantic not in pdf:
                   failures.append(f"PDF text missing semantic term {semantic}")
