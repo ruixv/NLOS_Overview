@@ -1,0 +1,72 @@
+name: Integrate THz deep-unfolding NLOS paper
+
+on:
+  push:
+    branches:
+      - automation/thz-deep-unfolding-20260805
+    paths:
+      - updates/run_thz_deep_unfolding_20260805.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out integration branch
+        uses: actions/checkout@v4
+        with:
+          ref: automation/thz-deep-unfolding-20260805
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-publishers texlive-bibtex-extra poppler-utils ghostscript
+
+      - name: Apply bounded source updates
+        run: python3 tools/integrate_thz_deep_unfolding_20260805.py
+
+      - name: Rebuild survey PDF
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate source and PDF consistency
+        run: |
+          python3 tools/integrate_thz_deep_unfolding_20260805.py
+          ! grep -E "Citation .* undefined|There were undefined references|There were undefined citations" bare_jrnl.log
+          test -s bare_jrnl.pdf
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          tr '\n' ' ' < /tmp/bare_jrnl.txt | grep -F "Learning to See Around Corners"
+          tr '\n' ' ' < /tmp/bare_jrnl.txt | grep -F "Model-driven learned THz reconstruction"
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test -n "$pages"
+          test "$pages" -ge 1
+          mkdir -p /tmp/pdfcheck
+          pdftoppm -f 1 -singlefile -png -r 72 bare_jrnl.pdf /tmp/pdfcheck/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 72 bare_jrnl.pdf /tmp/pdfcheck/last >/dev/null 2>&1
+          test -s /tmp/pdfcheck/first.png
+          test -s /tmp/pdfcheck/last.png
+          grep -F '<div class="stat"><b>257</b><span>tracked latest entries</span></div>' index.html
+          grep -F '10.3390/photonics13050440' README.md index.html article/5newscenes.tex egbib_merged_20260711.bib
+
+      - name: Commit validated public artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf \
+            egbib_20260805_thz_deep_unfolding.bib egbib_merged_20260711.bib \
+            updates/2026-07-11-bibliography-deduplication.md \
+            updates/2026-08-05-thz-deep-unfolding-nlos.md
+          git diff --cached --quiet && { echo "No artifact changes to commit"; exit 0; }
+          git commit -m "Integrate THz radar deep-unfolding NLOS imaging"
+          git push origin HEAD:automation/thz-deep-unfolding-20260805
