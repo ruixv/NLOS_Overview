@@ -1,0 +1,100 @@
+name: Finalize NLOS survey consistency 20260806
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finalize-nlos-consistency-20260806
+  cancel-in-progress: false
+
+jobs:
+  finalize-build-validate:
+    if: github.event.pull_request.head.ref == 'automation/nlos-consistency-20260806'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Apply final placement and deduplication
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/finalize_nlos_consistency_20260806.py
+          python3 scripts/finalize_nlos_consistency_20260806.py
+
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Rebuild survey PDF
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.txt
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate final placement and PDF
+        run: |
+          set -euo pipefail
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          article = Path('article/5newscenes.tex').read_text(errors='ignore')
+          html = Path('index.html').read_text(errors='ignore')
+          note = Path('updates/2026-08-06-citation-and-public-artifact-sync.md').read_text(errors='ignore')
+          aux = Path('bare_jrnl.aux').read_text(errors='ignore')
+          bbl = Path('bare_jrnl.bbl').read_text(errors='ignore')
+          log = Path('bare_jrnl.log').read_text(errors='ignore')
+          pdf = ''.join(c for c in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if c.isalnum())
+          sentence = 'Polarization-encoded spatial multiplexing separated speckles from multiple optical-memory-effect regions in a single exposure, expanding steady-state around-corner imaging beyond the conventional memory-effect field of view.'
+          radar_key = 'alburadiPolarimetricRadarNLOS2025'
+          bookmark = '\\bookmark[dest=\\HyperLocalCurrentHref,level=2]{Acoustic NLOS Imaging}'
+          errors = []
+          if article.index(radar_key) > article.index(bookmark): errors.append('radar paragraph is not inside the radar section')
+          if html.count(sentence) != 1: errors.append(f'website duplicate sentence count {html.count(sentence)}')
+          if 'Revalidated **Non-line-of-sight imaging via physics-informed cascade learning**' not in note: errors.append('PICL note wording not corrected')
+          if 'Revalidated the existing final-venue record for **Passive acoustic' not in note: errors.append('Sommer note wording not corrected')
+          if radar_key not in aux or radar_key not in bbl: errors.append('radar citation not resolved')
+          if 'rapidindoormappingandnonlineofsightimaging' not in pdf: errors.append('radar record missing from rendered PDF')
+          if re.search(r'Citation .* undefined|There were undefined citations|Repeated entry', log): errors.append('LaTeX citation problem')
+          actual = html.count('{cat:')
+          declared = re.findall(r'<b>(\d+)</b><span>tracked latest entries</span>', html)
+          if len(declared) != 1 or int(declared[0]) != actual: errors.append('website counter mismatch')
+          if errors: raise SystemExit('Validation failed:\n- ' + '\n- '.join(errors))
+          print(f'Final consistency validation passed for {actual} website records')
+          PY
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Persist validated final public artifacts
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f scripts/finalize_nlos_consistency_20260806.py .github/workflows/finalize-nlos-consistency-20260806.yml
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          git add -A
+          git commit -m 'Finalize NLOS survey placement and website consistency'
+          git push origin HEAD:"$HEAD_BRANCH"
