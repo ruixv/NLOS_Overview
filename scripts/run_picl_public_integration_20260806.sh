@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BRANCH=automation/picl-public-sync-20260806
+OUTPUT_BRANCH="automation/generated-picl-public-sync-${GITHUB_RUN_ID:-manual}"
+
+git show "origin/${BRANCH}:scripts/sync_picl_public_artifacts_20260806.py" > /tmp/sync_picl.py
+python3 -m py_compile /tmp/sync_picl.py
+python3 /tmp/sync_picl.py
+
+sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+sudo apt-get -o Acquire::Retries=5 update
+sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+  texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+  texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+  ghostscript poppler-utils
+
+old_hash=$(git hash-object bare_jrnl.pdf)
+rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+bibtex bare_jrnl
+rm -f bare_jrnl.aux bare_jrnl.out bare_jrnl.toc
+pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+new_hash=$(git hash-object bare_jrnl.pdf)
+echo "PDF blob: ${old_hash} -> ${new_hash}"
+test "$old_hash" != "$new_hash"
+
+pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+python3 - <<'PY'
+from pathlib import Path
+import re
+
+title = 'Non-line-of-sight imaging via physics-informed cascade learning'
+doi = '10.1364/JOSAA.593401'
+key = 'zhaoPICL2026'
+final_url = 'https://openaccess.thecvf.com/content/ICCV2025/html/Sun_Generalizable_Non-Line-of-Sight_Imaging_with_Learnable_Physical_Priors_ICCV_2025_paper.html'
+sentence = 'Polarization-encoded spatial multiplexing separated speckles from multiple optical-memory-effect regions in a single exposure, expanding steady-state around-corner imaging beyond the conventional memory-effect field of view.'
+readme = Path('README.md').read_text(errors='ignore')
+html = Path('index.html').read_text(errors='ignore')
+article = Path('article/4datadriven.tex').read_text(errors='ignore')
+tex = Path('bare_jrnl.tex').read_text(errors='ignore')
+bib = Path('egbib_merged_20260711.bib').read_text(errors='ignore')
+aux = Path('bare_jrnl.aux').read_text(errors='ignore')
+bbl = Path('bare_jrnl.bbl').read_text(errors='ignore')
+log = Path('bare_jrnl.log').read_text(errors='ignore')
+pdf = ''.join(c for c in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if c.isalnum())
+errors = []
+for label, data in [('README', readme), ('website', html)]:
+    if data.count(title) != 1: errors.append(f'{label}: PICL title count {data.count(title)}')
+    if data.count(doi) != 1: errors.append(f'{label}: PICL DOI count {data.count(doi)}')
+    if final_url not in data: errors.append(f'{label}: missing final ICCV URL')
+if html.count(sentence) != 1: errors.append(f'website duplicate sentence count {html.count(sentence)}')
+if article.count(key) != 1: errors.append(f'survey PICL citation count {article.count(key)}')
+if 'through 6 August 2026' not in tex: errors.append('survey coverage date missing')
+if len(re.findall(r'@article\s*\{\s*zhaoPICL2026\s*,', bib, re.I)) != 1: errors.append('PICL bibliography entry count is not one')
+if key not in aux or key not in bbl: errors.append('compiled PICL citation missing')
+for term in ['nonlineofsightimagingviaphysicsinformedcascadelearning','journaloftheopticalsocietyofamericaa','101364josaa593401','generalizablenonlineofsightimagingwithlearnablephysicalpriors','internationalconferenceoncomputervisioniccv']:
+    if term not in pdf: errors.append(f'PDF missing {term}')
+if re.search(r'Citation .* undefined|There were undefined citations|Repeated entry', log): errors.append('LaTeX log has unresolved/repeated citations')
+actual = html.count('{cat:')
+declared = re.findall(r'<b>(\d+)</b><span>tracked latest entries</span>', html)
+if len(declared) != 1 or int(declared[0]) != actual: errors.append(f'website counter mismatch: {declared} vs {actual}')
+if errors: raise SystemExit('Validation failed:\n- ' + '\n- '.join(errors))
+print(f'Validated PICL public synchronization across {actual} website records')
+PY
+pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+test -n "$pages"
+mkdir -p .pdf_render_check
+pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+test -s .pdf_render_check/first.png
+test -s .pdf_render_check/last.png
+rm -rf .pdf_render_check bare_jrnl.txt
+
+git config user.name 'github-actions[bot]'
+git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+git add README.md index.html bare_jrnl.tex bare_jrnl.pdf updates/2026-08-06-picl-public-artifact-sync.md
+if git diff --cached --quiet; then
+  echo 'No public-artifact changes were generated'
+  exit 1
+fi
+git checkout -b "$OUTPUT_BRANCH"
+git commit -m 'Synchronize PICL and final NLOS venue metadata'
+git push origin "$OUTPUT_BRANCH"
+echo "Generated branch: $OUTPUT_BRANCH"
