@@ -28,7 +28,8 @@ if html.count(sentence) != 1:
     raise RuntimeError(f"Unexpected polarization timeline sentence count: {html.count(sentence)}")
 INDEX.write_text(html, encoding="utf-8")
 
-note = NOTE.read_text(encoding="utf-8")nnote = note.replace(
+note = NOTE.read_text(encoding="utf-8")
+note = note.replace(
     "- Synchronized **Non-line-of-sight imaging via physics-informed cascade learning** (JOSA A 43(9), E9–E18, 2026; DOI `10.1364/JOSAA.593401`) across the README discovery surface, website explorer, existing survey discussion, bibliography, and rebuilt PDF.\n",
     "- Revalidated **Non-line-of-sight imaging via physics-informed cascade learning** (JOSA A 43(9), E9–E18, 2026; DOI `10.1364/JOSAA.593401`) across its existing README, website, survey, bibliography, and rebuilt-PDF records.\n",
 )
