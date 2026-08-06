@@ -5,6 +5,8 @@ on:
     branches: [master]
     paths:
       - updates/run_picl_public_sync_master_v2_20260806.trigger
+  pull_request:
+    branches: [master]
 
 permissions:
   contents: write
