@@ -1,0 +1,32 @@
+name: Integrate PICL public artifacts v2 20260806
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - updates/run_picl_public_sync_master_v2_20260806.trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-picl-public-sync-v2-20260806
+  cancel-in-progress: false
+
+jobs:
+  launch-reviewed-runner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+      - name: Fetch and execute reviewed integration runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin automation/picl-public-sync-20260806:refs/remotes/origin/automation/picl-public-sync-20260806
+          git show origin/automation/picl-public-sync-20260806:scripts/run_picl_public_integration_20260806.sh > /tmp/run_picl_integration.sh
+          chmod +x /tmp/run_picl_integration.sh
+          /tmp/run_picl_integration.sh
