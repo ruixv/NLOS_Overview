@@ -6,6 +6,11 @@ on:
       - automation/nlos-citation-trace-20260806b
     paths:
       - .github/workflows/integrate-citation-traced-acoustic-mmwave-20260806.yml
+  pull_request:
+    branches:
+      - master
+    paths:
+      - .github/workflows/integrate-citation-traced-acoustic-mmwave-20260806.yml
 
 permissions:
   contents: write
