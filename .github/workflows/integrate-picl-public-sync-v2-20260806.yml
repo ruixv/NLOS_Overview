@@ -29,6 +29,6 @@ jobs:
         run: |
           set -euo pipefail
           git fetch origin automation/picl-public-sync-20260806:refs/remotes/origin/automation/picl-public-sync-20260806
-          git show origin/automation/picl-public-sync-20260806:scripts/run_picl_public_integration_20260806.sh > /tmp/run_picl_integration.sh
+          git show origin/automation/picl-public-sync-20260806:scripts/run_picl_public_integration_v3_20260806.sh > /tmp/run_picl_integration.sh
           chmod +x /tmp/run_picl_integration.sh
           /tmp/run_picl_integration.sh
