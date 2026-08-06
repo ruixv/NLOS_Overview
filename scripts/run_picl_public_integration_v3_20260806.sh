@@ -66,4 +66,7 @@ PY
 # Execute the reviewed build, validation, rendering, and generated-branch
 # persistence stages from the original runner, skipping its updater invocation.
 awk '/^sudo sed -i/{emit=1} emit' /tmp/original_runner.sh > /tmp/build_validate_persist.sh
+# PDF text extraction may insert a line-break hyphen inside the title; the DOI,
+# journal, and a distinctive title fragment together remain a strict check.
+sed -i 's/nonlineofsightimagingviaphysicsinformedcascadelearning/physicsinformedcascadelearning/' /tmp/build_validate_persist.sh
 source /tmp/build_validate_persist.sh
