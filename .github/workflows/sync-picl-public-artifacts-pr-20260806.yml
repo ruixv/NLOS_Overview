@@ -1,0 +1,123 @@
+name: Validate and persist PICL public sync
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-picl-public-artifacts-20260806
+  cancel-in-progress: false
+
+jobs:
+  sync-build-validate:
+    if: github.event.pull_request.head.ref == 'automation/picl-public-sync-20260806'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Apply bounded synchronization when needed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Fq 'Non-line-of-sight imaging via physics-informed cascade learning' README.md \
+             && grep -Fq '**Update run: 6 August 2026.**' README.md; then
+            echo 'Public source synchronization is already present'
+          else
+            python3 -m py_compile scripts/sync_picl_public_artifacts_20260806.py
+            python3 scripts/sync_picl_public_artifacts_20260806.py
+          fi
+
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Rebuild survey PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          rm -f bare_jrnl.aux bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate synchronization and rendered PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          title = 'Non-line-of-sight imaging via physics-informed cascade learning'
+          doi = '10.1364/JOSAA.593401'
+          key = 'zhaoPICL2026'
+          final_url = 'https://openaccess.thecvf.com/content/ICCV2025/html/Sun_Generalizable_Non-Line-of-Sight_Imaging_with_Learnable_Physical_Priors_ICCV_2025_paper.html'
+          sentence = 'Polarization-encoded spatial multiplexing separated speckles from multiple optical-memory-effect regions in a single exposure, expanding steady-state around-corner imaging beyond the conventional memory-effect field of view.'
+          readme = Path('README.md').read_text(errors='ignore')
+          html = Path('index.html').read_text(errors='ignore')
+          article = Path('article/4datadriven.tex').read_text(errors='ignore')
+          tex = Path('bare_jrnl.tex').read_text(errors='ignore')
+          bib = Path('egbib_merged_20260711.bib').read_text(errors='ignore')
+          aux = Path('bare_jrnl.aux').read_text(errors='ignore')
+          bbl = Path('bare_jrnl.bbl').read_text(errors='ignore')
+          log = Path('bare_jrnl.log').read_text(errors='ignore')
+          pdf = ''.join(c for c in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if c.isalnum())
+          errors = []
+          for label, data in [('README', readme), ('website', html)]:
+              if data.count(title) != 1: errors.append(f'{label}: PICL title count {data.count(title)}')
+              if data.count(doi) != 1: errors.append(f'{label}: PICL DOI count {data.count(doi)}')
+              if final_url not in data: errors.append(f'{label}: missing final ICCV URL')
+          if html.count(sentence) != 1: errors.append(f'website duplicate sentence count {html.count(sentence)}')
+          if article.count(key) != 1: errors.append(f'survey citation count {article.count(key)}')
+          if 'through 6 August 2026' not in tex: errors.append('survey coverage date not updated')
+          if len(re.findall(r'@article\s*\{\s*zhaoPICL2026\s*,', bib, re.I)) != 1: errors.append('PICL bibliography entry count is not one')
+          if key not in aux or key not in bbl: errors.append('compiled citation key missing from AUX or BBL')
+          for term in ['nonlineofsightimagingviaphysicsinformedcascadelearning','journaloftheopticalsocietyofamericaa','101364josaa593401','generalizablenonlineofsightimagingwithlearnablephysicalpriors','internationalconferenceoncomputervisioniccv']:
+              if term not in pdf: errors.append(f'PDF missing {term}')
+          if re.search(r'Citation .* undefined|There were undefined citations|Repeated entry', log): errors.append('LaTeX log has unresolved/repeated citations')
+          actual = html.count('{cat:')
+          declared = re.findall(r'<b>(\d+)</b><span>tracked latest entries</span>', html)
+          if len(declared) != 1 or int(declared[0]) != actual: errors.append(f'website counter mismatch: {declared} vs {actual}')
+          if errors: raise SystemExit('Validation failed:\n- ' + '\n- '.join(errors))
+          print(f'Validated {actual} website records and synchronized survey/PDF')
+          PY
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Persist validated public artifacts
+        shell: bash
+        env:
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f scripts/sync_picl_public_artifacts_20260806.py \
+            .github/workflows/sync-picl-public-artifacts-20260806.yml \
+            .github/workflows/sync-picl-public-artifacts-pr-20260806.yml \
+            updates/run_picl_public_sync_20260806.trigger
+          git add -A
+          git commit -m 'Synchronize PICL and final NLOS venue metadata'
+          git push origin HEAD:"$HEAD_BRANCH"
