@@ -1,0 +1,153 @@
+name: Sync PICL public artifacts 20260806
+
+on:
+  push:
+    branches:
+      - automation/picl-public-sync-20260806
+    paths:
+      - updates/run_picl_public_sync_20260806.trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-picl-public-artifacts-20260806
+  cancel-in-progress: false
+
+jobs:
+  update-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out update branch
+        uses: actions/checkout@v4
+        with:
+          ref: automation/picl-public-sync-20260806
+          fetch-depth: 0
+
+      - name: Apply bounded source changes
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/sync_picl_public_artifacts_20260806.py
+          python3 scripts/sync_picl_public_artifacts_20260806.py
+
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Rebuild survey PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          old_hash=$(git hash-object bare_jrnl.pdf)
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          rm -f bare_jrnl.aux bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          new_hash=$(git hash-object bare_jrnl.pdf)
+          echo "PDF blob: $old_hash -> $new_hash"
+          test "$old_hash" != "$new_hash"
+
+      - name: Validate public consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          pdfinfo bare_jrnl.pdf | tee /tmp/bare_jrnl_pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          title = "Non-line-of-sight imaging via physics-informed cascade learning"
+          doi = "10.1364/JOSAA.593401"
+          key = "zhaoPICL2026"
+          final_title = "Generalizable Non-Line-of-Sight Imaging with Learnable Physical Priors"
+          final_url = "https://openaccess.thecvf.com/content/ICCV2025/html/Sun_Generalizable_Non-Line-of-Sight_Imaging_with_Learnable_Physical_Priors_ICCV_2025_paper.html"
+          duplicate_sentence = "Polarization-encoded spatial multiplexing separated speckles from multiple optical-memory-effect regions in a single exposure, expanding steady-state around-corner imaging beyond the conventional memory-effect field of view."
+
+          readme = Path("README.md").read_text(errors="ignore")
+          html = Path("index.html").read_text(errors="ignore")
+          article = Path("article/4datadriven.tex").read_text(errors="ignore")
+          tex = Path("bare_jrnl.tex").read_text(errors="ignore")
+          bib = Path("egbib_merged_20260711.bib").read_text(errors="ignore")
+          aux = Path("bare_jrnl.aux").read_text(errors="ignore")
+          bbl = Path("bare_jrnl.bbl").read_text(errors="ignore")
+          log = Path("bare_jrnl.log").read_text(errors="ignore")
+          pdf_raw = Path("bare_jrnl.txt").read_text(errors="ignore").lower()
+          pdf = "".join(ch for ch in pdf_raw if ch.isalnum())
+
+          failures = []
+          for label, text in (("README", readme), ("website", html)):
+              if text.count(title) != 1:
+                  failures.append(f"{label} contains PICL title {text.count(title)} times")
+              if text.count(doi) != 1:
+                  failures.append(f"{label} contains PICL DOI {text.count(doi)} times")
+              if final_url not in text:
+                  failures.append(f"{label} lacks final ICCV URL")
+          if html.count(duplicate_sentence) != 1:
+              failures.append(f"website contains timeline sentence {html.count(duplicate_sentence)} times")
+          if article.count(key) != 1:
+              failures.append(f"article/4datadriven.tex contains citation key {article.count(key)} times")
+          if "through 6 August 2026" not in tex:
+              failures.append("bare_jrnl.tex lacks current coverage date")
+          if len(re.findall(r"@article\s*\{\s*zhaoPICL2026\s*,", bib, flags=re.I)) != 1:
+              failures.append("merged bibliography does not contain exactly one PICL entry")
+          for label, text in (("AUX", aux), ("BBL", bbl)):
+              if key not in text:
+                  failures.append(f"{label} missing PICL citation key")
+          for semantic in (
+              "nonlineofsightimagingviaphysicsinformedcascadelearning",
+              "journaloftheopticalsocietyofamericaa",
+              "101364josaa593401",
+              "generalizablenonlineofsightimagingwithlearnablephysicalpriors",
+              "internationalconferenceoncomputervisioniccv",
+          ):
+              if semantic not in pdf:
+                  failures.append(f"PDF text missing semantic term {semantic}")
+          if re.search(r"Citation .* undefined|There were undefined citations|Repeated entry", log):
+              failures.append("LaTeX log contains unresolved or repeated citations")
+
+          actual = html.count("{cat:")
+          declared = re.findall(r'<b>(\d+)</b><span>tracked latest entries</span>', html)
+          if len(declared) != 1:
+              failures.append(f"website counter matched {len(declared)} times")
+          elif int(declared[0]) != actual:
+              failures.append(f"website counter says {declared[0]} but explorer contains {actual}")
+
+          if failures:
+              raise SystemExit("Artifact validation failed:\n- " + "\n- ".join(failures))
+          print(f"Validated PICL and final-venue synchronization across {actual} website records")
+          PY
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/bare_jrnl_pdfinfo.txt)
+          test -n "$pages"
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Commit validated public artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f scripts/sync_picl_public_artifacts_20260806.py \
+            .github/workflows/sync-picl-public-artifacts-20260806.yml \
+            updates/run_picl_public_sync_20260806.trigger
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No validated changes to commit"
+            exit 1
+          fi
+          git commit -m "Synchronize PICL and final NLOS venue metadata"
+          git push origin HEAD:automation/picl-public-sync-20260806
