@@ -1,0 +1,141 @@
+name: Integrate citation-traced acoustic and mmWave NLOS papers
+
+on:
+  push:
+    branches:
+      - automation/nlos-citation-trace-20260806b
+    paths:
+      - .github/workflows/integrate-citation-traced-acoustic-mmwave-20260806.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-citation-trace-20260806b
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out reviewed branch
+        uses: actions/checkout@v4
+        with:
+          ref: automation/nlos-citation-trace-20260806b
+          fetch-depth: 0
+
+      - name: Apply bounded source updates
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/sync_citation_traced_acoustic_mmwave_20260806.py
+          python3 scripts/sync_citation_traced_acoustic_mmwave_20260806.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Rebuild survey PDF
+        run: |
+          set -euo pipefail
+          old_hash=$(git hash-object bare_jrnl.pdf)
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.txt
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          new_hash=$(git hash-object bare_jrnl.pdf)
+          echo "PDF blob: $old_hash -> $new_hash"
+          test "$old_hash" != "$new_hash"
+
+      - name: Validate cross-artifact consistency
+        run: |
+          set -euo pipefail
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          titles = [
+              'Non-line-of-sight sound source localization based on block sparse Bayesian learning and second-order edge diffraction',
+              'Non-Line-of-Sight Multi-Target Localization in T-Junctions Using Ray Tracing of mmWave Radar',
+          ]
+          dois = ['10.1016/j.apacoust.2024.110369', '10.1109/IV64158.2025.11097630']
+          keys = ['zhaiSecondOrderAcousticNLOS2025', 'jeonRayTracingMmWaveNLOS2025']
+          readme = Path('README.md').read_text(errors='ignore')
+          html = Path('index.html').read_text(errors='ignore')
+          article = Path('article/5newscenes.tex').read_text(errors='ignore')
+          tex = Path('bare_jrnl.tex').read_text(errors='ignore')
+          bib = Path('egbib_merged_20260711.bib').read_text(errors='ignore')
+          aux = Path('bare_jrnl.aux').read_text(errors='ignore')
+          bbl = Path('bare_jrnl.bbl').read_text(errors='ignore')
+          log = Path('bare_jrnl.log').read_text(errors='ignore')
+          pdf = ''.join(c for c in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if c.isalnum())
+          errors = []
+          for title, doi in zip(titles, dois):
+              for label, data in [('README', readme), ('website', html)]:
+                  if data.count(title) != 1:
+                      errors.append(f'{label}: {title!r} count is {data.count(title)}')
+                  if data.count(doi) != 1:
+                      errors.append(f'{label}: DOI {doi} count is {data.count(doi)}')
+          for key in keys:
+              if article.count(key) != 1:
+                  errors.append(f'survey article citation {key} count is {article.count(key)}')
+              if len(re.findall(r'@(article|inproceedings)\s*\{\s*' + re.escape(key) + r'\s*,', bib, re.I)) != 1:
+                  errors.append(f'bibliography entry {key} count is not one')
+              if key not in aux or key not in bbl:
+                  errors.append(f'compiled citation missing for {key}')
+          if 'second-order acoustic diffraction inversion and measured outdoor multi-target mmWave localization synchronized' not in tex:
+              errors.append('bare_jrnl audit note missing')
+          if re.search(r'Citation .* undefined|There were undefined citations|Repeated entry', log):
+              errors.append('LaTeX log contains unresolved or repeated citations')
+          actual = html.count('{cat:')
+          declared = re.findall(r'<b>(\d+)</b><span>tracked latest entries</span>', html)
+          if len(declared) != 1 or int(declared[0]) != actual:
+              errors.append(f'website counter mismatch: declared {declared}, actual {actual}')
+          for term in [
+              'nonlineofsightsoundsourcelocalizationbasedonblocksparsebayesianlearningandsecondorderedgediffraction',
+              'nonlineofsightmultitargetlocalizationintjunctionsusingraytracingofmmwaveradar',
+              'appliedacoustics',
+              'ieeeintelligentvehiclessymposium',
+          ]:
+              if term not in pdf:
+                  errors.append(f'PDF text missing {term}')
+          if errors:
+              raise SystemExit('Validation failed:\n- ' + '\n- '.join(errors))
+          print(f'Validated two additions across {actual} website paper records')
+          PY
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Commit validated artifacts
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f scripts/sync_citation_traced_acoustic_mmwave_20260806.py
+          rm -f .github/workflows/integrate-citation-traced-acoustic-mmwave-20260806.yml
+          git add -A README.md index.html article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf \
+            egbib_merged_20260711.bib updates/2026-08-06-second-order-acoustic-and-mmwave-tjunction-citation-trace.md \
+            scripts/sync_citation_traced_acoustic_mmwave_20260806.py \
+            .github/workflows/integrate-citation-traced-acoustic-mmwave-20260806.yml
+          git diff --cached --stat
+          if git diff --cached --quiet; then
+            echo 'No changes generated' >&2
+            exit 1
+          fi
+          git commit -m 'Integrate diffraction-acoustic and T-junction mmWave NLOS papers'
+          git push origin HEAD:automation/nlos-citation-trace-20260806b
