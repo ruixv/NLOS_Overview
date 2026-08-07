@@ -1,3 +1,4 @@
+# Trigger reviewed Aug 7 public-artifact rebuild.
 name: Integrate Aug 7 NLOS citation trace
 
 on:
