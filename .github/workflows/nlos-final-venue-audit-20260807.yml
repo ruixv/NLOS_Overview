@@ -1,0 +1,92 @@
+name: NLOS final venue audit 2026-08-07
+
+on:
+  push:
+    branches:
+      - automation/nlos-venue-audit-20260807
+    paths:
+      - .github/workflows/nlos-final-venue-audit-20260807.yml
+
+permissions:
+  contents: write
+
+jobs:
+  audit-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout audit branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply bounded source updates
+        run: |
+          python3 scripts/sync_final_venue_audit_20260807.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('article/5newscenes.tex')
+          t = p.read_text(encoding='utf-8')
+          old = 'Young~\\etal~studied single-photon-LiDAR NLOS sensing for autonomous navigation~\\cite{youngNavigationNLOS2024},'
+          new = 'At ICRA~2025, Young~\\etal~studied single-photon-LiDAR NLOS sensing for autonomous navigation~\\cite{youngNavigationNLOS2024},'
+          if t.count(old) != 1:
+              raise SystemExit(f'Expected one Young navigation survey anchor, found {t.count(old)}')
+          p.write_text(t.replace(old, new, 1), encoding='utf-8')
+          PY
+
+      - name: Verify source consistency before build
+        run: |
+          grep -Fq '10.1609/aaai.v39i7.32757' README.md
+          grep -Fq '10.1109/ICRA55743.2025.11128292' README.md
+          grep -Fq 'AAAI 2025, 39(7), 7051–7059' index.html
+          grep -Fq 'IEEE ICRA 2025, 4907–4914' index.html
+          grep -Fq 'through 7 August 2026.' bare_jrnl.tex
+          grep -Fq 'At AAAI~2025, Su~\etal~proposed DG-NLOS' article/4datadriven.tex
+          grep -Fq 'At ICRA~2025, Young~\etal~studied single-photon-LiDAR' article/5newscenes.tex
+          grep -Fq 'doi = {10.1609/aaai.v39i7.32757}' egbib_merged_20260711.bib
+          grep -Fq 'doi = {10.1109/ICRA55743.2025.11128292}' egbib_merged_20260711.bib
+          grep -Fq 'doi = {10.1109/ICCV51070.2023.00966}' egbib_merged_20260711.bib
+          grep -Fq 'pages = {27542--27551}' egbib_merged_20260711.bib
+          test "$(grep -o 'tracked latest entries' index.html | wc -l)" -eq 1
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-publishers texlive-science texlive-bibtex-extra poppler-utils ghostscript
+
+      - name: Compile updated survey
+        run: |
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate bibliography and PDF
+        run: |
+          if grep -E 'LaTeX Warning: Citation .* undefined|There were undefined references' bare_jrnl.log; then
+            echo 'Unresolved citations or references detected' >&2
+            exit 1
+          fi
+          pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
+          pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          grep -Fq 'DG-NLOS' /tmp/bare_jrnl.txt
+          grep -Fq 'ICRA 2025' /tmp/bare_jrnl.txt
+          grep -Fq 'AAAI 2025' /tmp/bare_jrnl.txt
+          grep -Fq 'TransiT' /tmp/bare_jrnl.txt
+          grep -Fq 'NLOS-NeuS' /tmp/bare_jrnl.txt
+          mkdir -p /tmp/nlos-render
+          pdftoppm -f 1 -singlefile -png -r 80 bare_jrnl.pdf /tmp/nlos-render/first >/dev/null 2>&1
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          pdftoppm -f "$pages" -singlefile -png -r 80 bare_jrnl.pdf /tmp/nlos-render/last >/dev/null 2>&1
+          test -s /tmp/nlos-render/first.png
+          test -s /tmp/nlos-render/last.png
+
+      - name: Commit validated public artifacts
+        run: |
+          git config user.name 'NLOS Overview automation'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git rm scripts/sync_final_venue_audit_20260807.py .github/workflows/nlos-final-venue-audit-20260807.yml
+          git add README.md index.html bare_jrnl.tex bare_jrnl.pdf article/*.tex '*.bib' updates/2026-08-07-final-venue-audit.md
+          git status --short
+          git diff --cached --check
+          git commit -m 'Reconcile final venues for NLOS milestone papers'
+          git push origin HEAD:automation/nlos-venue-audit-20260807
