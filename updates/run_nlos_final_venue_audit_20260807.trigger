@@ -1,0 +1,1 @@
+Run the reviewed 7 August 2026 final-venue reconciliation for DG-NLOS, single-photon-LiDAR autonomous navigation, TransiT, and NLOS-NeuS; rebuild and validate bare_jrnl.pdf before committing public artifacts.
