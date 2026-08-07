@@ -1,0 +1,182 @@
+name: Integrate Aug 7 NLOS citation trace (fixed)
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-nlos-citation-trace-20260807c.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-citation-trace-20260807c
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out reviewed integration branch
+        uses: actions/checkout@v4
+        with:
+          ref: automation/nlos-citation-trace-20260807c
+          fetch-depth: 0
+
+      - name: Apply bounded public-artifact updates
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/sync_citation_trace_20260807b.py
+          python3 scripts/sync_citation_trace_20260807b.py
+
+      - name: Validate synchronized source state
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          readme = Path('README.md').read_text(encoding='utf-8')
+          html = Path('index.html').read_text(encoding='utf-8')
+          a4 = Path('article/4datadriven.tex').read_text(encoding='utf-8')
+          a5 = Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bare = Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+
+          titles = [
+              'Non-line-of-sight sound source localization based on block sparse Bayesian learning and second-order edge diffraction',
+              'Non-Line-of-Sight Multi-Target Localization in T-Junctions Using Ray Tracing of mmWave Radar',
+              'BiScalar-AA: BiScalar Attentive Amplifier Network for NLOS Object Detection and Tracking Using Millimeter-Wave Radar',
+              'Two-Stage Attention Network for NLOS Object Detection and Tracking Using mmWave Radar',
+              'CornerRadar: RF-Based Indoor Localization Around Corners',
+              'Mosaic: Leveraging Diverse Reflector Geometries for Omnidirectional Around-Corner Automotive Radar',
+              'Around the Corner mmWave Imaging in Practical Environments',
+              'Non-Line-of-Sight 3D Object Reconstruction via mmWave Surface Normal Estimation',
+              'Wave-Former: Through-Occlusion 3D Reconstruction via Wireless Shape Completion',
+              'RISE: Single Static Radar-based Indoor Scene Understanding',
+              'A Renderer-Enabled Framework for Computing Parameter Estimation Lower Bounds in Plenoptic Imaging Systems',
+          ]
+          keys = [
+              'zhaiSecondOrderAcousticNLOS2025','jeonRayTracingMmWaveNLOS2025','yuBiScalarAA2025','yuTSANNLOS2025',
+              'yueCornerRadar2022','woodfordMosaic2022','doddsRFlect2024','doddsMmNorm2025','doddsWaveFormer2026',
+              'zhouRISE2026','sambasivanRendererBounds2026'
+          ]
+          errors = []
+          for title in titles:
+              for label, text in [('README', readme), ('website', html)]:
+                  if text.count(title) != 1:
+                      errors.append(f'{label}: title count for {title!r} is {text.count(title)}')
+          for key in keys:
+              if a5.count(key) != 1:
+                  errors.append(f'article/5newscenes.tex: citation {key} count is {a5.count(key)}')
+              if len(re.findall(r'^@\w+\s*\{\s*' + re.escape(key) + r'\s*,', bib, re.M)) != 1:
+                  errors.append(f'bibliography: key {key} count is not one')
+          required = [
+              ('README', readme, '10.1609/aaai.v39i7.32757'),
+              ('README', readme, '10.1109/ICRA55743.2025.11128292'),
+              ('website', html, 'AAAI 2025, 39(7), 7051–7059'),
+              ('website', html, 'IEEE ICRA 2025, 4907–4914'),
+              ('article4', a4, 'At AAAI~2025, Su~\\etal~proposed DG-NLOS'),
+              ('article5', a5, 'At ICRA~2025, Young~\\etal~studied single-photon-LiDAR'),
+              ('bare', bare, 'through 7 August 2026.'),
+              ('bib', bib, 'doi = {10.1109/ICCV51070.2023.00966}'),
+              ('bib', bib, 'pages = {10532--10541}'),
+              ('bib', bib, 'doi = {10.1609/aaai.v39i7.32757}'),
+              ('bib', bib, 'doi = {10.1109/ICRA55743.2025.11128292}'),
+          ]
+          for label, text, needle in required:
+              if needle not in text:
+                  errors.append(f'{label}: missing {needle}')
+          actual = html.count('{cat:')
+          declared = re.findall(r'<b>(\d+)</b><span>tracked latest entries</span>', html)
+          if actual != 268 or declared != ['268']:
+              errors.append(f'website explorer mismatch: actual={actual}, declared={declared}')
+          if errors:
+              raise SystemExit('Source validation failed:\n- ' + '\n- '.join(errors))
+          print('Source synchronization validated: 11 additions, four venue corrections, 268 explorer records.')
+          PY
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Rebuild survey PDF
+        run: |
+          set -euo pipefail
+          old_hash=$(git hash-object bare_jrnl.pdf)
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.txt
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          new_hash=$(git hash-object bare_jrnl.pdf)
+          echo "PDF blob: $old_hash -> $new_hash"
+          test "$old_hash" != "$new_hash"
+
+      - name: Validate compiled bibliography, PDF semantics, and rendering
+        run: |
+          set -euo pipefail
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          log = Path('bare_jrnl.log').read_text(errors='ignore')
+          aux = Path('bare_jrnl.aux').read_text(errors='ignore')
+          bbl = Path('bare_jrnl.bbl').read_text(errors='ignore')
+          pdf_raw = Path('bare_jrnl.txt').read_text(errors='ignore').lower()
+          pdf = ''.join(c for c in pdf_raw if c.isalnum())
+          keys = [
+              'zhaiSecondOrderAcousticNLOS2025','jeonRayTracingMmWaveNLOS2025','yuBiScalarAA2025','yuTSANNLOS2025',
+              'yueCornerRadar2022','woodfordMosaic2022','doddsRFlect2024','doddsMmNorm2025','doddsWaveFormer2026',
+              'zhouRISE2026','sambasivanRendererBounds2026','suDGNLOS2025','youngNavigationNLOS2024','fujimuraNLOSNeuS2023'
+          ]
+          errors = []
+          for key in keys:
+              if key not in aux or key not in bbl:
+                  errors.append(f'compiled citation missing for {key}')
+          if re.search(r'Citation .* undefined|There were undefined citations|There were undefined references|Repeated entry', log):
+              errors.append('LaTeX/BibTeX log contains unresolved citations/references or repeated-entry errors')
+          for term in ['cornerradar','mosaic','waveformer','rise','secondorderedgediffraction','rendererenabledperformancebounds','aaai2025','icra2025','nlosneus']:
+              if term not in pdf:
+                  errors.append(f'PDF text missing normalized term {term}')
+          if errors:
+              raise SystemExit('Compiled validation failed:\n- ' + '\n- '.join(errors))
+          print('Compiled survey citations and semantic checks passed.')
+          PY
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Commit only validated public artifacts
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f scripts/sync_citation_trace_20260807b.py
+          rm -f .github/workflows/integrate-nlos-citation-trace-20260807b.yml
+          rm -f .github/workflows/integrate-nlos-citation-trace-20260807c.yml
+          rm -f .github/workflows/integrate-nlos-final-venue-audit-20260807.yml
+          rm -f updates/run_nlos_final_venue_audit_20260807.trigger
+          git add -A
+          git diff --cached --check
+          git diff --cached --stat
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit' >&2
+            exit 1
+          fi
+          git commit -m 'Integrate Aug 7 citation-traced NLOS lineage'
+          git push origin HEAD:automation/nlos-citation-trace-20260807c
