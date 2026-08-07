@@ -30,6 +30,16 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m py_compile scripts/sync_forward_citation_cluster_20260808.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/sync_forward_citation_cluster_20260808.py')
+          s = p.read_text()
+          old = 'pattern = rf"(?m)^    {year} ── .+$"'
+          new = 'pattern = rf"(?m)^{year} ── .+$"'
+          if s.count(old) != 1:
+              raise SystemExit(f'timeline-regex patch expected one match, got {s.count(old)}')
+          p.write_text(s.replace(old, new, 1))
+          PY
           python3 scripts/sync_forward_citation_cluster_20260808.py
 
       - name: Install LaTeX and PDF validation tools
@@ -117,7 +127,6 @@ jobs:
               errors.append(f'website counter mismatch declared={declared}, actual={actual}')
           if actual != 267:
               errors.append(f'expected 267 website paper records after direct additions, found {actual}')
-          # Final-venue checks.
           checks = [
               ('README DG-NLOS', readme, '10.1609/aaai.v39i7.32757'),
               ('README ICRA navigation', readme, '10.1109/ICRA55743.2025.11128292'),
