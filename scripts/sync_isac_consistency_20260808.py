@@ -2,7 +2,6 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-
 SPAWC_TITLE = "Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave"
 ICT_TITLE = "Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware"
 SGATV_TITLE = "Structure-guided adaptive total variation for parameter-free passive non-line-of-sight imaging"
@@ -31,13 +30,13 @@ def replace_line_regex(text, pattern, replacement, label):
     return text[:m.start()] + replacement + text[m.end():]
 
 
-def append_readme_year(text, year, lines):
+def append_readme_year(text, year, line):
     pattern = re.compile(rf'^{year} ──.*$', re.M)
     matches = list(pattern.finditer(text))
     if len(matches) != 1:
         raise RuntimeError(f"README timeline year {year}: expected one line, found {len(matches)}")
     m = matches[0]
-    return text[:m.end()] + "\n" + lines.rstrip("\n") + text[m.end():]
+    return text[:m.end()] + "\n" + line.rstrip("\n") + text[m.end():]
 
 
 def append_html_year(text, year, sentence):
@@ -49,54 +48,35 @@ def append_html_year(text, year, sentence):
     return text[:m.start()] + m.group(1) + m.group(2) + sentence + m.group(3) + text[m.end():]
 
 
-# ---------------------------------------------------------------------------
-# README: synchronize one website/survey-only passive paper, add the missing
-# SPAWC ISAC precursor, and correct the 2026 ICT record to its final venue.
-# ---------------------------------------------------------------------------
+# README --------------------------------------------------------------------
 readme = read("README.md")
 if SPAWC_TITLE in readme:
-    raise RuntimeError("README already contains the SPAWC paper")
-if SGATV_TITLE in readme:
-    raise RuntimeError("README already contains SG-ATV; updater baseline changed")
+    raise RuntimeError("README already contains SPAWC precursor; integration may already be applied")
+if readme.count(SGATV_TITLE) != 1:
+    raise RuntimeError(f"README SG-ATV title count is {readme.count(SGATV_TITLE)}; expected current baseline count 1")
 if readme.count(ICT_TITLE) != 1:
     raise RuntimeError(f"README ICT title count is {readme.count(ICT_TITLE)}")
 
 header = "| Year | Paper | Venue / Status | Why it matters |\n|------|-------|----------------|----------------|\n"
-rows = (
-    "| 2026 | [Structure-guided adaptive total variation for parameter-free passive non-line-of-sight imaging](https://doi.org/10.1364/OE.587111) — Zhang et al. | Optics Express 34(3), 5210–5224 (2026) | SG-ATV derives spatially varying total-variation weights from a preliminary hidden-scene estimate, automatically balancing edge preservation and noise suppression for conventional-camera passive NLOS without manual regularization tuning. |\n"
-    "| 2024 | [Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave](https://doi.org/10.1109/SPAWC60668.2024.10694426) — Tosi et al. | IEEE SPAWC 2024, 331–335 | Demonstrates NLOS target detection using a 27.4-GHz 5G/mmWave ISAC proof-of-concept in a factory-like environment, evaluates CSI-processing strategies for suppressing TDD-induced spectral replicas, and establishes the experimental precursor to the later reliable intrusion-detection system. |\n"
-)
-readme = replace_once(readme, header, header + rows, "README latest-additions header")
-
+spawc_row = "| 2024 | [Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave](https://doi.org/10.1109/SPAWC60668.2024.10694426) — Tosi et al. | IEEE SPAWC 2024, 331–335 | Demonstrates NLOS target detection using a 27.4-GHz 5G/mmWave ISAC proof-of-concept in a factory-like environment, evaluates CSI-processing strategies for suppressing TDD-induced spectral replicas, and establishes the experimental precursor to the later reliable intrusion-detection system. |\n"
+readme = replace_once(readme, header, header + spawc_row, "README latest-additions header")
 readme = replace_line_regex(
     readme,
     r'^\| 2026 \| \[Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware\]\(https://arxiv\.org/abs/2604\.07032\) — Tosi et al\. \| arXiv 2026 \|.*$',
     "| 2026 | [Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware](https://arxiv.org/abs/2604.07032) — Tosi et al. | 32nd International Conference on Telecommunications (ICT 2026), 25–30 | Uses a commercial 27.4-GHz 5G/mmWave ISAC platform, large-surface reflections, range–Doppler processing, and PHD filtering for reliable detection and tracking of fully occluded moving intruders in an industrial testbed; the arXiv link is retained for accessible full text. |",
     "README ICT final venue",
 )
-
 if "SPAWC establishes experimental 5G/mmWave ISAC NLOS feasibility" not in readme:
-    readme = append_readme_year(
-        readme,
-        2024,
-        "   │     SPAWC establishes experimental 5G/mmWave ISAC NLOS feasibility with a 27.4-GHz communication-radio proof of concept",
-    )
-if "SG-ATV makes passive computational periscopy parameter-free" not in readme:
-    readme = append_readme_year(
-        readme,
-        2026,
-        "   │     SG-ATV makes passive computational periscopy parameter-free through scene-adaptive TV weights; the ICT study turns the earlier cellular-ISAC feasibility demo into robust hidden-intruder tracking",
-    )
+    readme = append_readme_year(readme, 2024, "   │     SPAWC establishes experimental 5G/mmWave ISAC NLOS feasibility with a 27.4-GHz communication-radio proof of concept")
+if "ICT turns cellular-ISAC NLOS feasibility into robust hidden-intruder tracking" not in readme:
+    readme = append_readme_year(readme, 2026, "   │     ICT turns cellular-ISAC NLOS feasibility into robust hidden-intruder detection and tracking with standards-compatible mmWave hardware")
 write("README.md", readme)
 
 
-# ---------------------------------------------------------------------------
-# Website: add the SPAWC record, finalize ICT metadata, retain the already
-# integrated SG-ATV record, update timeline, and keep the explorer count exact.
-# ---------------------------------------------------------------------------
+# Website -------------------------------------------------------------------
 html = read("index.html")
 if SPAWC_TITLE in html:
-    raise RuntimeError("index.html already contains the SPAWC paper")
+    raise RuntimeError("index.html already contains SPAWC precursor; integration may already be applied")
 if html.count(SGATV_TITLE) != 1:
     raise RuntimeError(f"index.html SG-ATV title count is {html.count(SGATV_TITLE)}")
 if html.count(ICT_TITLE) != 1:
@@ -118,9 +98,7 @@ if "ICT 2026 extends the cellular-ISAC branch" not in html:
 write("index.html", html)
 
 
-# ---------------------------------------------------------------------------
-# Survey prose: place the cellular ISAC lineage inside the radar/RF section.
-# ---------------------------------------------------------------------------
+# Survey prose --------------------------------------------------------------
 a5 = read("article/5newscenes.tex")
 if "tosiFeasibilityISACNLOS2024" in a5 or "tosiReliableISACNLOS2026" in a5:
     raise RuntimeError("article/5newscenes.tex already contains Tosi ISAC citations")
@@ -134,9 +112,7 @@ a5 = replace_once(a5, anchor, anchor + paragraph, "radar paragraph anchor")
 write("article/5newscenes.tex", a5)
 
 
-# ---------------------------------------------------------------------------
-# Bibliography used directly by bare_jrnl.tex.
-# ---------------------------------------------------------------------------
+# Bibliography --------------------------------------------------------------
 bib = read("egbib_merged_20260711.bib")
 for key in ("tosiFeasibilityISACNLOS2024", "tosiReliableISACNLOS2026"):
     if re.search(r'^@\w+\s*\{\s*' + re.escape(key) + r'\s*,', bib, re.M):
@@ -168,27 +144,25 @@ entries = r"""
 write("egbib_merged_20260711.bib", bib.rstrip() + entries + "\n")
 
 
-# bare_jrnl.tex is the top-level survey source; record the integration without
-# duplicating prose already maintained in the included section files.
+# Top-level source audit comment -------------------------------------------
 bare = read("bare_jrnl.tex")
-comment = "% 8 August 2026 ISAC/passive consistency trace: SPAWC cellular-ISAC NLOS precursor, ICT final venue, and SG-ATV README synchronization integrated.\n"
+comment = "% 8 August 2026 ISAC consistency trace: SPAWC cellular-ISAC NLOS precursor and ICT final venue integrated; SG-ATV cross-artifact consistency verified.\n"
 if comment not in bare:
     bare = comment + bare
 write("bare_jrnl.tex", bare)
 
 
-# Update the prior bounded patch note so the public update log does not remain
-# misleadingly marked as pending after this guarded integration succeeds.
+# Mark the earlier patch note as applied after this guarded run succeeds. ---
 log_path = "updates/2026-08-08-isac-nlos-final-venue-citation-trace.md"
 log = read(log_path)
 status = """
 
 ## Applied status
 
-Applied through the guarded 8 August 2026 cross-artifact integration. The SPAWC 2024 precursor is now included in README, website, survey prose, and bibliography; the 2026 intrusion-detection paper is labeled by its final ICT 2026 venue; SG-ATV is synchronized into README to match the website/survey/bibliography; and the survey PDF is rebuilt and validated by the integration workflow.
+Applied through the guarded 8 August 2026 cross-artifact integration. The SPAWC 2024 precursor is now included in README, website, survey prose, and bibliography; the 2026 intrusion-detection paper is labeled by its final ICT 2026 venue. SG-ATV was already synchronized across README, website, passive-survey prose, and bibliography and was verified unchanged. The survey PDF is rebuilt and validated by the integration workflow.
 """
 if "## Applied status" not in log:
     log = log.rstrip() + status + "\n"
 write(log_path, log)
 
-print("Applied bounded ISAC + passive consistency updates.")
+print("Applied bounded cellular-ISAC NLOS integration; verified existing SG-ATV consistency.")
