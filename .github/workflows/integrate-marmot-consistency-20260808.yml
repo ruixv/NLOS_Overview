@@ -1,14 +1,9 @@
-name: Integrate MARMOT survey consistency
+name: Finalize NLOS citation-trace artifacts
 
 on:
   push:
     branches:
       - automation-isac-nlos-20260808
-    paths:
-      - '.github/trigger-marmot-consistency-20260808'
-  pull_request:
-    branches:
-      - master
     paths:
       - '.github/trigger-marmot-consistency-20260808'
 
@@ -17,7 +12,6 @@ permissions:
 
 jobs:
   integrate:
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Checkout integration branch
@@ -31,7 +25,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Apply bounded MARMOT source update
+      - name: Apply bounded source updates
         run: python tools/integrate_marmot_consistency_20260808.py
 
       - name: Install LaTeX and PDF tools
@@ -54,57 +48,98 @@ jobs:
             exit 1
           fi
 
-      - name: Validate MARMOT in sources and PDF
+      - name: Validate source and PDF consistency
         run: |
           grep -Fq 'MARMOT: Masked Autoencoder for Modeling Transient Imaging' README.md
           grep -Fq 'shenMARMOT2025' article/5newscenes.tex
           grep -Fq 'Masked transient pretraining' article/5newscenes.tex
           test "$(grep -Fo 'shenMARMOT2025' egbib_merged_20260711.bib | wc -l)" -eq 1
           test "$(grep -Fo 'title:\"MARMOT: Masked Autoencoder for Modeling Transient Imaging\"' index.html | wc -l)" -eq 1
-          pdftotext bare_jrnl.pdf /tmp/marmot.txt
+
+          grep -Fq 'Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave' README.md
+          grep -Fq 'International Conference on Telecommunications (ICT 2026), 25–30' README.md
+          grep -Fq 'tosiFeasibilityISACNLOS2024' article/5newscenes.tex
+          grep -Fq 'tosiReliableISACNLOS2026' article/5newscenes.tex
+
+          grep -Fq 'IEEE Transactions on Mobile Computing 25(5), 6002–6016 (2026)' README.md
+          grep -Fq '10.1109/TMC.2025.3634623' README.md
+          grep -Fq 'IEEE TMC 25(5), 6002–6016 (2026)' index.html
+          grep -Fq 'final journal record appears in IEEE Transactions on Mobile Computing' article/5newscenes.tex
+          test "$(grep -Fo 'shiN2LoS2025' egbib_merged_20260711.bib | wc -l)" -eq 1
+          grep -Fq 'Cheng, Qingqing and Yuan, Weijie' egbib_merged_20260711.bib
+          grep -Fq 'doi = {10.1109/TMC.2025.3634623}' egbib_merged_20260711.bib
+          grep -Fq 'pages = {6002--6016}' egbib_merged_20260711.bib
+          grep -Fq 'through 9 August 2026' bare_jrnl.tex
+          grep -Fq '**Update run: 9 August 2026.**' README.md
+          grep -Fq 'Updated 9 August 2026' index.html
+          grep -Fq '<div class="stat"><b>268</b><span>tracked latest entries</span></div>' index.html
+          test -s updates/2026-08-09-marmot-n2los-final-venue.md
+
+          pdftotext bare_jrnl.pdf /tmp/nlos.txt
           python - <<'PY'
           from pathlib import Path
           import re
-          text = Path('/tmp/marmot.txt').read_text(encoding='utf-8', errors='ignore')
+          text = Path('/tmp/nlos.txt').read_text(encoding='utf-8', errors='ignore')
           compact = re.sub(r'[\s\-‐‑‒–—]+', '', text).lower()
-          assert 'maskedtransientpretraining' in compact
-          assert 'marmot' in compact
-          assert '2506.08470' in text
-          print('MARMOT PDF semantic checks passed.')
+          required = {
+              'MARMOT': 'marmot',
+              'masked transient pretraining': 'maskedtransientpretraining',
+              'SPAWC NLOS ISAC': 'feasibilityofnonlineofsightintegratedsensingandcommunicationatmmwave',
+              'ICT NLOS intrusion': 'reliablenonlineofsightintrusiondetectionwithintegratedsensingandcommunicationshardware',
+              'N2LoS': 'single-tagmmwavebackscatterforrobustnonlineofsightlocalization',
+              'N2LoS DOI': '10.1109/tmc.2025.3634623',
+          }
+          for label, token in required.items():
+              assert token in compact, f'missing PDF semantic token: {label}'
+          assert re.search(r'IEEE\s+Transactions\s+on\s+Mobile\s+Computing', text, re.I), 'missing final TMC venue'
+          assert re.search(r'6002\s*[–-]+\s*6016', text), 'missing N2LoS final pages'
+          print('PDF semantic checks passed.')
           PY
+
           pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
-          page=''
+          test -n "$pages"
+          pdftoppm -png -f 1 -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-first
+          radar_page=''
           for p in $(seq 1 "$pages"); do
-            if pdftotext -f "$p" -l "$p" bare_jrnl.pdf - | grep -Fq 'Masked transient'; then
-              page="$p"
+            if pdftotext -f "$p" -l "$p" bare_jrnl.pdf - | grep -Fq 'N2LoS'; then
+              radar_page="$p"
               break
             fi
           done
-          test -n "$page"
-          pdftoppm -png -f "$page" -singlefile -r 120 bare_jrnl.pdf /tmp/marmot-page
-          test -s /tmp/marmot-page.png
+          test -n "$radar_page"
+          pdftoppm -png -f "$radar_page" -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-radar
           python - <<'PY'
           import os, struct
-          path='/tmp/marmot-page.png'
-          assert os.path.getsize(path) > 10000
-          with open(path,'rb') as f: sig=f.read(24)
-          assert sig[:8] == b'\x89PNG\r\n\x1a\n'
-          w,h=struct.unpack('>II',sig[16:24])
-          assert w>500 and h>500
-          print('Rendered MARMOT survey page is structurally valid.')
+          for path in ['/tmp/nlos-first.png', '/tmp/nlos-radar.png']:
+              assert os.path.getsize(path) > 10000, path
+              with open(path, 'rb') as f:
+                  sig = f.read(24)
+              assert sig[:8] == b'\x89PNG\r\n\x1a\n'
+              w, h = struct.unpack('>II', sig[16:24])
+              assert w > 500 and h > 500, (path, w, h)
+          print('Rendered first and N2LoS-containing pages are structurally valid.')
           PY
 
-      - name: Commit validated MARMOT integration
+      - name: Commit validated public artifacts and remove temporary integration files
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git rm -f .github/trigger-marmot-consistency-20260808 \
+          rm -f /tmp/nlos.txt
+          for f in \
+            .github/trigger-marmot-consistency-20260808 \
+            .github/trigger-isac-nlos-20260808 \
             .github/workflows/integrate-marmot-consistency-20260808.yml \
-            tools/integrate_marmot_consistency_20260808.py
-          if test -f .github/workflows/integrate-isac-nlos-push-20260808.yml; then
-            git rm -f .github/workflows/integrate-isac-nlos-push-20260808.yml
-          fi
-          git add README.md article/5newscenes.tex bare_jrnl.pdf
+            .github/workflows/integrate-isac-nlos-push-20260808.yml \
+            .github/workflows/integrate-isac-nlos-20260808.yml \
+            tools/integrate_marmot_consistency_20260808.py \
+            tools/integrate_isac_nlos_20260808.py; do
+            if test -e "$f"; then git rm -f "$f"; fi
+          done
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-08-09-marmot-n2los-final-venue.md updates/2026-08-08-isac-nlos-final-venue-citation-trace.md
           git diff --cached --check
-          git commit -m 'Integrate MARMOT masked transient pretraining into survey'
-          git push origin HEAD:automation-isac-nlos-20260808
+          if git diff --cached --quiet; then
+            echo 'No artifact changes to commit.'
+          else
+            git commit -m 'Finalize MARMOT, ISAC, and N2LoS survey updates'
+            git push origin HEAD:automation-isac-nlos-20260808
+          fi
