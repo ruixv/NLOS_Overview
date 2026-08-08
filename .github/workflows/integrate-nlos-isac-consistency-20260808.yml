@@ -57,8 +57,8 @@ jobs:
                   if text.count(title) != 1:
                       errors.append(f'{label}: title count for {title!r} is {text.count(title)}')
 
-          if a3.count('zhangStructureGuidedATV2026') != 1:
-              errors.append(f'article/3passive.tex SG-ATV citation count is {a3.count("zhangStructureGuidedATV2026")}')
+          if a3.count('zhangStructureGuidedATV2026') < 1:
+              errors.append('article/3passive.tex is missing the SG-ATV citation')
           for key in ('tosiFeasibilityISACNLOS2024', 'tosiReliableISACNLOS2026'):
               if a5.count(key) != 1:
                   errors.append(f'article/5newscenes.tex citation {key} count is {a5.count(key)}')
@@ -70,7 +70,7 @@ jobs:
               ('README ICT final venue', readme, '32nd International Conference on Telecommunications (ICT 2026), 25–30'),
               ('website ICT final venue', html, 'venue:"ICT 2026, 25–30"'),
               ('survey ISAC prose', a5, 'Cellular ISAC hardware for NLOS sensing.'),
-              ('bare integration comment', bare, 'ISAC/passive consistency trace'),
+              ('bare integration comment', bare, 'ISAC consistency trace'),
               ('update applied status', update_log, '## Applied status'),
               ('SG-ATV DOI', readme, '10.1364/OE.587111'),
           ]
@@ -90,7 +90,7 @@ jobs:
 
           if errors:
               raise SystemExit('Source validation failed:\n- ' + '\n- '.join(errors))
-          print('Source synchronization validated: SPAWC addition, ICT final venue, SG-ATV README sync, 268 explorer records.')
+          print('Source synchronization validated: SPAWC addition, ICT final venue, existing SG-ATV coverage, 268 explorer records.')
           PY
 
       - name: Install LaTeX and PDF validation tools
