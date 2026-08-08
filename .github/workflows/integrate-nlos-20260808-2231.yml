@@ -1,0 +1,158 @@
+name: Integrate NLOS citation trace 20260808 2231
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-nlos-20260808-2231.yml
+      - scripts/sync_nlos_20260808_2231.py
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-20260808-2231
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out integration branch
+        uses: actions/checkout@v4
+        with:
+          ref: automation/nlos-20260808-2231
+          fetch-depth: 0
+
+      - name: Apply bounded source updates
+        run: |
+          set -euo pipefail
+          sed -i 's/^    block = """$/    block = r"""/' scripts/sync_nlos_20260808_2231.py
+          sed -i 's/269/268/g' scripts/sync_nlos_20260808_2231.py
+          python3 -m py_compile scripts/sync_nlos_20260808_2231.py
+          python3 scripts/sync_nlos_20260808_2231.py
+
+      - name: Validate synchronized source state
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          readme=Path('README.md').read_text(encoding='utf-8')
+          html=Path('index.html').read_text(encoding='utf-8')
+          a5=Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bare=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          titles=[
+            'Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave',
+            'Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware',
+            'N2LoS: Single-Tag mmWave Backscatter for Robust Non-Line-of-Sight Localization',
+            'Non-Line-of-Sight Perception Method for Autonomous Haul Trucks in Open-Pit Mines Based on 4D mmWave Radar and LiDAR Fusion',
+          ]
+          keys=['tosiFeasibilityISACNLOS2024','tosiReliableISACNLOS2026','shiN2LoS2025','yangMiningRadarLiDARNLOS2026']
+          errors=[]
+          for title in titles:
+            for label,text in [('README',readme),('website',html)]:
+              if text.count(title)!=1: errors.append(f'{label}: {title!r} count={text.count(title)}')
+          for key in keys:
+            if key not in a5: errors.append(f'article/5 missing citation {key}')
+            if len(re.findall(r'^@\w+\s*\{\s*'+re.escape(key)+r'\s*,',bib,re.M))!=1: errors.append(f'bib key count invalid: {key}')
+          for label,text,needle in [
+            ('README',readme,'IEEE Transactions on Mobile Computing 25(5), 6002–6016 (2026)'),
+            ('README',readme,'International Conference on Telecommunications (ICT 2026), 25–30'),
+            ('website',html,'IEEE TMC 25(5), 6002–6016'),
+            ('website',html,'ICT 2026, 25–30'),
+            ('article5',a5,'Cellular ISAC hardware for NLOS sensing.'),
+            ('article5',a5,'Blind-Spot Complementary Fusion'),
+            ('bare',bare,'through 8 August 2026.'),
+            ('bib',bib,'10.1109/TMC.2025.3634623'),
+            ('bib',bib,'10.1109/SPAWC60668.2024.10694426'),
+            ('bib',bib,'10.3390/s26144615'),
+          ]:
+            if needle not in text: errors.append(f'{label} missing {needle!r}')
+          actual=html.count('{cat:')
+          declared=re.findall(r'<b>(\d+)</b><span>tracked latest entries</span>',html)
+          if actual!=268 or declared!=['268']: errors.append(f'explorer count actual={actual}, declared={declared}')
+          if errors: raise SystemExit('Source validation failed:\n- '+'\n- '.join(errors))
+          print('Source synchronization validated at 268 explorer records.')
+          PY
+
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended \
+            texlive-science texlive-pictures texlive-publishers ghostscript poppler-utils
+
+      - name: Rebuild survey PDF
+        run: |
+          set -euo pipefail
+          old_hash=$(git hash-object bare_jrnl.pdf)
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.txt
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          new_hash=$(git hash-object bare_jrnl.pdf)
+          echo "PDF blob: $old_hash -> $new_hash"
+          test "$old_hash" != "$new_hash"
+
+      - name: Validate compiled PDF and render affected page
+        run: |
+          set -euo pipefail
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          log=Path('bare_jrnl.log').read_text(errors='ignore')
+          aux=Path('bare_jrnl.aux').read_text(errors='ignore')
+          bbl=Path('bare_jrnl.bbl').read_text(errors='ignore')
+          raw=Path('bare_jrnl.txt').read_text(errors='ignore').lower()
+          norm=''.join(c for c in raw if c.isalnum())
+          keys=['tosiFeasibilityISACNLOS2024','tosiReliableISACNLOS2026','shiN2LoS2025','yangMiningRadarLiDARNLOS2026']
+          errors=[]
+          for key in keys:
+            if key not in aux or key not in bbl: errors.append(f'compiled citation missing: {key}')
+          if re.search(r'Citation .* undefined|There were undefined citations|There were undefined references|Repeated entry',log):
+            errors.append('LaTeX/BibTeX log contains unresolved citation/reference or repeated-entry errors')
+          # Use robust venue/author tokens rather than long phrases that pdftotext may hyphenate.
+          for term in ['spawc','internationalconferenceontelecommunications','ieeetransactionsonmobilecomputing','tosi','n2los','openpitmines']:
+            if term not in norm: errors.append(f'PDF text missing robust token {term}')
+          if errors: raise SystemExit('Compiled validation failed:\n- '+'\n- '.join(errors))
+          print('Compiled survey citation and semantic checks passed.')
+          PY
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 130 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          radar_page=""
+          for p in $(seq 1 "$pages"); do
+            pdftotext -f "$p" -l "$p" bare_jrnl.pdf /tmp/p.txt
+            if grep -Eqi '27[ .]?4|Tosi|cellular ISAC' /tmp/p.txt; then radar_page="$p"; break; fi
+          done
+          test -n "$radar_page"
+          pdftoppm -f "$radar_page" -singlefile -png -r 130 bare_jrnl.pdf .pdf_render_check/radar >/dev/null 2>&1
+          test -s .pdf_render_check/radar.png
+          file .pdf_render_check/first.png .pdf_render_check/radar.png
+          rm -rf .pdf_render_check bare_jrnl.txt /tmp/p.txt
+
+      - name: Commit only validated public artifacts
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f scripts/sync_nlos_20260808_2231.py .github/workflows/integrate-nlos-20260808-2231.yml
+          git add -A README.md index.html article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf \
+            egbib_merged_20260711.bib updates/2026-08-08-isac-nlos-final-venue-citation-trace.md \
+            updates/2026-08-08-isac-radar-lidar-consistency-integration.md \
+            scripts/sync_nlos_20260808_2231.py .github/workflows/integrate-nlos-20260808-2231.yml
+          git diff --cached --check
+          git diff --cached --stat
+          git diff --cached --quiet && { echo 'No generated changes to commit' >&2; exit 1; } || true
+          git commit -m 'Synchronize ISAC and radar-LiDAR NLOS records'
+          git push origin HEAD:automation/nlos-20260808-2231
