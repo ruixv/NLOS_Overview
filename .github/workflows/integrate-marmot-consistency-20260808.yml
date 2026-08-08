@@ -1,0 +1,104 @@
+name: Integrate MARMOT survey consistency
+
+on:
+  push:
+    branches:
+      - automation-isac-nlos-20260808
+    paths:
+      - '.github/trigger-marmot-consistency-20260808'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout integration branch
+        uses: actions/checkout@v4
+        with:
+          ref: automation-isac-nlos-20260808
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply bounded MARMOT source update
+        run: python tools/integrate_marmot_consistency_20260808.py
+
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Rebuild survey PDF
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          if grep -Eq 'Citation .* undefined|There were undefined references|There were undefined citations' bare_jrnl.log; then
+            echo 'Unresolved citations/references remain in bare_jrnl.log' >&2
+            exit 1
+          fi
+
+      - name: Validate MARMOT in sources and PDF
+        run: |
+          grep -Fq 'MARMOT: Masked Autoencoder for Modeling Transient Imaging' README.md
+          grep -Fq 'shenMARMOT2025' article/5newscenes.tex
+          grep -Fq 'Masked transient pretraining' article/5newscenes.tex
+          test "$(grep -Fo 'shenMARMOT2025' egbib_merged_20260711.bib | wc -l)" -eq 1
+          test "$(grep -Fo 'title:\"MARMOT: Masked Autoencoder for Modeling Transient Imaging\"' index.html | wc -l)" -eq 1
+          pdftotext bare_jrnl.pdf /tmp/marmot.txt
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text = Path('/tmp/marmot.txt').read_text(encoding='utf-8', errors='ignore')
+          compact = re.sub(r'[\s\-‐‑‒–—]+', '', text).lower()
+          assert 'maskedtransientpretraining' in compact
+          assert 'marmot' in compact
+          assert '2506.08470' in text
+          print('MARMOT PDF semantic checks passed.')
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          page=''
+          for p in $(seq 1 "$pages"); do
+            if pdftotext -f "$p" -l "$p" bare_jrnl.pdf - | grep -Fq 'Masked transient'; then
+              page="$p"
+              break
+            fi
+          done
+          test -n "$page"
+          pdftoppm -png -f "$page" -singlefile -r 120 bare_jrnl.pdf /tmp/marmot-page
+          test -s /tmp/marmot-page.png
+          python - <<'PY'
+          import os, struct
+          path='/tmp/marmot-page.png'
+          assert os.path.getsize(path) > 10000
+          with open(path,'rb') as f: sig=f.read(24)
+          assert sig[:8] == b'\x89PNG\r\n\x1a\n'
+          w,h=struct.unpack('>II',sig[16:24])
+          assert w>500 and h>500
+          print('Rendered MARMOT survey page is structurally valid.')
+          PY
+
+      - name: Commit validated MARMOT integration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -f .github/trigger-marmot-consistency-20260808 \
+            .github/workflows/integrate-marmot-consistency-20260808.yml \
+            tools/integrate_marmot_consistency_20260808.py
+          if test -f .github/workflows/integrate-isac-nlos-push-20260808.yml; then
+            git rm -f .github/workflows/integrate-isac-nlos-push-20260808.yml
+          fi
+          git add README.md article/5newscenes.tex bare_jrnl.pdf
+          git diff --cached --check
+          git commit -m 'Integrate MARMOT masked transient pretraining into survey'
+          git push origin HEAD:automation-isac-nlos-20260808
