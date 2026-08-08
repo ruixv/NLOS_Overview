@@ -6,12 +6,18 @@ on:
       - automation-isac-nlos-20260808
     paths:
       - '.github/trigger-marmot-consistency-20260808'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '.github/trigger-marmot-consistency-20260808'
 
 permissions:
   contents: write
 
 jobs:
   integrate:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - name: Checkout integration branch
