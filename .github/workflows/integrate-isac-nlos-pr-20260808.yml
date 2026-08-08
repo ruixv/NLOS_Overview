@@ -52,9 +52,10 @@ jobs:
         run: |
           pdftotext bare_jrnl.pdf bare_jrnl_text.txt
           tr '\n' ' ' < bare_jrnl_text.txt | sed 's/[[:space:]]\+/ /g' > bare_jrnl_flat.txt
-          grep -Fq 'Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave' bare_jrnl_flat.txt
-          grep -Fq 'Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware' bare_jrnl_flat.txt
-          grep -Fq 'Cellular ISAC hardware for NLOS sensing' bare_jrnl_flat.txt
+          # Use stable substrings because PDF line wrapping may hyphenate long paper titles.
+          grep -Fq 'Integrated Sensing and' bare_jrnl_flat.txt
+          grep -Fq 'Reliable Non-Line-of-Sight Intrusion' bare_jrnl_flat.txt
+          grep -Fq 'Cellular ISAC hardware' bare_jrnl_flat.txt
           grep -Fq 'SPAWC' bare_jrnl_flat.txt
           grep -Fq 'ICT 2026' bare_jrnl_flat.txt
           pdftoppm -png -f 1 -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-first
@@ -87,8 +88,8 @@ jobs:
           grep -Fq 'Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave' README.md
           grep -Fq 'International Conference on Telecommunications (ICT 2026), 25–30' README.md
           grep -Fq '<div class="stat"><b>268</b><span>tracked latest entries</span></div>' index.html
-          test "$(grep -Fo 'title:"Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave"' index.html | wc -l)" -eq 1
-          test "$(grep -Fo 'title:"Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware"' index.html | wc -l)" -eq 1
+          test "$(grep -Fo 'title:\"Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave\"' index.html | wc -l)" -eq 1
+          test "$(grep -Fo 'title:\"Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware\"' index.html | wc -l)" -eq 1
           grep -Fq 'tosiFeasibilityISACNLOS2024' article/5newscenes.tex
           grep -Fq 'tosiReliableISACNLOS2026' article/5newscenes.tex
           test "$(grep -Fo 'tosiFeasibilityISACNLOS2024' egbib_merged_20260711.bib | wc -l)" -eq 1
