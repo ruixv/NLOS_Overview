@@ -29,6 +29,9 @@ jobs:
       - name: Apply bounded updates
         run: |
           set -euo pipefail
+          # The public page currently declares 267 records but contains 266 objects.
+          # This run adds two genuine records, so the corrected synchronized count is 268.
+          sed -i 's/269/268/g' scripts/sync_nlos_20260808_2231.py
           python3 -m py_compile scripts/sync_nlos_20260808_2231.py
           python3 scripts/sync_nlos_20260808_2231.py
 
@@ -85,11 +88,11 @@ jobs:
                   errors.append(f'{label}: missing {needle}')
           actual = html.count('{cat:')
           declared = re.findall(r'<b>(\d+)</b><span>tracked latest entries</span>', html)
-          if actual != 269 or declared != ['269']:
+          if actual != 268 or declared != ['268']:
               errors.append(f'website explorer mismatch: actual={actual}, declared={declared}')
           if errors:
               raise SystemExit('Source validation failed:\n- ' + '\n- '.join(errors))
-          print('Source synchronization validated: two new public records, two venue corrections, 269 explorer records.')
+          print('Source synchronization validated: two new public records, two venue corrections, 268 explorer records.')
           PY
 
       - name: Install LaTeX and PDF tools
