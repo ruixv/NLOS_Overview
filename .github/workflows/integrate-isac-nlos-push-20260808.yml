@@ -1,0 +1,120 @@
+name: Integrate cellular ISAC NLOS lineage on branch
+
+on:
+  push:
+    branches:
+      - automation-isac-nlos-20260808
+    paths:
+      - '.github/trigger-isac-nlos-20260808'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout integration branch
+        uses: actions/checkout@v4
+        with:
+          ref: automation-isac-nlos-20260808
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply bounded source updates
+        run: python tools/integrate_isac_nlos_20260808.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Rebuild survey PDF
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          if grep -Eq 'Citation .* undefined|There were undefined references|There were undefined citations' bare_jrnl.log; then
+            echo 'Unresolved citations/references remain in bare_jrnl.log' >&2
+            exit 1
+          fi
+
+      - name: Validate PDF semantics and render key pages
+        run: |
+          pdftotext bare_jrnl.pdf bare_jrnl_text.txt
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text = Path('bare_jrnl_text.txt').read_text(encoding='utf-8', errors='ignore')
+          compact = re.sub(r'[\s\-‐‑‒–—]+', '', text).lower()
+          required = {
+              'SPAWC title': 'feasibilityofnonlineofsightintegratedsensingandcommunicationatmmwave',
+              'ICT title': 'reliablenonlineofsightintrusiondetectionwithintegratedsensingandcommunicationshardware',
+              'survey narrative': 'cellularisachardwarefornlossensing',
+          }
+          for label, token in required.items():
+              assert token in compact, f'missing PDF semantic token: {label}'
+          assert 'SPAWC' in text, 'missing SPAWC venue token in PDF'
+          assert re.search(r'ICT\s+2026', text), 'missing ICT 2026 venue token in PDF'
+          print('PDF semantic checks passed with line-break/hyphen normalization.')
+          PY
+          pdftoppm -png -f 1 -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-first
+          test -s /tmp/nlos-first.png
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          radar_page=''
+          for p in $(seq 1 "$pages"); do
+            if pdftotext -f "$p" -l "$p" bare_jrnl.pdf - | grep -Fq 'ISAC'; then
+              radar_page="$p"
+              break
+            fi
+          done
+          test -n "$radar_page"
+          pdftoppm -png -f "$radar_page" -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-radar
+          test -s /tmp/nlos-radar.png
+          python - <<'PY'
+          import os, struct
+          for path in ['/tmp/nlos-first.png', '/tmp/nlos-radar.png']:
+              assert os.path.getsize(path) > 10000, path
+              with open(path, 'rb') as f:
+                  sig = f.read(24)
+              assert sig[:8] == b'\x89PNG\r\n\x1a\n'
+              w, h = struct.unpack('>II', sig[16:24])
+              assert w > 500 and h > 500, (path, w, h)
+          print('Rendered first page and an ISAC-containing page are structurally valid.')
+          PY
+
+      - name: Cross-artifact consistency checks
+        run: |
+          grep -Fq 'Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave' README.md
+          grep -Fq 'International Conference on Telecommunications (ICT 2026), 25–30' README.md
+          grep -Fq '<div class="stat"><b>268</b><span>tracked latest entries</span></div>' index.html
+          test "$(grep -Fo 'title:"Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave"' index.html | wc -l)" -eq 1
+          test "$(grep -Fo 'title:"Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware"' index.html | wc -l)" -eq 1
+          grep -Fq 'tosiFeasibilityISACNLOS2024' article/5newscenes.tex
+          grep -Fq 'tosiReliableISACNLOS2026' article/5newscenes.tex
+          test "$(grep -Fo 'tosiFeasibilityISACNLOS2024' egbib_merged_20260711.bib | wc -l)" -eq 1
+          test "$(grep -Fo 'tosiReliableISACNLOS2026' egbib_merged_20260711.bib | wc -l)" -eq 1
+          grep -Fq 'Integration completed on 8 August 2026' updates/2026-08-08-isac-nlos-final-venue-citation-trace.md
+
+      - name: Commit validated public artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f bare_jrnl_text.txt bare_jrnl_flat.txt
+          git rm -f .github/trigger-isac-nlos-20260808 \
+            .github/workflows/integrate-isac-nlos-20260808.yml \
+            .github/workflows/integrate-isac-nlos-push-20260808.yml \
+            tools/integrate_isac_nlos_20260808.py
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex *.bib bare_jrnl.pdf updates/2026-08-08-isac-nlos-final-venue-citation-trace.md
+          git diff --cached --check
+          git commit -m 'Integrate cellular ISAC NLOS lineage'
+          git push origin HEAD:automation-isac-nlos-20260808
