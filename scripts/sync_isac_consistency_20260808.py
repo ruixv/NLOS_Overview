@@ -30,15 +30,6 @@ def replace_line_regex(text, pattern, replacement, label):
     return text[:m.start()] + replacement + text[m.end():]
 
 
-def append_readme_year(text, year, line):
-    pattern = re.compile(rf'^{year} ──.*$', re.M)
-    matches = list(pattern.finditer(text))
-    if len(matches) != 1:
-        raise RuntimeError(f"README timeline year {year}: expected one line, found {len(matches)}")
-    m = matches[0]
-    return text[:m.end()] + "\n" + line.rstrip("\n") + text[m.end():]
-
-
 def append_html_year(text, year, sentence):
     pattern = re.compile(r'(<div class="tl"><div class="year">' + str(year) + r'</div><div class="tl-body"><strong>.*?<p>)(.*?)(</p></div></div>)', re.S)
     matches = list(pattern.finditer(text))
@@ -66,10 +57,6 @@ readme = replace_line_regex(
     "| 2026 | [Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware](https://arxiv.org/abs/2604.07032) — Tosi et al. | 32nd International Conference on Telecommunications (ICT 2026), 25–30 | Uses a commercial 27.4-GHz 5G/mmWave ISAC platform, large-surface reflections, range–Doppler processing, and PHD filtering for reliable detection and tracking of fully occluded moving intruders in an industrial testbed; the arXiv link is retained for accessible full text. |",
     "README ICT final venue",
 )
-if "SPAWC establishes experimental 5G/mmWave ISAC NLOS feasibility" not in readme:
-    readme = append_readme_year(readme, 2024, "   │     SPAWC establishes experimental 5G/mmWave ISAC NLOS feasibility with a 27.4-GHz communication-radio proof of concept")
-if "ICT turns cellular-ISAC NLOS feasibility into robust hidden-intruder tracking" not in readme:
-    readme = append_readme_year(readme, 2026, "   │     ICT turns cellular-ISAC NLOS feasibility into robust hidden-intruder detection and tracking with standards-compatible mmWave hardware")
 write("README.md", readme)
 
 
