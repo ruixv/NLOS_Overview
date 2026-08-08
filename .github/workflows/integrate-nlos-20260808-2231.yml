@@ -29,6 +29,8 @@ jobs:
       - name: Apply bounded updates
         run: |
           set -euo pipefail
+          # Preserve LaTeX backslashes in the inserted survey paragraph.
+          sed -i 's/^    block = """$/    block = r"""/' scripts/sync_nlos_20260808_2231.py
           # The public page currently declares 267 records but contains 266 objects.
           # This run adds two genuine records, so the corrected synchronized count is 268.
           sed -i 's/269/268/g' scripts/sync_nlos_20260808_2231.py
