@@ -4,12 +4,16 @@ on:
   push:
     branches: [automation-isac-nlos-20260808]
     paths: ['.github/trigger-export-final-nlos-20260810']
+  pull_request:
+    branches: [master]
+    paths: ['.github/trigger-marmot-consistency-20260808']
 
 permissions:
   contents: read
 
 jobs:
   build:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
