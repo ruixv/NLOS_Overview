@@ -1,0 +1,124 @@
+name: Export finalized NLOS artifacts
+
+on:
+  push:
+    branches: [automation-isac-nlos-20260808]
+    paths: ['.github/trigger-export-final-nlos-20260810']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: automation-isac-nlos-20260808
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply bounded source updates
+        run: |
+          python tools/integrate_marmot_consistency_20260808.py
+          python - <<'PY'
+          import importlib.util
+          import re
+          from pathlib import Path
+
+          path = Path('tools/integrate_rough_relay_mmwave_20260809.py')
+          spec = importlib.util.spec_from_file_location('rough', path)
+          m = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(m)
+
+          def patch_readme_fixed():
+              text = m.read('README.md')
+              start = text.index('## Latest Additions')
+              end = text.index('\n---', start)
+              header = '|------|-------|----------------|----------------|'
+              pos = text.index(header, start, end) + len(header)
+              latest = text[start:end]
+              rows = [p['row'] for p in m.PAPERS if p['title'] not in latest]
+              if rows:
+                  text = text[:pos] + '\n' + '\n'.join(rows) + text[pos:]
+
+              additions = [
+                  (
+                      r'(?m)^(\s*2024 ── RFlect:.*)$',
+                      "   │     Xu et al.: rough-relay stochastic scattering and multi-angle double-sparse inversion turn non-ideal wall geometry into recoverable mmWave NLOS structure [IEEE IoT Journal / IEEE TSP]\n"
+                      "   │     Mehrotra et al.: Hydra explicitly exploits multi-bounce scattering for beyond-field-of-view localization without an environment map [MobiCom]"
+                  ),
+                  (
+                      r'(?m)^(\s*│\s+Lai et al\.: HoloRadar.*)$',
+                      "   │     Xu et al.: Bayesian compressive sensing treats imprecise multi-angle relay orientations as latent dictionary parameters [IEEE SPL]\n"
+                      "   │     Lv et al.: mmWave-only relay-reflector reconstruction removes the LiDAR / known-wall prerequisite for around-corner human sensing [INFOCOM]"
+                  ),
+                  (
+                      r'(?m)^(\s*2026 ── Wave-Former:.*)$',
+                      "       │     Liu et al.: a dedicated rough-relay mmWave overview consolidates realistic scattering-surface models, multipath-management challenges, and recovery strategies [IEEE AES Magazine]"
+                  ),
+              ]
+              for pattern, line in additions:
+                  if line not in text:
+                      match = re.search(pattern, text)
+                      if not match:
+                          raise RuntimeError(f'README timeline anchor not found: {pattern}')
+                      text = text[:match.end()] + '\n' + line + text[match.end():]
+              m.write('README.md', text)
+
+          patch_readme_fixed()
+          m.patch_index()
+          m.patch_survey()
+          m.patch_bib()
+          m.patch_master_tex_and_note()
+          m.validate()
+          print('Rough-relay citation-trace source integration passed.')
+          PY
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+      - name: Rebuild survey PDF
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          ! grep -Eq 'Citation .* undefined|There were undefined references|There were undefined citations' bare_jrnl.log
+      - name: Validate integrated artifacts
+        run: |
+          grep -Fq '**Update run: 9 August 2026.**' README.md
+          grep -Fq 'Updated 9 August 2026' index.html
+          grep -Fq '<div class="stat"><b>274</b><span>tracked latest entries</span></div>' index.html
+          grep -Fq 'MARMOT: Masked Autoencoder for Modeling Transient Imaging' README.md
+          grep -Fq 'Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave' README.md
+          grep -Fq 'International Conference on Telecommunications (ICT 2026), 25–30' README.md
+          grep -Fq 'IEEE Transactions on Mobile Computing 25(5), 6002–6016 (2026)' README.md
+          grep -Fq '10.1109/TMC.2025.3634623' README.md
+          grep -Fq 'Leveraging Rough-Relay-Surface Scattering for Non-Line-of-Sight mmWave Radar Sensing' README.md
+          grep -Fq 'Double Sparse Structure-Enhanced mmWave NLOS Imaging Under Multiangle Relay Surface' README.md
+          grep -Fq 'Bayesian Compressive Sensing for NLOS mmWave Imaging Under Imprecisely Multiangle Surfaces' README.md
+          grep -Fq 'mmWave-Based Relay Reflector Reconstruction for LiDAR-Free Around-Corner Human Sensing' README.md
+          grep -Fq 'Hydra: Exploiting Multi-Bounce Scattering for Beyond-Field-of-View mmWave Radar' README.md
+          grep -Fq 'MmWave NLOS Sensing under Rough Relay Surface: Challenges and Solutions' README.md
+          grep -Fq 'Rough, uncertain, and unknown relay geometry in mmWave NLOS' article/5newscenes.tex
+          pdftotext bare_jrnl.pdf /tmp/nlos.txt
+          grep -Fiq 'rough relay' /tmp/nlos.txt
+          grep -Fiq 'MARMOT' /tmp/nlos.txt
+          grep -Fiq 'Integrated Sensing and Communication' /tmp/nlos.txt
+      - name: Package public artifacts
+        run: |
+          mkdir -p /tmp/nlos-final/article /tmp/nlos-final/updates
+          cp README.md index.html bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf /tmp/nlos-final/
+          cp article/5newscenes.tex /tmp/nlos-final/article/
+          cp updates/2026-08-09-marmot-n2los-final-venue.md /tmp/nlos-final/updates/
+          cp updates/2026-08-08-isac-nlos-final-venue-citation-trace.md /tmp/nlos-final/updates/
+          cp updates/2026-08-09-rough-relay-mmwave-citation-trace.md /tmp/nlos-final/updates/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nlos-finalized-public-artifacts-20260810
+          path: /tmp/nlos-final
+          retention-days: 2
