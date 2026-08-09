@@ -24,7 +24,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Apply bounded source updates
-        run: python tools/integrate_marmot_consistency_20260808.py
+        run: |
+          python tools/integrate_marmot_consistency_20260808.py
+          python tools/integrate_rough_relay_mmwave_20260809.py
       - name: Install LaTeX and PDF tools
         run: |
           sudo apt-get update
@@ -59,8 +61,22 @@ jobs:
           grep -Fq 'through 9 August 2026' bare_jrnl.tex
           grep -Fq '**Update run: 9 August 2026.**' README.md
           grep -Fq 'Updated 9 August 2026' index.html
-          grep -Fq '<div class="stat"><b>268</b><span>tracked latest entries</span></div>' index.html
+          grep -Fq '<div class="stat"><b>274</b><span>tracked latest entries</span></div>' index.html
           test -s updates/2026-08-09-marmot-n2los-final-venue.md
+
+          grep -Fq 'Leveraging Rough-Relay-Surface Scattering for Non-Line-of-Sight mmWave Radar Sensing' README.md
+          grep -Fq 'Double Sparse Structure-Enhanced mmWave NLOS Imaging Under Multiangle Relay Surface' README.md
+          grep -Fq 'Bayesian Compressive Sensing for NLOS mmWave Imaging Under Imprecisely Multiangle Surfaces' README.md
+          grep -Fq 'mmWave-Based Relay Reflector Reconstruction for LiDAR-Free Around-Corner Human Sensing' README.md
+          grep -Fq 'Hydra: Exploiting Multi-Bounce Scattering for Beyond-Field-of-View mmWave Radar' README.md
+          grep -Fq 'MmWave NLOS Sensing under Rough Relay Surface: Challenges and Solutions' README.md
+          grep -Fq 'Rough, uncertain, and unknown relay geometry in mmWave NLOS' article/5newscenes.tex
+          for key in xuRoughRelayMmWave2024 xuDoubleSparseMmWave2024 xuBayesianMmWave2025 lvRelayReflector2025 mehrotraHydra2024 liuRoughRelaySurvey2026; do
+            test "$(grep -Fo "$key" egbib_merged_20260711.bib | wc -l)" -eq 1
+            grep -Fq "$key" article/5newscenes.tex
+          done
+          test -s updates/2026-08-09-rough-relay-mmwave-citation-trace.md
+
           pdftotext bare_jrnl.pdf /tmp/nlos.txt
           python - <<'PY'
           from pathlib import Path
@@ -74,7 +90,13 @@ jobs:
             'Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave',
             'Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware',
             'Single-Tag mmWave Backscatter for Robust Non-Line-of-Sight Localization',
-            '10.1109/TMC.2025.3634623']
+            '10.1109/TMC.2025.3634623',
+            'Leveraging Rough-Relay-Surface Scattering for Non-Line-of-Sight mmWave Radar Sensing',
+            'Double Sparse Structure-Enhanced mmWave NLOS Imaging Under Multiangle Relay Surface',
+            'Bayesian Compressive Sensing for NLOS mmWave Imaging Under Imprecisely Multiangle Surfaces',
+            'mmWave-Based Relay Reflector Reconstruction for LiDAR-Free Around-Corner Human Sensing',
+            'Hydra: Exploiting Multi-Bounce Scattering for Beyond-Field-of-View mmWave Radar',
+            'MmWave NLOS Sensing under Rough Relay Surface: Challenges and Solutions']
           for token in required:
               assert norm(token) in compact, f'missing PDF token: {token}'
           assert re.search(r'IEEE\s+Transactions\s+on\s+Mobile\s+Computing',text,re.I)
@@ -85,7 +107,7 @@ jobs:
           pdftoppm -png -f 1 -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-first
           radar_page=''
           for p in $(seq 1 "$pages"); do
-            if pdftotext -f "$p" -l "$p" bare_jrnl.pdf - | grep -Fq 'Single-Tag mmWave Backscatter'; then radar_page="$p"; break; fi
+            if pdftotext -f "$p" -l "$p" bare_jrnl.pdf - | grep -Fq 'rough relay'; then radar_page="$p"; break; fi
           done
           test -n "$radar_page"
           pdftoppm -png -f "$radar_page" -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-radar
@@ -102,12 +124,9 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          for f in .github/trigger-marmot-consistency-20260808 .github/trigger-isac-nlos-20260808 .github/workflows/integrate-marmot-consistency-20260808.yml .github/workflows/integrate-isac-nlos-push-20260808.yml .github/workflows/integrate-isac-nlos-20260808.yml tools/integrate_marmot_consistency_20260808.py tools/integrate_isac_nlos_20260808.py; do
-            if test -e "$f"; then git rm -f "$f"; fi
-          done
-          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-08-09-marmot-n2los-final-venue.md updates/2026-08-08-isac-nlos-final-venue-citation-trace.md
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-08-09-marmot-n2los-final-venue.md updates/2026-08-08-isac-nlos-final-venue-citation-trace.md updates/2026-08-09-rough-relay-mmwave-citation-trace.md
           git diff --cached --check
           if ! git diff --cached --quiet; then
-            git commit -m 'Finalize MARMOT, ISAC, and N2LoS survey updates'
+            git commit -m 'Integrate rough-relay mmWave citation-trace papers'
             git push origin HEAD:automation-isac-nlos-20260808
           fi
