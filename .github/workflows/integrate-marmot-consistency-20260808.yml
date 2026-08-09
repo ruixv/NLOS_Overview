@@ -85,7 +85,7 @@ jobs:
           pdftoppm -png -f 1 -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-first
           radar_page=''
           for p in $(seq 1 "$pages"); do
-            if pdftotext -f "$p" -l "$p" bare_jrnl.pdf - | grep -Fq 'N2LoS'; then radar_page="$p"; break; fi
+            if pdftotext -f "$p" -l "$p" bare_jrnl.pdf - | grep -Fq 'Single-Tag mmWave Backscatter'; then radar_page="$p"; break; fi
           done
           test -n "$radar_page"
           pdftoppm -png -f "$radar_page" -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-radar
