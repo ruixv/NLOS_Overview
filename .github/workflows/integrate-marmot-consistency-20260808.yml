@@ -26,7 +26,59 @@ jobs:
       - name: Apply bounded source updates
         run: |
           python tools/integrate_marmot_consistency_20260808.py
-          python tools/integrate_rough_relay_mmwave_20260809.py
+          python - <<'PY'
+          import importlib.util
+          import re
+          from pathlib import Path
+
+          path = Path('tools/integrate_rough_relay_mmwave_20260809.py')
+          spec = importlib.util.spec_from_file_location('rough', path)
+          m = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(m)
+
+          def patch_readme_fixed():
+              text = m.read('README.md')
+              start = text.index('## Latest Additions')
+              end = text.index('\n---', start)
+              header = '|------|-------|----------------|----------------|'
+              pos = text.index(header, start, end) + len(header)
+              latest = text[start:end]
+              rows = [p['row'] for p in m.PAPERS if p['title'] not in latest]
+              if rows:
+                  text = text[:pos] + '\n' + '\n'.join(rows) + text[pos:]
+
+              additions = [
+                  (
+                      r'(?m)^(\s*2024 ── RFlect:.*)$',
+                      "   │     Xu et al.: rough-relay stochastic scattering and multi-angle double-sparse inversion turn non-ideal wall geometry into recoverable mmWave NLOS structure [IEEE IoT Journal / IEEE TSP]\n"
+                      "   │     Mehrotra et al.: Hydra explicitly exploits multi-bounce scattering for beyond-field-of-view localization without an environment map [MobiCom]"
+                  ),
+                  (
+                      r'(?m)^(\s*│\s+Lai et al\.: HoloRadar.*)$',
+                      "   │     Xu et al.: Bayesian compressive sensing treats imprecise multi-angle relay orientations as latent dictionary parameters [IEEE SPL]\n"
+                      "   │     Lv et al.: mmWave-only relay-reflector reconstruction removes the LiDAR / known-wall prerequisite for around-corner human sensing [INFOCOM]"
+                  ),
+                  (
+                      r'(?m)^(\s*2026 ── Wave-Former:.*)$',
+                      "       │     Liu et al.: a dedicated rough-relay mmWave overview consolidates realistic scattering-surface models, multipath-management challenges, and recovery strategies [IEEE AES Magazine]"
+                  ),
+              ]
+              for pattern, line in additions:
+                  if line not in text:
+                      match = re.search(pattern, text)
+                      if not match:
+                          raise RuntimeError(f'README timeline anchor not found: {pattern}')
+                      text = text[:match.end()] + '\n' + line + text[match.end():]
+              m.write('README.md', text)
+
+          patch_readme_fixed()
+          m.patch_index()
+          m.patch_survey()
+          m.patch_bib()
+          m.patch_master_tex_and_note()
+          m.validate()
+          print('Rough-relay / multi-angle / unknown-reflector / multi-bounce mmWave citation-trace integration passed.')
+          PY
       - name: Install LaTeX and PDF tools
         run: |
           sudo apt-get update
