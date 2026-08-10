@@ -9,7 +9,7 @@ on:
     paths: ['.github/trigger-marmot-consistency-20260808']
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -126,3 +126,17 @@ jobs:
           name: nlos-finalized-public-artifacts-20260810
           path: /tmp/nlos-final
           retention-days: 2
+      - name: Persist validated generated artifacts on integration branch
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-08-09-marmot-n2los-final-venue.md \
+            updates/2026-08-09-rough-relay-mmwave-citation-trace.md \
+            updates/2026-08-08-isac-nlos-final-venue-citation-trace.md
+          if git diff --cached --quiet; then
+            echo 'No generated changes to persist.'
+          else
+            git commit -m 'Persist validated final NLOS public artifacts'
+            git push origin HEAD:automation-isac-nlos-20260808
+          fi
