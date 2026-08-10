@@ -1,0 +1,9 @@
+# Validated public-artifact propagation — 11 August 2026
+
+The previously validated 9 August public/source bundle has now been propagated atomically from the validated integration commit `3d85c5fe30fe91c27c857b8926f25e9dae92aa60` onto `master` by reusing its existing Git blob objects. This synchronizes `README.md`, `index.html`, `bare_jrnl.tex`, `egbib_merged_20260711.bib`, `article/5newscenes.tex`, and the matching generated `bare_jrnl.pdf` for the MARMOT masked-transient-pretraining entry, the final IEEE TMC record for N2LoS, the six-paper realistic-relay / multi-bounce mmWave citation-trace lineage, and the website-side ToF benchmark coverage represented by that validated build.
+
+This propagation intentionally does **not** claim that the later-discovered Hou et al. paper, *Non-line-of-sight multi-person pose sensing*, Optics Express 33(20), 41937–41950 (2025), DOI `10.1364/OE.570120`, is already integrated into the generated PDF. That paper was discovered after the validated binary was built. Its exact metadata and semantically appropriate insertion instructions remain recorded in `updates/2026-08-10-validated-pending-public-artifacts.md`; it should be added across README / website / survey prose / BibTeX together with a fresh PDF rebuild rather than creating a source/PDF mismatch.
+
+`FermatFormer: A Fermat Optics Based Neural Architecture for Non-line-of-sight Imaging` also remains on metadata hold: ICCP 2026 / award evidence is public, but a stable canonical proceedings record with complete authorship/pages/DOI has not yet been verified, so no fabricated BibTeX entry should be added.
+
+Fresh search and forward-citation tracing on 11 August 2026 did not verify a newer direct NLOS-imaging publication than Sultan et al., *Iterating the transient light transport matrix for non-line-of-sight imaging*, Nature Communications, published 22 July 2026.
