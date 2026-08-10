@@ -1,0 +1,84 @@
+name: Integrate Hou multi-person NLOS pose sensing
+
+on:
+  push:
+    branches: [automation-hou-nlos-20260811]
+    paths: ['.github/trigger-hou-nlos-20260811']
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: automation-hou-nlos-20260811
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply bounded Hou source update
+        run: python tools/integrate_hou_multiperson_pose_20260811.py
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+      - name: Rebuild survey PDF
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          ! grep -Eq 'Citation .* undefined|There were undefined references|There were undefined citations' bare_jrnl.log
+      - name: Validate source and PDF consistency
+        run: |
+          grep -Fq 'Non-line-of-sight multi-person pose sensing' README.md
+          grep -Fq '10.1364/OE.570120' README.md
+          grep -Fq 'Non-line-of-sight multi-person pose sensing' index.html
+          grep -Fq '<div class="stat"><b>275</b><span>tracked latest entries</span></div>' index.html
+          grep -Fq 'houMultiPersonPose2025' article/5newscenes.tex
+          test "$(grep -Fo 'houMultiPersonPose2025' egbib_merged_20260711.bib | wc -l)" -eq 1
+          grep -Fq 'through 11 August 2026' bare_jrnl.tex
+          pdftotext bare_jrnl.pdf /tmp/nlos-hou.txt
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text=Path('/tmp/nlos-hou.txt').read_text(encoding='utf-8',errors='ignore')
+          norm=lambda s: re.sub(r'[\s\-‐‑‒–—]+','',s).lower()
+          compact=norm(text)
+          for token in ['Non-line-of-sight multi-person pose sensing','AMPE-NLOS','10.1364/OE.570120','MARMOT','rough relay']:
+              assert norm(token) in compact, f'missing PDF token: {token}'
+          print('PDF semantic checks passed.')
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          pose_page=''
+          for p in $(seq 1 "$pages"); do
+            if pdftotext -f "$p" -l "$p" bare_jrnl.pdf - | grep -Fiq 'adaptive multi-person'; then pose_page="$p"; break; fi
+          done
+          test -n "$pose_page"
+          pdftoppm -png -f 1 -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-first
+          pdftoppm -png -f "$pose_page" -singlefile -r 120 bare_jrnl.pdf /tmp/nlos-pose
+          python - <<'PY'
+          import os, struct
+          for path in ['/tmp/nlos-first.png','/tmp/nlos-pose.png']:
+              assert os.path.getsize(path)>10000
+              with open(path,'rb') as f: sig=f.read(24)
+              assert sig[:8]==b'\x89PNG\r\n\x1a\n'
+              w,h=struct.unpack('>II',sig[16:24])
+              assert w>500 and h>500
+          print('Rendered-page structural checks passed.')
+          PY
+      - name: Commit synchronized public artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-08-11-hou-multiperson-pose.md
+          git diff --cached --check
+          if ! git diff --cached --quiet; then
+            git commit -m 'Integrate adaptive multi-person NLOS pose sensing'
+            git push origin HEAD:automation-hou-nlos-20260811
+          fi
