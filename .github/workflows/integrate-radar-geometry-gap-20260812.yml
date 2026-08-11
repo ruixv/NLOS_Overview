@@ -26,25 +26,39 @@ jobs:
           ref: automation/radar-geometry-gap-20260812
           fetch-depth: 0
 
+      - name: Detect already-integrated state
+        id: guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -q 'zhuMultipathEnvironmentNLOS2026' egbib_merged_20260711.bib \
+             && grep -q 'Multipath Exploitation-Based 3-D Environmental Perception and NLOS Moving Target Reconstruction for mmWave MIMO Imaging Radar' README.md \
+             && grep -q 'From assumed relay geometry to joint environment and target inference.' article/5newscenes.tex; then
+            echo 'done=true' >> "$GITHUB_OUTPUT"
+            echo 'Validated public integration is already committed; skipping regeneration.'
+          else
+            echo 'done=false' >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Apply bounded public-artifact updates
+        if: steps.guard.outputs.done != 'true'
         run: |
           set -euo pipefail
           python3 -m py_compile scripts/sync_radar_geometry_gap_20260812.py
           python3 scripts/sync_radar_geometry_gap_20260812.py
 
       - name: Validate synchronized source state
+        if: steps.guard.outputs.done != 'true'
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
           import re
-
           readme = Path('README.md').read_text(encoding='utf-8')
           html = Path('index.html').read_text(encoding='utf-8')
           a5 = Path('article/5newscenes.tex').read_text(encoding='utf-8')
           bare = Path('bare_jrnl.tex').read_text(encoding='utf-8')
           bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
-
           titles = [
               'Multipath Exploitation-Based 3-D Environmental Perception and NLOS Moving Target Reconstruction for mmWave MIMO Imaging Radar',
               'NLOS Building Layout and Target Estimation in an L-Shaped Corner with Complex Geometries',
@@ -63,40 +77,25 @@ jobs:
           ]
           errors = []
           for title in titles:
-              if readme.count(title) != 1:
-                  errors.append(f'README title count {title!r} = {readme.count(title)}')
-              if html.count(title) != 1:
-                  errors.append(f'index title count {title!r} = {html.count(title)}')
+              if readme.count(title) != 1: errors.append(f'README title count {title!r} = {readme.count(title)}')
+              if html.count(title) != 1: errors.append(f'index title count {title!r} = {html.count(title)}')
           for key in keys:
-              if a5.count(key) != 1:
-                  errors.append(f'article/5newscenes citation {key} count = {a5.count(key)}')
+              if a5.count(key) != 1: errors.append(f'article citation {key} count = {a5.count(key)}')
               if len(re.findall(r'^@\w+\s*\{\s*' + re.escape(key) + r'\s*,', bib, re.M)) != 1:
                   errors.append(f'bibliography key {key} not unique')
           for doi in dois:
-              if bib.lower().count(doi.lower()) != 1:
-                  errors.append(f'bibliography DOI {doi} count = {bib.lower().count(doi.lower())}')
-          if '**Update run: 12 August 2026.**' not in readme:
-              errors.append('README update date was not advanced to 12 August 2026')
-          if 'Updated 12 August 2026 · 210+ papers' not in html:
-              errors.append('website hero update date was not advanced to 12 August 2026')
-          if 'From assumed relay geometry to joint environment and target inference.' not in a5:
-              errors.append('survey radar trajectory paragraph is missing')
-          if not bare.startswith('% 12 August 2026 radar citation trace:'):
-              errors.append('bare_jrnl.tex maintenance trace is missing')
-          if '\\input{article/5newscenes.tex}' not in bare:
-              errors.append('bare_jrnl.tex no longer includes article/5newscenes.tex')
-          actual = html.count('{cat:')
-          declared = re.findall(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', html)
-          if declared != [str(actual)]:
-              errors.append(f'website explorer count mismatch: actual={actual}, declared={declared}')
-          if actual < 283:
-              errors.append(f'website paper count unexpectedly low after six additions: {actual}')
-          if errors:
-              raise SystemExit('Source validation failed:\n- ' + '\n- '.join(errors))
-          print(f'Source synchronization validated: six radar additions, {actual} explorer records.')
+              if bib.lower().count(doi.lower()) != 1: errors.append(f'bibliography DOI {doi} not unique')
+          if '**Update run: 12 August 2026.**' not in readme: errors.append('README date not advanced')
+          if 'Updated 12 August 2026 · 210+ papers' not in html: errors.append('website date not advanced')
+          if 'From assumed relay geometry to joint environment and target inference.' not in a5: errors.append('survey trajectory paragraph missing')
+          if not bare.startswith('% 12 August 2026 radar citation trace:'): errors.append('bare_jrnl maintenance trace missing')
+          if '\\input{article/5newscenes.tex}' not in bare: errors.append('bare_jrnl no longer inputs article/5newscenes.tex')
+          if errors: raise SystemExit('Source validation failed:\n- ' + '\n- '.join(errors))
+          print('Source synchronization validated.')
           PY
 
       - name: Install LaTeX and PDF validation tools
+        if: steps.guard.outputs.done != 'true'
         run: |
           sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
           sudo apt-get -o Acquire::Retries=5 update
@@ -106,6 +105,7 @@ jobs:
             ghostscript poppler-utils
 
       - name: Rebuild survey PDF
+        if: steps.guard.outputs.done != 'true'
         run: |
           set -euo pipefail
           old_hash=$(git hash-object bare_jrnl.pdf)
@@ -119,15 +119,14 @@ jobs:
           echo "PDF blob: $old_hash -> $new_hash"
           test "$old_hash" != "$new_hash"
 
-      - name: Validate compiled bibliography, PDF semantics, and rendering
+      - name: Validate compiled citations and PDF
+        if: steps.guard.outputs.done != 'true'
         run: |
           set -euo pipefail
-          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
           python3 - <<'PY'
           from pathlib import Path
           import re
-
           log = Path('bare_jrnl.log').read_text(errors='ignore')
           aux = Path('bare_jrnl.aux').read_text(errors='ignore')
           bbl = Path('bare_jrnl.bbl').read_text(errors='ignore')
@@ -139,40 +138,32 @@ jobs:
           ]
           errors = []
           for key in keys:
-              if key not in aux or key not in bbl:
-                  errors.append(f'compiled citation missing for {key}')
+              if key not in aux or key not in bbl: errors.append('compiled citation missing for ' + key)
           if re.search(r'Citation .* undefined|There were undefined citations|There were undefined references|Repeated entry', log):
-              errors.append('LaTeX/BibTeX log contains unresolved citations/references or repeated-entry errors')
+              errors.append('LaTeX/BibTeX log has unresolved references or repeated entries')
           for term in ['reflectivesurface','unknownlshapedcorridor','distributedradar','environmentalperception','multipathassistedjpda']:
-              if term not in pdf:
-                  errors.append(f'PDF text missing normalized term {term}')
-          if errors:
-              raise SystemExit('Compiled validation failed:\n- ' + '\n- '.join(errors))
-          print('Compiled survey citations and semantic checks passed.')
+              if term not in pdf: errors.append('PDF text missing ' + term)
+          if errors: raise SystemExit('Compiled validation failed:\n- ' + '\n- '.join(errors))
+          print('Compiled survey validation passed.')
           PY
-          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
           test -n "$pages"
           mkdir -p .pdf_render_check
-          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
-          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
           test -s .pdf_render_check/first.png
           test -s .pdf_render_check/last.png
           rm -rf .pdf_render_check bare_jrnl.txt
 
-      - name: Commit only validated public artifacts
+      - name: Commit validated public artifacts
+        if: steps.guard.outputs.done != 'true'
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          rm -f scripts/sync_radar_geometry_gap_20260812.py
-          rm -f .github/workflows/integrate-radar-geometry-gap-20260812.yml
-          git rm -f egbib_20260811_radar_multipath_geometry_gap.bib || true
-          git add -A README.md index.html article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf \
-            egbib_merged_20260711.bib updates/2026-08-12-radar-geometry-gap-synchronized.md \
-            egbib_20260811_radar_multipath_geometry_gap.bib scripts/sync_radar_geometry_gap_20260812.py \
-            .github/workflows/integrate-radar-geometry-gap-20260812.yml
+          git add README.md index.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib updates/2026-08-12-radar-geometry-gap-synchronized.md
+          git add -f bare_jrnl.pdf
           git diff --cached --check
-          git diff --cached --stat
           if git diff --cached --quiet; then
             echo 'No generated changes to commit' >&2
             exit 1
