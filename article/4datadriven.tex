@@ -90,6 +90,11 @@ The semantic NLOS trajectory is not limited to optical relay-wall images. Zeng~\
 \subsection{Network combined with physical models} \label{combined}
 
 \vspace{0.8mm}
+
+\vspace{0.8mm}
+\noindent \textbf{Optimization-derived attention and frequency-domain expert fusion.}
+A parallel physics-guided trajectory derives adaptive network-like weighting directly from optimization variables instead of learning every gate from paired data. Zhang~\etal~model non-Gaussian NLOS residuals with a mixture distribution and obtain dual-space adaptive weights that act as zero-shot attention inside an alternating solver~\cite{zhangAdaptiveMixtureAttentionNLOS2025}. Their later frequency-domain multi-regularization-experts formulation partitions the inverse problem across complementary regularized Wiener-style experts and fuses them with gates derived from dual variables~\cite{zhangFrequencyMoENLOS2026}. These methods complement CMFormer, NLOST, and transient Transformers by showing that attention and mixture-of-experts behavior can emerge from the inverse model itself, retaining interpretability and avoiding a fully supervised gating network.
+
 \noindent \textbf{Dual-model guidance for under-scanned transients.}
 Yan~\etal~first recover sufficient-density measurements from sparse transients with three-dimensional pyramid pooling and window attention, then combine LCT and $f$--$k$ branches to retain complementary global structure and fine texture~\cite{yanDualModelUnderscanning2026}. Multi-scale refinement and adaptive fusion place classical geometric- and wave-optics inverses inside one learned under-scanning pipeline, extending measurement completion beyond a single fixed reconstruction backend.
 
