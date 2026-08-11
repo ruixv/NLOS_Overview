@@ -1,0 +1,26 @@
+name: Validate paper graph
+
+on:
+  pull_request:
+    paths:
+      - 'overview-v2.html'
+      - 'index.html'
+      - 'assets/paper-graph-data.js'
+      - 'scripts/validate_paper_graph.mjs'
+      - 'egbib*.bib'
+      - '.github/workflows/validate-paper-graph.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate graph coverage, edges, and known relations
+        run: node scripts/validate_paper_graph.mjs
