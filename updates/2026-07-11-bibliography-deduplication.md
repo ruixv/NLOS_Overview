@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 91 source files and keeps one highest-priority record for each of 508 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 94 source files and keeps one highest-priority record for each of 536 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 1028
-- Case-insensitive duplicate replacements: 520
+- Parsed source records: 1062
+- Case-insensitive duplicate replacements: 526
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -332,8 +332,8 @@ This update generates `egbib_merged_20260711.bib` from 91 source files and keeps
 - `bogerLombardPassiveAcousticCorners2023` / `bogerLombardPassiveAcousticCorners2023`: `egbib_merged_20260711.bib` → `egbib_20260702_updates.bib`
 - `coloneRISAidedDetection2026` / `coloneRISAidedDetection2026`: `egbib_merged_20260711.bib` → `egbib_20260702_updates.bib`
 - `sanjeevaBiStaticIRSCRB2026` / `sanjeevaBiStaticIRSCRB2026`: `egbib_merged_20260711.bib` → `egbib_20260702_updates.bib`
-- `tosiNLOSIntrusionISAC2026` / `tosiNLOSIntrusionISAC2026`: `egbib_merged_20260711.bib` → `egbib_20260702_updates.bib`
 - `esmaeilbeigMultiIRSHiddenTarget2022` / `esmaeilbeigMultiIRSHiddenTarget2022`: `egbib_merged_20260711.bib` → `egbib_20260702_updates.bib`
+- `tosiReliableISACNLOS2026` / `tosiReliableISACNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260702_updates.bib`
 - `choLEAP2024` / `choLEAP2024`: `egbib_merged_20260711.bib` → `egbib_20260703_updates.bib`
 - `luesiaScatteringPhasor2023` / `luesiaScatteringPhasor2023`: `egbib_merged_20260711.bib` → `egbib_20260703_updates.bib`
 - `guiHDPSPassiveNLOS2024` / `guiHDPSPassiveNLOS2024`: `egbib_merged_20260711.bib` → `egbib_20260703_updates.bib`
@@ -530,6 +530,12 @@ This update generates `egbib_merged_20260711.bib` from 91 source files and keeps
 - `choLEAP2024` / `choLEAP2024`: `egbib_20260703_updates.bib` → `egbib_20260731_zz_leap_final_venue.bib`
 - `xuProductConvolutionNLOS2022` / `xuProductConvolutionNLOS2022`: `egbib_merged_20260711.bib` → `egbib_20260801_frequency_domain.bib`
 - `tianVirtualRMAHistograms2025` / `tianVirtualRMAHistograms2025`: `egbib_merged_20260711.bib` → `egbib_20260801_frequency_domain.bib`
+- `alakusAcousticMaterialNLOS2026` / `alakusAcousticMaterialNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260803_acoustic_material.bib`
+- `tosiFeasibilityISACNLOS2024` / `tosiFeasibilityISACNLOS2024`: `egbib_merged_20260711.bib` → `egbib_20260808_isac_updates.bib`
+- `zhangCMFormerNLOS2025` / `zhangCMFormerNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260811_learning_sampling_updates.bib`
+- `oyamaAdaptiveSpiralNLOS2026` / `oyamaAdaptiveSpiralNLOS2026`: `egbib_20260718_core_citation_updates.bib` → `egbib_20260811_learning_sampling_updates.bib`
+- `yasmeenDualBeamRIS2026` / `yasmeenDualBeamRIS2026`: `egbib_20260702_updates.bib` → `egbib_20260811_ris_vitalsign_updates.bib`
+- `parkTjunctionPedestrian2025` / `parkTjunctionPedestrian2025`: `egbib_2026_updates.bib` → `egbib_20260811_ris_vitalsign_updates.bib`
 - `jeonSoundVehicleNLOS2025` / `jeonSoundVehicleNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
 - `zhaiIrregularGridAcousticNLOS2025` / `zhaiIrregularGridAcousticNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
 

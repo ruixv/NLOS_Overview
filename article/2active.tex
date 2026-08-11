@@ -585,6 +585,11 @@ Wang~\etal~retain the speed of $f$--$k$ migration but replace fixed Stolt interp
 \noindent \textbf{Common-model benchmarking of ToF NLOS inverses.}
 Marco~\etal~place representative ToF NLOS methods under a shared forward model and controlled hardware and photon-count assumptions~\cite{marcoComprehensiveToFNLOS2026}. Their analysis relates Radon-style, frequency-domain, and phasor-field formulations and shows that apparent method differences must be separated from common aperture, visibility, resolution, and noise limits. This benchmark-oriented viewpoint complements algorithm-by-algorithm summaries and provides a reproducible basis for evaluating future inverse operators.
 
+
+\vspace{0.8mm}
+\noindent \textbf{Measurement-adaptive regularization and transient completion.}
+Recent active NLOS work revisits robustness and sparse acquisition without abandoning the physical forward operator. Zhou~\etal~construct a ground-truth-free TOF-SSIM criterion and adaptively modify transient histograms before backprojection, suppressing reconstruction artifacts in both confocal and non-confocal geometries~\cite{zhouAdaptiveArtifactCancellationNLOS2025}. Ding~\etal~stabilize under-sampled recovery with object-domain and joint signal--object-domain curvature regularization and GPU-oriented ADMM solvers~\cite{dingCurvatureRegularizationNLOS2024}. Cui~\etal~instead treat aperture-limited acquisition as a measurement-constrained latent-diffusion problem: TransDiff restores dense transient information without paired supervision before hidden-scene reconstruction~\cite{cuiTransDiffNLOS2025}. Oyama~\etal~move adaptation into acquisition itself, shifting an Archimedean spiral toward relay-wall regions with stronger sequential returns and compensating the resulting nonuniform density with Voronoi weights~\cite{oyamaAdaptiveSpiralNLOS2026}. Together, these methods make data quality, relay-aperture support, and sample placement explicit optimization variables rather than fixed assumptions inherited from dense rectangular scanning.
+
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Challenges and Prospects}
 \vspace{0.8mm}
 \noindent \textbf{Irregular, aperture-limited, and under-scanned relay measurements.}
