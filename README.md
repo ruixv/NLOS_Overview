@@ -64,10 +64,16 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 11 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 12 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [Multipath Exploitation-Based 3-D Environmental Perception and NLOS Moving Target Reconstruction for mmWave MIMO Imaging Radar](https://doi.org/10.1109/TAES.2025.3647422) — Zhu et al. | IEEE Transactions on Aerospace and Electronic Systems 62, 3569–3587 (2026) | Jointly estimates 3-D environmental/reflector structure and reconstructs NLOS moving targets from mmWave MIMO multipath, transferring estimated reflector parameters into path-oriented hidden-target localization and validating the pipeline experimentally. |
+| 2025 | [NLOS Building Layout and Target Estimation in an L-Shaped Corner with Complex Geometries](https://doi.org/10.1109/TIM.2024.3522427) — Xue et al. | IEEE Transactions on Instrumentation and Measurement 74 (2025) | Removes the usual known-layout assumption: tracks multipath ToAs, separates diffraction and first-/second-order reflection paths, localizes the hidden target and reconstructs part of the L-shaped relay geometry with a portable SISO radar. |
+| 2025 | [A Two-Stage NLOS Target Positioning Method Based on 0-1 Non-Coherent Binary Accumulation](https://doi.org/10.1109/TVT.2025.3542117) — Wu et al. | IEEE Transactions on Vehicular Technology 74(6), 8866–8878 (2025) | Uses CFAR-derived 0-1 non-coherent binary accumulation and a two-stage estimator to make multipath NLOS target positioning more robust to false alarms and missed detections. |
+| 2025 | [A Reflective Surface Estimation Method Based on Multipath Utilization](https://doi.org/10.1109/TIM.2025.3541688) — Luo et al. | IEEE Transactions on Instrumentation and Measurement 74, 1–11 (2025) | Estimates the relay/reflective surface itself from multipath-ellipse tangency, dictionary matching and Kalman smoothing, turning a normally assumed calibration quantity into part of the radar inverse problem. |
+| 2025 | [NLOS Tracking with Distributed Radar Using Multipath-Assisted JPDA](https://doi.org/10.1109/IGARSS55030.2025.11242772) — Xu et al. | IEEE IGARSS 2025, 8751–8755 | Extends multipath exploitation from static localization to distributed-radar NLOS tracking with multipath-assisted joint probabilistic data association. |
+| 2025 | [Non-Line-of-Sight Target Localization in Unknown L-Shaped Corridor Based UWB MIMO Radar](https://doi.org/10.23919/JSEE.2025.000021) — Jia et al. | Journal of Systems Engineering and Electronics 36(3), 681–693 (2025) | Uses dual backprojection views and diffraction/reflection path-length matching to estimate hidden target positions and the unknown corridor width, remaining effective when some propagation paths are lost. |
 | 2025 | [Non-Line-of-Sight Human Vital-Sign Sensing Aided by Reconfigurable Intelligent Surfaces](https://doi.org/10.12263/DZXB.20240674) — Li et al. | Acta Electronica Sinica 53(1), 1–13 (2025) | Uses visual-aided programmable RIS beam control to redirect RF sensing energy into a hidden human region, then estimates respiration and heartbeat with an improved VMD pipeline. This is physiological NLOS sensing rather than hidden-shape reconstruction. |
 | 2025 | [Liquid Crystal RIS Integrated with SIL Radar for NLOS Vital Sign Monitoring](https://doi.org/10.1109/IMBioC63524.2025.10989670) — Tripathy et al. | IEEE IMBioC 2025 | Integrates a liquid-crystal RIS with a self-injection-locked radar, electronically steering the sensing path into an NLOS region for experimentally validated contactless vital-sign monitoring. |
 | 2025 | [Non-line-of-sight multi-person pose sensing](https://doi.org/10.1364/OE.570120) — Hou et al. | Optics Express 33(20), 41937–41950 (2025) | Introduces AMPE-NLOS, the first adaptive multi-person 3D pose/mesh sensing framework for active transient NLOS: LCT supplies coarse volumetric features, a 3D U-Net refines them, and body-center-guided SMPL parameter sampling separates a variable number of hidden people. The paper validates on simulation and a self-built confocal laser/SPAD system. |
@@ -457,6 +463,9 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Lai et al.: HoloRadar reconstructs complete LOS/NLOS 3D scenes with one mobile mmWave radar [NeurIPS]
    │     Xu et al.: Bayesian compressive sensing treats imprecise multi-angle relay orientations as latent dictionary parameters [IEEE SPL]
    │     Lv et al.: mmWave-only relay-reflector reconstruction removes the LiDAR / known-wall prerequisite for around-corner human sensing [INFOCOM]
+   │     Luo et al.: multipath-ellipse geometry makes the reflective surface itself an estimated radar state [IEEE TIM]
+   │     Xue et al. and Jia et al.: unknown L-shaped layouts are jointly inferred with hidden targets from diffraction/reflection paths [IEEE TIM / JSEE]
+   │     Wu et al. and Xu et al.: binary-accumulation positioning and distributed JPDA extend multipath exploitation toward robust NLOS localization and tracking [IEEE TVT / IGARSS]
    │     Alburadi et al.: 228 GHz polarimetric FMCW mapping exploits double-bounce specular paths for measured around-corner imaging [IEEE TGRS]
    │     Cai et al.: ACTE-Net and equivariant adaptive-threshold unfolding introduce unsupervised and self-supervised measured mmWave inversion [IEEE TAP / TCI]
    │     Miao et al.: adaptive photon-arrival windowing suppresses overwhelming daylight background before TV-regularized transient reconstruction [Optics Express]
@@ -464,6 +473,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
     2026 ── Wave-Former: physics-aware wireless shape completion reconstructs complete 3D geometry of fully occluded objects [CVPR]
        │     Liu et al.: a dedicated rough-relay mmWave overview consolidates realistic scattering-surface models, multipath-management challenges, and recovery strategies [IEEE AES Magazine]
        │     RISE: AoA/AoD multipath enhancement and hierarchical diffusion enable layout reconstruction and object detection from one static radar [CVPR]
+       │     Zhu et al.: weak-reflector 3-D environmental perception is coupled to path-oriented NLOS moving-target reconstruction [IEEE TAES]
 2026 ── Yin et al.: Si-SPAD and phase-congruency regularization enable 200 m all-day active NLOS under 94,314 lx sunlight [Optics and Lasers in Engineering]
    │     ICT follow-up: industrial 5G/mmWave ISAC adds range--Doppler detection and PHD tracking for reliable fully NLOS intrusion monitoring [ICT 2026]
    │     Doğan: laser–acoustic early fusion and LAO-Net extend hidden-human NLOS sensing from localization/reconstruction toward four-class orientation inference [Scientific Reports]
