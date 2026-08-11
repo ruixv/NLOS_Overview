@@ -1,0 +1,136 @@
+name: Synchronize NLOS RIS and survey artifacts
+
+on:
+  push:
+    branches: [automation-nlos-sync-20260811-ris]
+    paths: ['.github/trigger-nlos-ris-sync-20260811']
+
+permissions:
+  contents: write
+
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: automation-nlos-sync-20260811-ris
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python bibliography dependency
+        run: python -m pip install --disable-pip-version-check bibtexparser
+      - name: Apply bounded source synchronization
+        run: |
+          python tools/integrate_nlos_ris_sync_20260811.py
+          python scripts/merge_nlos_bibliography.py
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+      - name: Rebuild survey PDF deterministically
+        env:
+          SOURCE_DATE_EPOCH: '1786400000'
+          FORCE_SOURCE_DATE: '1'
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          ! grep -Eq 'Citation .* undefined|There were undefined references|There were undefined citations' bare_jrnl.log
+      - name: Validate synchronized public artifacts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          checks = {
+              'README.md': [
+                  '10.12263/DZXB.20240674',
+                  '10.1109/IMBioC63524.2025.10989670',
+                  '10.1109/IROS60139.2025.11246461',
+              ],
+              'index.html': [
+                  'Non-Line-of-Sight Human Vital-Sign Sensing Aided by Reconfigurable Intelligent Surfaces',
+                  'Liquid Crystal RIS Integrated with SIL Radar for NLOS Vital Sign Monitoring',
+                  'IEEE/RSJ IROS 2025, 19661–19668',
+                  '<div class="stat"><b>277</b><span>tracked latest entries</span></div>',
+              ],
+              'article/2active.tex': [
+                  'zhouAdaptiveArtifactCancellationNLOS2025',
+                  'dingCurvatureRegularizationNLOS2024',
+                  'cuiTransDiffNLOS2025',
+                  'oyamaAdaptiveSpiralNLOS2026',
+              ],
+              'article/4datadriven.tex': [
+                  'zhangAdaptiveMixtureAttentionNLOS2025',
+                  'zhangFrequencyMoENLOS2026',
+              ],
+              'article/5newscenes.tex': [
+                  'liRISVitalSignNLOS2025',
+                  'tripathyLCRISVitalSign2025',
+                  'parkTjunctionPedestrian2025',
+                  'wenSparseApertureISARNLOS2024',
+              ],
+              'egbib_merged_20260711.bib': [
+                  '10.12263/DZXB.20240674',
+                  '10.1109/IMBioC63524.2025.10989670',
+                  '10.1109/IROS60139.2025.11246461',
+              ],
+          }
+          for rel, tokens in checks.items():
+              text=Path(rel).read_text(encoding='utf-8', errors='ignore')
+              for token in tokens:
+                  assert token in text, f'{rel}: missing {token}'
+          # Stale public Park venue must be gone.
+          readme=Path('README.md').read_text(encoding='utf-8')
+          index=Path('index.html').read_text(encoding='utf-8')
+          stale='mmWave Radar-Based Non-Line-of-Sight Pedestrian Localization at T-Junctions Utilizing Road Layout Extraction via Camera'
+          assert not ('https://arxiv.org/abs/2508.02348) — Park et al. | arXiv 2025' in readme)
+          assert not ('title:"'+stale+'",authors:"Park et al.",year:2025,venue:"arXiv 2025"' in index)
+          # DOI duplicate audit in merged bibliography.
+          import re
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          dois=[d.lower() for d in re.findall(r'(?mi)^\s*doi\s*=\s*\{([^}]+)\}', bib)]
+          for doi in ['10.12263/dzxb.20240674','10.1109/imbioc63524.2025.10989670','10.1109/iros60139.2025.11246461']:
+              assert dois.count(doi)==1, f'DOI count for {doi}: {dois.count(doi)}'
+          print('Source and bibliography consistency checks passed.')
+          PY
+          pdftotext bare_jrnl.pdf /tmp/nlos-sync.txt
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text=Path('/tmp/nlos-sync.txt').read_text(encoding='utf-8', errors='ignore')
+          norm=lambda s: re.sub(r'[\s\-‐‑‒–—]+','',s).lower()
+          compact=norm(text)
+          for token in [
+              'Non-Line-of-Sight Human Vital-Sign Sensing Aided by Reconfigurable Intelligent Surfaces',
+              'Liquid Crystal RIS Integrated with SIL Radar for NLOS Vital Sign Monitoring',
+              'Optimization-derived attention',
+              'Sparse-aperture moving-target RF reconstruction',
+          ]:
+              assert norm(token) in compact, f'missing PDF semantic token: {token}'
+          print('PDF semantic checks passed.')
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test -n "$pages"
+          pdftoppm -png -f 1 -singlefile -r 100 bare_jrnl.pdf /tmp/nlos-first
+          test -s /tmp/nlos-first.png
+      - name: Remove one-run automation helpers
+        run: |
+          rm -f tools/integrate_nlos_ris_sync_20260811.py
+          rm -f .github/trigger-nlos-ris-sync-20260811
+          rm -f .github/workflows/nlos-ris-sync-20260811.yml
+      - name: Commit synchronized source and PDF
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo 'No synchronized changes to commit.'
+            exit 1
+          fi
+          git commit -m 'Synchronize RIS NLOS sensing and survey coverage'
+          git push origin HEAD:automation-nlos-sync-20260811-ris
