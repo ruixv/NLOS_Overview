@@ -4,6 +4,9 @@ on:
   push:
     branches: [automation-ris-nlos-sync-20260811]
     paths: ['.github/trigger-ris-nlos-sync-20260811']
+  pull_request:
+    branches: [master]
+    paths: ['.github/trigger-ris-nlos-sync-20260811']
 
 permissions:
   contents: write
