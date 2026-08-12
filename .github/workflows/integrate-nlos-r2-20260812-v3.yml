@@ -1,0 +1,177 @@
+name: Integrate NLOS-R2 passive understanding paper v3
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-nlos-r2-20260812-v3.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-nlos-r2-20260812-v3
+  cancel-in-progress: true
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Synchronize NLOS-R2 public artifacts and metadata
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, textwrap
+          DOI='10.1109/ICME59968.2025.11209224'
+          URL='https://doi.org/'+DOI
+          TITLE='NLOS-R²: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding'
+          AUTHORS='Yi Wang, Ruixu Geng, Jiarui Zhang, Xiaolong Du, Yan Chen, Yang Hu'
+          KEY='wang2025nlos'
+          SUMMARY=('Alternates passive hidden-scene reconstruction and recognition in a mutual-refinement loop, using semantic predictions to help reconstruction and improved reconstructions to strengthen recognition; this moves passive NLOS from image recovery toward joint semantic understanding.')
+
+          # README: add to Latest Additions and 2025 learning/semantic timeline.
+          rp=Path('README.md'); r=rp.read_text(encoding='utf-8')
+          if DOI not in r:
+              m=re.search(r'(^## Latest Additions\s*$.*?^\|------\|-------\|----------------\|----------------\|\s*$)',r,re.M|re.S)
+              if not m: raise RuntimeError('README Latest Additions table header not found')
+              row=f'\n| 2025 | [{TITLE}]({URL}) — Wang et al. | IEEE ICME 2025, 1–6 | {SUMMARY} |'
+              r=r[:m.end()]+row+r[m.end():]
+              pat=re.compile(r'(^\s*│\s+Lin et al\.: CA-SlotNet uses contrast-guided slot routing and physics-aware regularization for classification from temporally truncated photon sequences \[IEEE EICARS\]\s*$)',re.M)
+              mm=pat.search(r)
+              if not mm: raise RuntimeError('README CA-SlotNet timeline anchor not found')
+              line='\n   │     Wang et al.: NLOS-R² alternates passive reconstruction and recognition, coupling image recovery with semantic hidden-scene understanding [IEEE ICME]'
+              r=r[:mm.end()]+line+r[mm.end():]
+          rp.write_text(r,encoding='utf-8')
+
+          # Website: searchable latest entry plus 2025 trajectory.
+          ip=Path('index.html'); h=ip.read_text(encoding='utf-8')
+          if DOI not in h:
+              anchor='    const papers=[\n'
+              if h.count(anchor)!=1: raise RuntimeError('index paper array anchor not unique')
+              obj=(f'    {{cat:"latest passive learning recognition understanding",title:"{TITLE}",authors:"{AUTHORS}",year:2025,venue:"IEEE ICME 2025, 1–6",url:"{URL}",key:"{SUMMARY}"}},\n')
+              h=h.replace(anchor,anchor+obj,1)
+              traj='AME-Net and NLOS-Action moved ordinary-camera passive sensing from hidden-image recovery toward robust hidden-action recognition from subtle relay-wall motion.'
+              if h.count(traj)!=1: raise RuntimeError('index 2025 semantic trajectory anchor not unique')
+              h=h.replace(traj,traj+' NLOS-R² coupled passive reconstruction with recognition in an alternating mutual-refinement loop, making joint hidden-scene understanding an explicit learning objective.',1)
+          count=len(re.findall(r'\{cat:"',h))
+          h,n=re.subn(r'<div class="stat"><b>\d+</b><span>tracked latest entries</span></div>',f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>',h,count=1)
+          if n!=1: raise RuntimeError('website tracked-entry stat missing')
+          h=h.replace('Last updated: 11 August 2026','Last updated: 12 August 2026')
+          ip.write_text(h,encoding='utf-8')
+
+          # Survey already contains the paper; fix display only.
+          ap=Path('article/4datadriven.tex'); a=ap.read_text(encoding='utf-8')
+          if KEY not in a: raise RuntimeError('survey lacks wang2025nlos citation')
+          a=a.replace('NLOS-R~2, which alternates','NLOS-R$^2$, which alternates')
+          ap.write_text(a,encoding='utf-8')
+
+          # Upgrade existing BibTeX records to verified final metadata.
+          canonical=r'''@inproceedings{wang2025nlos,
+            author = {Wang, Yi and Geng, Ruixu and Zhang, Jiarui and Du, Xiaolong and Chen, Yan and Hu, Yang},
+            booktitle = {2025 IEEE International Conference on Multimedia and Expo (ICME)},
+            doi = {10.1109/ICME59968.2025.11209224},
+            pages = {1--6},
+            publisher = {IEEE},
+            title = {{NLOS-R$^2$}: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding},
+            url = {https://doi.org/10.1109/ICME59968.2025.11209224},
+            year = {2025}
+          }'''
+          pat=re.compile(r'@inproceedings\{wang2025nlos,.*?\n\}',re.S|re.I)
+          found=[]
+          for p in sorted(Path('.').glob('*.bib')):
+              t=p.read_text(encoding='utf-8')
+              if re.search(r'@inproceedings\{wang2025nlos,',t,re.I):
+                  t2,n=pat.subn(canonical,t,count=1)
+                  if n!=1: raise RuntimeError(f'unsafe BibTeX replacement in {p}')
+                  p.write_text(t2,encoding='utf-8'); found.append(p.name)
+          if 'egbib_merged_20260711.bib' not in found: raise RuntimeError('merged bibliography lacks wang2025nlos')
+
+          bp=Path('bare_jrnl.tex'); b=bp.read_text(encoding='utf-8')
+          note='% 12 August 2026 consistency sync: NLOS-R^2 (IEEE ICME 2025) final metadata, DOI, README, website, and existing survey citation aligned.\n'
+          if note not in b: b=note+b
+          bp.write_text(b,encoding='utf-8')
+
+          note_text=f'''
+          # NLOS-R² cross-artifact consistency update — 12 August 2026
+
+          A recent-literature and forward-citation/passive-semantic lineage audit found that **{TITLE}** was already cited and discussed in the living survey (`article/4datadriven.tex`) and already had a partial BibTeX record, but it was absent from the public README and website paper explorer/timeline.
+
+          **Verified final metadata:** {AUTHORS}; 2025 IEEE International Conference on Multimedia and Expo (ICME), pp. 1–6; DOI `{DOI}`; DBLP key `conf/icmcs/WangGZDCH25`.
+
+          The synchronization adds the paper to README Latest Additions and the 2025 semantic-learning milestone path, adds it to the searchable website with passive/learning/recognition tags and a timeline sentence, preserves its existing semantically appropriate survey discussion while correcting the NLOS-R² display, upgrades the bibliography with final DOI/URL metadata, and rebuilds the survey PDF.
+          '''
+          Path('updates/2026-08-12-nlos-r2-consistency.md').write_text(textwrap.dedent(note_text).lstrip(),encoding='utf-8')
+          print('BibTeX files updated:',found,'website entries:',count)
+          PY
+
+      - name: Add bookmark compatibility shim
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); t=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          if shim not in t:
+              anchor="\\usepackage{hyperref}\n"
+              if t.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+              p.write_text(t.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+
+      - name: Clean build products
+        run: rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.fdb_latexmk bare_jrnl.fls bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Validate all public artifacts
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, subprocess
+          DOI='10.1109/ICME59968.2025.11209224'; KEY='wang2025nlos'
+          r=Path('README.md').read_text(encoding='utf-8'); h=Path('index.html').read_text(encoding='utf-8')
+          a=Path('article/4datadriven.tex').read_text(encoding='utf-8'); b=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          log=Path('bare_jrnl.log').read_text(encoding='utf-8',errors='ignore'); bbl=Path('bare_jrnl.bbl').read_text(encoding='utf-8',errors='ignore')
+          assert DOI in r and 'NLOS-R² alternates passive reconstruction and recognition' in r
+          assert h.count(DOI)==1 and 'NLOS-R² coupled passive reconstruction' in h
+          assert KEY in a
+          assert b.lower().count('@inproceedings{'+KEY.lower()+',')==1 and b.count(DOI)==2
+          assert 'NLOS-R' in bbl or 'NLOS--R' in bbl
+          assert not re.search(r'Citation.*undefined|undefined citations',log,re.I)
+          count=len(re.findall(r'\{cat:"',h)); assert f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>' in h
+          subprocess.run(['pdftotext','bare_jrnl.pdf','/tmp/nr2.txt'],check=True)
+          txt=Path('/tmp/nr2.txt').read_text(encoding='utf-8',errors='ignore'); assert 'Alternate Reconstruction' in txt and 'Recognition' in txt
+          assert Path('bare_jrnl.pdf').stat().st_size>100000
+          print('Validation passed; website entries:',count)
+          PY
+
+      - name: Render PDF endpoints
+        run: |
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test "$pages" -gt 0
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+
+      - name: Commit and push synchronized artifacts
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/4datadriven.tex bare_jrnl.tex bare_jrnl.pdf '*.bib' updates/2026-08-12-nlos-r2-consistency.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Synchronize NLOS-R2 passive understanding paper'
+          git push origin HEAD:master
