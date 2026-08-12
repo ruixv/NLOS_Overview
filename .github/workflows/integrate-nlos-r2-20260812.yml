@@ -1,0 +1,260 @@
+name: Integrate NLOS-R2 passive understanding paper
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-nlos-r2-20260812.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-nlos-r2-20260812
+  cancel-in-progress: true
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Synchronize NLOS-R2 across public artifacts and survey metadata
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          DOI = '10.1109/ICME59968.2025.11209224'
+          URL = 'https://doi.org/' + DOI
+          TITLE = 'NLOS-R²: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding'
+          KEY = 'wang2025nlos'
+          AUTHORS = 'Yi Wang, Ruixu Geng, Jiarui Zhang, Xiaolong Du, Yan Chen, Yang Hu'
+          SUMMARY = ('Alternates passive hidden-scene reconstruction and recognition in a mutual-refinement loop, '
+                     'using semantic predictions to help reconstruction and improved reconstructions to strengthen '
+                     'recognition; this moves passive NLOS from image recovery toward joint semantic understanding.')
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise RuntimeError(f'{label}: expected one anchor, found {count}')
+              return text.replace(old, new, 1)
+
+          # README: Latest Additions + semantically appropriate deep-learning placement + milestone timeline.
+          readme_path = Path('README.md')
+          readme = readme_path.read_text(encoding='utf-8')
+          if DOI not in readme:
+              start = readme.index('## Latest Additions')
+              end = readme.index('\n## ', start + len('## Latest Additions'))
+              section = readme[start:end]
+              sep = '|------|-------|----------------|----------------|\n'
+              if sep not in section:
+                  raise RuntimeError('README Latest Additions table separator not found')
+              row = (f'| 2025 | [{TITLE}]({URL}) — Wang et al. | IEEE ICME 2025, 1–6 | '
+                     f'{SUMMARY} |\n')
+              section = section.replace(sep, sep + row, 1)
+              readme = readme[:start] + section + readme[end:]
+
+              dl_start = readme.index('## Deep Learning for NLOS')
+              dl_end = readme.index('\n## ', dl_start + len('## Deep Learning for NLOS'))
+              block = (f'\n### Joint reconstruction and recognition\n\n'
+                       f'- [{TITLE}]({URL}) — {AUTHORS}. **IEEE ICME 2025, 1–6.** '
+                       f'{SUMMARY}\n')
+              readme = readme[:dl_end] + block + readme[dl_end:]
+
+              timeline_anchor = ('   │     Lin et al.: CA-SlotNet uses contrast-guided slot routing and physics-aware '
+                                 'regularization for classification from temporally truncated photon sequences [IEEE EICARS]\n')
+              timeline_line = ('   │     Wang et al.: NLOS-R² alternates passive reconstruction and recognition, '
+                               'coupling image recovery with semantic hidden-scene understanding [IEEE ICME]\n')
+              if timeline_anchor in readme:
+                  readme = readme.replace(timeline_anchor, timeline_anchor + timeline_line, 1)
+              else:
+                  raise RuntimeError('README 2025 semantic-learning timeline anchor not found')
+          readme_path.write_text(readme, encoding='utf-8')
+
+          # Website: searchable paper explorer/latest additions + 2025 trajectory + counter/date.
+          index_path = Path('index.html')
+          html = index_path.read_text(encoding='utf-8')
+          if DOI not in html:
+              paper_anchor = '    const papers=[\n'
+              obj = (f'    {{cat:"latest passive learning recognition understanding",title:"{TITLE}",'
+                     f'authors:"{AUTHORS}",year:2025,venue:"IEEE ICME 2025, 1–6",url:"{URL}",'
+                     f'key:"{SUMMARY}"}},\n')
+              html = replace_once(html, paper_anchor, paper_anchor + obj, 'index paper array')
+              trajectory_anchor = ('AME-Net and NLOS-Action moved ordinary-camera passive sensing from hidden-image '
+                                   'recovery toward robust hidden-action recognition from subtle relay-wall motion.')
+              trajectory_new = (trajectory_anchor + ' NLOS-R² coupled passive reconstruction with recognition in an '
+                                'alternating mutual-refinement loop, making joint hidden-scene understanding an explicit '
+                                'learning objective.')
+              html = replace_once(html, trajectory_anchor, trajectory_new, 'index 2025 timeline')
+          count = len(re.findall(r'\{cat:"', html))
+          html = re.sub(r'<div class="stat"><b>\d+</b><span>tracked latest entries</span></div>',
+                        f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>', html, count=1)
+          html = html.replace('Last updated: 11 August 2026', 'Last updated: 12 August 2026')
+          index_path.write_text(html, encoding='utf-8')
+
+          # Survey prose already contained this paper; correct the display form and retain its semantic placement.
+          article_path = Path('article/4datadriven.tex')
+          article = article_path.read_text(encoding='utf-8')
+          if KEY not in article:
+              raise RuntimeError('Survey prose unexpectedly lacks wang2025nlos citation')
+          article = article.replace('NLOS-R~2, which alternates', 'NLOS-R$^2$, which alternates')
+          article_path.write_text(article, encoding='utf-8')
+
+          # Canonical final-venue BibTeX: update every bibliography source that already carries this key.
+          canonical = r'''@inproceedings{wang2025nlos,
+            author = {Wang, Yi and Geng, Ruixu and Zhang, Jiarui and Du, Xiaolong and Chen, Yan and Hu, Yang},
+            booktitle = {2025 IEEE International Conference on Multimedia and Expo (ICME)},
+            doi = {10.1109/ICME59968.2025.11209224},
+            pages = {1--6},
+            publisher = {IEEE},
+            title = {{NLOS-R$^2$}: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding},
+            url = {https://doi.org/10.1109/ICME59968.2025.11209224},
+            year = {2025}
+          }'''
+          found = []
+          pat = re.compile(r'@inproceedings\{wang2025nlos,.*?\n\}', re.S | re.I)
+          for bib_path in sorted(Path('.').glob('*.bib')):
+              text = bib_path.read_text(encoding='utf-8', errors='strict')
+              if re.search(r'@inproceedings\{wang2025nlos,', text, re.I):
+                  text2, n = pat.subn(canonical, text, count=1)
+                  if n != 1:
+                      raise RuntimeError(f'Could not safely replace {KEY} in {bib_path}')
+                  bib_path.write_text(text2, encoding='utf-8')
+                  found.append(bib_path.name)
+          if 'egbib_merged_20260711.bib' not in found:
+              raise RuntimeError('Merged survey bibliography did not contain wang2025nlos')
+
+          # Record the cross-artifact consistency update in the root survey source.
+          root_path = Path('bare_jrnl.tex')
+          root = root_path.read_text(encoding='utf-8')
+          note = ('% 12 August 2026 consistency sync: NLOS-R^2 (IEEE ICME 2025) final metadata, DOI, '
+                  'README, website, and existing survey citation aligned.\n')
+          if note not in root:
+              root = note + root
+          root_path.write_text(root, encoding='utf-8')
+
+          # Human-readable update record.
+          update = Path('updates/2026-08-12-nlos-r2-consistency.md')
+          update.write_text(f'''# NLOS-R² cross-artifact consistency update — 12 August 2026
+
+A forward-citation/passive-semantic lineage audit found that **{TITLE}** was already cited and discussed in the living survey source (`article/4datadriven.tex`) and already had a partial BibTeX record, but was absent from the public README and website paper explorer/timeline.
+
+## Verified final metadata
+
+- Authors: {AUTHORS}
+- Venue: 2025 IEEE International Conference on Multimedia and Expo (ICME)
+- Pages: 1–6
+- DOI: {DOI}
+- DBLP key: `conf/icmcs/WangGZDCH25`
+
+## Synchronization performed
+
+- Added the paper to README Latest Additions, the deep-learning section, and the 2025 milestone timeline.
+- Added it to `index.html` as a `latest passive learning recognition understanding` entry and updated the 2025 website trajectory.
+- Preserved the existing semantically appropriate survey discussion in `article/4datadriven.tex` while correcting the NLOS-R² display form.
+- Upgraded the existing `{KEY}` BibTeX record(s) with the verified DOI, URL, pages, and final IEEE ICME venue metadata.
+- Rebuilt and validated `bare_jrnl.pdf` in CI.
+
+This update closes a public-artifact consistency gap rather than inventing a new survey category: the paper links reconstruction quality to semantic recognition and belongs in the passive/deep-learning transition from hidden-image recovery to hidden-scene understanding.
+''', encoding='utf-8')
+
+          print('Synchronized NLOS-R²; bibliography records updated in:', ', '.join(found))
+          print('Website paper count:', count)
+          PY
+
+      - name: Add bookmark compatibility shim for current TeX Live
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('bare_jrnl.tex')
+          text = path.read_text(encoding='utf-8')
+          shim = "\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          if shim not in text:
+              anchor = "\\usepackage{hyperref}\n"
+              if text.count(anchor) != 1:
+                  raise RuntimeError('hyperref package anchor is not unique')
+              text = text.replace(anchor, anchor + shim, 1)
+              path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Clean generated LaTeX files
+        run: rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.fdb_latexmk bare_jrnl.fls bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+
+      - name: Build survey PDF
+        id: latex
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Validate README, website, survey, bibliography, and PDF consistency
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, subprocess
+          DOI='10.1109/ICME59968.2025.11209224'
+          KEY='wang2025nlos'
+          title='NLOS-R²: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding'
+          files={
+              'README': Path('README.md').read_text(encoding='utf-8'),
+              'website': Path('index.html').read_text(encoding='utf-8'),
+              'survey': Path('article/4datadriven.tex').read_text(encoding='utf-8'),
+              'root': Path('bare_jrnl.tex').read_text(encoding='utf-8'),
+              'bib': Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'),
+              'bbl': Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore'),
+              'log': Path('bare_jrnl.log').read_text(encoding='utf-8', errors='ignore'),
+          }
+          assert DOI in files['README'], 'README missing NLOS-R2 DOI'
+          assert DOI in files['website'], 'website missing NLOS-R2 DOI'
+          assert DOI in files['bib'], 'merged bibliography missing NLOS-R2 DOI'
+          assert files['README'].count(DOI) >= 2, 'README should place NLOS-R2 in latest/category coverage'
+          assert files['website'].count(DOI) == 1, 'website NLOS-R2 entry missing or duplicated'
+          assert files['survey'].count(KEY) >= 1, 'survey citation missing'
+          assert files['bib'].lower().count('@inproceedings{' + KEY.lower() + ',') == 1, 'BibTeX key missing or duplicated'
+          assert files['bib'].count(DOI) == 2, 'canonical BibTeX DOI/URL fields incomplete or duplicated'
+          assert 'NLOS-R' in files['bbl'] or 'NLOS--R' in files['bbl'], 'compiled bibliography missing NLOS-R2'
+          assert not re.search(r'Citation.*undefined|undefined citations', files['log'], re.I), 'undefined citation remains'
+          count=len(re.findall(r'\{cat:"', files['website']))
+          assert f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>' in files['website'], 'website counter mismatch'
+          subprocess.run(['pdftotext','bare_jrnl.pdf','/tmp/nlos-r2.txt'], check=True)
+          pdftext=Path('/tmp/nlos-r2.txt').read_text(encoding='utf-8', errors='ignore')
+          assert 'Alternate Reconstruction' in pdftext and 'Recognition' in pdftext, 'rebuilt PDF lacks NLOS-R2 bibliographic text'
+          assert Path('bare_jrnl.pdf').stat().st_size > 100000, 'PDF unexpectedly small'
+          print(f'Cross-artifact validation passed; website tracks {count} entries')
+          PY
+
+      - name: Render first and last PDF pages for visual preflight
+        run: |
+          if command -v pdftoppm >/dev/null 2>&1 && command -v pdfinfo >/dev/null 2>&1; then
+            pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+            test "$pages" -gt 0
+            mkdir -p /tmp/nlos_pdf_render
+            pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf /tmp/nlos_pdf_render/first
+            pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf /tmp/nlos_pdf_render/last
+            test -s /tmp/nlos_pdf_render/first.png
+            test -s /tmp/nlos_pdf_render/last.png
+          fi
+
+      - name: Commit synchronized public artifacts and rebuilt survey
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/4datadriven.tex bare_jrnl.tex bare_jrnl.pdf '*.bib' \
+            updates/2026-08-12-nlos-r2-consistency.md .github/workflows/integrate-nlos-r2-20260812.yml
+          if git diff --cached --quiet; then
+            echo 'No repository changes were necessary.'
+            exit 0
+          fi
+          git commit -m 'Synchronize NLOS-R2 passive understanding paper'
+          git push origin HEAD:master
