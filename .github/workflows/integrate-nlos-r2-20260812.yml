@@ -29,6 +29,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
+          import textwrap
 
           DOI = '10.1109/ICME59968.2025.11209224'
           URL = 'https://doi.org/' + DOI
@@ -45,7 +46,6 @@ jobs:
                   raise RuntimeError(f'{label}: expected one anchor, found {count}')
               return text.replace(old, new, 1)
 
-          # README: Latest Additions + semantically appropriate deep-learning placement + milestone timeline.
           readme_path = Path('README.md')
           readme = readme_path.read_text(encoding='utf-8')
           if DOI not in readme:
@@ -71,13 +71,11 @@ jobs:
                                  'regularization for classification from temporally truncated photon sequences [IEEE EICARS]\n')
               timeline_line = ('   │     Wang et al.: NLOS-R² alternates passive reconstruction and recognition, '
                                'coupling image recovery with semantic hidden-scene understanding [IEEE ICME]\n')
-              if timeline_anchor in readme:
-                  readme = readme.replace(timeline_anchor, timeline_anchor + timeline_line, 1)
-              else:
+              if timeline_anchor not in readme:
                   raise RuntimeError('README 2025 semantic-learning timeline anchor not found')
+              readme = readme.replace(timeline_anchor, timeline_anchor + timeline_line, 1)
           readme_path.write_text(readme, encoding='utf-8')
 
-          # Website: searchable paper explorer/latest additions + 2025 trajectory + counter/date.
           index_path = Path('index.html')
           html = index_path.read_text(encoding='utf-8')
           if DOI not in html:
@@ -98,7 +96,6 @@ jobs:
           html = html.replace('Last updated: 11 August 2026', 'Last updated: 12 August 2026')
           index_path.write_text(html, encoding='utf-8')
 
-          # Survey prose already contained this paper; correct the display form and retain its semantic placement.
           article_path = Path('article/4datadriven.tex')
           article = article_path.read_text(encoding='utf-8')
           if KEY not in article:
@@ -106,7 +103,6 @@ jobs:
           article = article.replace('NLOS-R~2, which alternates', 'NLOS-R$^2$, which alternates')
           article_path.write_text(article, encoding='utf-8')
 
-          # Canonical final-venue BibTeX: update every bibliography source that already carries this key.
           canonical = r'''@inproceedings{wang2025nlos,
             author = {Wang, Yi and Geng, Ruixu and Zhang, Jiarui and Du, Xiaolong and Chen, Yan and Hu, Yang},
             booktitle = {2025 IEEE International Conference on Multimedia and Expo (ICME)},
@@ -130,7 +126,6 @@ jobs:
           if 'egbib_merged_20260711.bib' not in found:
               raise RuntimeError('Merged survey bibliography did not contain wang2025nlos')
 
-          # Record the cross-artifact consistency update in the root survey source.
           root_path = Path('bare_jrnl.tex')
           root = root_path.read_text(encoding='utf-8')
           note = ('% 12 August 2026 consistency sync: NLOS-R^2 (IEEE ICME 2025) final metadata, DOI, '
@@ -139,30 +134,31 @@ jobs:
               root = note + root
           root_path.write_text(root, encoding='utf-8')
 
-          # Human-readable update record.
           update = Path('updates/2026-08-12-nlos-r2-consistency.md')
-          update.write_text(f'''# NLOS-R² cross-artifact consistency update — 12 August 2026
+          update_text = f'''
+          # NLOS-R² cross-artifact consistency update — 12 August 2026
 
-A forward-citation/passive-semantic lineage audit found that **{TITLE}** was already cited and discussed in the living survey source (`article/4datadriven.tex`) and already had a partial BibTeX record, but was absent from the public README and website paper explorer/timeline.
+          A forward-citation/passive-semantic lineage audit found that **{TITLE}** was already cited and discussed in the living survey source (`article/4datadriven.tex`) and already had a partial BibTeX record, but was absent from the public README and website paper explorer/timeline.
 
-## Verified final metadata
+          ## Verified final metadata
 
-- Authors: {AUTHORS}
-- Venue: 2025 IEEE International Conference on Multimedia and Expo (ICME)
-- Pages: 1–6
-- DOI: {DOI}
-- DBLP key: `conf/icmcs/WangGZDCH25`
+          - Authors: {AUTHORS}
+          - Venue: 2025 IEEE International Conference on Multimedia and Expo (ICME)
+          - Pages: 1–6
+          - DOI: {DOI}
+          - DBLP key: `conf/icmcs/WangGZDCH25`
 
-## Synchronization performed
+          ## Synchronization performed
 
-- Added the paper to README Latest Additions, the deep-learning section, and the 2025 milestone timeline.
-- Added it to `index.html` as a `latest passive learning recognition understanding` entry and updated the 2025 website trajectory.
-- Preserved the existing semantically appropriate survey discussion in `article/4datadriven.tex` while correcting the NLOS-R² display form.
-- Upgraded the existing `{KEY}` BibTeX record(s) with the verified DOI, URL, pages, and final IEEE ICME venue metadata.
-- Rebuilt and validated `bare_jrnl.pdf` in CI.
+          - Added the paper to README Latest Additions, the deep-learning section, and the 2025 milestone timeline.
+          - Added it to `index.html` as a `latest passive learning recognition understanding` entry and updated the 2025 website trajectory.
+          - Preserved the existing semantically appropriate survey discussion in `article/4datadriven.tex` while correcting the NLOS-R² display form.
+          - Upgraded the existing `{KEY}` BibTeX record(s) with the verified DOI, URL, pages, and final IEEE ICME venue metadata.
+          - Rebuilt and validated `bare_jrnl.pdf` in CI.
 
-This update closes a public-artifact consistency gap rather than inventing a new survey category: the paper links reconstruction quality to semantic recognition and belongs in the passive/deep-learning transition from hidden-image recovery to hidden-scene understanding.
-''', encoding='utf-8')
+          This closes a public-artifact consistency gap: the paper links reconstruction quality to semantic recognition and belongs in the passive/deep-learning transition from hidden-image recovery to hidden-scene understanding.
+          '''
+          update.write_text(textwrap.dedent(update_text).lstrip(), encoding='utf-8')
 
           print('Synchronized NLOS-R²; bibliography records updated in:', ', '.join(found))
           print('Website paper count:', count)
@@ -187,7 +183,6 @@ This update closes a public-artifact consistency gap rather than inventing a new
         run: rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.fdb_latexmk bare_jrnl.fls bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
 
       - name: Build survey PDF
-        id: latex
         uses: xu-cheng/latex-action@v3
         with:
           root_file: bare_jrnl.tex
@@ -204,12 +199,10 @@ This update closes a public-artifact consistency gap rather than inventing a new
           import re, subprocess
           DOI='10.1109/ICME59968.2025.11209224'
           KEY='wang2025nlos'
-          title='NLOS-R²: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding'
           files={
               'README': Path('README.md').read_text(encoding='utf-8'),
               'website': Path('index.html').read_text(encoding='utf-8'),
               'survey': Path('article/4datadriven.tex').read_text(encoding='utf-8'),
-              'root': Path('bare_jrnl.tex').read_text(encoding='utf-8'),
               'bib': Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'),
               'bbl': Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore'),
               'log': Path('bare_jrnl.log').read_text(encoding='utf-8', errors='ignore'),
