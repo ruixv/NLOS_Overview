@@ -69,7 +69,6 @@ jobs:
           test -s bare_jrnl.pdf
           python3 - <<'PY'
           from pathlib import Path
-          import re
           title='Material Classification in Acoustic NLOS Environments Using an Attention-Based U-Net and Multimodal Fusion With the ANLOS-R Dataset'
           doi='10.1109/ACCESS.2026.3664294'; key='alakusANLOSR2026'; follow='alakusAcousticMaterialNLOS2026'
           readme=Path('README.md').read_text(encoding='utf-8')
@@ -77,11 +76,12 @@ jobs:
           acoustic=Path('article/5newscenes.tex').read_text(encoding='utf-8')
           bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
           tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          key_count=bib.lower().count('@article{'+key.lower()+',')
           checks=[
             (title in readme and doi in readme,'README final record'),
             (title in corpus and doi in corpus,'canonical V2 corpus record'),
             (key in acoustic and follow in acoustic,'survey precursor/follow-up citations'),
-            (len(re.findall(r'@[A-Za-z]+\\{'+re.escape(key)+r',',bib,re.I))==1,'single ANLOS-R BibTeX key'),
+            (key_count==1,f'single ANLOS-R BibTeX key (found {key_count})'),
             (doi.lower() in bib.lower(),'ANLOS-R DOI in merged bibliography'),
             (not Path('egbib_20260813_acoustic_anlos_r_gap.bib').exists(),'staging BibTeX removed'),
             ('14 August 2026' in tex,'survey synchronization date'),
