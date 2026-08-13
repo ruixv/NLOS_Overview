@@ -70,16 +70,20 @@ jobs:
           corpus=Path('data/papers-source.html').read_text(encoding='utf-8');acoustic=Path('article/5newscenes.tex').read_text(encoding='utf-8')
           bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8');tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
           log=Path('bare_jrnl.log').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.log').exists() else ''
-          key_count=len(re.findall(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,re.I))
-          fields=[v.strip().lower() for v in re.findall(r'(?im)^\s*doi\s*=\s*[\{\"]([^}\"]+)[}\"]\s*,?\s*$',bib)]
-          doi_count=sum(v==doi.lower() for v in fields)
+          key_matches=list(re.finditer(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,re.I))
+          if len(key_matches)!=1: raise AssertionError(f'BibTeX key count is {len(key_matches)}, expected 1')
+          start=key_matches[0].start()
+          nxt=re.search(r'\n@[A-Za-z]+\{',bib[key_matches[0].end():])
+          end=key_matches[0].end()+nxt.start() if nxt else len(bib)
+          entry=bib[start:end]
+          norm=re.sub(r'\s+','',entry).lower()
           checks=[
             (title in readme and doi in readme,'README final record'),
             (title in corpus and doi in corpus,'canonical paper corpus record'),
             ('Updated 14 Aug 2026' in index,'homepage freshness label'),
             (key in acoustic and follow in acoustic,'survey precursor/follow-up citations'),
-            (key_count==1,f'BibTeX key uniqueness ({key_count})'),
-            (doi_count==1,f'BibTeX DOI-field uniqueness ({doi_count})'),
+            (('doi={'+doi.lower()+'}') in norm,'ANLOS-R DOI field'),
+            (norm.count('doi={')==1,'single DOI field in ANLOS-R entry'),
             (not Path('egbib_20260813_acoustic_anlos_r_gap.bib').exists(),'staging BibTeX removed'),
             ('14 August 2026' in tex,'survey freshness date'),
             (not re.search(r'Citation.*undefined|undefined citations',log,re.I),'no undefined citations'),
