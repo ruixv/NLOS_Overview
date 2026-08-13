@@ -1,0 +1,88 @@
+name: Integrate verified NLOS updates 2026-08-13 v2
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-nlos-20260813-v2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply verified literature updates
+        run: python3 scripts/integrate_verified_nlos_20260813.py
+      - name: Prepare LaTeX compatibility shim
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+              if s.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+              p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+      - name: Clean old PDF build products
+        run: rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.fdb_latexmk bare_jrnl.fls bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+      - name: Validate synchronization
+        run: |
+          test -s bare_jrnl.pdf
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, subprocess
+          readme=Path('README.md').read_text(encoding='utf-8')
+          index=Path('index.html').read_text(encoding='utf-8')
+          radar=Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          deep=Path('article/4datadriven.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          log=Path('bare_jrnl.log').read_text(encoding='utf-8',errors='ignore')
+          titles=['A CROSS-REGIONAL NLOS TARGET LOCALIZATION METHOD BASED ON JOINT MULTIPATH GLRT','Multipath Ghost Correlation-Based NLOS Target Localization and Building Layuot Estimation','Building Corner and NLOS Target Parameter Estimation Based on Diffraction Signal Utilization','NLOS-R²: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding']
+          keys=['yuCrossRegionalNLOSGLRT2026','weiMultipathGhostNLOS2025','yuDiffractionCornerNLOS2025','wang2025nlos']
+          assert all(t in readme and t in index for t in titles)
+          assert all(k in bib for k in keys)
+          assert all(k in radar for k in keys[:3])
+          assert 'wang2025nlos' in deep and 'NLOS-R$^2$' in deep
+          for k in keys: assert len(re.findall(r'@[A-Za-z]+\{'+re.escape(k)+r',',bib,re.I))==1
+          assert not re.search(r'Citation.*undefined|undefined citations',log,re.I)
+          subprocess.run(['pdftotext','bare_jrnl.pdf','/tmp/nlos.txt'],check=True)
+          txt=Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore')
+          assert 'Multipath Ghost' in txt and 'Building Corner' in txt
+          assert Path('bare_jrnl.pdf').stat().st_size>100000
+          PY
+      - name: Render PDF endpoints
+        run: |
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+      - name: Commit synchronized public artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cat > updates/2026-08-13-verified-nlos-sync.md <<'EOF'
+          # Verified NLOS literature synchronization — 13 August 2026
+
+          Integrated three missing radar NLOS papers: the IGARSS 2026 cross-regional joint-multipath GLRT paper, the EUSIPCO 2025 multipath-ghost/layout paper, and the FUSION 2025 diffraction-driven corner/target paper. Also synchronized final IEEE ICME 2025 metadata for NLOS-R², which was already discussed in the survey but missing from README/index.
+
+          Core-paper forward-citation tracing was repeated from LCT, f-k migration, phasor-field and related milestone seeds. Major high-relevance recent optical follow-ons surfaced by the search were already present in the repository, so they were not duplicated.
+          EOF
+          git add README.md index.html article/4datadriven.tex article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-08-13-verified-nlos-sync.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Synchronize latest verified NLOS papers'
+          git push origin HEAD:master
