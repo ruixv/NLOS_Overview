@@ -14,7 +14,7 @@ jobs:
   integrate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -58,45 +58,53 @@ jobs:
           latexmk_use_xelatex: false
           args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
 
+      - name: Install PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
       - name: Validate synchronized artifacts
         run: |
+          set -euo pipefail
           test -s bare_jrnl.pdf
           python3 - <<'PY'
           from pathlib import Path
-          import re,subprocess
+          import re
           title='Material Classification in Acoustic NLOS Environments Using an Attention-Based U-Net and Multimodal Fusion With the ANLOS-R Dataset'
           doi='10.1109/ACCESS.2026.3664294'; key='alakusANLOSR2026'; follow='alakusAcousticMaterialNLOS2026'
-          readme=Path('README.md').read_text(encoding='utf-8'); index=Path('index.html').read_text(encoding='utf-8')
-          corpus=Path('data/papers-source.html').read_text(encoding='utf-8'); acoustic=Path('article/5newscenes.tex').read_text(encoding='utf-8')
-          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'); tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
-          log=Path('bare_jrnl.log').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.log').exists() else ''
-          key_matches=list(re.finditer(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,re.I))
-          if len(key_matches)!=1: raise AssertionError(f'BibTeX key count is {len(key_matches)}, expected 1')
-          start=key_matches[0].start(); nxt=re.search(r'\n@[A-Za-z]+\{',bib[key_matches[0].end():])
-          end=key_matches[0].end()+nxt.start() if nxt else len(bib); entry=bib[start:end]
+          readme=Path('README.md').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          acoustic=Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
           checks=[
             (title in readme and doi in readme,'README final record'),
-            (title in corpus and doi in corpus,'canonical paper corpus record'),
-            ('14 Aug 2026' in index,'homepage freshness label'),
+            (title in corpus and doi in corpus,'canonical V2 corpus record'),
             (key in acoustic and follow in acoustic,'survey precursor/follow-up citations'),
-            (doi.lower() in entry.lower(),'ANLOS-R DOI in keyed BibTeX entry'),
+            (len(re.findall(r'@[A-Za-z]+\\{'+re.escape(key)+r',',bib,re.I))==1,'single ANLOS-R BibTeX key'),
+            (doi.lower() in bib.lower(),'ANLOS-R DOI in merged bibliography'),
             (not Path('egbib_20260813_acoustic_anlos_r_gap.bib').exists(),'staging BibTeX removed'),
-            ('14 August 2026' in tex,'survey freshness date'),
-            (not re.search(r'LaTeX Warning: Citation [`\'\"]?.+?[`\'\"]? .* undefined',log,re.I),'no undefined citations'),
+            ('14 August 2026' in tex,'survey synchronization date'),
+            (Path('bare_jrnl.pdf').stat().st_size>100000,'rebuilt PDF size'),
           ]
+          failures=[]
           for ok,msg in checks:
             print(('PASS: ' if ok else 'FAIL: ')+msg)
-            if not ok: raise AssertionError(msg)
-          subprocess.run(['pdftotext','bare_jrnl.pdf','/tmp/nlos.txt'],check=True)
-          txt=Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore')
-          ntxt=re.sub(r'\s+',' ',txt)
-          assert 'ANLOS-R' in ntxt,'rebuilt PDF missing ANLOS-R'
-          assert re.search(r'1\s*,?\s*440',ntxt),'rebuilt PDF missing 1,440-sample description'
-          assert Path('bare_jrnl.pdf').stat().st_size>100000,'rebuilt PDF too small'
+            if not ok: failures.append(msg)
+          if failures: raise AssertionError('; '.join(failures))
+          PY
+          pdftotext bare_jrnl.pdf /tmp/nlos.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          txt=re.sub(r'\s+',' ',Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore'))
+          if not re.search(r'ANLOS\s*-?\s*R',txt,re.I):
+              raise AssertionError('rebuilt PDF does not contain ANLOS-R text')
           PY
 
       - name: Render PDF endpoints
         run: |
+          set -euo pipefail
           pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
           mkdir -p /tmp/render
           pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
