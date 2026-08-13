@@ -64,10 +64,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 12 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 14 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [Material Classification in Acoustic NLOS Environments Using an Attention-Based U-Net and Multimodal Fusion With the ANLOS-R Dataset](https://doi.org/10.1109/ACCESS.2026.3664294) — Alakuş and Türkoğlu | IEEE Access 14, 26983–27004 (2026) | Introduces ANLOS-R, a 1,440-sample wall-mediated acoustic NLOS dataset collected with an 8-speaker/8-microphone multi-position setup, together with attention-U-Net reflection isolation and multimodal spectral-temporal fusion for hidden-material recognition. It is the dataset/multimodal precursor to the later Sensors 2026 wavelet-feature follow-up. |
 | 2026 | [Multipath Exploitation-Based 3-D Environmental Perception and NLOS Moving Target Reconstruction for mmWave MIMO Imaging Radar](https://doi.org/10.1109/TAES.2025.3647422) — Zhu et al. | IEEE Transactions on Aerospace and Electronic Systems 62, 3569–3587 (2026) | Jointly estimates 3-D environmental/reflector structure and reconstructs NLOS moving targets from mmWave MIMO multipath, transferring estimated reflector parameters into path-oriented hidden-target localization and validating the pipeline experimentally. |
 | 2025 | [NLOS Building Layout and Target Estimation in an L-Shaped Corner with Complex Geometries](https://doi.org/10.1109/TIM.2024.3522427) — Xue et al. | IEEE Transactions on Instrumentation and Measurement 74 (2025) | Removes the usual known-layout assumption: tracks multipath ToAs, separates diffraction and first-/second-order reflection paths, localizes the hidden target and reconstructs part of the L-shaped relay geometry with a portable SISO radar. |
 | 2025 | [A Two-Stage NLOS Target Positioning Method Based on 0-1 Non-Coherent Binary Accumulation](https://doi.org/10.1109/TVT.2025.3542117) — Wu et al. | IEEE Transactions on Vehicular Technology 74(6), 8866–8878 (2025) | Uses CFAR-derived 0-1 non-coherent binary accumulation and a two-stage estimator to make multipath NLOS target positioning more robust to false alarms and missed detections. |

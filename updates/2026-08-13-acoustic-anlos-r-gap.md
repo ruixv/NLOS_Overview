@@ -1,5 +1,8 @@
 # 13 August 2026 — acoustic ANLOS-R gap
 
+> **Resolved:** integrated into public artifacts and rebuilt survey PDF on 13 August 2026.
+
+
 A fresh recent-literature and forward-citation pass found one high-confidence missing paper:
 
 **Dilan Onat Alakuş and İbrahim Türkoğlu, “Material Classification in Acoustic NLOS Environments Using an Attention-Based U-Net and Multimodal Fusion With the ANLOS-R Dataset,” IEEE Access, vol. 14, pp. 26983–27004, 2026. DOI: 10.1109/ACCESS.2026.3664294.**
