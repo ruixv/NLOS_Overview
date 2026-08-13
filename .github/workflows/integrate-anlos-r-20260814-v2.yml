@@ -1,0 +1,122 @@
+name: Integrate ANLOS-R acoustic NLOS precursor v2
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-anlos-r-20260814-v2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply ANLOS-R integration
+        run: |
+          python3 scripts/integrate_anlos_r_20260813.py
+          python3 - <<'PY'
+          from pathlib import Path
+          pairs={
+            'README.md':[('**Update run: 13 August 2026.**','**Update run: 14 August 2026.**')],
+            'index.html':[('Updated 13 Aug 2026','Updated 14 Aug 2026')],
+            'data/papers-source.html':[('Updated 13 August 2026','Updated 14 August 2026'),('Last updated: 13 August 2026','Last updated: 14 August 2026')],
+            'bare_jrnl.tex':[('through 13 August 2026','through 14 August 2026')],
+          }
+          for fn,repls in pairs.items():
+            p=Path(fn); s=p.read_text(encoding='utf-8')
+            for a,b in repls:s=s.replace(a,b)
+            p.write_text(s,encoding='utf-8')
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          note='% 14 August 2026 synchronization: ANLOS-R IEEE Access dataset/multimodal precursor integrated across public artifacts and bibliography.\n'
+          if note not in s:p.write_text(note+s,encoding='utf-8')
+          PY
+
+      - name: Add LaTeX compatibility shim
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+            if s.count(anchor)!=1:raise RuntimeError('hyperref anchor not unique')
+            p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Validate synchronized artifacts
+        run: |
+          test -s bare_jrnl.pdf
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,subprocess
+          title='Material Classification in Acoustic NLOS Environments Using an Attention-Based U-Net and Multimodal Fusion With the ANLOS-R Dataset'
+          doi='10.1109/ACCESS.2026.3664294';key='alakusANLOSR2026';follow='alakusAcousticMaterialNLOS2026'
+          readme=Path('README.md').read_text(encoding='utf-8');index=Path('index.html').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8');acoustic=Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8');tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          log=Path('bare_jrnl.log').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.log').exists() else ''
+          key_count=len(re.findall(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,re.I))
+          fields=[v.strip().lower() for v in re.findall(r'(?im)^\s*doi\s*=\s*[\{\"]([^}\"]+)[}\"]\s*,?\s*$',bib)]
+          doi_count=sum(v==doi.lower() for v in fields)
+          checks=[
+            (title in readme and doi in readme,'README final record'),
+            (title in corpus and doi in corpus,'canonical paper corpus record'),
+            ('Updated 14 Aug 2026' in index,'homepage freshness label'),
+            (key in acoustic and follow in acoustic,'survey precursor/follow-up citations'),
+            (key_count==1,f'BibTeX key uniqueness ({key_count})'),
+            (doi_count==1,f'BibTeX DOI-field uniqueness ({doi_count})'),
+            (not Path('egbib_20260813_acoustic_anlos_r_gap.bib').exists(),'staging BibTeX removed'),
+            ('14 August 2026' in tex,'survey freshness date'),
+            (not re.search(r'Citation.*undefined|undefined citations',log,re.I),'no undefined citations'),
+          ]
+          for ok,msg in checks:
+            print(('PASS: ' if ok else 'FAIL: ')+msg)
+            if not ok:raise AssertionError(msg)
+          subprocess.run(['pdftotext','bare_jrnl.pdf','/tmp/nlos.txt'],check=True)
+          txt=Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore')
+          assert 'ANLOS-R' in txt and '1,440' in txt,'rebuilt PDF missing ANLOS-R evidence'
+          assert Path('bare_jrnl.pdf').stat().st_size>100000,'rebuilt PDF too small'
+          PY
+
+      - name: Render PDF endpoints
+        run: |
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+
+      - name: Record update note
+        run: |
+          cat > updates/2026-08-14-anlos-r-integrated.md <<'EOF'
+          # ANLOS-R acoustic NLOS precursor synchronized — 14 August 2026
+
+          Integrated Alakuş and Türkoğlu, “Material Classification in Acoustic NLOS Environments Using an Attention-Based U-Net and Multimodal Fusion With the ANLOS-R Dataset,” IEEE Access 14, 26983–27004 (2026), DOI 10.1109/ACCESS.2026.3664294.
+
+          This paper is treated as the ANLOS-R dataset / attention-U-Net / multimodal-fusion precursor to the later Sensors 2026 wavelet–acoustic feature and SHAP follow-up. README, the canonical V2 paper corpus, survey prose, merged bibliography, and rebuilt PDF were checked together before commit.
+          EOF
+
+      - name: Commit synchronized artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html data/papers-source.html article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-08-13-acoustic-anlos-r-gap.md updates/2026-08-14-anlos-r-integrated.md
+          git add -u egbib_20260813_acoustic_anlos_r_gap.bib || true
+          if git diff --cached --quiet;then exit 0;fi
+          git commit -m 'Integrate ANLOS-R acoustic NLOS precursor'
+          git push origin HEAD:master
