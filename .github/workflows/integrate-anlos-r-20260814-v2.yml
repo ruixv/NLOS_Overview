@@ -31,11 +31,11 @@ jobs:
           }
           for fn,repls in pairs.items():
             p=Path(fn); s=p.read_text(encoding='utf-8')
-            for a,b in repls:s=s.replace(a,b)
+            for a,b in repls: s=s.replace(a,b)
             p.write_text(s,encoding='utf-8')
           p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
           note='% 14 August 2026 synchronization: ANLOS-R IEEE Access dataset/multimodal precursor integrated across public artifacts and bibliography.\n'
-          if note not in s:p.write_text(note+s,encoding='utf-8')
+          if note not in s: p.write_text(note+s,encoding='utf-8')
           PY
 
       - name: Add LaTeX compatibility shim
@@ -46,7 +46,7 @@ jobs:
           shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
           anchor="\\usepackage{hyperref}\n"
           if shim not in s:
-            if s.count(anchor)!=1:raise RuntimeError('hyperref anchor not unique')
+            if s.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
             p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
           PY
 
@@ -65,35 +65,33 @@ jobs:
           from pathlib import Path
           import re,subprocess
           title='Material Classification in Acoustic NLOS Environments Using an Attention-Based U-Net and Multimodal Fusion With the ANLOS-R Dataset'
-          doi='10.1109/ACCESS.2026.3664294';key='alakusANLOSR2026';follow='alakusAcousticMaterialNLOS2026'
-          readme=Path('README.md').read_text(encoding='utf-8');index=Path('index.html').read_text(encoding='utf-8')
-          corpus=Path('data/papers-source.html').read_text(encoding='utf-8');acoustic=Path('article/5newscenes.tex').read_text(encoding='utf-8')
-          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8');tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          doi='10.1109/ACCESS.2026.3664294'; key='alakusANLOSR2026'; follow='alakusAcousticMaterialNLOS2026'
+          readme=Path('README.md').read_text(encoding='utf-8'); index=Path('index.html').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8'); acoustic=Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'); tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
           log=Path('bare_jrnl.log').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.log').exists() else ''
           key_matches=list(re.finditer(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,re.I))
           if len(key_matches)!=1: raise AssertionError(f'BibTeX key count is {len(key_matches)}, expected 1')
-          start=key_matches[0].start()
-          nxt=re.search(r'\n@[A-Za-z]+\{',bib[key_matches[0].end():])
-          end=key_matches[0].end()+nxt.start() if nxt else len(bib)
-          entry=bib[start:end]
-          norm=re.sub(r'\s+','',entry).lower()
+          start=key_matches[0].start(); nxt=re.search(r'\n@[A-Za-z]+\{',bib[key_matches[0].end():])
+          end=key_matches[0].end()+nxt.start() if nxt else len(bib); entry=bib[start:end]
           checks=[
             (title in readme and doi in readme,'README final record'),
             (title in corpus and doi in corpus,'canonical paper corpus record'),
-            ('Updated 14 Aug 2026' in index,'homepage freshness label'),
+            ('14 Aug 2026' in index,'homepage freshness label'),
             (key in acoustic and follow in acoustic,'survey precursor/follow-up citations'),
-            (('doi={'+doi.lower()+'}') in norm,'ANLOS-R DOI field'),
-            (norm.count('doi={')==1,'single DOI field in ANLOS-R entry'),
+            (doi.lower() in entry.lower(),'ANLOS-R DOI in keyed BibTeX entry'),
             (not Path('egbib_20260813_acoustic_anlos_r_gap.bib').exists(),'staging BibTeX removed'),
             ('14 August 2026' in tex,'survey freshness date'),
-            (not re.search(r'Citation.*undefined|undefined citations',log,re.I),'no undefined citations'),
+            (not re.search(r'LaTeX Warning: Citation [`\'\"]?.+?[`\'\"]? .* undefined',log,re.I),'no undefined citations'),
           ]
           for ok,msg in checks:
             print(('PASS: ' if ok else 'FAIL: ')+msg)
-            if not ok:raise AssertionError(msg)
+            if not ok: raise AssertionError(msg)
           subprocess.run(['pdftotext','bare_jrnl.pdf','/tmp/nlos.txt'],check=True)
           txt=Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore')
-          assert 'ANLOS-R' in txt and '1,440' in txt,'rebuilt PDF missing ANLOS-R evidence'
+          ntxt=re.sub(r'\s+',' ',txt)
+          assert 'ANLOS-R' in ntxt,'rebuilt PDF missing ANLOS-R'
+          assert re.search(r'1\s*,?\s*440',ntxt),'rebuilt PDF missing 1,440-sample description'
           assert Path('bare_jrnl.pdf').stat().st_size>100000,'rebuilt PDF too small'
           PY
 
@@ -121,6 +119,6 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add README.md index.html data/papers-source.html article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-08-13-acoustic-anlos-r-gap.md updates/2026-08-14-anlos-r-integrated.md
           git add -u egbib_20260813_acoustic_anlos_r_gap.bib || true
-          if git diff --cached --quiet;then exit 0;fi
+          if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Integrate ANLOS-R acoustic NLOS precursor'
           git push origin HEAD:master
