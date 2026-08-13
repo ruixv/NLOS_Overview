@@ -1,0 +1,292 @@
+name: Integrate verified NLOS updates 2026-08-13
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-nlos-20260813.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-nlos-20260813
+  cancel-in-progress: true
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Synchronize verified literature updates
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, textwrap
+
+          IG_TITLE='A CROSS-REGIONAL NLOS TARGET LOCALIZATION METHOD BASED ON JOINT MULTIPATH GLRT'
+          IG_URL='https://2026.ieeeigarss.org/search.php?show=search'
+          IG_KEY='yuCrossRegionalNLOSGLRT2026'
+          EU_TITLE='Multipath Ghost Correlation-Based NLOS Target Localization and Building Layuot Estimation'
+          EU_DOI='10.23919/EUSIPCO63237.2025.11226331'
+          EU_URL='https://doi.org/'+EU_DOI
+          EU_KEY='weiMultipathGhostNLOS2025'
+          FU_TITLE='Building Corner and NLOS Target Parameter Estimation Based on Diffraction Signal Utilization'
+          FU_DOI='10.23919/FUSION65864.2025.11124177'
+          FU_URL='https://doi.org/'+FU_DOI
+          FU_KEY='yuDiffractionCornerNLOS2025'
+          NR_TITLE='NLOS-R²: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding'
+          NR_DOI='10.1109/ICME59968.2025.11209224'
+          NR_URL='https://doi.org/'+NR_DOI
+          NR_KEY='wang2025nlos'
+
+          # README: add missing verified entries and update the development trajectory.
+          rp=Path('README.md'); r=rp.read_text(encoding='utf-8')
+          r=r.replace('**Update run: 12 August 2026.**','**Update run: 13 August 2026.**')
+          header='|------|-------|----------------|----------------|'
+          if r.count(header)!=1:
+              raise RuntimeError('README Latest Additions table header not unique')
+          rows=[]
+          if IG_TITLE not in r:
+              rows.append(f'| 2026 | [{IG_TITLE}]({IG_URL}) — Yu et al. | IEEE IGARSS 2026, paper 2579 (TUP1.PC.9) | Introduces a cross-regional NLOS target-localization formulation based on a joint multipath generalized likelihood ratio test; the official IGARSS program lists the work in the Object Detection and Recognition track, extending multipath radar localization toward region-robust target inference. |')
+          if EU_DOI not in r:
+              rows.append(f'| 2025 | [{EU_TITLE}]({EU_URL}) — Wei et al. | EUSIPCO 2025, 2247–2251 | Separates multipath in Range–Doppler space, estimates DoA and multipath-ghost positions, and exploits the spatial correlation between those ghosts and the building layout to jointly infer hidden-target location and wall parameters. |')
+          if FU_DOI not in r:
+              rows.append(f'| 2025 | [{FU_TITLE}]({FU_URL}) — Yu et al. | FUSION 2025, 1–6 | Exploits electromagnetic diffraction information at a building corner to jointly estimate corner/scene parameters and an NLOS target, complementing reflection- and ghost-based radar localization with an explicitly diffraction-driven path. |')
+          if NR_DOI not in r:
+              rows.append(f'| 2025 | [{NR_TITLE}]({NR_URL}) — Wang et al. | IEEE ICME 2025, 1–6 | Alternates passive hidden-scene reconstruction and recognition in a mutual-refinement loop, allowing semantic predictions to sharpen reconstruction and improved reconstructions to strengthen recognition. |')
+          if rows:
+              r=r.replace(header,header+'\n'+'\n'.join(rows),1)
+
+          radar_anchor='   │     Wu et al. and Xu et al.: binary-accumulation positioning and distributed JPDA extend multipath exploitation toward robust NLOS localization and tracking [IEEE TVT / IGARSS]'
+          if radar_anchor in r and 'joint-multipath GLRT extends localization across scene regions [IGARSS 2026]' not in r:
+              extra=('\n   │     Yu et al.: diffraction-signal utilization jointly estimates building-corner and hidden-target parameters [FUSION]'
+                     '\n   │     Wei et al.: multipath-ghost spatial correlation jointly estimates NLOS targets and building layout [EUSIPCO]'
+                     '\n   │     Yu et al.: a joint-multipath GLRT extends localization across scene regions [IGARSS 2026]')
+              r=r.replace(radar_anchor,radar_anchor+extra,1)
+          if 'Wang et al.: NLOS-R² alternates passive reconstruction and recognition' not in r:
+              m=re.search(r'(^\s*│\s+Lin et al\.: CA-SlotNet[^\n]*$)',r,re.M)
+              if m:
+                  line='\n   │     Wang et al.: NLOS-R² alternates passive reconstruction and recognition in a mutual-refinement loop [IEEE ICME]'
+                  r=r[:m.end()]+line+r[m.end():]
+          rp.write_text(r,encoding='utf-8')
+
+          # Website: searchable paper explorer/latest entries and 2025/2026 timeline trajectory.
+          ip=Path('index.html'); h=ip.read_text(encoding='utf-8')
+          h=h.replace('Updated 12 August 2026','Updated 13 August 2026').replace('Last updated: 12 August 2026','Last updated: 13 August 2026')
+          anchor='    const papers=[\n'
+          if h.count(anchor)!=1:
+              raise RuntimeError('index paper array anchor not unique')
+          objs=[]
+          def jsobj(cat,title,authors,year,venue,url,key):
+              return f'    {{cat:"{cat}",title:"{title}",authors:"{authors}",year:{year},venue:"{venue}",url:"{url}",key:"{key}"}},\n'
+          if IG_TITLE not in h:
+              objs.append(jsobj('latest rf radar nlos localization multipath glrt',IG_TITLE,'Yupeng Yu; Shisheng Guo; Zihan Xu; Zhihao Zhu; Yufei Wei; Yisen Zhou; Guolong Cui',2026,'IEEE IGARSS 2026 · paper 2579 · TUP1.PC.9',IG_URL,'Cross-regional NLOS target localization based on a joint multipath GLRT; official IGARSS 2026 program entry.'))
+          if EU_DOI not in h:
+              objs.append(jsobj('latest rf radar nlos localization multipath layout',EU_TITLE,'Yufei Wei; Shisheng Guo; Zihan Xu; Xu Hao; Zhihao Zhu; Yupeng Yu; Yisen Zhou; Guolong Cui',2025,'EUSIPCO 2025 · 2247–2251',EU_URL,'Uses Range–Doppler multipath separation, IAA DoA estimation, and ghost/layout spatial correlation for joint target and building-layout inference.'))
+          if FU_DOI not in h:
+              objs.append(jsobj('latest rf radar nlos localization diffraction corner',FU_TITLE,'Yupeng Yu; Shisheng Guo; Zhihao Zhu; Zihan Xu; Yisen Zhou; Yufei Wei; Guolong Cui',2025,'FUSION 2025 · 1–6',FU_URL,'Uses diffraction-signal information for building-corner and hidden-target parameter estimation.'))
+          if NR_DOI not in h:
+              objs.append(jsobj('latest passive learning recognition understanding',NR_TITLE,'Yi Wang; Ruixu Geng; Jiarui Zhang; Xiaolong Du; Yan Chen; Yang Hu',2025,'IEEE ICME 2025 · 1–6',NR_URL,'Alternates reconstruction and recognition so semantic predictions and hidden-image recovery mutually refine one another.'))
+          if objs:
+              h=h.replace(anchor,anchor+''.join(objs),1)
+
+          def append_timeline(year,sentence,marker):
+              nonlocal_h=[None]
+              pat=re.compile(r'(<div class="tl"><div class="year">'+str(year)+r'</div><div class="tl-body"><strong>.*?</strong><p>)(.*?)(</p></div></div>)',re.S)
+              m=pat.search(h)
+              if not m: raise RuntimeError(f'index {year} timeline block not found')
+              if marker in m.group(2): return
+              nonlocal_h[0]=h[:m.start(2)]+m.group(2)+' '+sentence+h[m.end(2):]
+              return nonlocal_h[0]
+          x=append_timeline(2025,'Diffraction-driven corner estimation at FUSION and multipath-ghost correlation at EUSIPCO further made hidden-target localization and building-layout recovery a coupled radar inference problem; NLOS-R² also coupled passive reconstruction and recognition at ICME.','multipath-ghost correlation at EUSIPCO')
+          if x is not None: h=x
+          x=append_timeline(2026,'At IGARSS 2026, a cross-regional joint-multipath GLRT extended the radar localization lineage toward scene-region changes rather than a single fixed corner geometry.','cross-regional joint-multipath GLRT')
+          if x is not None: h=x
+          count=len(re.findall(r'\{cat:"',h))
+          h,n=re.subn(r'<div class="stat"><b>\d+</b><span>tracked latest entries</span></div>',f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>',h,count=1)
+          if n!=1: raise RuntimeError('website tracked-entry stat missing')
+          ip.write_text(h,encoding='utf-8')
+
+          # Survey: integrate the radar lineage semantically rather than appending a bare list.
+          ap=Path('article/5newscenes.tex'); a=ap.read_text(encoding='utf-8')
+          conclusion='Together, these works shift RF NLOS from reconstruction under a calibrated relay map toward joint estimation of the environment, propagation paths, hidden-target state, and motion.'
+          if conclusion not in a: raise RuntimeError('radar lineage conclusion anchor missing')
+          if IG_KEY not in a:
+              addition=(
+                'The same lineage is reinforced by recent conference work that isolates complementary propagation cues. '
+                'Yu~\\etal~exploit corner-diffraction information for joint building-corner and hidden-target parameter estimation~\\cite{'+FU_KEY+'}, making diffracted energy an explicit sensing channel rather than only a source of bias. '
+                'Wei~\\etal~separate multipath in Range--Doppler space, estimate direction of arrival and multipath-ghost positions, and then use ghost--layout spatial correlation to jointly recover target location and wall parameters~\\cite{'+EU_KEY+'}. '
+                'At IGARSS~2026, Yu~\\etal~present a cross-regional NLOS target-localization formulation based on a joint multipath generalized likelihood ratio test~\\cite{'+IG_KEY+'}, extending this trajectory toward likelihood-based localization that is designed to remain useful across different scene regions. '
+              )
+              a=a.replace(conclusion,addition+conclusion,1)
+          ap.write_text(a,encoding='utf-8')
+
+          # Survey semantic-learning consistency: paper was already discussed, but normalize its display.
+          dp=Path('article/4datadriven.tex'); d=dp.read_text(encoding='utf-8')
+          if NR_KEY not in d: raise RuntimeError('survey lacks existing wang2025nlos citation')
+          d=d.replace('NLOS-R~2, which alternates','NLOS-R$^2$, which alternates')
+          dp.write_text(d,encoding='utf-8')
+
+          # Bibliography: final metadata for NLOS-R² + three radar entries.
+          bp=Path('egbib_merged_20260711.bib'); b=bp.read_text(encoding='utf-8')
+          nr=r'''@inproceedings{wang2025nlos,
+  author = {Wang, Yi and Geng, Ruixu and Zhang, Jiarui and Du, Xiaolong and Chen, Yan and Hu, Yang},
+  booktitle = {2025 IEEE International Conference on Multimedia and Expo (ICME)},
+  doi = {10.1109/ICME59968.2025.11209224},
+  pages = {1--6},
+  publisher = {IEEE},
+  title = {{NLOS-R$^2$}: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding},
+  url = {https://doi.org/10.1109/ICME59968.2025.11209224},
+  year = {2025}
+}'''
+          pat=re.compile(r'@inproceedings\{wang2025nlos,.*?\n\}',re.S|re.I)
+          b,n=pat.subn(nr,b,count=1)
+          if n!=1: raise RuntimeError('merged bibliography wang2025nlos entry not found uniquely')
+          entries=[]
+          if FU_KEY not in b:
+              entries.append(r'''@inproceedings{yuDiffractionCornerNLOS2025,
+  author = {Yu, Yupeng and Guo, Shisheng and Zhu, Zhihao and Xu, Zihan and Zhou, Yisen and Wei, Yufei and Cui, Guolong},
+  booktitle = {2025 28th International Conference on Information Fusion (FUSION)},
+  doi = {10.23919/FUSION65864.2025.11124177},
+  pages = {1--6},
+  publisher = {IEEE},
+  title = {Building Corner and NLOS Target Parameter Estimation Based on Diffraction Signal Utilization},
+  url = {https://doi.org/10.23919/FUSION65864.2025.11124177},
+  year = {2025}
+}''')
+          if EU_KEY not in b:
+              entries.append(r'''@inproceedings{weiMultipathGhostNLOS2025,
+  author = {Wei, Yufei and Guo, Shisheng and Xu, Zihan and Hao, Xu and Zhu, Zhihao and Yu, Yupeng and Zhou, Yisen and Cui, Guolong},
+  booktitle = {2025 33rd European Signal Processing Conference (EUSIPCO)},
+  doi = {10.23919/EUSIPCO63237.2025.11226331},
+  pages = {2247--2251},
+  publisher = {IEEE},
+  title = {Multipath Ghost Correlation-Based NLOS Target Localization and Building Layuot Estimation},
+  url = {https://doi.org/10.23919/EUSIPCO63237.2025.11226331},
+  year = {2025}
+}''')
+          if IG_KEY not in b:
+              entries.append(r'''@inproceedings{yuCrossRegionalNLOSGLRT2026,
+  author = {Yu, Yupeng and Guo, Shisheng and Xu, Zihan and Zhu, Zhihao and Wei, Yufei and Zhou, Yisen and Cui, Guolong},
+  booktitle = {2026 IEEE International Geoscience and Remote Sensing Symposium (IGARSS)},
+  note = {Paper 2579, poster TUP1.PC.9, presented 11 August 2026},
+  title = {A Cross-Regional NLOS Target Localization Method Based on Joint Multipath GLRT},
+  url = {https://2026.ieeeigarss.org/search.php?show=search},
+  year = {2026}
+}''')
+          if entries: b=b.rstrip()+'\n\n'+'\n\n'.join(entries)+'\n'
+          bp.write_text(b,encoding='utf-8')
+
+          # Survey build note and update log.
+          tp=Path('bare_jrnl.tex'); t=tp.read_text(encoding='utf-8')
+          note='% 13 August 2026 literature sync: IGARSS 2026 cross-regional multipath GLRT, EUSIPCO ghost-correlation layout inference, FUSION diffraction-driven corner estimation, and NLOS-R^2 final ICME metadata synchronized across public artifacts.\n'
+          if note not in t: t=note+t
+          tp.write_text(t,encoding='utf-8')
+
+          log=f'''# Verified NLOS literature synchronization — 13 August 2026
+
+This update integrates three missing radar NLOS papers and closes one cross-artifact metadata gap discovered during a fresh keyword + forward-citation / lineage audit.
+
+## Newly integrated radar papers
+
+- **{IG_TITLE}** — IEEE IGARSS 2026, paper 2579 / TUP1.PC.9. Official conference program verified the title, seven authors, track, and 11 August 2026 presentation. Proceedings pagination/DOI was not yet exposed in the live conference program, so the bibliography deliberately uses the official program URL and does not invent a DOI.
+- **{EU_TITLE}** — EUSIPCO 2025, pp. 2247–2251, DOI `{EU_DOI}`. The published title contains the spelling “Layuot”; that spelling is preserved for bibliographic fidelity.
+- **{FU_TITLE}** — FUSION 2025, pp. 1–6, DOI `{FU_DOI}`.
+
+These papers extend the radar trajectory from unknown-layout estimation toward explicit diffraction utilization, multipath-ghost/layout correlation, and cross-regional likelihood-based localization.
+
+## NLOS-R² consistency fix
+
+**{NR_TITLE}** was already discussed in `article/4datadriven.tex` and had a partial bibliography record, but it was missing from the public README and website. This run adds the final IEEE ICME 2025 metadata and DOI `{NR_DOI}` to the public artifacts and rebuilds the survey PDF.
+
+## Citation-tracing result
+
+Forward-citation searches from LCT, f-k migration, phasor-field, and related core seeds surfaced several high-relevance recent optical works, but the current repository already contains the major verified candidates (including learned LCT, geometry-constrained NLOS, TransVID, physics-informed cascade learning, stereo NLOS, arbitrary-relay Gaussian transient rendering, and recent passive/thermal works). They were therefore not duplicated.
+'''
+          Path('updates/2026-08-13-verified-nlos-sync.md').write_text(log,encoding='utf-8')
+          print('Synchronized entries; website paper count:',count)
+          PY
+
+      - name: Add bookmark compatibility shim
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); t=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          if shim not in t:
+              anchor="\\usepackage{hyperref}\n"
+              if t.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+              p.write_text(t.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+
+      - name: Clean build products
+        run: rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.fdb_latexmk bare_jrnl.fls bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.pdf
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Validate public artifacts
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, subprocess
+          titles=[
+            'A CROSS-REGIONAL NLOS TARGET LOCALIZATION METHOD BASED ON JOINT MULTIPATH GLRT',
+            'Multipath Ghost Correlation-Based NLOS Target Localization and Building Layuot Estimation',
+            'Building Corner and NLOS Target Parameter Estimation Based on Diffraction Signal Utilization',
+            'NLOS-R²: Alternate Reconstruction and Recognition for Non-Line-of-Sight Understanding'
+          ]
+          keys=['yuCrossRegionalNLOSGLRT2026','weiMultipathGhostNLOS2025','yuDiffractionCornerNLOS2025','wang2025nlos']
+          r=Path('README.md').read_text(encoding='utf-8'); h=Path('index.html').read_text(encoding='utf-8')
+          a=Path('article/5newscenes.tex').read_text(encoding='utf-8'); d=Path('article/4datadriven.tex').read_text(encoding='utf-8')
+          b=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8'); log=Path('bare_jrnl.log').read_text(encoding='utf-8',errors='ignore')
+          assert all(t in r for t in titles), 'README missing synchronized title'
+          assert all(t in h for t in titles), 'index missing synchronized title'
+          assert all(k in b for k in keys), 'bibliography missing key'
+          assert all(k in a for k in keys[:3]), 'radar survey section missing citation'
+          assert 'wang2025nlos' in d and 'NLOS-R$^2$' in d
+          assert '10.23919/EUSIPCO63237.2025.11226331' in b
+          assert '10.23919/FUSION65864.2025.11124177' in b
+          assert '10.1109/ICME59968.2025.11209224' in b
+          for k in keys:
+              assert len(re.findall(r'@[A-Za-z]+\{'+re.escape(k)+r',',b,re.I))==1, f'duplicate/missing BibTeX key {k}'
+          assert not re.search(r'Citation.*undefined|undefined citations|There were undefined references',log,re.I), 'LaTeX has undefined citation/reference warnings'
+          count=len(re.findall(r'\{cat:"',h)); assert f'<div class="stat"><b>{count}</b><span>tracked latest entries</span></div>' in h
+          subprocess.run(['pdftotext','bare_jrnl.pdf','/tmp/nlos-sync.txt'],check=True)
+          txt=Path('/tmp/nlos-sync.txt').read_text(encoding='utf-8',errors='ignore')
+          assert 'Multipath Ghost' in txt and 'Building Corner' in txt, 'new radar bibliography/discussion not visible in PDF text'
+          assert Path('bare_jrnl.pdf').stat().st_size>100000
+          print('Validation passed; website entries:',count,'PDF bytes:',Path('bare_jrnl.pdf').stat().st_size)
+          PY
+
+      - name: Render PDF endpoints
+        run: |
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test "$pages" -gt 0
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+
+      - name: Commit and push synchronized artifacts
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html article/4datadriven.tex article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-08-13-verified-nlos-sync.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Synchronize latest verified NLOS papers'
+          git push origin HEAD:master
