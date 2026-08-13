@@ -23,7 +23,6 @@ jobs:
           python3 scripts/integrate_anlos_r_20260813.py
           python3 - <<'PY'
           from pathlib import Path
-          # This automation run occurs on 14 Aug 2026; keep public freshness labels current.
           replacements = {
               'README.md': [('**Update run: 13 August 2026.**','**Update run: 14 August 2026.**')],
               'index.html': [('Updated 13 Aug 2026','Updated 14 Aug 2026')],
@@ -84,7 +83,7 @@ jobs:
           assert 'Updated 14 Aug 2026' in index
           assert key in acoustic and follow in acoustic
           assert len(re.findall(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,re.I))==1
-          assert bib.lower().count(doi.lower())==1
+          assert len(re.findall(r'(?im)^\s*doi\s*=\s*\{'+re.escape(doi)+r'\}\s*,?\s*$',bib))==1
           assert not Path('egbib_20260813_acoustic_anlos_r_gap.bib').exists()
           assert '14 August 2026' in tex
           assert not re.search(r'Citation.*undefined|undefined citations',log,re.I)
