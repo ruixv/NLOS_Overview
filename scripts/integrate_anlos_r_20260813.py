@@ -65,9 +65,11 @@ if KEY not in s:
     mm=re.search(r'@article\{'+re.escape(KEY)+r',.*?\n\}',staged,flags=re.S|re.I)
     if not mm: raise RuntimeError('ANLOS-R BibTeX entry not found in staging file')
     s=s.rstrip()+'\n\n'+mm.group(0).strip()+'\n'
-# Strong duplicate checks before writing.
+# Strong duplicate checks before writing. Count the DOI field, not raw DOI text,
+# because a valid BibTeX entry normally repeats the DOI inside its URL field.
 if len(re.findall(r'@[A-Za-z]+\{'+re.escape(KEY)+r',',s,re.I))!=1: raise RuntimeError('ANLOS-R BibTeX key duplication')
-if s.lower().count(DOI.lower())!=1: raise RuntimeError('ANLOS-R DOI duplication in merged bibliography')
+doi_fields=re.findall(r'(?im)^\s*doi\s*=\s*\{'+re.escape(DOI)+r'\}\s*,?\s*$',s)
+if len(doi_fields)!=1: raise RuntimeError('ANLOS-R DOI-field duplication in merged bibliography')
 p.write_text(s,encoding='utf-8')
 if stage.exists(): stage.unlink()
 
