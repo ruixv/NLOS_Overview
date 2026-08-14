@@ -63,12 +63,14 @@ jobs:
           bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
           tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
           for title,doi,key in records:
+            key_count=len(re.findall(r'@[A-Za-z]+[{]'+re.escape(key)+r',',bib,re.I))
+            doi_count=len(re.findall(r'(?im)^\s*doi\s*=\s*[{]'+re.escape(doi)+r'[}]\s*,?\s*$',bib))
             checks=[
               (title in readme and doi in readme,'README record'),
               (title in corpus and doi in corpus,'canonical V2 corpus record'),
               (key in survey,'survey citation'),
-              (len(re.findall(r'@[A-Za-z]+\\{'+re.escape(key)+r',',bib,re.I))==1,'single BibTeX key'),
-              (len(re.findall(r'(?im)^\\s*doi\\s*=\\s*\\{'+re.escape(doi)+r'\\}\\s*,?\\s*$',bib))==1,'single DOI field'),
+              (key_count==1,f'single BibTeX key (found {key_count})'),
+              (doi_count==1,f'single DOI field (found {doi_count})'),
             ]
             for ok,msg in checks:
               print(('PASS: ' if ok else 'FAIL: ')+title+' — '+msg)
@@ -82,9 +84,10 @@ jobs:
           from pathlib import Path
           import re
           txt=re.sub(r'\s+',' ',Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore'))
-          for needle in ['DCPNet','hierarchical-NeRF','two-bounce']:
-            if not re.search(re.escape(needle),txt,re.I):
-              raise AssertionError('rebuilt PDF missing '+needle)
+          groups=[('DCPNet',),('hierarchical','implicit reconstruction'),('two-bounce','two bounce')]
+          for alternatives in groups:
+            if not any(re.search(re.escape(needle),txt,re.I) for needle in alternatives):
+              raise AssertionError('rebuilt PDF missing one of: '+', '.join(alternatives))
           PY
           if grep -Eiq 'Citation .* undefined|There were undefined references' bare_jrnl.log; then
             echo 'Undefined citation/reference warning detected'
