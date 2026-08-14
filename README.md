@@ -64,10 +64,12 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 14 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 15 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [Real-time two-bounce non-line-of-sight object tracking via dual-view collaborative perception network](https://doi.org/10.1364/OE.575453) — Zhang et al. | Optics Express 33(20), 42542–42556 (2025) | Uses time-multiplexed alternating dual illumination to acquire two shadow views and DCPNet to fuse cross-view spatial consistency with single-view temporal coherence for real-time hidden-object trajectory estimation; physics-rendered training data and real fine-tuning validate corridor/tunnel-style two-bounce tracking. |
+| 2025 | [Efficient implicit reconstruction of hidden object in two-bounce non-line-of-sight imaging](https://doi.org/10.1364/OE.567764) — Chen et al. | Optics Express 33(19), 41244–41260 (2025) | Replaces explicit voxel carving with hierarchical NeRF-based implicit ray carving and spatial/temporal ray selection, reducing redundant shadow rays while reconstructing static and dynamic hidden scenes; reports about 2% relative depth deviation in a 20 m × 10 m × 4 m volume. |
 | 2026 | [Material Classification in Acoustic NLOS Environments Using an Attention-Based U-Net and Multimodal Fusion With the ANLOS-R Dataset](https://doi.org/10.1109/ACCESS.2026.3664294) — Alakuş and Türkoğlu | IEEE Access 14, 26983–27004 (2026) | Introduces ANLOS-R, a 1,440-sample wall-mediated acoustic NLOS dataset collected with an 8-speaker/8-microphone multi-position setup, together with attention-U-Net reflection isolation and multimodal spectral-temporal fusion for hidden-material recognition. It is the dataset/multimodal precursor to the later Sensors 2026 wavelet-feature follow-up. |
 | 2026 | [Multipath Exploitation-Based 3-D Environmental Perception and NLOS Moving Target Reconstruction for mmWave MIMO Imaging Radar](https://doi.org/10.1109/TAES.2025.3647422) — Zhu et al. | IEEE Transactions on Aerospace and Electronic Systems 62, 3569–3587 (2026) | Jointly estimates 3-D environmental/reflector structure and reconstructs NLOS moving targets from mmWave MIMO multipath, transferring estimated reflector parameters into path-oriented hidden-target localization and validating the pipeline experimentally. |
 | 2025 | [NLOS Building Layout and Target Estimation in an L-Shaped Corner with Complex Geometries](https://doi.org/10.1109/TIM.2024.3522427) — Xue et al. | IEEE Transactions on Instrumentation and Measurement 74 (2025) | Removes the usual known-layout assumption: tracks multipath ToAs, separates diffraction and first-/second-order reflection paths, localizes the hidden target and reconstructs part of the L-shaped relay geometry with a portable SISO radar. |
@@ -375,7 +377,9 @@ Key breakthroughs that shaped the NLOS Imaging field:
        │     Jeon et al.: ray-traced 2D mmWave point clouds localize multiple hidden pedestrians at measured outdoor T-junctions [IEEE IV]
        │     Zhai et al.: second-order edge diffraction plus block sparse Bayesian learning localizes hidden acoustic sources without direct/first-order paths [Applied Acoustics]
        │     BiScalar-AA and TSAN: attention-based radar pseudo-image models extend NLOS toward learned object detection and tracking [IEEE SWC / Computer Engineering]
-2025 ── Roueinfar & Salmanian: low-cost 808 nm steady-state NIR raster scanning [IEEE ICEE]
+2025 ── Chen et al.: hierarchical-NeRF implicit ray carving makes two-bounce shadow reconstruction more efficient [Optics Express]
+   │     Zhang et al.: DCPNet advances two-bounce NLOS from reconstruction to real-time dual-view tracking [Optics Express]
+   │     2025 ── Roueinfar & Salmanian: low-cost 808 nm steady-state NIR raster scanning [IEEE ICEE]
    │     Tian et al.: deconvolution and virtual modulated range migration recover 50× super-resolution histograms from nanosecond-resolution ToF data [Optics Letters]
      │     Guo et al.: vectorial digitelligent optics jointly optimizes phase and polarization to refocus through a rough relay wall and attain near-diffraction-limited 0.40-mm NLOS imaging [Engineering]
    │     Oyama and Takatori: painted-surface reflections support semantic NLOS obstacle detection after reflection-aware appearance normalization [IEEE ITSC]
