@@ -1,0 +1,108 @@
+name: Integrate missing spherical-slice NLOS precursor
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-spherical-slice-nlos-20260815.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Apply verified spherical-slice integration
+        run: python3 scripts/integrate_spherical_slice_gap_20260815.py
+
+      - name: Add LaTeX compatibility shim if needed
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+            if s.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+            p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Install PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Validate public-artifact synchronization
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          title='High-resolution non-confocal non-line-of-sight imaging based on spherical-slice transform from spatial and temporal frequency to space and time'
+          doi='10.1364/OL.528300'
+          key='yuSphericalSliceNonconfocalNLOS2024'
+          readme=Path('README.md').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          survey=Path('article/2active.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          checks=[
+            (title in readme and doi in readme,'README record'),
+            (title in corpus and doi in corpus,'canonical V2 corpus record'),
+            (key in survey and 'spherical-slice' in survey.lower(),'survey lineage'),
+            (len(re.findall(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,re.I))==1,'single BibTeX key'),
+            (len(re.findall(r'(?im)^\s*doi\s*=\s*\{'+re.escape(doi)+r'\}\s*,?\s*$',bib))==1,'single DOI field'),
+            ('15 August 2026' in tex,'survey synchronization date'),
+            (Path('updates/2026-08-15-nonconfocal-spherical-slice-gap.md').exists(),'update note'),
+            (Path('bare_jrnl.pdf').stat().st_size > 100000,'rebuilt PDF size'),
+          ]
+          for ok,msg in checks:
+            print(('PASS: ' if ok else 'FAIL: ')+msg)
+            if not ok: raise AssertionError(msg)
+          PY
+          pdftotext bare_jrnl.pdf /tmp/nlos.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          txt=re.sub(r'\s+',' ',Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore')).lower()
+          for pat in [r'spherical.?slice',r'non.?confocal',r'reference.?function']:
+            if not re.search(pat,txt,re.I): raise AssertionError('rebuilt PDF missing '+pat)
+          PY
+          if grep -Eiq 'Citation .* undefined|There were undefined references' bare_jrnl.log; then
+            echo 'Undefined citation/reference warning detected'
+            grep -Ei 'Citation .* undefined|There were undefined references' bare_jrnl.log || true
+            exit 1
+          fi
+
+      - name: Render PDF endpoints
+        run: |
+          set -euo pipefail
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+
+      - name: Commit synchronized artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html data/papers-source.html article/2active.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-08-15-nonconfocal-spherical-slice-gap.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Integrate spherical-slice nonconfocal NLOS precursor'
+          git push origin HEAD:master
