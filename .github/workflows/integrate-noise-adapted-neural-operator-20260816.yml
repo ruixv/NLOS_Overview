@@ -1,0 +1,117 @@
+name: Integrate noise-adapted neural-operator NLOS gap
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - updates/noise_adapted_neural_operator_20260816.trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-noise-adapted-neural-operator-20260816
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out current master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Install bibliography dependency
+        run: python3 -m pip install --user bibtexparser
+
+      - name: Apply synchronized source integration
+        run: |
+          python3 -m py_compile scripts/integrate_noise_adapted_neural_operator_20260816.py
+          python3 scripts/integrate_noise_adapted_neural_operator_20260816.py
+          python3 scripts/merge_nlos_bibliography.py
+          rm -f egbib_20260816_nano_gap.bib
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Cleanly rebuild survey PDF
+        run: |
+          old_hash=$(git hash-object bare_jrnl.pdf)
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          new_hash=$(git hash-object bare_jrnl.pdf)
+          echo "PDF blob: $old_hash -> $new_hash"
+          test "$old_hash" != "$new_hash"
+
+      - name: Validate public artifacts and survey consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          title='Noise-adapted Neural Operator for Robust Non-Line-of-Sight Imaging'
+          key='wangNoiseAdaptedNeuralOperator2025'
+          arxiv='2508.09655'
+
+          test "$(grep -F -c "$title" README.md)" -eq 1
+          test "$(grep -F -c "title:\"$title\"" data/papers-source.html)" -eq 1
+          grep -F -q '**Update run: 16 August 2026.**' README.md
+          grep -F -q 'NANO formulates transient NLOS inversion' README.md
+
+          test "$(grep -F -c "{$key," egbib_merged_20260711.bib)" -eq 1
+          grep -F -q "$arxiv" egbib_merged_20260711.bib
+          grep -F -q '10.48550/arXiv.2508.09655' egbib_merged_20260711.bib
+
+          grep -F -q "$key" article/2active.tex
+          grep -F -q "$key" article/4datadriven.tex
+          grep -F -q "$key" bare_jrnl.aux
+          grep -F -q "$key" bare_jrnl.bbl
+          grep -F -q 'noise-adapted neural-operator NLOS reconstruction synchronized' bare_jrnl.tex
+          grep -F -q 'data/papers-source.html' assets/paper-graph-data.js
+
+          ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
+          needles = ['noiseadaptedneuraloperator', 'continuousfunctionspaces', 'photonstarved']
+          missing = [n for n in needles if n not in text]
+          print('PDF semantic checks:', 'ok' if not missing else f'missing {missing}')
+          if missing:
+              raise SystemExit(1)
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Commit and push validated public artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md data/papers-source.html article/2active.tex article/4datadriven.tex \
+            bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-08-16-noise-adapted-neural-operator.md
+          git add -u egbib_20260816_nano_gap.bib
+          if git diff --cached --quiet; then
+            echo "No generated public-artifact changes to commit"
+            exit 1
+          fi
+          git commit -m "Integrate noise-adapted neural-operator NLOS reconstruction"
+          git push origin HEAD:master
