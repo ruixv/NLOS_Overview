@@ -64,7 +64,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 15 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 16 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
@@ -458,6 +458,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
     │     Hashemi et al. and Chen et al.: multispectral clutter separation and learned hyperspectral band selection strengthen passive NLOS under realistic backgrounds [IEEE TPAMI / Expert Systems with Applications]
     │     Zhang et al.: CMFormer reduces transient-volume memory cost and reaches consumer-GPU real-time reconstruction [Optics and Lasers in Engineering]
 2025 ── Shi et al.: fast configurable transient simulation and an open NLOS benchmark [arXiv]
+   │     Wang et al.: NANO formulates transient NLOS inversion as a noise-conditioned neural operator in continuous function spaces, targeting discretization invariance across sparse/irregular scan grids and photon-starved measurements [arXiv]
    │     Shen et al.: MARMOT shifts transient learning toward reusable masked pretraining on TransVerse, with the retained scan subset acting as arbitrary sampling [arXiv]
    │     Shen et al.: HOLI-1-to-3 combines LOS radiance and NLOS transient fields to complete invisible 3D geometry from one viewpoint [IEEE TPAMI]
    │     Klinghoffer et al.: Shoot-Bounce-3D learns to demultiplex single-shot two-bounce single-photon LiDAR for occlusion- and mirror-aware geometry [SIGGRAPH Asia]
