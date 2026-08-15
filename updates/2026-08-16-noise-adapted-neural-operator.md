@@ -1,6 +1,6 @@
 # 16 August 2026 NLOS citation-trace update: NANO
 
-## Newly integrated paper
+## Survey consistency gap closed
 
 Lianfang Wang, Kuilin Qin, Xueying Liu, Huibin Chang, Yong Wang, and Yuping Duan, **Noise-adapted Neural Operator for Robust Non-Line-of-Sight Imaging**, arXiv:2508.09655 [cs.CV], first submitted 13 August 2025 and revised 31 March 2026.
 
@@ -8,8 +8,9 @@ Lianfang Wang, Kuilin Qin, Xueying Liu, Huibin Chang, Yong Wang, and Yuping Duan
 - It explicitly builds from the LCT forward/inverse formulation and compares against physical and learned NLOS reconstruction baselines.
 - NANO estimates measurement noise and conditions a neural operator formulated in continuous function spaces, with deep unfolding from a regularized inverse problem.
 - The operator formulation targets resolution/discretization invariance, sparse or irregular scanning, and severe photon starvation; experiments include simulated and real NLOS data.
+- The paper was already present in the repository's README catalogue and canonical website corpus before this run, but it had not yet been integrated into the LaTeX survey narrative, active-method table, merged bibliography, and regenerated survey PDF.
 - The arXiv record states that the manuscript has been submitted to IEEE for possible publication. No final accepted/published IEEE journal or conference venue was verified as of this update, so the public artifacts correctly retain **arXiv** as the venue rather than guessing a final publication.
 
 ## Repository synchronization
 
-README Latest Additions and the 2025 trajectory, the canonical V2 paper corpus (`data/papers-source.html`), the active-method table, the physics/data-driven survey narrative, merged BibTeX, `bare_jrnl.tex`, and the rebuilt `bare_jrnl.pdf` are synchronized by the integration workflow. The public homepage consumes the canonical paper corpus for Paper Explorer and the 3D graph.
+The existing README/catalogue entry is retained without duplication; the README update stamp and 2025 trajectory are refreshed, the canonical V2 timeline (`data/papers-source.html`) now places NANO in the operator-learning development path, and the active-method table, physics/data-driven survey narrative, merged BibTeX, `bare_jrnl.tex`, and rebuilt `bare_jrnl.pdf` are synchronized. The public homepage consumes the canonical paper corpus for Paper Explorer and the 3D graph.
