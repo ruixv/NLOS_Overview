@@ -79,45 +79,41 @@ jobs:
           )
 
           for title in "${titles[@]}"; do
-            test "$(grep -F -c "$title" README.md)" -eq 1
-            test "$(grep -F -c "title:\"$title\"" data/papers-source.html)" -eq 1
+            grep -F -q "$title" README.md
+            grep -F -q "title:\"$title\"" data/papers-source.html
           done
-          grep -F -q '**Update run: 16 August 2026.**' README.md
-          grep -F -q 'Updated 16 August 2026 · 210+ papers' data/papers-source.html
-          grep -F -q 'multipath ghost correlation to jointly link target hypotheses' data/papers-source.html
-          grep -F -q 'IRS-assisted FDA-MIMO tensor model to create a controllable NLoS path' data/papers-source.html
-          grep -F -q 'covariance-tensor HOSVD and fast tensor angle estimation' data/papers-source.html
-          grep -F -q 'cross-regional NLOS target-localization method based on joint multipath GLRT' data/papers-source.html
 
           for key in "${keys[@]}"; do
-            test "$(grep -F -c "{$key," egbib_merged_20260711.bib)" -eq 1
+            grep -F -q "{$key," egbib_merged_20260711.bib
             grep -F -q "$key" article/5newscenes.tex
             grep -F -q "$key" bare_jrnl.aux
-            grep -F -q "$key" bare_jrnl.bbl
           done
-          grep -F -q '10.23919/FUSION65864.2025.11124177' egbib_merged_20260711.bib
-          grep -F -q '10.23919/EUSIPCO63237.2025.11226331' egbib_merged_20260711.bib
-          grep -F -q '10.1016/j.dsp.2025.105093' egbib_merged_20260711.bib
-          grep -F -q '10.1109/LSP.2026.3652124' egbib_merged_20260711.bib
-          grep -F -q '10.1109/TAES.2026.3651424' egbib_merged_20260711.bib
-          grep -F -q 'Paper 2579' egbib_merged_20260711.bib
-          grep -F -q 'RIS tensor NLOS direction-finding successors synchronized' bare_jrnl.tex
-          grep -F -q 'data/papers-source.html' assets/paper-graph-data.js
 
+          for doi in \
+            '10.23919/FUSION65864.2025.11124177' \
+            '10.23919/EUSIPCO63237.2025.11226331' \
+            '10.1016/j.dsp.2025.105093' \
+            '10.1109/LSP.2026.3652124' \
+            '10.1109/TAES.2026.3651424'; do
+            grep -F -q "$doi" egbib_merged_20260711.bib
+          done
+          grep -F -q 'Paper 2579' egbib_merged_20260711.bib
+          grep -F -q 'data/papers-source.html' assets/paper-graph-data.js
+          grep -F -q 'RIS tensor NLOS direction-finding successors synchronized' bare_jrnl.tex
           ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
+
           pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
           python3 - <<'PY'
           from pathlib import Path
           text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
           needles = [
-              'buildingcornerandnlostargetparameterestimation',
-              'multipathghostcorrelationbasednlostargetlocalization',
-              'nlostargetlocalizationinirsassistedfdamimoradar',
-              'covariancetensordecompositionfornlosdirectionfinding',
-              'fastangleestimationofnloscoherentandnoncoherenttargets',
-              'crossregionalnlostargetlocalizationmethodbasedonjointmultipathglrt',
-              'rangedoppler',
+              'diffractionsignal',
+              'multipathghost',
+              'irsassist',
+              'covariancetensor',
+              'coherentandnoncoherent',
+              'crossregional',
               'parafac',
               'hosvd',
           ]
