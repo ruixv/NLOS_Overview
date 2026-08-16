@@ -1,0 +1,157 @@
+name: Synchronize public NLOS update dates
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - updates/public_date_sync_20260816.trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-public-dates-20260816
+  cancel-in-progress: false
+
+jobs:
+  sync-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out current master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Apply exact date synchronization
+        run: |
+          python3 -m py_compile scripts/sync_public_dates_20260816.py
+          python3 scripts/sync_public_dates_20260816.py
+          git diff --check
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Cleanly rebuild survey PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          old_hash=$(git hash-object bare_jrnl.pdf)
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          new_hash=$(git hash-object bare_jrnl.pdf)
+          echo "PDF blob: $old_hash -> $new_hash"
+          test "$old_hash" != "$new_hash"
+
+      - name: Validate source and rendered PDF consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          corpus = Path('data/papers-source.html').read_text(encoding='utf-8', errors='ignore')
+          readme = Path('README.md').read_text(encoding='utf-8', errors='ignore')
+          tex = Path('bare_jrnl.tex').read_text(encoding='utf-8', errors='ignore')
+          survey = Path('article/5newscenes.tex').read_text(encoding='utf-8', errors='ignore')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8', errors='ignore')
+
+          if 'Updated 16 August 2026 · 210+ papers' not in corpus:
+              raise SystemExit('FAILED V2 header date')
+          if 'Last updated: 16 August 2026' not in corpus:
+              raise SystemExit('FAILED V2 footer date')
+          if 'Last updated: 15 August 2026' in corpus:
+              raise SystemExit('FAILED stale V2 footer remains')
+          if 'through 16 August 2026.' not in tex:
+              raise SystemExit('FAILED survey coverage date')
+          if 'through 15 August 2026.' in tex:
+              raise SystemExit('FAILED stale survey coverage date remains')
+          if '\\bibliography{egbib_merged_20260711}' not in tex:
+              raise SystemExit('FAILED survey bibliography source')
+
+          # Guard representative 16-Aug additions and modality-expansion records
+          # so this maintenance edit cannot silently truncate public content.
+          guards = [
+              (readme, 'Non-line-of-sight imaging under white-light illumination: a two-step deep learning approach'),
+              (corpus, 'Noise-adapted Neural Operator for Robust Non-Line-of-Sight Imaging'),
+              (corpus, 'Passive acoustic non-line-of-sight localization without a relay surface'),
+              (corpus, 'Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave'),
+              (corpus, 'Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware'),
+              (survey, 'tosiFeasibilityISACNLOS2024'),
+              (survey, 'tosiReliableISACNLOS2026'),
+              (bib, 'zhengWhiteLightTwoStepNLOS2021'),
+              (bib, 'tosiFeasibilityISACNLOS2024'),
+              (bib, 'tosiReliableISACNLOS2026'),
+          ]
+          for text, needle in guards:
+              if needle not in text:
+                  raise SystemExit(f'FAILED public-content guard: {needle}')
+
+          m = re.search(r'<b>(\d+)</b><span>tracked latest entries</span>', corpus)
+          if not m:
+              raise SystemExit('FAILED V2 tracked-entry counter')
+          displayed = int(m.group(1))
+          actual = len(re.findall(r'\{cat:"', corpus))
+          if displayed != actual:
+              raise SystemExit(f'FAILED V2 paper count: displayed={displayed}, actual={actual}')
+
+          aux = Path('bare_jrnl.aux').read_text(encoding='utf-8', errors='ignore')
+          for key in ['zhengWhiteLightTwoStepNLOS2021', 'tosiFeasibilityISACNLOS2024', 'tosiReliableISACNLOS2026']:
+              if key not in aux:
+                  raise SystemExit(f'FAILED resolved citation: {key}')
+          log = Path('bare_jrnl.log').read_text(encoding='utf-8', errors='ignore')
+          if 'There were undefined citations' in log or 'Repeated entry' in log or re.search(r'Citation .* undefined', log):
+              raise SystemExit('FAILED LaTeX citation validation')
+          print(f'source consistency: ok; canonical tracked papers={displayed}')
+          PY
+
+          pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
+          needles = ['16august2026', 'whitelight', 'cellularisac']
+          missing = [n for n in needles if n not in text]
+          if missing:
+              raise SystemExit(f'FAILED PDF semantic validation: missing {missing}')
+          print('PDF semantic validation: ok')
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Commit validated synchronization and remove helpers
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f scripts/sync_public_dates_20260816.py \
+            .github/workflows/sync-public-dates-20260816.yml \
+            updates/public_date_sync_20260816.trigger
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/papers-source.html bare_jrnl.tex bare_jrnl.pdf \
+            updates/2026-08-16-cross-artifact-date-sync.md
+          git add -u scripts/sync_public_dates_20260816.py \
+            .github/workflows/sync-public-dates-20260816.yml \
+            updates/public_date_sync_20260816.trigger
+          if git diff --cached --quiet; then
+            echo 'No validated synchronization changes to commit'
+            exit 1
+          fi
+          git commit -m "Synchronize 16 August public survey dates"
+          git push origin HEAD:master
