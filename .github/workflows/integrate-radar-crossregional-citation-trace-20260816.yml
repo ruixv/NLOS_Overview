@@ -62,11 +62,13 @@ jobs:
           titles=(
             'Building Corner and NLOS Target Parameter Estimation Based on Diffraction Signal Utilization'
             'Multipath Ghost Correlation-Based NLOS Target Localization and Building Layuot Estimation'
+            'NLoS target localization in IRS-assisted FDA-MIMO radar: A tensor decomposition perspective'
             'A Cross-Regional NLOS Target Localization Method Based on Joint Multipath GLRT'
           )
           keys=(
             'yuDiffractionCornerNLOS2025'
             'weiGhostCorrelationNLOS2025'
+            'yuIRSFdaMimoNLOS2025'
             'yuCrossRegionalGLRTNLOS2026'
           )
 
@@ -76,8 +78,9 @@ jobs:
           done
           grep -F -q '**Update run: 16 August 2026.**' README.md
           grep -F -q 'Updated 16 August 2026 · 210+ papers' data/papers-source.html
-          grep -F -q 'multipath ghost correlation jointly links target hypotheses' data/papers-source.html
-          grep -F -q 'joint multipath GLRT extends radar NLOS localization across regions' data/papers-source.html
+          grep -F -q 'multipath ghost correlation to jointly link target hypotheses' data/papers-source.html
+          grep -F -q 'IRS-assisted FDA-MIMO tensor model to create a controllable NLoS path' data/papers-source.html
+          grep -F -q 'cross-regional NLOS target-localization method based on joint multipath GLRT' data/papers-source.html
 
           for key in "${keys[@]}"; do
             test "$(grep -F -c "{$key," egbib_merged_20260711.bib)" -eq 1
@@ -87,8 +90,9 @@ jobs:
           done
           grep -F -q '10.23919/FUSION65864.2025.11124177' egbib_merged_20260711.bib
           grep -F -q '10.23919/EUSIPCO63237.2025.11226331' egbib_merged_20260711.bib
+          grep -F -q '10.1016/j.dsp.2025.105093' egbib_merged_20260711.bib
           grep -F -q 'Paper 2579' egbib_merged_20260711.bib
-          grep -F -q 'diffraction, multipath-ghost, and cross-regional radar NLOS localization synchronized' bare_jrnl.tex
+          grep -F -q 'IRS-assisted tensor localization' bare_jrnl.tex
           grep -F -q 'data/papers-source.html' assets/paper-graph-data.js
 
           ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
@@ -100,8 +104,10 @@ jobs:
           needles = [
               'buildingcornerandnlostargetparameterestimation',
               'multipathghostcorrelationbasednlostargetlocalization',
+              'nlostargetlocalizationinirsassistedfdamimoradar',
               'crossregionalnlostargetlocalizationmethodbasedonjointmultipathglrt',
-              'range-doppler'.replace('-', ''),
+              'rangedoppler',
+              'parafac',
           ]
           missing = [n for n in needles if n not in text]
           print('PDF semantic checks:', 'ok' if not missing else f'missing {missing}')
