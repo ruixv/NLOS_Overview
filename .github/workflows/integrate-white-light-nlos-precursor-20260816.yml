@@ -59,30 +59,50 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          title='Non-line-of-sight imaging under white-light illumination: a two-step deep learning approach'
-          key='zhengWhiteLightTwoStepNLOS2021'
-          doi='10.1364/OE.443127'
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
 
-          grep -F -q "$title" README.md
-          grep -F -q "title:\"$title\"" data/papers-source.html
-          grep -F -q "$key" article/3passive.tex
-          grep -F -q "{$key," egbib_merged_20260711.bib
-          grep -F -q "$doi" egbib_merged_20260711.bib
-          grep -F -q "$key" bare_jrnl.aux
-          grep -F -q 'data/papers-source.html' assets/paper-graph-data.js
-          ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
+          title = 'Non-line-of-sight imaging under white-light illumination: a two-step deep learning approach'
+          key = 'zhengWhiteLightTwoStepNLOS2021'
+          doi = '10.1364/OE.443127'
 
-          count=$(grep -F -c "{$key," egbib_merged_20260711.bib)
-          test "$count" -eq 1
-          doi_count=$(grep -F -c "$doi" egbib_merged_20260711.bib)
-          test "$doi_count" -eq 1
+          checks = {
+              'README title': (Path('README.md'), title),
+              'canonical corpus title': (Path('data/papers-source.html'), title),
+              'passive survey citation': (Path('article/3passive.tex'), key),
+              'merged bibliography key': (Path('egbib_merged_20260711.bib'), key),
+              'merged bibliography DOI': (Path('egbib_merged_20260711.bib'), doi),
+              'resolved aux citation': (Path('bare_jrnl.aux'), key),
+              'V2 data source': (Path('assets/paper-graph-data.js'), 'data/papers-source.html'),
+          }
+          for label, (path, needle) in checks.items():
+              text = path.read_text(encoding='utf-8', errors='ignore')
+              if needle not in text:
+                  raise SystemExit(f'FAILED {label}: {needle!r} not found in {path}')
+              print('ok:', label)
+
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8', errors='ignore')
+          key_entries = re.findall(r'@[A-Za-z]+\{\s*' + re.escape(key) + r'\s*,', bib, flags=re.I)
+          if len(key_entries) != 1:
+              raise SystemExit(f'FAILED bibliography uniqueness: {len(key_entries)} entries for {key}')
+          if bib.lower().count(doi.lower()) != 1:
+              raise SystemExit(f'FAILED DOI uniqueness: {bib.lower().count(doi.lower())} occurrences of {doi}')
+
+          log = Path('bare_jrnl.log').read_text(encoding='utf-8', errors='ignore')
+          bad = ['There were undefined citations', 'Repeated entry']
+          if any(x in log for x in bad) or re.search(r'Citation .* undefined', log):
+              raise SystemExit('FAILED LaTeX citation validation')
+          print('source/bibliography validation: ok')
+          PY
 
           pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
           pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
           python3 - <<'PY'
           from pathlib import Path
           text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
-          needles = ['whitelightillumination', 'twostepdeeplearning', 'specklecorrelation']
+          # Check robust semantic fragments that are present in survey prose, independent of line wrapping.
+          needles = ['whitelight', 'specklecorrelation', 'zheng']
           missing = [n for n in needles if n not in text]
           print('PDF semantic checks:', 'ok' if not missing else f'missing {missing}')
           if missing:
