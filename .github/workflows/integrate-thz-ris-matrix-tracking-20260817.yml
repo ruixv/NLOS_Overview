@@ -31,7 +31,7 @@ jobs:
       - name: Install LaTeX and PDF utilities
         run: |
           sudo apt-get update
-          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-bibtex-extra texlive-font-utils poppler-utils
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-bibtex-extra texlive-font-utils texlive-publishers poppler-utils
 
       - name: Rebuild survey PDF
         shell: bash
