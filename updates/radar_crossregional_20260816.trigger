@@ -1,1 +1,1 @@
-Trigger synchronized integration of the 16 August 2026 radar/RF NLOS citation-trace additions.
+Trigger synchronized integration of the 16 August 2026 radar/RF NLOS citation-trace additions, including IRS-assisted FDA-MIMO tensor localization.
