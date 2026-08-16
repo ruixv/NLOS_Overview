@@ -34,6 +34,16 @@ PAPERS = [
         "cat": "latest modality radar rf multipath glrt localization cross-regional",
         "summary": "A newly presented IGARSS 2026 radar NLOS localization work centered on a joint multipath GLRT for cross-regional target localization; the official program verifies the paper and presentation, while no proceedings DOI was indexed at this update.",
     },
+    {
+        "title": "NLoS target localization in IRS-assisted FDA-MIMO radar: A tensor decomposition perspective",
+        "key": "yuIRSFdaMimoNLOS2025",
+        "year": 2025,
+        "authors": "Yu et al.",
+        "venue": "Digital Signal Processing 161 (2025), 105093",
+        "url": "https://doi.org/10.1016/j.dsp.2025.105093",
+        "cat": "latest modality radar rf ris irs fda-mimo tensor localization controllable-propagation",
+        "summary": "Uses an IRS to establish an NLoS path for bistatic FDA-MIMO radar, estimates target count with sequential MDL, factorizes a third-order echo tensor with PARAFAC, decouples DOD/range and estimates 2-D DOA, then geometrically localizes multiple hidden traffic targets.",
+    },
 ]
 
 
@@ -50,7 +60,7 @@ def require(text, needle, label):
         raise RuntimeError(f"Missing anchor for {label}: {needle[:160]}")
 
 
-# README: add three verified missing radar papers without duplicating existing entries.
+# README: add verified missing radar papers without duplicating existing entries.
 readme = read("README.md")
 header = "|------|-------|----------------|----------------|\n"
 require(readme, header, "README latest table")
@@ -68,6 +78,7 @@ if "Yu et al.: diffraction-signal utilization estimates building-corner" not in 
     require(readme, anchor, "README radar timeline")
     addition = (
         "   │     Yu et al.: diffraction-signal utilization estimates building-corner and hidden-target parameters, while Wei et al. correlate multipath ghosts with wall geometry for joint target/layout recovery [IEEE FUSION / EUSIPCO]\n"
+        "   │     Yu et al.: an IRS-assisted FDA-MIMO tensor model turns a controllable hidden path into multi-target range/angle localization [Digital Signal Processing]\n"
         "   │     Yu et al.: cross-regional NLOS localization moves the multipath-detection branch toward joint-GLRT inference across hidden regions [IEEE IGARSS]\n"
     )
     readme = readme.replace(anchor, anchor + addition, 1)
@@ -96,17 +107,17 @@ if objects:
         raise RuntimeError("Could not locate tracked latest entries counter")
     data = pat.sub(f'<b>{int(m.group(1)) + added}</b><span>tracked latest entries</span>', data, count=1)
 
-if "multipath ghost correlation jointly links target hypotheses" not in data:
+if "multipath ghost correlation to jointly link target hypotheses" not in data:
     pat25 = re.compile(r'(<div class="tl"><div class="year">2025</div><div class="tl-body"><strong>.*?</strong><p>)(.*?)(</p></div></div>)', re.S)
     m25 = pat25.search(data)
     if not m25:
         raise RuntimeError("Could not locate 2025 website timeline")
     sentence25 = (
-        " Yu et al. exploited diffraction signals to estimate building-corner and NLOS-target parameters, while Wei et al. used multipath ghost correlation to jointly link target hypotheses with unknown wall geometry."
+        " Yu et al. exploited diffraction signals to estimate building-corner and NLOS-target parameters, while Wei et al. used multipath ghost correlation to jointly link target hypotheses with unknown wall geometry. Yu et al. also used an IRS-assisted FDA-MIMO tensor model to create a controllable NLoS path and recover multi-target range/angle parameters for geometric localization."
     )
     data = data[:m25.start()] + m25.group(1) + m25.group(2) + sentence25 + m25.group(3) + data[m25.end():]
 
-if "joint multipath GLRT extends radar NLOS localization across regions" not in data:
+if "cross-regional NLOS target-localization method based on joint multipath GLRT" not in data:
     pat26 = re.compile(r'(<div class="tl"><div class="year">2026</div><div class="tl-body"><strong>.*?</strong><p>)(.*?)(</p></div></div>)', re.S)
     m26 = pat26.search(data)
     if not m26:
@@ -120,7 +131,8 @@ write("data/papers-source.html", data)
 
 # Radar/RF survey narrative: extend the unknown-geometry lineage with diffraction, ghost correlation and the fresh GLRT result.
 newscenes = read("article/5newscenes.tex")
-if not all(p["key"] in newscenes for p in PAPERS):
+core_keys = ["yuDiffractionCornerNLOS2025", "weiGhostCorrelationNLOS2025", "yuCrossRegionalGLRTNLOS2026"]
+if not all(k in newscenes for k in core_keys):
     anchor = "Together, these works shift RF NLOS from reconstruction under a calibrated relay map toward joint estimation of the environment, propagation paths, hidden-target state, and motion.\n"
     require(newscenes, anchor, "radar unknown-geometry paragraph")
     para = r"""
@@ -130,12 +142,21 @@ if not all(p["key"] in newscenes for p in PAPERS):
 The same unknown-environment trajectory is also visible in recent conference work that makes more explicit use of diffraction and multipath hypotheses. Yu~\etal~use diffraction-signal information to estimate building-corner and NLOS-target parameters rather than treating the corner geometry only as fixed prior knowledge~\cite{yuDiffractionCornerNLOS2025}, extending the earlier diffraction-based around-corner localization lineage. Wei~\etal~jointly estimate hidden-target locations and building layouts by extracting multipath Range--Doppler features, estimating directions and ghost positions with the iterative adaptive approach, and spatially matching the resulting ghosts to candidate targets and walls~\cite{weiGhostCorrelationNLOS2025}. This turns multipath ghosts from nuisance artifacts into geometric constraints that couple target localization and environment reconstruction. At IGARSS 2026, Yu~\etal~further reported a cross-regional NLOS target-localization method based on a joint multipath generalized likelihood ratio test (GLRT)~\cite{yuCrossRegionalGLRTNLOS2026}. The official conference program verifies the paper and its 11 August 2026 presentation; because a proceedings DOI was not yet indexed at the time of this update, we retain the final conference designation without inventing publication metadata. Together, these works sharpen the progression from known-corner diffraction models to joint target--layout inference and then to detection/localization rules designed to combine multipath evidence across hidden regions.
 """
     newscenes = newscenes.replace(anchor, anchor + para, 1)
+
+# Put the IRS-assisted FDA-MIMO work in the controllable-propagation lineage rather than the passive multipath paragraph.
+if "yuIRSFdaMimoNLOS2025" not in newscenes:
+    anchor = "Tripathy~\\etal~integrate a liquid-crystal RIS with a self-injection-locked radar and experimentally demonstrate contactless vital-sign monitoring after electronically steering the sensing path into an NLOS region~\\cite{tripathyLCRISVitalSign2025}."
+    require(newscenes, anchor, "RIS controllable-propagation paragraph")
+    sentence = (
+        " Yu~\\etal~use an IRS to establish a controllable NLoS path for bistatic FDA--MIMO radar, construct the received echoes as a third-order tensor, estimate target number by sequential MDL, and apply PARAFAC factorization to decouple DOD/range and recover 2-D DOA before geometric multi-target localization~\\cite{yuIRSFdaMimoNLOS2025}. This extends reconfigurable propagation from beam redirection and physiological sensing toward explicit hidden-target localization with multidimensional radar parameter estimation."
+    )
+    newscenes = newscenes.replace(anchor, anchor + sentence, 1)
 write("article/5newscenes.tex", newscenes)
 
 
 # Top-level survey synchronization marker.
 tex = read("bare_jrnl.tex")
-marker = "% 16 August 2026 citation trace: diffraction, multipath-ghost, and cross-regional radar NLOS localization synchronized.\n"
+marker = "% 16 August 2026 citation trace: diffraction, multipath-ghost, IRS-assisted tensor localization, and cross-regional radar NLOS synchronized.\n"
 if marker not in tex:
     tex = marker + tex
 write("bare_jrnl.tex", tex)
@@ -150,11 +171,12 @@ note.write_text(
 
 1. Yupeng Yu et al., **Building Corner and NLOS Target Parameter Estimation Based on Diffraction Signal Utilization**, IEEE FUSION 2025, pp. 1--6, DOI 10.23919/FUSION65864.2025.11124177. The paper continues the electromagnetic-diffraction around-corner lineage by estimating corner/target parameters from diffraction evidence instead of requiring all geometry as prior input.
 2. Yufei Wei et al., **Multipath Ghost Correlation-Based NLOS Target Localization and Building Layuot Estimation**, IEEE EUSIPCO 2025, pp. 2247--2251, DOI 10.23919/EUSIPCO63237.2025.11226331. The published paper uses Range--Doppler multipath separation, IAA direction/ghost estimation, and spatial matching to jointly infer hidden targets and building layout.
-3. Yupeng Yu et al., **A Cross-Regional NLOS Target Localization Method Based on Joint Multipath GLRT**, IEEE IGARSS 2026, Paper 2579 / TUP1.PC.9, presented 11 August 2026. The official IGARSS program verifies the title, authors, paper number, session, and presentation time. No proceedings DOI was available in the official program when this update was prepared, so the bibliography intentionally uses the official conference page rather than guessing a DOI.
+3. Weijia Yu et al., **NLoS target localization in IRS-assisted FDA-MIMO radar: A tensor decomposition perspective**, Digital Signal Processing 161 (2025), 105093, DOI 10.1016/j.dsp.2025.105093. The paper uses an IRS to establish the hidden path, estimates target count with sequential MDL, factorizes a third-order FDA-MIMO echo tensor with PARAFAC, and combines DOD/range plus 2-D DOA estimates for multi-target localization.
+4. Yupeng Yu et al., **A Cross-Regional NLOS Target Localization Method Based on Joint Multipath GLRT**, IEEE IGARSS 2026, Paper 2579 / TUP1.PC.9, presented 11 August 2026. The official IGARSS program verifies the title, authors, paper number, session, and presentation time. No proceedings DOI was available in the official program when this update was prepared, so the bibliography intentionally uses the official conference page rather than guessing a DOI.
 
 ## Citation-trace context
 
-A fresh forward-citation and recent-publication pass from the canonical optical/transient core papers (Velten 2012, LCT, f-k migration, phasor-field, computational periscopy and major learned/transient successors) did not reveal another high-confidence optical gap not already represented in the repository. The three additions above instead close a radar/RF lineage gap adjacent to the already integrated unknown-relay-geometry papers: known diffraction geometry -> diffraction-aided corner/target parameter estimation -> multipath-ghost target/layout matching -> cross-regional joint-GLRT localization.
+A fresh forward-citation and recent-publication pass from the canonical optical/transient core papers (Velten 2012, LCT, f-k migration, phasor-field, computational periscopy and major learned/transient successors) did not reveal another high-confidence optical gap not already represented in the repository. The additions above instead close two coupled radar/RF lineage gaps: known diffraction geometry -> diffraction-aided corner/target parameter estimation -> multipath-ghost target/layout matching -> cross-regional joint-GLRT localization; and fixed environmental relays -> IRS-created NLoS paths -> tensor-based multi-target localization.
 
 ## Synchronization
 
