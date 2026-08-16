@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2021 | [Non-line-of-sight imaging under white-light illumination: a two-step deep learning approach](https://doi.org/10.1364/OE.443127) — Zheng et al. | Optics Express 29(24), 40091–40105 (2021) | Introduces an ordinary-camera white-light NLOS system that embeds a speckle-correlation model in a two-stage DNN: the first network regularizes scattered-pattern autocorrelation and the second reconstructs the hidden image, providing the direct precursor to later physics-enhanced white-light NLOS learning. |
 | 2026 | [Covariance Tensor Decomposition for NLOS Direction Finding in RIS-Aided Bistatic MIMO Radar](https://doi.org/10.1109/LSP.2026.3652124) — Xie et al. | IEEE Signal Processing Letters 33 (2026), 574–578 | Builds a fourth-order covariance tensor for RIS-aided bistatic MIMO radar, extracts the signal subspace with HOSVD, reconstructs steering structure through the Khatri–Rao product, and estimates paired NLOS DOD/DOA efficiently. |
 | 2026 | [Fast Angle Estimation of NLoS Coherent and Noncoherent Targets via Tensor Decomposition in RIS-Assisted Bistatic MIMO Radar](https://doi.org/10.1109/TAES.2026.3651424) — Yu et al. | IEEE TAES 62 (2026), 8574–8584 | Extends tensor-based RIS-assisted bistatic MIMO radar processing to fast angle estimation for both coherent and noncoherent hidden targets, strengthening the reconfigurable-propagation direction-finding branch. |
 | 2025 | [Building Corner and NLOS Target Parameter Estimation Based on Diffraction Signal Utilization](https://doi.org/10.23919/FUSION65864.2025.11124177) — Yu et al. | IEEE FUSION 2025, 1–6 | Uses electromagnetic corner-diffraction returns to estimate building-corner and hidden-target parameters, extending diffraction-based UWB NLOS localization beyond the earlier assumption that corner geometry is already known. |
@@ -403,6 +404,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
    │
 2021 ── Nam et al.: real-time diffuse-object NLOS video at 5 fps [Nature Comm.]
+   │     Zheng et al.: ordinary-camera white-light speckle correlation plus a two-step DNN establishes a broadband learned NLOS branch without coherent illumination [Optics Express]
    │     Peng et al.: NLOS photography — direct high-resolution hidden-view image synthesis from transients [arXiv]
    │
     2022 ── CornerRadar: learned RF hint maps enable robust indoor around-corner localization across diverse layouts [PACM IMWUT]
