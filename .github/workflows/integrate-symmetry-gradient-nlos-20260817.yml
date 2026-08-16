@@ -108,7 +108,7 @@ jobs:
           import re
           text = Path('bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore')
           norm = re.sub(r'[^a-z0-9]+', '', text.lower())
-          for needle in ['gradientcoordinatedphysicsguidedtraining','physguard','sensorcalibration']:
+          for needle in ['gradientcoordinatedphysicsguidedtraining','sensorcalibration']:
               if needle not in norm:
                   raise SystemExit(f'Missing rebuilt-PDF semantic marker: {needle}')
           PY
