@@ -62,6 +62,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
+          import bibtexparser
 
           title = 'Non-line-of-sight imaging under white-light illumination: a two-step deep learning approach'
           key = 'zhengWhiteLightTwoStepNLOS2021'
@@ -82,12 +83,18 @@ jobs:
                   raise SystemExit(f'FAILED {label}: {needle!r} not found in {path}')
               print('ok:', label)
 
-          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8', errors='ignore')
-          key_entries = re.findall(r'@[A-Za-z]+\{\s*' + re.escape(key) + r'\s*,', bib, flags=re.I)
+          bib_path = Path('egbib_merged_20260711.bib')
+          bib_text = bib_path.read_text(encoding='utf-8', errors='ignore')
+          key_entries = re.findall(r'@[A-Za-z]+\{\s*' + re.escape(key) + r'\s*,', bib_text, flags=re.I)
           if len(key_entries) != 1:
               raise SystemExit(f'FAILED bibliography uniqueness: {len(key_entries)} entries for {key}')
-          if bib.lower().count(doi.lower()) != 1:
-              raise SystemExit(f'FAILED DOI uniqueness: {bib.lower().count(doi.lower())} occurrences of {doi}')
+
+          with bib_path.open(encoding='utf-8') as fh:
+              db = bibtexparser.load(fh)
+          doi_entries = [e.get('ID') for e in db.entries if e.get('doi', '').strip().lower() == doi.lower()]
+          if doi_entries != [key]:
+              raise SystemExit(f'FAILED DOI-entry uniqueness: {doi_entries} for {doi}')
+          print('ok: one BibTeX record owns the DOI; DOI may also appear once in its URL field')
 
           log = Path('bare_jrnl.log').read_text(encoding='utf-8', errors='ignore')
           bad = ['There were undefined citations', 'Repeated entry']
@@ -101,7 +108,6 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
-          # Check robust semantic fragments that are present in survey prose, independent of line wrapping.
           needles = ['whitelight', 'specklecorrelation', 'zheng']
           missing = [n for n in needles if n not in text]
           print('PDF semantic checks:', 'ok' if not missing else f'missing {missing}')
