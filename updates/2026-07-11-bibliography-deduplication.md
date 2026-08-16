@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 94 source files and keeps one highest-priority record for each of 536 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 95 source files and keeps one highest-priority record for each of 561 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 1062
-- Case-insensitive duplicate replacements: 526
+- Parsed source records: 1096
+- Case-insensitive duplicate replacements: 535
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -532,8 +532,17 @@ This update generates `egbib_merged_20260711.bib` from 94 source files and keeps
 - `tianVirtualRMAHistograms2025` / `tianVirtualRMAHistograms2025`: `egbib_merged_20260711.bib` → `egbib_20260801_frequency_domain.bib`
 - `alakusAcousticMaterialNLOS2026` / `alakusAcousticMaterialNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260803_acoustic_material.bib`
 - `tosiFeasibilityISACNLOS2024` / `tosiFeasibilityISACNLOS2024`: `egbib_merged_20260711.bib` → `egbib_20260808_isac_updates.bib`
+- `zhangFMoENLOS2026` / `zhangFMoENLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260811_learning_sampling_updates.bib`
+- `zhangAdaptiveMixtureAttentionNLOS2025` / `zhangAdaptiveMixtureAttentionNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260811_learning_sampling_updates.bib`
 - `zhangCMFormerNLOS2025` / `zhangCMFormerNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260811_learning_sampling_updates.bib`
+- `zhangSGATVPassiveNLOS2026` / `zhangSGATVPassiveNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260811_learning_sampling_updates.bib`
+- `zhouAdaptiveArtifactCancellationNLOS2025` / `zhouAdaptiveArtifactCancellationNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260811_learning_sampling_updates.bib`
+- `cuiTransDiffNLOS2025` / `cuiTransDiffNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260811_learning_sampling_updates.bib`
+- `dingCurvatureRegularizationNLOS2024` / `dingCurvatureRegularizationNLOS2024`: `egbib_merged_20260711.bib` → `egbib_20260811_learning_sampling_updates.bib`
 - `oyamaAdaptiveSpiralNLOS2026` / `oyamaAdaptiveSpiralNLOS2026`: `egbib_20260718_core_citation_updates.bib` → `egbib_20260811_learning_sampling_updates.bib`
+- `wenSparseApertureISARNLOS2024` / `wenSparseApertureISARNLOS2024`: `egbib_merged_20260711.bib` → `egbib_20260811_learning_sampling_updates.bib`
+- `liRISVitalSignNLOS2025` / `liRISVitalSignNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260811_ris_vitalsign_updates.bib`
+- `tripathyLCRISVitalSign2025` / `tripathyLCRISVitalSign2025`: `egbib_merged_20260711.bib` → `egbib_20260811_ris_vitalsign_updates.bib`
 - `yasmeenDualBeamRIS2026` / `yasmeenDualBeamRIS2026`: `egbib_20260702_updates.bib` → `egbib_20260811_ris_vitalsign_updates.bib`
 - `parkTjunctionPedestrian2025` / `parkTjunctionPedestrian2025`: `egbib_2026_updates.bib` → `egbib_20260811_ris_vitalsign_updates.bib`
 - `jeonSoundVehicleNLOS2025` / `jeonSoundVehicleNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
