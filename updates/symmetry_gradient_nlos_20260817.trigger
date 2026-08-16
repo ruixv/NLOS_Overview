@@ -1,1 +1,1 @@
-Trigger validated integration for the verified Symmetry 2026 physics-guided NLOS reconstruction citation gap.
+Trigger validated integration for the verified Symmetry 2026 physics-guided NLOS reconstruction citation gap. Validation revision 2.
