@@ -2,9 +2,9 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 95 source files and keeps one highest-priority record for each of 561 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 95 source files and keeps one highest-priority record for each of 562 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 1096
+- Parsed source records: 1097
 - Case-insensitive duplicate replacements: 535
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0

@@ -167,6 +167,10 @@ Extending the neural transient field (NeTF)~\cite{shenNonlineofsightImagingNeura
 Sun~\etal~introduced a framework with learnable physical priors~\cite{sunGeneralizable2025}, replacing manually designed fixed priors (such as single fixed path compensation) with adaptive priors learned from data. This enables significantly better generalization to diverse scene conditions and varying SNR levels, addressing the limited generalization capability that has been a persistent challenge for physics-based deep NLOS methods.
 
 \vspace{0.8mm}
+\noindent \textbf{Gradient-coordinated physics-guided training.}
+Ling~\etal~identify a complementary failure mode of physics-guided learning: heterogeneous reconstruction, measurement-consistency, and sensor-calibration objectives can produce conflicting gradients even when every loss term is physically meaningful~\cite{lingSymmetryGradientNLOS2026}. Rather than tuning another scalar loss weighting, their framework coordinates the gradient families explicitly through soft conflict projection, protected physical routing, learnable instrument calibration, and staged unfreezing. Evaluated with NLOST-style transient reconstruction under multiple low-SNR conditions, the study shifts physics--data fusion from adding priors to the objective toward governing how competing physical constraints are allowed to update shared parameters; the coordination is used during training and does not require a heavier inference-time reconstruction architecture.
+
+\vspace{0.8mm}
 \noindent \textbf{Diffusion model priors.}
 Su~\etal~proposed a model-guided iterative diffusion sampling approach for NLOS reconstruction~\cite{suModelGuidedDiffusion2024}, where the physical forward model of NLOS imaging guides the diffusion sampling process to generate reconstructions that satisfy measurement constraints while leveraging the strong generative prior of a pre-trained diffusion model. This approach achieves state-of-the-art NLOS reconstruction quality, demonstrating that diffusion models are a powerful new tool for solving the NLOS inverse problem.
 
