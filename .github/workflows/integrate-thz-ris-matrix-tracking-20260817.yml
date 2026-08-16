@@ -1,0 +1,167 @@
+name: Integrate THz and RIS NLOS citation gaps
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'updates/thz_ris_matrix_tracking_20260817.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Python dependency
+        run: python -m pip install --upgrade bibtexparser
+
+      - name: Validate and apply source integration
+        run: |
+          python -m py_compile scripts/integrate_thz_ris_matrix_tracking_gaps_20260817.py
+          python scripts/integrate_thz_ris_matrix_tracking_gaps_20260817.py
+          python scripts/merge_nlos_bibliography.py
+          rm -f egbib_20260817_thz_ris_matrix_tracking_gap.bib
+
+      - name: Install LaTeX and PDF utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-bibtex-extra texlive-font-utils poppler-utils
+
+      - name: Rebuild survey PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          old_hash="$(sha256sum bare_jrnl.pdf | awk '{print $1}')"
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          new_hash="$(sha256sum bare_jrnl.pdf | awk '{print $1}')"
+          test "$new_hash" != "$old_hash"
+
+      - name: Validate public-artifact consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          readme = Path('README.md').read_text(encoding='utf-8')
+          data = Path('data/papers-source.html').read_text(encoding='utf-8')
+          survey = Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex = Path('bare_jrnl.tex').read_text(encoding='utf-8')
+
+          titles = [
+              'Seeing Around Obstacles Using Active Terahertz Imaging',
+              'Around-the-Corner Radar Sensing Using Reconfigurable Intelligent Surface',
+              'Radar Sensing Using Dual-Beam Reconfigurable Intelligent Surface',
+              '“Around-the-Corner” Radar: Particle Filters for Non-Line-of-Sight Target Tracking in the Presence of Ambiguities',
+              'Single-Antenna Non-Line-of-Sight Matrix Imaging via Reconfigurable Intelligent Surfaces',
+              'Improving SNR for NLoS Target Detection Using Multi-RIS-Assisted Monostatic Radar',
+          ]
+          for title in titles:
+              if title not in readme:
+                  raise SystemExit(f'Missing README title: {title}')
+              if title not in data:
+                  raise SystemExit(f'Missing V2 title: {title}')
+
+          keys = [
+              'cuiActiveTHzNLOS2024',
+              'yasmeenAroundCornerRIS2024',
+              'yasmeenDualBeamRIS2026',
+              'phamParticleFilterAroundCorner2025',
+              'goicoecheaSingleAntennaRISNLOS2025',
+              'liaquatMultiRISNLOS2025',
+          ]
+          for key in keys:
+              if key not in survey:
+                  raise SystemExit(f'Missing survey citation: {key}')
+              if re.search(r'@[A-Za-z]+\s*\{\s*' + re.escape(key) + r'\s*,', bib, flags=re.I) is None:
+                  raise SystemExit(f'Missing merged BibTeX key: {key}')
+
+          identifiers = [
+              '10.1109/TTHZ.2024.3401041',
+              '10.1109/MAPCON61407.2024.10923061',
+              '10.1109/RadarConf2559087.2025.11205052',
+              '10.1109/TAES.2024.3503560',
+              '2512.12359',
+              '10.1109/OJVT.2025.3547163',
+          ]
+          for ident in identifiers:
+              if ident not in bib:
+                  raise SystemExit(f'Missing bibliography identifier: {ident}')
+
+          for key in ['cuiActiveTHzNLOS2024','phamParticleFilterAroundCorner2025','goicoecheaSingleAntennaRISNLOS2025','liaquatMultiRISNLOS2025']:
+              count = len(re.findall(r'@[A-Za-z]+\s*\{\s*' + re.escape(key) + r'\s*,', bib, flags=re.I))
+              if count != 1:
+                  raise SystemExit(f'Expected one merged BibTeX record for {key}, found {count}')
+
+          if 'Update run: 17 August 2026' not in readme:
+              raise SystemExit('README date was not synchronized to 17 August 2026')
+          if 'Updated 17 August 2026' not in data:
+              raise SystemExit('V2 header date was not synchronized to 17 August 2026')
+          if 'through 17 August 2026' not in tex:
+              raise SystemExit('Survey title-note date was not synchronized to 17 August 2026')
+          if '% 17 August 2026 citation trace:' not in tex:
+              raise SystemExit('Survey provenance marker missing')
+          PY
+
+          for key in cuiActiveTHzNLOS2024 yasmeenAroundCornerRIS2024 yasmeenDualBeamRIS2026 phamParticleFilterAroundCorner2025 goicoecheaSingleAntennaRISNLOS2025 liaquatMultiRISNLOS2025; do
+            grep -q "citation{$key}" bare_jrnl.aux || { echo "Missing AUX citation $key"; exit 1; }
+            grep -qi "$key" bare_jrnl.bbl || { echo "Missing BBL entry $key"; exit 1; }
+          done
+
+          if grep -Eq 'Warning--I didn.t find a database entry|multiply defined|repeated entry|There were undefined references' bare_jrnl.blg bare_jrnl.log; then
+            echo 'LaTeX/BibTeX consistency warning detected'
+            grep -En 'Warning--I didn.t find a database entry|multiply defined|repeated entry|There were undefined references' bare_jrnl.blg bare_jrnl.log || true
+            exit 1
+          fi
+
+      - name: Validate PDF semantics and rendering
+        shell: bash
+        run: |
+          set -euo pipefail
+          pdfinfo bare_jrnl.pdf > pdfinfo.txt
+          pdftotext bare_jrnl.pdf bare_jrnl.txt
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text = Path('bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore')
+          norm = re.sub(r'[^a-z0-9]+', '', text.lower())
+          for needle in ['terahertz','particlefilter','reflectionmatrix','multiris']:
+              if needle not in norm:
+                  raise SystemExit(f'Missing rebuilt-PDF semantic marker: {needle}')
+          PY
+          pages="$(awk '/^Pages:/ {print $2}' pdfinfo.txt)"
+          test -n "$pages"
+          test "$pages" -ge 1
+          mkdir -p render_check
+          pdftoppm -f 1 -singlefile -png -r 90 bare_jrnl.pdf render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 90 bare_jrnl.pdf render_check/last >/dev/null 2>&1
+          test -s render_check/first.png
+          test -s render_check/last.png
+
+      - name: Commit synchronized public artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md data/papers-source.html article/5newscenes.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-08-17-thz-ris-matrix-tracking-citation-trace.md updates/2026-07-11-bibliography-deduplication.md
+          git add -u egbib_20260817_thz_ris_matrix_tracking_gap.bib
+          if git diff --cached --quiet; then
+            echo 'No public-artifact changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Integrate THz and RIS NLOS citation gaps'
+          git push origin HEAD:master
