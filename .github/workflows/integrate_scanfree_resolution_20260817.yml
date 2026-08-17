@@ -41,7 +41,7 @@ jobs:
           done
           for key in \
             zhangRealTimeScanFreeNLOS2024 \
-            zhangSubpixelResolvingNLOS2025 \
+            zhangSubpixelModulation2025 \
             zhangSpatialCorrelationNLOS2025; do
             grep -Fq "$key" article/2active.tex
             test "$(grep -Fic "{$key," egbib_merged_20260711.bib)" -eq 1
@@ -79,7 +79,7 @@ jobs:
           set -euo pipefail
           for key in \
             zhangRealTimeScanFreeNLOS2024 \
-            zhangSubpixelResolvingNLOS2025 \
+            zhangSubpixelModulation2025 \
             zhangSpatialCorrelationNLOS2025; do
             grep -Fq "$key" bare_jrnl.aux
           done
