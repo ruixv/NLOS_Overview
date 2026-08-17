@@ -47,8 +47,8 @@ timeline_sentence = (
 )
 if "Wang et al.: SPIR-Net jointly reconstructs hidden appearance" not in readme:
     anchor = (
-        "   │     Boger-Lombard, Slobodkin, and Katz established passive acoustic daylight localization "
-        "from uncontrolled-noise cross-correlations.\n"
+        "   │     Boger-Lombard et al.: acoustic daylight interferometry retrieves Green functions from uncontrolled noise "
+        "for passive around-corner localization [Scientific Reports]\n"
     )
     require(readme, anchor, "README 2023 trajectory")
     readme = readme.replace(anchor, anchor + timeline_sentence, 1)
@@ -114,21 +114,6 @@ if PAPER["key"] not in survey:
         "semantic sensing by explicitly coupling image recovery with spatial localization.\n"
     )
     survey = survey.replace(anchor, anchor + paragraph, 1)
-
-# Add the work to the passive deep-learning comparison table if the table anchor is present.
-if "SPIR-Net" not in survey.split("\\begin{table}", 1)[-1]:
-    row_anchor = "\\cite{zhouNonlineofsightImagingPhong2020}"
-    idx = survey.find(row_anchor)
-    if idx != -1:
-        line_end = survey.find("\n", idx)
-        if line_end == -1:
-            raise RuntimeError("Malformed passive deep-learning table row")
-        row = (
-            "\\cite{wangPassiveImagingLocalization2023} & SPIR-Net (modified LeNet + U-Net + cGAN) "
-            "& Single-shot speckle image & Hidden image + spatial location & Passive steady-state speckle / CCD "
-            "& Experimental data\\\\\n"
-        )
-        survey = survey[:line_end+1] + row + survey[line_end+1:]
 write("article/3passive.tex", survey)
 
 # Provenance marker; public snapshot date is already 17 August 2026.
