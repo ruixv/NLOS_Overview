@@ -1,0 +1,138 @@
+name: Integrate passive speckle NLOS localization gap
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'updates/passive_speckle_localization_20260817.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Python dependency
+        run: python -m pip install --upgrade bibtexparser
+
+      - name: Validate and apply source integration
+        run: |
+          python -m py_compile scripts/integrate_passive_speckle_localization_20260817.py
+          python scripts/integrate_passive_speckle_localization_20260817.py
+          python scripts/merge_nlos_bibliography.py
+          rm -f egbib_20260817_passive_speckle_localization_gap.bib
+
+      - name: Install LaTeX and PDF utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science texlive-bibtex-extra texlive-font-utils texlive-publishers poppler-utils
+
+      - name: Rebuild survey PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          old_hash="$(sha256sum bare_jrnl.pdf | awk '{print $1}')"
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.pdf
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          new_hash="$(sha256sum bare_jrnl.pdf | awk '{print $1}')"
+          test "$new_hash" != "$old_hash"
+
+      - name: Validate public-artifact consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          title = 'Non-line-of-sight imaging and location determination using deep learning'
+          key = 'wangPassiveImagingLocalization2023'
+          doi = '10.1016/j.optlaseng.2023.107701'
+
+          readme = Path('README.md').read_text(encoding='utf-8')
+          data = Path('data/papers-source.html').read_text(encoding='utf-8')
+          survey = Path('article/3passive.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex = Path('bare_jrnl.tex').read_text(encoding='utf-8')
+
+          if title not in readme:
+              raise SystemExit('Missing README title')
+          if title not in data:
+              raise SystemExit('Missing V2 title')
+          if key not in survey:
+              raise SystemExit('Missing survey citation')
+          if re.search(r'@[A-Za-z]+\s*\{\s*' + re.escape(key) + r'\s*,', bib, flags=re.I) is None:
+              raise SystemExit('Missing merged BibTeX key')
+          if doi not in bib:
+              raise SystemExit('Missing verified DOI in merged bibliography')
+          count = len(re.findall(r'@[A-Za-z]+\s*\{\s*' + re.escape(key) + r'\s*,', bib, flags=re.I))
+          if count != 1:
+              raise SystemExit(f'Expected one merged BibTeX record, found {count}')
+          if 'Update run: 17 August 2026' not in readme:
+              raise SystemExit('README snapshot date changed unexpectedly')
+          if 'Updated 17 August 2026' not in data:
+              raise SystemExit('V2 snapshot date changed unexpectedly')
+          if 'through 17 August 2026' not in tex:
+              raise SystemExit('Survey snapshot date changed unexpectedly')
+          marker = '% 17 August 2026 citation/keyword trace: passive speckle joint imaging-and-localization precursor synchronized.'
+          if marker not in tex:
+              raise SystemExit('Survey provenance marker missing')
+          PY
+
+          grep -q 'citation{wangPassiveImagingLocalization2023}' bare_jrnl.aux || { echo 'Missing AUX citation'; exit 1; }
+          grep -qi 'wangPassiveImagingLocalization2023' bare_jrnl.bbl || { echo 'Missing BBL entry'; exit 1; }
+
+          if grep -Eq 'Warning--I didn.t find a database entry|multiply defined|repeated entry|There were undefined references' bare_jrnl.blg bare_jrnl.log; then
+            echo 'LaTeX/BibTeX consistency warning detected'
+            grep -En 'Warning--I didn.t find a database entry|multiply defined|repeated entry|There were undefined references' bare_jrnl.blg bare_jrnl.log || true
+            exit 1
+          fi
+
+      - name: Validate PDF semantics and rendering
+        shell: bash
+        run: |
+          set -euo pipefail
+          pdfinfo bare_jrnl.pdf > pdfinfo.txt
+          pdftotext bare_jrnl.pdf bare_jrnl.txt
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text = Path('bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore')
+          norm = re.sub(r'[^a-z0-9]+', '', text.lower())
+          for needle in ['jointpassiveimagingandlocalizationfromspeckle','spirnet','107701']:
+              if needle not in norm:
+                  raise SystemExit(f'Missing rebuilt-PDF semantic marker: {needle}')
+          PY
+          pages="$(awk '/^Pages:/ {print $2}' pdfinfo.txt)"
+          test -n "$pages"
+          test "$pages" -ge 1
+          mkdir -p render_check
+          pdftoppm -f 1 -singlefile -png -r 90 bare_jrnl.pdf render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 90 bare_jrnl.pdf render_check/last >/dev/null 2>&1
+          test -s render_check/first.png
+          test -s render_check/last.png
+
+      - name: Commit synchronized public artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md data/papers-source.html article/3passive.tex bare_jrnl.tex egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-08-17-passive-speckle-localization-gap.md updates/2026-07-11-bibliography-deduplication.md
+          git add -u egbib_20260817_passive_speckle_localization_gap.bib
+          if git diff --cached --quiet; then
+            echo 'No public-artifact changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Integrate passive speckle NLOS imaging and localization precursor'
+          git push origin HEAD:master
