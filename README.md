@@ -487,6 +487,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Garcia-Pueyo and Muñoz: inverse phasor fields — diffraction-operator conditioning and a rank-based recoverability metric [Optics Express]
    │     Luesia-Lahoz et al.: zero-phase phasor fields — phase zero crossings provide precise and noise-robust hidden depth [ICCP]
    │     Czajkowski and Murray-Bruce: visible occluders as opportunistic apertures — passive wide-FoV 3D recovery for extended-depth scenes [EUSIPCO]
+   │     Zhang et al.: sub-pixel resolving modulation — DMD pixel shifting densifies scan-free relay samples and recovers about 1-cm lateral detail while retaining LCT/virtual-wave/boundary-migration compatibility [Optics Express]
    │     Zhang et al.: spatial-correlation scan-free NLOS — a 3D blur-kernel model and correlation resampling recover 2-cm detail at 5 fps from a 16×16 detector [Optics and Lasers in Engineering]
    │     Liu et al.: polarization differential correlography — single-shot polarized speckle encoding removes mechanical scanning and achieves millimeter-scale steady-state NLOS reconstruction [Chinese Optics Letters]
    │     Liang et al.: HP-CDT — LOS latent representations guide a lightweight hybrid CNN--Transformer for active steady-state hidden-image reconstruction [Signal Processing]

@@ -1,6 +1,6 @@
 # 17 August 2026 — Scan-free SPAD-array resolution citation/consistency trace
 
-Status: pending guarded integration/build.
+Status: integrated by the guarded workflow; public-source changes are committed only after the LaTeX/PDF and cross-artifact checks pass.
 
 ## What this run found
 
@@ -26,7 +26,7 @@ The integration script is designed to:
 - restore all three records to the canonical V2 corpus in `data/papers-source.html`, which feeds the 3D graph and Paper Explorer;
 - synchronize the visible living-survey date in `index.html`;
 - replace the existing two-paper scan-free paragraph in `article/2active.tex` with a three-stage literature-review paragraph and add the new citation to the SPAD-array method table;
-- restore the two lost BibTeX records and add the new Optics Express BibTeX record in `egbib_merged_20260711.bib`;
+- verify the three existing canonical BibTeX records in `egbib_merged_20260711.bib` and reuse `zhangSubpixelModulation2025` for the Optics Express paper, avoiding a duplicate alias;
 - add a provenance marker to `bare_jrnl.tex`;
 - rebuild `bare_jrnl.pdf` and require citation, public-artifact, PDF-text, and PDF-render checks before the generated sources/PDF are committed.
 
