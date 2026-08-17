@@ -25,7 +25,7 @@ jobs:
           python-version: '3.11'
 
       - name: Integrate citation-traced scan-free lineage
-        run: python scripts/integrate_scanfree_resolution_20260817.py
+        run: python -u scripts/run_scanfree_resolution_20260817.py
 
       - name: Validate synchronized source artifacts
         shell: bash
