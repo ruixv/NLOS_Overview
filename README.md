@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2023 | [Non-line-of-sight imaging and location determination using deep learning](https://doi.org/10.1016/j.optlaseng.2023.107701) — Wang et al. | Optics and Lasers in Engineering 169, 107701 (2023) | Uses a single-shot wall-mediated speckle pattern with SPIR-Net to jointly reconstruct hidden-object appearance and estimate object location, adding spatial localization to passive steady-state NLOS without pulsed ToF or time-gated hardware. |
 | 2026 | [Symmetry-Aware Gradient Coordination for Physics-Guided Non-Line-of-Sight Imaging](https://doi.org/10.3390/sym18050711) — Ling et al. | Symmetry 18(5), 711 (2026) | Treats physics-guided NLOS training as a multi-objective gradient-coordination problem rather than a single weighted scalar loss, combining soft conflict projection, hard physical routing, learnable sensor calibration, and staged optimization for improved low-SNR reconstruction robustness. |
 | 2024 | [Seeing Around Obstacles Using Active Terahertz Imaging](https://doi.org/10.1109/TTHZ.2024.3401041) — Cui and Trichopoulos | IEEE Transactions on Terahertz Science and Technology 14(4), 433–445 (2024) | Uses 270–300 GHz active THz imaging and a mirror-folding reconstruction that treats ordinary building surfaces as lossy mirrors, recovering hidden-object geometry and pose with centimeter-scale resolution without prior scene geometry or material properties. |
 | 2024 | [Around-the-Corner Radar Sensing Using Reconfigurable Intelligent Surface](https://doi.org/10.1109/MAPCON61407.2024.10923061) — Yasmeen et al. | IEEE MAPCON 2024 | Demonstrates a custom 1-bit RIS with a 5.5 GHz monostatic radar in a real corridor, electronically redirecting illumination around a corner and recovering hidden-human walking micro-Doppler signatures; the final MAPCON venue supersedes the later arXiv upload. |
@@ -426,6 +427,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Wei et al.: measured 77 GHz mmWave NLOS 3D imaging establishes mirror-symmetry backprojection and relay-phase compensation [IEEE TGRS]
 2023 ── Wang et al.: Signal Superresolution Network — plug-and-play 16× sparse-scan acceleration [CVPR]
    │     Boger-Lombard et al.: acoustic daylight interferometry retrieves Green functions from uncontrolled noise for passive around-corner localization [Scientific Reports]
+   │     Wang et al.: SPIR-Net jointly reconstructs hidden appearance and estimates object position from a single-shot passive speckle pattern, adding learned spatial localization without transient timing [Optics and Lasers in Engineering]
    │     Zhu et al.: simulation-trained compressive learning reconstructs 32×32 hidden images from 8×8 transient scans [Physical Review Applied]
    │     Li et al.: patterned active single-pixel correlation plus inverse diffraction improves hidden-image recovery [Journal of Optics]
    │     Liu et al.: SSCR — mixed-dimensional regularization from 5×5 confocal measurements [CVPR]
