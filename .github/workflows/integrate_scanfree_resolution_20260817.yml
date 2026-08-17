@@ -1,0 +1,120 @@
+name: Integrate scan-free SPAD resolution lineage
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/integrate_scanfree_resolution_20260817.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out current master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Integrate citation-traced scan-free lineage
+        run: python scripts/integrate_scanfree_resolution_20260817.py
+
+      - name: Validate synchronized source artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          for doi in \
+            '10.1063/5.0235687' \
+            '10.1364/OE.569102' \
+            '10.1016/j.optlaseng.2025.109100'; do
+            grep -Fiq "$doi" README.md
+            grep -Fiq "$doi" data/papers-source.html
+            grep -Fiq "$doi" egbib_merged_20260711.bib
+          done
+          for key in \
+            zhangRealTimeScanFreeNLOS2024 \
+            zhangSubpixelResolvingNLOS2025 \
+            zhangSpatialCorrelationNLOS2025; do
+            grep -Fq "$key" article/2active.tex
+            test "$(grep -Fic "{$key," egbib_merged_20260711.bib)" -eq 1
+          done
+          grep -Fq 'Sub-pixel resolving modulation for non-line-of-sight imaging' README.md
+          grep -Fq 'Sub-pixel resolving modulation for non-line-of-sight imaging' data/papers-source.html
+          grep -Fq 'Updated 17 Aug 2026' index.html
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            texlive-latex-base texlive-latex-extra texlive-fonts-recommended \
+            texlive-publishers texlive-science poppler-utils
+
+      - name: Clean-build survey PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          if grep -Eiq 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log; then
+            echo 'LaTeX consistency check failed.' >&2
+            grep -Ein 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log >&2 || true
+            exit 1
+          fi
+
+      - name: Validate citations and PDF semantics
+        shell: bash
+        run: |
+          set -euo pipefail
+          for key in \
+            zhangRealTimeScanFreeNLOS2024 \
+            zhangSubpixelResolvingNLOS2025 \
+            zhangSpatialCorrelationNLOS2025; do
+            grep -Fq "$key" bare_jrnl.aux
+          done
+          grep -Fq 'Sub-pixel resolving modulation' bare_jrnl.bbl
+          pdftotext bare_jrnl.pdf /tmp/nlos-survey.txt
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text = re.sub(r'\s+', ' ', Path('/tmp/nlos-survey.txt').read_text(errors='ignore'))
+          assert 'Sub-pixel resolving modulation for non-line-of-sight imaging' in text
+          assert 'Real-time scan-free non-line-of-sight imaging' in text
+          assert 'High-resolution and real-time non-line-of-sight imaging based on spatial correlation' in text
+          PY
+
+      - name: Render-check first and last PDF pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          pages="$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')"
+          test -n "$pages"
+          pdftoppm -f 1 -singlefile -png -r 90 bare_jrnl.pdf /tmp/nlos-first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 90 bare_jrnl.pdf /tmp/nlos-last >/dev/null 2>&1
+          test -s /tmp/nlos-first.png
+          test -s /tmp/nlos-last.png
+
+      - name: Commit synchronized public artifacts and rebuilt PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'nlos-update-bot'
+          git config user.email 'nlos-update-bot@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No public changes remain to commit.'
+            exit 0
+          fi
+          git commit -m 'Synchronize scan-free SPAD resolution lineage'
+          git push origin HEAD:master
