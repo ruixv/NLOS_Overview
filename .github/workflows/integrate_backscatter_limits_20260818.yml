@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/integrate_backscatter_limits_20260818.yml'
 
+# Retriggered via merged PR so the guarded source/PDF integration can execute on master.
 permissions:
   contents: write
 
