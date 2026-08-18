@@ -11,6 +11,7 @@ on:
       - '.github/workflows/integrate_backscatter_limits_20260818.yml'
 
 # Allow a same-repository PR to run the guarded integration when connector-authored push events are suppressed.
+# Execution trigger: 18 August 2026 literature synchronization.
 permissions:
   contents: write
 
