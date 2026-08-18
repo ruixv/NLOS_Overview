@@ -33,11 +33,13 @@ jobs:
           set -euo pipefail
           grep -Fq '2607.03459' README.md
           grep -Fq 'Ambient IoT Backscatter Devices as Passive Anchors for NLOS Cellular Positioning: Fundamental Limits' README.md
+          grep -Fq '**Update run: 18 August 2026.**' README.md
           grep -Fq '2607.03459' data/papers-source.html
           grep -Fq 'Ambient IoT Backscatter Devices as Passive Anchors for NLOS Cellular Positioning: Fundamental Limits' data/papers-source.html
           grep -Fq 'yigitlerAmbientIoTBackscatter2026' article/5newscenes.tex
           test "$(grep -Fic '{yigitlerAmbientIoTBackscatter2026,' egbib_merged_20260711.bib)" -eq 1
           grep -Fq '2607.03459' egbib_merged_20260711.bib
+          grep -Fq 'through 18 August 2026.' bare_jrnl.tex
           grep -Fq 'Updated 18 Aug 2026' index.html
           grep -Fq 'Updated 18 August 2026' data/papers-source.html
           grep -Fq 'Last updated: 18 August 2026' data/papers-source.html
@@ -78,6 +80,7 @@ jobs:
           text = re.sub(r'\s+', ' ', Path('/tmp/nlos-survey.txt').read_text(errors='ignore'))
           assert 'Ambient IoT Backscatter Devices as Passive Anchors' in text
           assert 'Backscatter-assisted indoor NLOS positioning' in text
+          assert 'through 18 August 2026' in text
           PY
 
       - name: Render-check first and last PDF pages
