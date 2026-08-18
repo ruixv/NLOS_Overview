@@ -39,3 +39,7 @@ The guarded integrator updates all public-facing artifacts together:
 - `bare_jrnl.pdf`: rebuild only after source/citation validation succeeds.
 
 The associated GitHub Actions workflow performs a clean `pdflatex → bibtex → pdflatex → pdflatex` build, checks the citation in `.aux/.bbl`, verifies the title appears in extracted PDF text, render-checks the first and last pages, and only then commits the synchronized artifacts and rebuilt PDF.
+
+## Current execution status
+
+As of the latest repository state inspected on 18 August 2026, the guarded workflow definition and integration script are present, but the synchronized public-content commit has not appeared: `README.md` still reports the 17 August 2026 update and does not yet contain arXiv:2607.03459. The available GitHub connector does not expose a workflow-dispatch action, and connector-authored pushes have not surfaced an executable workflow run. Therefore the large public files are not overwritten manually in this run, and `bare_jrnl.pdf` must still be treated as the pre-integration build. The paper metadata, semantic insertion plan, BibTeX key, source-update script, and build/validation recipe are all preserved in-repository so the next environment that can execute the guarded workflow can complete the integration without blind file replacement.
