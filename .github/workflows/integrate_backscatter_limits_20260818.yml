@@ -1,5 +1,6 @@
 name: Integrate backscatter NLOS fundamental limits
 
+# 18 Aug 2026 rerun: execute the verified public-artifact/PDF integration on current master.
 on:
   push:
     branches: [master]
