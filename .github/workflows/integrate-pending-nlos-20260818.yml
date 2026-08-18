@@ -115,3 +115,5 @@ jobs:
           fi
           git commit -m 'Integrate 18-Aug citation-traced NLOS records'
           git push origin HEAD:master
+
+# PR-triggered automation run: 2026-08-18
