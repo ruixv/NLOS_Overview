@@ -58,6 +58,7 @@ def update_readme() -> None:
         else:
             text = insert_after_line(text, "Goïcoechea et al.: a single antenna plus programmable RIS", timeline_line, "README 2026 RF timeline fallback")
 
+    text = text.replace("**Update run: 17 August 2026.**", "**Update run: 18 August 2026.**", 1)
     text = re.sub(r"This update run \(17 August 2026\)", "This update run (18 August 2026)", text, count=1)
     write(path, text)
 
@@ -169,6 +170,7 @@ def merge_bibliography() -> None:
 def update_master() -> None:
     path = "bare_jrnl.tex"
     text = read(path)
+    text = text.replace("extends coverage to include significant advances from 2022 through 17 August 2026.", "extends coverage to include significant advances from 2022 through 18 August 2026.", 1)
     marker = "% 18 August 2026 RF/backscatter trace: Ambient-IoT passive-anchor NLOS positioning fundamental limits integrated.\n"
     if marker not in text:
         text = marker + text
@@ -202,8 +204,12 @@ def validate() -> None:
         raise RuntimeError("BibTeX key is not unique")
     if bib.count(ARXIV_ID) < 1:
         raise RuntimeError("BibTeX arXiv id missing")
+    if "**Update run: 18 August 2026.**" not in readme:
+        raise RuntimeError("README update date not synchronized")
     if "18 August 2026" not in website:
         raise RuntimeError("website date not synchronized")
+    if "through 18 August 2026." not in master:
+        raise RuntimeError("survey snapshot date not synchronized")
     if not master.startswith("% 18 August 2026 RF/backscatter trace"):
         raise RuntimeError("master provenance marker missing")
 
