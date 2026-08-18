@@ -32,8 +32,6 @@ def insert_after_line(text: str, needle: str, addition: str, label: str) -> str:
     matches = [i for i, line in enumerate(lines) if needle in line]
     if not matches:
         raise RuntimeError(f"{label}: anchor not found: {needle}")
-    # Prefer the last occurrence for timeline-like prose, where a paper may also
-    # appear earlier in the Latest Additions table.
     i = matches[-1]
     lines.insert(i + 1, addition if addition.endswith("\n") else addition + "\n")
     return "".join(lines)
@@ -48,24 +46,19 @@ def update_readme() -> None:
         "Derives closed-form equivalent Fisher information matrices for calibrated, partially calibrated, and fully uncalibrated Ambient-IoT backscatter anchors in uplink NLOS positioning. It quantifies which carrier-phase and delay information survives unknown device phases/gains and shows that joint single-snapshot UE–scatterer identifiability requires at least two passive anchors in 2D or three in 3D with sufficient angular diversity. |\n"
     )
     if ARXIV_ID not in text:
-        anchor = "Backscatter Assisted Indoor NLOS Positioning"
-        text = insert_after_line(text, anchor, row, "README backscatter paper row")
+        text = insert_after_line(text, "Backscatter Assisted Indoor NLOS Positioning", row, "README backscatter paper row")
 
     timeline_line = (
         "   │     Yiğitler et al.: Ambient-IoT backscatter fundamental limits — calibration-aware EFIM/CRB analysis identifies which NLOS positioning information survives unreferenced passive anchors and the minimum 2D/3D anchor geometry for joint UE–scatterer identifiability [arXiv]\n"
     )
     if "Ambient-IoT backscatter fundamental limits" not in text:
-        # This RF branch is already grouped around practical RIS/backscatter work.
         anchor = "Yasmeen et al.: one-bit RIS quantization"
         if anchor in text:
             text = insert_after_line(text, anchor, timeline_line, "README 2026 RF timeline")
         else:
-            # Fallback to the later single-antenna RIS line if the wording around
-            # Yasmeen changes in a future synchronization pass.
             text = insert_after_line(text, "Goïcoechea et al.: a single antenna plus programmable RIS", timeline_line, "README 2026 RF timeline fallback")
 
     text = re.sub(r"This update run \(17 August 2026\)", "This update run (18 August 2026)", text, count=1)
-    text = re.sub(r"This update run \(18 August 2026\)", "This update run (18 August 2026)", text, count=1)
     write(path, text)
 
 
@@ -200,7 +193,7 @@ def validate() -> None:
     survey = read("article/5newscenes.tex")
     bib = read("egbib_merged_20260711.bib")
     master = read("bare_jrnl.tex")
-    for name, text in (("README", readme), ("website", website), ("survey", survey), ("bib", bib)):
+    for name, text in (("README", readme), ("website", website), ("bib", bib)):
         if ARXIV_ID not in text:
             raise RuntimeError(f"{name} missing {ARXIV_ID}")
     if survey.count(KEY) != 1:
