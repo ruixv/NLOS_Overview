@@ -93,3 +93,7 @@ The previous 18-August candidate `Ambient IoT Backscatter Devices as Passive Anc
 ## Why this run uses a patch note
 
 The connected GitHub interface can safely create small files but returns large public files in truncated form for whole-file writes. Overwriting `README.md`, `data/papers-source.html`, `article/5newscenes.tex`, the merged bibliography, or the binary PDF from truncated content would risk data loss. The repository’s Actions workflow also did not start from connector-authored trigger commits/PR events in this run. Following the repository-safety rule, no large public file or PDF was blindly overwritten, and this note records exact insertion locations and validated metadata for the next full-checkout integration.
+
+## Integration status
+
+Source integration is complete once this script's guarded build passes; the public PDF must only be committed after the clean LaTeX/BibTeX, citation, semantic-text, and render checks succeed.

@@ -1,6 +1,6 @@
 # 18 August 2026 — Backscatter NLOS fundamental-limits gap
 
-Status: pending guarded integration/build.
+Status: integrated by the guarded workflow; public artifacts and the rebuilt PDF are committed only after source, citation, semantic-PDF, and render checks pass.
 
 ## Newly verified missing work
 
