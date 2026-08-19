@@ -27,11 +27,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Integrate verified records
+      - name: Integrate verified ICPR citation-trace record
         run: |
           set -euo pipefail
-          python scripts/integrate_backscatter_limits_20260818.py
-          python scripts/integrate_acoustic_liveness_20260818.py
+          # The 18-Aug backscatter/acoustic records are already public on master
+          # (commit 2788e5e); do not rerun their one-shot provenance validators.
           python scripts/integrate_nlos_mt_20260820.py
 
       - name: Validate synchronized source artifacts
