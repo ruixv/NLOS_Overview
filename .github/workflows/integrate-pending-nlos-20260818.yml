@@ -80,13 +80,16 @@ jobs:
           set -euo pipefail
           grep -Fq 'yigitlerAmbientIoTBackscatter2026' bare_jrnl.aux
           grep -Fq 'cetinAcousticLivenessNLOS2026' bare_jrnl.aux
+          grep -Fq 'Ambient {IoT} Backscatter Devices as Passive Anchors for {NLOS} Cellular Positioning' bare_jrnl.bbl
+          grep -Fq 'Comparative Analysis of Deep Latent Representation and Statistical Fusion Strategies' bare_jrnl.bbl
           pdftotext bare_jrnl.pdf /tmp/nlos-survey.txt
           python - <<'PY'
           from pathlib import Path
           import re
           text = re.sub(r'\s+', ' ', Path('/tmp/nlos-survey.txt').read_text(errors='ignore'))
-          assert 'Ambient IoT Backscatter Devices as Passive Anchors' in text
-          assert 'Comparative Analysis of Deep Latent Representation' in text
+          # Validate prose rather than exact bibliography typography; pdftotext may
+          # insert line-break hyphens into long titles even when the PDF is correct.
+          assert 'joint single-snapshot UE' in text or 'joint single-snapshot UE--scatterer' in text
           assert 'Acoustic liveness detection in cluttered NLOS scenes' in text
           assert 'through 18 August 2026' in text
           PY
