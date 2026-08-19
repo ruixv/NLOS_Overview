@@ -88,15 +88,17 @@ jobs:
           from pathlib import Path
           import re
           txt=Path('/tmp/nlos-passive.txt').read_text(encoding='utf-8',errors='ignore')
-          norm=re.sub(r'[-‐‑–—]\s*\n\s*','',txt)
-          norm=re.sub(r'\s+',' ',norm).casefold()
+          # Join line-break hyphenation, then normalize all dash variants and whitespace.
+          txt=re.sub(r'[-‐‑–—]\s*\n\s*','',txt)
+          txt=re.sub(r'[-‐‑–—]+',' ',txt)
+          norm=re.sub(r'\s+',' ',txt).casefold()
           checks={
             'hyperspectral survey prose': ['hyperspectral conditioning','spatial spectral attention','hs nlos'],
             'rough-surface survey prose': ['rough relay surfaces as passive cameras','microscale scattering','keyhole'],
           }
           failures=[]
           for label,tokens in checks.items():
-            ok=all(t.casefold().replace('-',' ') in norm.replace('-',' ') for t in tokens)
+            ok=all(t.casefold() in norm for t in tokens)
             print(('PASS: ' if ok else 'FAIL: ')+label)
             if not ok: failures.append(label)
           if failures: raise AssertionError('; '.join(failures))
