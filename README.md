@@ -64,10 +64,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 18 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 20 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [NLOS-MT: A Hybrid Mamba and Windowed Attention Transformer for Non-Line-of-Sight Imaging](https://doi.org/10.1007/978-3-032-31666-0_20) — Jin et al. | ICPR 2026, LNCS 16816, 297–311 (Springer chapter; first online 3 Aug 2026) | Combines a DeformMamba block for linear-complexity long-range/global transient modeling and robust denoising with a window-attention U-Net for local contextual refinement, extending learned active NLOS reconstruction from pure Transformer or pure Mamba designs to a hybrid state-space/attention architecture. |
 | 2023 | [Non-line-of-sight imaging and location determination using deep learning](https://doi.org/10.1016/j.optlaseng.2023.107701) — Wang et al. | Optics and Lasers in Engineering 169, 107701 (2023) | Uses a single-shot wall-mediated speckle pattern with SPIR-Net to jointly reconstruct hidden-object appearance and estimate object location, adding spatial localization to passive steady-state NLOS without pulsed ToF or time-gated hardware. |
 | 2026 | [Symmetry-Aware Gradient Coordination for Physics-Guided Non-Line-of-Sight Imaging](https://doi.org/10.3390/sym18050711) — Ling et al. | Symmetry 18(5), 711 (2026) | Treats physics-guided NLOS training as a multi-objective gradient-coordination problem rather than a single weighted scalar loss, combining soft conflict projection, hard physical routing, learnable sensor calibration, and staged optimization for improved low-SNR reconstruction robustness. |
 | 2024 | [Seeing Around Obstacles Using Active Terahertz Imaging](https://doi.org/10.1109/TTHZ.2024.3401041) — Cui and Trichopoulos | IEEE Transactions on Terahertz Science and Technology 14(4), 433–445 (2024) | Uses 270–300 GHz active THz imaging and a mirror-folding reconstruction that treats ordinary building surfaces as lossy mirrors, recovering hidden-object geometry and pose with centimeter-scale resolution without prior scene geometry or material properties. |
@@ -548,6 +549,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Gao et al.: learned LCT — high-frequency-preserving trainable inversion grounded in the original light-cone transform [Physical Review Applied]
    │     Sun et al.: TransVID — diffusion-based spatial-temporal interpolation for dynamic transient video [Optics Express]
    │     Ling et al.: gradient-coordinated physics-guided training routes conflicting reconstruction, physical-consistency, and sensor-calibration updates instead of collapsing them into one scalar loss [Symmetry]
+   │     Jin et al.: NLOS-MT combines DeformMamba long-range state-space modeling with windowed-attention U-Net local refinement for active transient reconstruction [ICPR 2026]
    │     Wang et al.: diffuse-aware attention encoding for passive NLOS through relay-wall diffusion [Optics Express]
    │     Wang et al.: GenPIE — generative geometry priors and differentiable transient transport recover a time-resolved plenoptic representation [SIGGRAPH / ACM TOG]
    │     Zhang et al.: D-NeSF — spatiotemporally disentangled neural shadow fields extend two-bounce NLOS stereo reconstruction from static scenes to moving hidden targets [ICGIP / Proceedings of SPIE]

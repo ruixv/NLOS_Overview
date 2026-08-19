@@ -263,6 +263,11 @@ Li~\etal~proposed NLOST~\cite{liNLOST2023}, the first transformer specifically d
 Li~\etal~proposed ST-Mamba~\cite{liMambaTemporalConsistency2024}, the first spatial-temporal Mamba model for dynamic NLOS reconstruction. ST-Mamba exploits the time-resolving causality in transient measurements through interleaved Mamba blocks, incorporating a wave-based loss function in the phasor field domain to handle measurement noise in NLOS video. This approach achieves superior temporal consistency across frames compared to per-frame reconstruction methods.
 
 \vspace{0.8mm}
+
+\vspace{0.8mm}
+\noindent \textbf{Hybrid state-space and windowed-attention reconstruction.}
+Building on the Transformer and state-space branches, Jin~\etal~introduced NLOS-MT at ICPR~2026~\cite{jinNLOSMT2026}. The network first forms an initial hidden intensity representation and then applies a DeformMamba block, where deformable convolution adapts to object shape while Mamba's selective state-space mechanism captures long-range dependencies with linear-complexity sequence modeling. A U-Net equipped with windowed attention subsequently restores local contextual detail. This global--local division complements NLOST's spatio-temporal self-attention, TransiT's transient Transformer, and ST-Mamba's temporal state-space modeling: rather than choosing attention or state-space layers as the dominant backbone, NLOS-MT explicitly combines both for denoising and structural reconstruction, with experiments on synthetic and publicly available real NLOS datasets.
+
 \noindent \textbf{Graph neural networks.}
 Su~\etal~proposed DG-NLOS~\cite{suDGNLOS2025}, which employs a graph neural network (GNN) as its fundamental component to transform dense NLOS grid data into sparse structural features. DG-NLOS uses a dual-branch architecture with one branch dedicated to albedo recovery and another for depth/geometry, enabling simultaneous reconstruction of appearance and structure with reduced computational and memory cost. To the authors' knowledge, DG-NLOS is the first work to employ GNNs as a core module for NLOS reconstruction.
 
