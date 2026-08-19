@@ -1,4 +1,4 @@
-name: Integrate pending 18-Aug NLOS records
+name: Integrate pending and citation-traced NLOS records
 
 on:
   workflow_dispatch:
@@ -27,11 +27,12 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Integrate both verified pending records
+      - name: Integrate verified records
         run: |
           set -euo pipefail
           python scripts/integrate_backscatter_limits_20260818.py
           python scripts/integrate_acoustic_liveness_20260818.py
+          python scripts/integrate_nlos_mt_20260820.py
 
       - name: Validate synchronized source artifacts
         shell: bash
@@ -39,17 +40,21 @@ jobs:
           set -euo pipefail
           grep -Fq '2607.03459' README.md
           grep -Fq '10.1109/ACCESS.2026.3692353' README.md
-          grep -Fq '**Update run: 18 August 2026.**' README.md
+          grep -Fq '10.1007/978-3-032-31666-0_20' README.md
+          grep -Fq '**Update run: 20 August 2026.**' README.md
           grep -Fq '2607.03459' data/papers-source.html
           grep -Fq '10.1109/ACCESS.2026.3692353' data/papers-source.html
+          grep -Fq '10.1007/978-3-032-31666-0_20' data/papers-source.html
           grep -Fq 'yigitlerAmbientIoTBackscatter2026' article/5newscenes.tex
           grep -Fq 'cetinAcousticLivenessNLOS2026' article/5newscenes.tex
+          grep -Fq 'jinNLOSMT2026' article/4datadriven.tex
           test "$(grep -Fic '{yigitlerAmbientIoTBackscatter2026,' egbib_merged_20260711.bib)" -eq 1
           test "$(grep -Fic '{cetinAcousticLivenessNLOS2026,' egbib_merged_20260711.bib)" -eq 1
-          grep -Fq 'through 18 August 2026.' bare_jrnl.tex
-          grep -Fq 'Updated 18 Aug 2026' index.html
-          grep -Fq 'Updated 18 August 2026' data/papers-source.html
-          grep -Fq 'Last updated: 18 August 2026' data/papers-source.html
+          test "$(grep -Fic '{jinNLOSMT2026,' egbib_merged_20260711.bib)" -eq 1
+          grep -Fq 'through 20 August 2026.' bare_jrnl.tex
+          grep -Fq 'Updated 20 Aug 2026' index.html
+          grep -Fq 'Updated 20 August 2026' data/papers-source.html
+          grep -Fq 'Last updated: 20 August 2026' data/papers-source.html
 
       - name: Install LaTeX and PDF validation tools
         run: |
@@ -80,8 +85,10 @@ jobs:
           set -euo pipefail
           grep -Fq 'yigitlerAmbientIoTBackscatter2026' bare_jrnl.aux
           grep -Fq 'cetinAcousticLivenessNLOS2026' bare_jrnl.aux
+          grep -Fq 'jinNLOSMT2026' bare_jrnl.aux
           grep -Fq '\bibitem{yigitlerAmbientIoTBackscatter2026}' bare_jrnl.bbl
           grep -Fq '\bibitem{cetinAcousticLivenessNLOS2026}' bare_jrnl.bbl
+          grep -Fq '\bibitem{jinNLOSMT2026}' bare_jrnl.bbl
           pdftotext -layout bare_jrnl.pdf /tmp/nlos-survey.txt
           python - <<'PY'
           from pathlib import Path
@@ -90,10 +97,7 @@ jobs:
           raw = Path('/tmp/nlos-survey.txt').read_text(errors='ignore')
           raw = re.sub(r'-\s*\n\s*', '', raw)
           text = re.sub(r'\s+', ' ', raw).casefold()
-          # Citation-key checks above are the strict semantic-presence guard. PDF text
-          # extraction is used only for coarse human-visible content/date smoke tests;
-          # avoid brittle exact phrases that can change under LaTeX hyphenation.
-          for token in ('backscatter', 'acoustic', 'multichannel', '18 august 2026'):
+          for token in ('backscatter', 'acoustic', 'multichannel', 'nlos-mt', 'mamba', '20 august 2026'):
               assert token in text, f'missing PDF smoke-test token: {token}'
           PY
 
@@ -119,7 +123,7 @@ jobs:
             echo 'No public changes remain to commit.'
             exit 0
           fi
-          git commit -m 'Integrate 18-Aug citation-traced NLOS records'
+          git commit -m 'Integrate ICPR NLOS-MT hybrid Mamba-Transformer reconstruction'
           git push origin HEAD:master
 
-# PR-triggered automation run: 2026-08-18
+# PR-triggered guarded integration; extended 2026-08-20 for NLOS-MT.
