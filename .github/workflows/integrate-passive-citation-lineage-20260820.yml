@@ -1,0 +1,123 @@
+name: Integrate missing passive NLOS citation lineage
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-passive-citation-lineage-20260820.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Apply passive citation-lineage integration
+        run: |
+          python3 scripts/integrate_passive_citation_lineage_20260820.py
+
+      - name: Validate source-level synchronization
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          papers=[
+            ('Hyper-NLOS: hyperspectral passive non-line-of-sight imaging','10.1364/OE.532699','chenHyperNLOS2024'),
+            ('Turning rough surfaces into non-line-of-sight cameras','10.1364/OPTICA.544275','liRoughSurfaceCameraNLOS2025'),
+          ]
+          readme=Path('README.md').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          passive=Path('article/3passive.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          for title,doi,key in papers:
+            assert title in readme and doi.lower() in readme.lower(), (title,'README')
+            assert title in corpus and doi.lower() in corpus.lower(), (title,'V2 corpus')
+            assert key in passive, (key,'passive survey')
+            assert bib.lower().count('@article{'+key.lower()+',') == 1, (key,'BibTeX key')
+            assert doi.lower() in bib.lower(), (doi,'merged bibliography')
+          assert '20 August 2026' in tex
+          assert not Path('egbib_20260819_hyperspectral_passive_gap.bib').exists()
+          assert not Path('egbib_20260820_passive_rough_surface_gap.bib').exists()
+          print('source-level synchronization checks passed')
+          PY
+          if [ -f scripts/validate_paper_graph.mjs ]; then node scripts/validate_paper_graph.mjs; fi
+
+      - name: Add LaTeX compatibility shim
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+            if s.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+            p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Install PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Validate rebuilt PDF and citations
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          test "$(stat -c%s bare_jrnl.pdf)" -gt 100000
+          grep -q 'chenHyperNLOS2024' bare_jrnl.aux
+          grep -q 'liRoughSurfaceCameraNLOS2025' bare_jrnl.aux
+          grep -q 'Hyper-NLOS' bare_jrnl.bbl
+          grep -qi 'Turning rough surfaces' bare_jrnl.bbl
+          pdftotext bare_jrnl.pdf /tmp/nlos-passive.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          txt=Path('/tmp/nlos-passive.txt').read_text(encoding='utf-8',errors='ignore')
+          norm=re.sub(r'[-‐‑–—]\s*\n\s*','',txt)
+          norm=re.sub(r'\s+',' ',norm).casefold()
+          checks={
+            'hyperspectral survey prose': ['hyperspectral conditioning','spatial spectral attention','hs nlos'],
+            'rough-surface survey prose': ['rough relay surfaces as passive cameras','microscale scattering','keyhole'],
+          }
+          failures=[]
+          for label,tokens in checks.items():
+            ok=all(t.casefold().replace('-',' ') in norm.replace('-',' ') for t in tokens)
+            print(('PASS: ' if ok else 'FAIL: ')+label)
+            if not ok: failures.append(label)
+          if failures: raise AssertionError('; '.join(failures))
+          PY
+
+      - name: Render PDF endpoints
+        run: |
+          set -euo pipefail
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test -n "$pages"
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+
+      - name: Commit synchronized artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html data/papers-source.html article/3passive.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-08-19-hyperspectral-passive-gap.md updates/2026-08-20-passive-citation-lineage.md
+          git add -u egbib_20260819_hyperspectral_passive_gap.bib egbib_20260820_passive_rough_surface_gap.bib || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Integrate hyperspectral and rough-surface passive NLOS milestones'
+          git push origin HEAD:master
