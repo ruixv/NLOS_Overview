@@ -1,1 +1,1 @@
-Trigger guarded integration of Hyper-NLOS 2024 and rough-surface Optica 2025 using BibTeX-key and robust PDF semantic validation.
+Trigger guarded integration of Hyper-NLOS 2024 and rough-surface Optica 2025 using citation-resolved title-fragment PDF validation (21 Aug 2026).
