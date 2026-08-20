@@ -161,17 +161,26 @@ if blocks:
     survey = survey.replace(insert_anchor, blocks + insert_anchor, 1)
 write("article/3passive.tex", survey)
 
-# Merge verified BibTeX records exactly once.
+# Merge verified BibTeX records exactly once. If an older canonical key is already
+# present without final DOI metadata, replace that whole entry with the verified
+# staging record instead of skipping it.
 bib = read("egbib_merged_20260711.bib")
+entry_pattern = re.compile(r"(?ms)^@\w+\{([^,]+),.*?^\}\s*")
 for staging_rel, key, doi in [
     ("egbib_20260819_hyperspectral_passive_gap.bib", "chenHyperNLOS2024", "10.1364/OE.532699"),
     ("egbib_20260820_passive_rough_surface_gap.bib", "liRoughSurfaceCameraNLOS2025", "10.1364/OPTICA.544275"),
 ]:
     staging = ROOT / staging_rel
-    if key not in bib and doi.casefold() not in bib.casefold():
-        if not staging.exists():
-            raise RuntimeError(f"Missing verified staging bibliography: {staging_rel}")
-        entry = staging.read_text(encoding="utf-8").strip()
+    if not staging.exists():
+        raise RuntimeError(f"Missing verified staging bibliography: {staging_rel}")
+    entry = staging.read_text(encoding="utf-8").strip()
+    matches = list(entry_pattern.finditer(bib))
+    key_match = next((m for m in matches if m.group(1).strip().casefold() == key.casefold()), None)
+    doi_match = next((m for m in matches if doi.casefold() in m.group(0).casefold()), None)
+    target = key_match or doi_match
+    if target:
+        bib = bib[:target.start()] + entry + "\n\n" + bib[target.end():]
+    else:
         bib = bib.rstrip() + "\n\n" + entry + "\n"
 write("egbib_merged_20260711.bib", bib)
 
