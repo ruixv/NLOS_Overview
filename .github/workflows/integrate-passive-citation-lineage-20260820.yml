@@ -8,7 +8,7 @@ on:
   pull_request:
     branches: [master]
     paths:
-      - triggers/passive_lineage_20260820.trigger
+      - updates/passive_lineage_20260820.trigger
   workflow_dispatch:
 
 permissions:
