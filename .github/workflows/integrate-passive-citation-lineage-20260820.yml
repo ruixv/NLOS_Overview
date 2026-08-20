@@ -123,3 +123,5 @@ jobs:
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Integrate hyperspectral and rough-surface passive NLOS milestones'
           git push origin HEAD:master
+
+# Retriggered 20 Aug 2026 after hardened PDF semantic normalization.
