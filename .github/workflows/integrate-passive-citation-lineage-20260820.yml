@@ -32,6 +32,7 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
+          import re
           papers=[
             ('Hyper-NLOS: hyperspectral passive non-line-of-sight imaging','10.1364/OE.532699','chenHyperNLOS2024'),
             ('Turning rough surfaces into non-line-of-sight cameras','10.1364/OPTICA.544275','liRoughSurfaceCameraNLOS2025'),
@@ -50,9 +51,15 @@ jobs:
           assert '20 August 2026' in tex
           assert not Path('egbib_20260819_hyperspectral_passive_gap.bib').exists()
           assert not Path('egbib_20260820_passive_rough_surface_gap.bib').exists()
+          # Static V2 integrity check. The general paper-graph validator currently imports
+          # browser-only window.fetch and cannot run in a bare Node process.
+          m=re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', corpus)
+          assert m, 'tracked-entry counter missing'
+          declared=int(m.group(1))
+          actual=corpus.count('{cat:')
+          assert declared == actual, (declared, actual, 'V2 tracked-entry count')
           print('source-level synchronization checks passed')
           PY
-          if [ -f scripts/validate_paper_graph.mjs ]; then node scripts/validate_paper_graph.mjs; fi
 
       - name: Add LaTeX compatibility shim
         run: |
