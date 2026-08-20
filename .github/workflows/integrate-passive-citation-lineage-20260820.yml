@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - .github/workflows/integrate-passive-citation-lineage-20260820.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/passive_lineage_20260820.trigger
   workflow_dispatch:
 
 permissions:
@@ -16,6 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
+          ref: master
           fetch-depth: 0
 
       - name: Apply passive citation-lineage integration
