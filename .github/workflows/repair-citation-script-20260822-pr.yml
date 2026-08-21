@@ -22,16 +22,17 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
+          import re
           p=Path('scripts/integrate_citation_trace_20260822.py')
           s=p.read_text(encoding='utf-8')
-          bad="reconstruction.'\\nnew_2026_tail ="
-          good="reconstruction.'\nnew_2026_tail ="
-          n=s.count(bad)
-          print('bad literal-newline count:', n)
+          i=s.find('old_2026_tail')
+          print('diagnostic:', repr(s[i:i+500]))
+          s2,n=re.subn(r'\\+n(?=new_2026_tail\s*=)', '\n', s)
+          print('literal-newline replacements:', n)
           if n != 1:
-              raise RuntimeError(f'Expected one broken literal newline, found {n}')
-          p.write_text(s.replace(bad,good,1),encoding='utf-8')
-          compile(p.read_text(encoding='utf-8'),str(p),'exec')
+              raise RuntimeError(f'Expected one broken literal newline before new_2026_tail, found {n}')
+          p.write_text(s2,encoding='utf-8')
+          compile(s2,str(p),'exec')
           print('compile check passed')
           PY
       - name: Commit repaired script
