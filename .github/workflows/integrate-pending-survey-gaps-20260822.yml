@@ -1,0 +1,158 @@
+name: Integrate pending NLOS survey gaps 2026-08-22
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-pending-survey-gaps-20260822.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Apply bounded source integration
+        run: |
+          set -euo pipefail
+          python3 scripts/integrate_pending_survey_gaps_20260822.py
+
+      - name: Validate source synchronization and de-duplication
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          passive=[
+              ('heDualInputUNetPNLOS2023','10.1109/NNICE58320.2023.10105693'),
+              ('yuCAGANPNLOS2023','10.1109/NNICE58320.2023.10105725'),
+              ('kimReliableOccluderPNLOS2024','10.1117/12.3017933'),
+          ]
+          pose=('xiaoNLOSHumanPose2026','10.1016/j.optlaseng.2026.109658')
+          readme=Path('README.md').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          ps=Path('article/3passive.tex').read_text(encoding='utf-8')
+          ds=Path('article/4datadriven.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          checks=[]
+          for key,doi in passive:
+              checks += [
+                  (readme.lower().count(doi.lower())==1, f'README exactly one {doi}'),
+                  (corpus.lower().count(doi.lower())==1, f'V2 exactly one {doi}'),
+                  (key in ps, f'passive survey cites {key}'),
+              ]
+          key,doi=pose
+          checks += [
+              (readme.lower().count(doi.lower())==1,'README keeps exactly one Xiao pose paper'),
+              (corpus.lower().count(doi.lower())==1,'V2 keeps exactly one Xiao pose paper'),
+              (key in ds,'data-driven survey cites Xiao pose paper'),
+              ('**Update run: 22 August 2026.**' in readme,'README date updated'),
+              ('Updated 22 August 2026' in corpus and 'Last updated: 22 August 2026' in corpus,'V2 dates updated'),
+              ('<b>314</b><span>tracked latest entries</span>' in corpus,'V2 count increased only for three missing public papers'),
+              ('through 22 August 2026' in tex,'survey coverage date updated'),
+          ]
+          for key,doi in passive+[pose]:
+              kc=len(re.findall(r'@\w+\{'+re.escape(key)+r'\s*,',bib,re.I))
+              dc=len(re.findall(r'doi\s*=\s*\{\s*'+re.escape(doi)+r'\s*\}',bib,re.I))
+              checks += [(kc==1,f'one BibTeX key {key} (found {kc})'),(dc==1,f'one DOI field {doi} (found {dc})')]
+          bad=[]
+          for ok,msg in checks:
+              print(('PASS: ' if ok else 'FAIL: ')+msg)
+              if not ok: bad.append(msg)
+          if bad: raise AssertionError('; '.join(bad))
+          PY
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Install PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Validate citations, PDF semantics, and rendering
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          for key in heDualInputUNetPNLOS2023 yuCAGANPNLOS2023 kimReliableOccluderPNLOS2024 xiaoNLOSHumanPose2026; do
+            grep -q "$key" bare_jrnl.aux
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          def norm(s): return ' '.join(re.sub(r'[^a-z0-9]+',' ',s.lower()).split())
+          bbl=norm(Path('bare_jrnl.bbl').read_text(encoding='utf-8',errors='ignore'))
+          titles=[
+            'Passive Non-Line-of-Sight imaging reconstruction based on dual input U-Net',
+            'CAGAN: A Channel-aware Generative Adversarial Network for Passive Non-Line-of-Sight Imaging',
+            'Reliable reconstruction of passive non-line of sight imaging with occluder by deep learning',
+            'Non-line-of-sight human pose estimation',
+          ]
+          missing=[t for t in titles if norm(t) not in bbl]
+          if missing: raise AssertionError('Missing normalized bibliography titles: '+repr(missing))
+          PY
+          pdftotext bare_jrnl.pdf /tmp/nlos-gaps.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          def norm(s): return ' '.join(re.sub(r'[^a-z0-9]+',' ',s.lower()).split())
+          txt=norm(Path('/tmp/nlos-gaps.txt').read_text(encoding='utf-8',errors='ignore'))
+          groups={
+            'supervised passive lineage':['supervised occluder aided passive reconstruction','dual input u net','cagan'],
+            'pose lineage':['robust transient human pose estimation','1 75 m','0 13'],
+            'survey date':['22 august 2026'],
+          }
+          bad=[]
+          for label,tokens in groups.items():
+              ok=all(norm(t) in txt for t in tokens)
+              print(f'PDF semantic check {label}: {ok}')
+              if not ok: bad.append(label)
+          if bad: raise AssertionError('Missing PDF semantic groups: '+', '.join(bad))
+          if Path('bare_jrnl.pdf').stat().st_size < 100000: raise AssertionError('PDF unexpectedly small')
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test -n "$pages"
+          mkdir -p /tmp/gap-render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/gap-render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/gap-render/last
+          test -s /tmp/gap-render/first.png
+          test -s /tmp/gap-render/last.png
+
+      - name: Record integrated status
+        run: |
+          cat > updates/2026-08-22-pending-survey-gaps-integrated.md <<'EOF'
+          # Pending NLOS survey gaps synchronized — 22 August 2026
+
+          Integrated three historical supervised occluder-aided passive NLOS papers (He et al. NNICE 2023; Yu et al. CAGAN NNICE 2023; Kim and Jang Proc. SPIE 2024) across README, canonical V2 corpus/timeline, passive-survey prose, merged bibliography, and PDF.
+
+          Also closed the survey/bibliography/PDF consistency gap for Xiao et al., “Non-line-of-sight human pose estimation,” Optics and Lasers in Engineering 201, 109658 (2026), DOI 10.1016/j.optlaseng.2026.109658. This paper was already present in README/V2, so no duplicate public paper object was added.
+
+          Clean LaTeX/BibTeX build, citation resolution, normalized bibliography/PDF semantic checks, DOI/key uniqueness, and first/last-page rendering all passed before commit.
+          EOF
+
+      - name: Commit synchronized public artifacts
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -f .github/workflows/integrate-pending-survey-gaps-20260822.yml scripts/integrate_pending_survey_gaps_20260822.py egbib_20260821_passive_occluder_learning_gap.bib egbib_20260822_semantic_pose_gap.bib
+          git add README.md data/papers-source.html article/3passive.tex article/4datadriven.tex egbib_merged_20260711.bib bare_jrnl.tex bare_jrnl.pdf updates/2026-08-21-passive-occluder-learning-gap.md updates/2026-08-22-semantic-pose-survey-gap.md updates/2026-08-22-pending-survey-gaps-integrated.md
+          if git diff --cached --quiet; then
+            echo 'No changes to commit'
+            exit 0
+          fi
+          git commit -m 'Integrate pending NLOS survey gaps'
+          git push origin HEAD:master
