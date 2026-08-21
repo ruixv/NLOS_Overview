@@ -1,0 +1,1 @@
+Run the guarded integration from current master using unique structured-record checks, then rebuild, validate, rebase, and push the synchronized source and PDF artifacts.
