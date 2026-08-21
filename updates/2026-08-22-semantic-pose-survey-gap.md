@@ -29,3 +29,7 @@ Xiao~\etal~further target semantic recovery when the transient signal itself bec
 ## Related audit result
 
 The same fresh publisher/citation-tracing pass rechecked PICL (`10.1364/JOSAA.593401`), learned LCT, consumer-LiDAR NLOS, arbitrary-relay 3D Gaussian Transient Rendering, MD-NLOS, Stereo NLOS, and relay-free acoustic NLOS. Those works are already represented in the current public corpus, so they should not be duplicated.
+
+## Guarded integration status — 22 August 2026
+
+Prepared for full public synchronization in the 22 August guarded build: README/V2 de-duplication, semantically placed survey prose, merged BibTeX, clean PDF build, citation checks, PDF text checks, and endpoint rendering are all required before commit.

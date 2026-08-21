@@ -64,10 +64,13 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 21 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 22 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2024 | [Reliable reconstruction of passive non-line of sight imaging with occluder by deep learning](https://doi.org/10.1117/12.3017933) — Kim, Jang | Proc. SPIE 13076, 1307608 (2024) | Standard-camera occluder-aided passive NLOS reconstruction with deep learning; emphasizes robustness to changes in both occluder and hidden-object position. |
+| 2023 | [CAGAN: A Channel-aware Generative Adversarial Network for Passive Non-Line-of-Sight Imaging](https://doi.org/10.1109/NNICE58320.2023.10105725) — Yu et al. | IEEE NNICE 2023 | Channel-aware GAN reconstruction on passive NLOS observations, using channel-feature fusion to emphasize informative content and suppress background interference. |
+| 2023 | [Passive Non-Line-of-Sight imaging reconstruction based on dual input U-Net](https://doi.org/10.1109/NNICE58320.2023.10105693) — He et al. | IEEE NNICE 2023 | Early supervised dual-input U-Net reconstruction for passive NLOS, bridging NLOS-Passive-style data-driven inversion and later attention/generative methods. |
 | 2026 | [Enhancing passive non-line-of-sight imaging via dynamic channel optimization](https://doi.org/10.1016/j.optcom.2026.133626) — Wang et al. | Optics Communications 620, 133626 (2026) | Introduces DCEEM for low-SNR passive NLOS: Bayesian multiplicative fusion combines feature statistics with light-transport descriptors to adaptively suppress noise-dominated channels, while hierarchical denoising/refinement and vector-quantization optimization strengthen hidden-scene reconstruction. |
 | 2024 | [Hyper-NLOS: hyperspectral passive non-line-of-sight imaging](https://doi.org/10.1364/OE.532699) — Chen et al. | Optics Express 32(20), 34807–34824 (2024) | HFN-Net exploits wavelength-resolved relay-wall measurements with a hyperspectral full-color autoencoder and spatial–spectral attention, improving passive-NLOS color/structure recovery and introducing the HS-NLOS dataset. |
 | 2025 | [Turning rough surfaces into non-line-of-sight cameras](https://doi.org/10.1364/OPTICA.544275) — Li et al. | Optica 12(5), 626–634 (2025) | Models microscale rough-wall scattering as an invertible passive encoding rather than a nuisance, enabling ordinary-camera high-resolution real-time NLOS imaging, near-90° field of view, full-color recovery, keyhole imaging, and non-invasive calibration. |
@@ -452,6 +455,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Cui and Trichopoulos: active 270–300 GHz THz imaging treats building surfaces as lossy mirrors and folds multi-reflection paths for centimeter-scale hidden-object geometry and pose [IEEE T-TST]
    │     Yasmeen et al.: a measured 5.5 GHz one-bit RIS redirects a monostatic radar around a corridor corner for hidden-human micro-Doppler sensing [IEEE MAPCON]
 2024 ── Li et al.: ST-Mamba — state-space temporal modeling and phasor-domain wave supervision for consistent dynamic NLOS video [NeurIPS]
+   │     He et al. and Yu et al. establish supervised dual-input U-Net and channel-aware GAN passive reconstruction, while Kim and Jang emphasize robustness to changes in occluder and hidden-object geometry [IEEE NNICE / Proc. SPIE]
    │     Chandran et al.: learned spotlight selection with an off-the-shelf projector-camera pair turns illumination placement into an end-to-end NLOS sensing variable [WACV]
    │     Li and Zhang: USEEN brings passive diffuse-wall NLOS reconstruction to room-scale scenes with 12.2 ms inference [Sensors]
    │     Wang et al.: instrument-response deconvolution removes TCSPC timing blur before LCT or f-k reconstruction, converting hardware jitter into an explicit inverse problem [Optics Express]

@@ -109,3 +109,7 @@ Validation must confirm:
 ## Conflict note
 
 PR #135 is still the guarded integration path for Hyper-NLOS 2024 and *Turning rough surfaces into non-line-of-sight cameras* (Optica 2025), and PR #136 stages DCEEM (*Optics Communications* 2026). Because those changes target the same README / V2 corpus / passive-survey / bibliography / PDF files, this gap is intentionally staged as small, non-destructive files rather than overwriting the current public artifacts.
+
+## Guarded integration status — 22 August 2026
+
+Prepared for full public synchronization in the 22 August guarded build: README/V2 de-duplication, semantically placed survey prose, merged BibTeX, clean PDF build, citation checks, PDF text checks, and endpoint rendering are all required before commit.
