@@ -42,14 +42,16 @@ jobs:
           passive=Path('article/3passive.tex').read_text(encoding='utf-8')
           bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
           tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          key_count=len(re.findall(r'@\w+\{'+re.escape(key)+r'\s*,',bib,re.I))
+          doi_field_count=len(re.findall(r'doi\s*=\s*\{\s*'+re.escape(doi)+r'\s*\}',bib,re.I))
           checks=[
               (readme.lower().count(doi.lower())==1,'README contains one DCEEM DOI'),
               (corpus.lower().count(doi.lower())==1,'V2 corpus contains one DCEEM DOI'),
               (title in readme,'README title present'),
               (title in corpus,'V2 title present'),
               (key in passive,'passive survey citation present'),
-              (len(re.findall(r'@\\w+\\{'+re.escape(key)+r'\\s*,',bib,re.I))==1,'one canonical BibTeX key'),
-              (bib.lower().count(doi.lower())==1,'one canonical DOI in merged bibliography'),
+              (key_count==1,f'one canonical BibTeX key (found {key_count})'),
+              (doi_field_count==1,f'one canonical DOI field in merged bibliography (found {doi_field_count})'),
               ('21 August 2026' in tex,'survey date/provenance updated'),
               ('Updated 21 August 2026' in corpus and 'Last updated: 21 August 2026' in corpus,'V2 dates updated'),
               ('<b>311</b><span>tracked latest entries</span>' in corpus,'V2 tracked count incremented once'),
