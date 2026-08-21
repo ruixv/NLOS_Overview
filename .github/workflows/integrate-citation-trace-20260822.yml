@@ -16,6 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
+          ref: master
           fetch-depth: 0
 
       - name: Apply citation-trace integration
@@ -56,11 +57,13 @@ jobs:
           ok='shenMARMOT2025' in data and 'one million confocal NLOS transients' in data
           print(('PASS: ' if ok else 'FAIL: ')+'MARMOT final-version survey prose')
           if not ok: failures.append('MARMOT survey prose')
+          marmot_start=bib.find('@article{shenMARMOT2025')
+          marmot_slice=bib[marmot_start:marmot_start+1100] if marmot_start>=0 else ''
           tests=[
             ('Visual Intelligence 4, 22 (2026)' in readme,'README MARMOT final venue'),
             ('Visual Intelligence 4, 22 (2026)' in corpus,'V2 MARMOT final venue'),
             ('journal = {Visual Intelligence}' in bib,'Bib MARMOT final venue'),
-            ('Qilin Sun' in bib and 'Suan Xia' not in bib[bib.find('@article{shenMARMOT2025'):bib.find('@article{shenMARMOT2025')+900], 'MARMOT final author list'),
+            ('Sun, Qilin' in marmot_slice and 'Xia, Suan' not in marmot_slice,'MARMOT final author list'),
             ('<b>317</b><span>tracked latest entries</span>' in corpus,'V2 tracked count 317'),
             ('22 August 2026' in tex,'survey provenance date'),
           ]
