@@ -68,7 +68,7 @@ jobs:
           checks=[
             ('jeonTJunctionMmWaveNLOS2025' in survey,'existing IV 2025 multi-target work now cited in survey'),
             ('parkTjunctionPedestrian2025' in survey,'existing IROS road-layout work retained in survey'),
-            ('ECCV 2026 (accepted)' in readme and 'proceedings metadata' in readme,'ECCV accepted venue is not overclaimed'),
+            ('ECCV 2026 (accepted' in readme and 'bingurrr.github.io/reflection-aware-nlos' in readme,'ECCV accepted venue/project source is not overclaimed'),
             ('22 August 2026 radar/acoustic trace:' in tex,'survey provenance marker'),
           ]
           actual=site.count('{cat:')
