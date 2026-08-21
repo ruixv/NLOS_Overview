@@ -1,0 +1,51 @@
+name: Synchronize 22 Aug NLOS homepage date
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/sync_index_date_20260822.trigger
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: master
+          fetch-depth: 0
+      - name: Synchronize static homepage survey badge
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old='Updated 20 Aug 2026'
+          new='Updated 22 Aug 2026'
+          if s.count(old)!=1:
+              raise RuntimeError(f'Expected one stale homepage date, found {s.count(old)}')
+          if new in s:
+              raise RuntimeError('New homepage date unexpectedly already present')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          readme=Path('README.md').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          assert 'Update run: 22 August 2026' in readme
+          assert 'Updated 22 August 2026' in corpus
+          assert '22 August 2026' in tex
+          assert new in p.read_text(encoding='utf-8')
+          print('Homepage date synchronized with README, canonical corpus, and survey source.')
+          PY
+      - name: Commit synchronized homepage
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/sync-index-date-20260822-pr.yml
+          git add index.html
+          git commit -m 'Synchronize 22 August homepage date'
+          git push origin HEAD:master
