@@ -63,14 +63,14 @@ jobs:
             ok=key in passive
             print(('PASS: ' if ok else 'FAIL: ')+'passive survey cites '+key)
             if not ok: bad.append('passive survey '+key)
-          marmot_start=bib.find('@article{shenMARMOT2025')
-          marmot_slice=bib[marmot_start:marmot_start+1100] if marmot_start>=0 else ''
+          m=re.search(r'@article\{shenMARMOT2025,\n(.*?)\n\}',bib,re.S)
+          marmot=m.group(1) if m else ''
           checks=[
             ('one million confocal NLOS transients' in data,'MARMOT final-version TransVerse scale'),
             ('Visual Intelligence 4, 22 (2026)' in readme,'README MARMOT final venue'),
             ('Visual Intelligence 4, 22 (2026)' in corpus,'V2 MARMOT final venue'),
-            ('journal = {Visual Intelligence}' in marmot_slice,'Bib MARMOT final venue'),
-            ('Sun, Qilin' in marmot_slice and 'Xia, Suan' not in marmot_slice,'MARMOT final author list'),
+            ('journal = {Visual Intelligence}' in marmot,'Bib MARMOT final venue'),
+            ('Sun, Qilin' in marmot and 'Xia, Suan' not in marmot,'MARMOT final author list'),
             ('<b>317</b><span>tracked latest entries</span>' in corpus,'V2 count 317'),
             ('22 August 2026' in tex,'survey provenance date'),
           ]
@@ -161,7 +161,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git rm -f .github/workflows/integrate-citation-trace-20260822.yml .github/workflows/integrate-citation-trace-20260822-pr.yml scripts/integrate_citation_trace_20260822.py
+          git rm -f .github/workflows/integrate-citation-trace-20260822.yml .github/workflows/integrate-citation-trace-20260822-pr.yml .github/workflows/repair-citation-script-20260822-pr.yml scripts/integrate_citation_trace_20260822.py
           git add README.md data/papers-source.html article/3passive.tex article/4datadriven.tex egbib_merged_20260711.bib bare_jrnl.tex bare_jrnl.pdf updates/2026-08-22-marmot-passive-citation-trace.md
           if git diff --cached --quiet; then
             echo 'No changes to commit'
