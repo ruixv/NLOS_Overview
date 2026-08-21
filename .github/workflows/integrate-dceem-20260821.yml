@@ -8,7 +8,7 @@ on:
   pull_request:
     branches: [master]
     paths:
-      - updates/trigger-dceem-20260821.md
+      - 'updates/trigger-dceem-20260821*.md'
   workflow_dispatch:
 
 permissions:
