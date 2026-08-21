@@ -1,0 +1,177 @@
+name: Guarded radar/acoustic NLOS citation-trace integration
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/trigger-radar-acoustic-nlos-20260822'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-radar-acoustic-nlos-20260822
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply bounded source integration
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/integrate_radar_acoustic_nlos_20260822.py
+          python scripts/integrate_radar_acoustic_nlos_20260822.py
+
+      - name: Validate synchronized sources
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          readme=Path('README.md').read_text(encoding='utf-8')
+          site=Path('data/papers-source.html').read_text(encoding='utf-8')
+          survey=Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          records=[
+            ('A dual-branch fusion network for footstep sound source localization in non-line-of-sight corridors','10.1121/10.0044386','wangCorridorLocNet2026'),
+            ('Radar-Based NLoS Pedestrian Localization for Darting-Out Scenarios Near Parked Vehicles with Camera-Assisted Point Cloud Interpretation','10.1109/IROS60139.2025.11246930','kimDartingOutNLOS2025'),
+            ('Reflection-Aware Reasoning for Non-Line-of-Sight Pedestrian Localization','', 'parkReflectionAwareNLOS2026'),
+          ]
+          bad=[]
+          for title,doi,key in records:
+              checks=[
+                (title in readme, 'README '+title),
+                (site.count('title:"'+title+'"')==1, 'V2 exactly one '+title),
+                (survey.count(key)==1, 'survey exactly one '+key),
+                (len(re.findall(r'@\w+\{'+re.escape(key)+r'\s*,',bib,re.I))==1, 'Bib exactly one '+key),
+              ]
+              if doi:
+                  checks.append((len(re.findall(r'doi\s*=\s*\{\s*'+re.escape(doi)+r'\s*\}',bib,re.I))==1,'Bib exactly one DOI '+doi))
+              for ok,msg in checks:
+                  print(('PASS: ' if ok else 'FAIL: ')+msg)
+                  if not ok: bad.append(msg)
+          checks=[
+            ('jeonTJunctionMmWaveNLOS2025' in survey,'existing IV 2025 multi-target work now cited in survey'),
+            ('parkTjunctionPedestrian2025' in survey,'existing IROS road-layout work retained in survey'),
+            ('ECCV 2026 (accepted)' in readme and 'proceedings metadata' in readme,'ECCV accepted venue is not overclaimed'),
+            ('22 August 2026 radar/acoustic trace:' in tex,'survey provenance marker'),
+          ]
+          actual=site.count('{cat:')
+          m=re.search(r'<b>(\d+)</b><span>tracked latest entries</span>',site)
+          checks.append((m is not None and int(m.group(1))==actual,'V2 tracked count matches paper array'))
+          for ok,msg in checks:
+              print(('PASS: ' if ok else 'FAIL: ')+msg)
+              if not ok: bad.append(msg)
+          if bad:
+              raise AssertionError('; '.join(bad))
+          print('Tracked entries:', actual)
+          PY
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            texlive-bibtex-extra ghostscript poppler-utils
+
+      - name: Rebuild survey PDF
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex')
+          s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+              if s.count(anchor)!=1:
+                  raise RuntimeError('hyperref anchor not unique')
+              p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          test -s bare_jrnl.pdf
+          if grep -Eq 'Citation .* undefined|There were undefined references|There were undefined citations|Repeated entry' bare_jrnl.log; then
+            echo 'Unresolved citation/reference or duplicate BibTeX entry remains' >&2
+            exit 1
+          fi
+
+      - name: Validate citations, PDF semantics, and rendering
+        run: |
+          set -euo pipefail
+          for key in wangCorridorLocNet2026 kimDartingOutNLOS2025 parkReflectionAwareNLOS2026 jeonTJunctionMmWaveNLOS2025; do
+            grep -Fq "$key" bare_jrnl.aux
+            grep -Fq "$key" bare_jrnl.bbl
+          done
+          pdftotext -layout bare_jrnl.pdf /tmp/nlos-radar-acoustic-20260822.txt
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          def norm(s): return ' '.join(re.sub(r'[^a-z0-9]+',' ',s.lower()).split())
+          txt=norm(Path('/tmp/nlos-radar-acoustic-20260822.txt').read_text(encoding='utf-8',errors='ignore'))
+          groups={
+            'CorridorLocNet':['corridorlocnet','gcc phat'],
+            'darting-out':['darting out','parked vehicles'],
+            'reflection-aware':['reflection aware','ego dynamic'],
+            'multi-target IV':['multi target','t junction'],
+          }
+          bad=[]
+          for label,toks in groups.items():
+              ok=all(norm(t) in txt for t in toks)
+              print(f'PDF semantic check {label}: {ok}')
+              if not ok: bad.append(label)
+          if bad:
+              raise AssertionError('Missing PDF semantic groups: '+', '.join(bad))
+          if Path('bare_jrnl.pdf').stat().st_size < 100000:
+              raise AssertionError('PDF unexpectedly small')
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test -n "$pages"
+          mkdir -p /tmp/render-radar-acoustic-20260822
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render-radar-acoustic-20260822/first >/dev/null 2>&1
+          test -s /tmp/render-radar-acoustic-20260822/first.png
+          topic_page=''
+          for p in $(seq 1 "$pages"); do
+            if pdftotext -f "$p" -l "$p" bare_jrnl.pdf - | tr '\n' ' ' | grep -Fiq 'CorridorLocNet'; then
+              topic_page="$p"
+              break
+            fi
+          done
+          test -n "$topic_page"
+          pdftoppm -f "$topic_page" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render-radar-acoustic-20260822/topic >/dev/null 2>&1
+          test -s /tmp/render-radar-acoustic-20260822/topic.png
+
+      - name: Commit validated public artifacts to PR head
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -f .github/trigger-radar-acoustic-nlos-20260822 \
+            .github/workflows/integrate-radar-acoustic-nlos-20260822.yml \
+            scripts/integrate_radar_acoustic_nlos_20260822.py
+          git add README.md data/papers-source.html article/5newscenes.tex bare_jrnl.tex \
+            egbib_merged_20260711.bib bare_jrnl.pdf \
+            updates/2026-08-22-radar-acoustic-nlos-citation-trace.md
+          git diff --cached --check
+          git commit -m 'Integrate radar and acoustic NLOS localization lineage'
+          git push origin HEAD:${{ github.head_ref }}
