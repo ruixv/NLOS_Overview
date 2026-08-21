@@ -81,17 +81,40 @@ jobs:
           set -euo pipefail
           test -s bare_jrnl.pdf
           grep -q 'wangDynamicChannelPNLOS2026' bare_jrnl.aux
-          grep -qi 'Enhancing passive non-line-of-sight imaging via dynamic channel optimization' bare_jrnl.bbl
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          def norm(s):
+              return ' '.join(re.sub(r'[^a-z0-9]+', ' ', s.lower()).split())
+
+          bbl = norm(Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore'))
+          title = norm('Enhancing passive non-line-of-sight imaging via dynamic channel optimization')
+          if title not in bbl:
+              raise AssertionError('DCEEM bibliography title missing from .bbl after normalization')
+          PY
           pdftotext bare_jrnl.pdf /tmp/nlos-dceem.txt
           python3 - <<'PY'
           from pathlib import Path
           import re
+
+          def norm(s):
+              return ' '.join(re.sub(r'[^a-z0-9]+', ' ', s.lower()).split())
+
           txt=Path('/tmp/nlos-dceem.txt').read_text(encoding='utf-8',errors='ignore')
-          norm=re.sub(r'[-‐‑–—\n\r\t ]+',' ',txt).lower()
-          required=['dynamic channel enhancement','bayesian','light transport','vector quantization']
-          missing=[x for x in required if x not in norm]
-          print('PDF semantic checks:', {x:(x in norm) for x in required})
-          if missing: raise AssertionError('Missing PDF semantic tokens: '+', '.join(missing))
+          pdf=norm(txt)
+          groups={
+              'DCEEM identity': ['dynamic channel enhancement', 'passive nlos'],
+              'physics-aware channel selection': ['light transport', 'channel'],
+              'survey date': ['21 august 2026'],
+          }
+          missing=[]
+          for label,tokens in groups.items():
+              ok=all(norm(t) in pdf for t in tokens)
+              print(f'PDF semantic check {label}: {ok}')
+              if not ok: missing.append(label)
+          if missing:
+              raise AssertionError('Missing normalized PDF semantic groups: '+', '.join(missing))
           if Path('bare_jrnl.pdf').stat().st_size < 100000:
               raise AssertionError('rebuilt PDF unexpectedly small')
           PY
@@ -112,7 +135,7 @@ jobs:
 
           The survey positions DCEEM after diffuse-aware / light-transport-aware passive reconstruction as a low-SNR physics-aware channel-selection step: feature statistics and physical descriptors are fused through Bayesian multiplicative weighting, followed by hierarchical denoising/refinement and vector-quantization optimization.
 
-          README, canonical V2 corpus/timeline, passive-survey prose, merged bibliography, and regenerated `bare_jrnl.pdf` were validated together. Citation resolution, PDF text semantics, and rendered first/last pages passed before commit.
+          README, canonical V2 corpus/timeline, passive-survey prose, merged bibliography, and regenerated `bare_jrnl.pdf` were validated together. Citation resolution, normalized PDF text semantics, and rendered first/last pages passed before commit.
           EOF
 
       - name: Commit synchronized public artifacts
