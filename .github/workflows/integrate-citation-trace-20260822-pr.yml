@@ -1,0 +1,171 @@
+name: Integrate 22 Aug NLOS citation trace via PR
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/citation_trace_20260822_pr.trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-citation-trace-20260822
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out current master
+        uses: actions/checkout@v5
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Apply synchronized source integration
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/integrate_citation_trace_20260822.py
+          python3 scripts/integrate_citation_trace_20260822.py
+
+      - name: Validate source synchronization
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          readme=Path('README.md').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          passive=Path('article/3passive.tex').read_text(encoding='utf-8')
+          data=Path('article/4datadriven.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          records=[
+            ('10.1007/s44267-026-00125-1','shenMARMOT2025'),
+            ('10.1117/12.3055610','liHyperspectralAutoencoderNLOS2025'),
+            ('10.37188/OPE.20263409.1496','yuEnhancedReflectionUNet2026'),
+            ('10.1117/12.3049350','wangPassiveHiddenTargetDetection2024'),
+          ]
+          bad=[]
+          for doi,key in records:
+            checks=[
+              (readme.lower().count(doi.lower())==1,f'README exactly one {doi}'),
+              (corpus.lower().count(doi.lower())==1,f'V2 exactly one {doi}'),
+              (len(re.findall(r'@\w+\{'+re.escape(key)+r'\s*,',bib,re.I))==1,f'one BibTeX key {key}'),
+              (len(re.findall(r'doi\s*=\s*\{\s*'+re.escape(doi)+r'\s*\}',bib,re.I))==1,f'one DOI field {doi}'),
+            ]
+            for ok,msg in checks:
+              print(('PASS: ' if ok else 'FAIL: ')+msg)
+              if not ok: bad.append(msg)
+          for key in ['liHyperspectralAutoencoderNLOS2025','yuEnhancedReflectionUNet2026','wangPassiveHiddenTargetDetection2024']:
+            ok=key in passive
+            print(('PASS: ' if ok else 'FAIL: ')+'passive survey cites '+key)
+            if not ok: bad.append('passive survey '+key)
+          marmot_start=bib.find('@article{shenMARMOT2025')
+          marmot_slice=bib[marmot_start:marmot_start+1100] if marmot_start>=0 else ''
+          checks=[
+            ('one million confocal NLOS transients' in data,'MARMOT final-version TransVerse scale'),
+            ('Visual Intelligence 4, 22 (2026)' in readme,'README MARMOT final venue'),
+            ('Visual Intelligence 4, 22 (2026)' in corpus,'V2 MARMOT final venue'),
+            ('journal = {Visual Intelligence}' in marmot_slice,'Bib MARMOT final venue'),
+            ('Sun, Qilin' in marmot_slice and 'Xia, Suan' not in marmot_slice,'MARMOT final author list'),
+            ('<b>317</b><span>tracked latest entries</span>' in corpus,'V2 count 317'),
+            ('22 August 2026' in tex,'survey provenance date'),
+          ]
+          for ok,msg in checks:
+            print(('PASS: ' if ok else 'FAIL: ')+msg)
+            if not ok: bad.append(msg)
+          if bad: raise AssertionError('; '.join(bad))
+          PY
+
+      - name: Install LaTeX and PDF tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Rebuild survey PDF
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+            if s.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+            p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate citations, PDF semantics, and rendering
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          for key in shenMARMOT2025 liHyperspectralAutoencoderNLOS2025 yuEnhancedReflectionUNet2026 wangPassiveHiddenTargetDetection2024; do
+            grep -F -q "$key" bare_jrnl.aux
+            grep -F -q "$key" bare_jrnl.bbl
+          done
+          ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
+          pdftotext -layout bare_jrnl.pdf /tmp/nlos-20260822.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          def norm(s): return ' '.join(re.sub(r'[^a-z0-9]+',' ',s.lower()).split())
+          txt=norm(Path('/tmp/nlos-20260822.txt').read_text(encoding='utf-8',errors='ignore'))
+          groups={
+            'MARMOT':['marmot','visual intelligence','transverse'],
+            'HAENet':['hyperspectral autoencoder','spatial spectral'],
+            'enhanced U-Net':['enhanced reflection','passive non line of sight'],
+            'hidden target detection':['hidden target detection','passive non line of sight'],
+          }
+          bad=[]
+          for label,toks in groups.items():
+            ok=all(norm(t) in txt for t in toks)
+            print(f'PDF semantic check {label}: {ok}')
+            if not ok: bad.append(label)
+          if bad: raise AssertionError('Missing PDF semantic groups: '+', '.join(bad))
+          if Path('bare_jrnl.pdf').stat().st_size < 100000: raise AssertionError('PDF unexpectedly small')
+          PY
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test -n "$pages"
+          mkdir -p /tmp/render-20260822
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render-20260822/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render-20260822/last >/dev/null 2>&1
+          test -s /tmp/render-20260822/first.png
+          test -s /tmp/render-20260822/last.png
+
+      - name: Record integrated status
+        run: |
+          cat > updates/2026-08-22-marmot-passive-citation-trace.md <<'EOF'
+          # MARMOT final venue and passive-NLOS citation-trace gaps — 22 August 2026
+
+          MARMOT was upgraded from its 2025 arXiv-only record to the final Visual Intelligence publication, volume 4, article 22 (2026), DOI 10.1007/s44267-026-00125-1, published 18 August 2026. The final author list contains Qilin Sun rather than Suan Xia; the final paper acknowledges Xia for data-acquisition support. The arXiv identifier remains auxiliary metadata.
+
+          Three citation-traced passive-NLOS gaps were also integrated: Li et al., hyperspectral autoencoder / HAENet (Proc. SPIE 13542, 135421R, 2025, DOI 10.1117/12.3055610); Wang et al., passive hidden-target detection (Proc. SPIE 13282, 132820R, 2024, DOI 10.1117/12.3049350); and Yu et al., enhanced-reflection U-Net reconstruction (Optics and Precision Engineering 34(9), 1496–1506, 2026, DOI 10.37188/OPE.20263409.1496).
+
+          README, canonical V2 corpus/timeline, passive/data-driven survey prose, merged bibliography, LaTeX source, and rebuilt PDF were validated together. The V2 tracked-entry count changed from 314 to 317 because MARMOT already existed and only its venue/metadata changed.
+          EOF
+
+      - name: Commit validated artifacts to master
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -f .github/workflows/integrate-citation-trace-20260822.yml .github/workflows/integrate-citation-trace-20260822-pr.yml scripts/integrate_citation_trace_20260822.py
+          git add README.md data/papers-source.html article/3passive.tex article/4datadriven.tex egbib_merged_20260711.bib bare_jrnl.tex bare_jrnl.pdf updates/2026-08-22-marmot-passive-citation-trace.md
+          if git diff --cached --quiet; then
+            echo 'No changes to commit'
+            exit 1
+          fi
+          git commit -m 'Finalize MARMOT venue and close passive NLOS gaps'
+          git push origin HEAD:master
