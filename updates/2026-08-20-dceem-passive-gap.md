@@ -81,3 +81,7 @@ Do **not** claim `bare_jrnl.pdf` is updated until this clean build and cross-art
 ## Interaction with pending passive-lineage integration
 
 PR #135 is still open for the separately verified Hyper-NLOS 2024 and *Turning rough surfaces into non-line-of-sight cameras* 2025 gaps. Avoid independently overwriting the same large passive-survey / corpus files while that guarded integration is unresolved. This note and the staging BibTeX intentionally keep the newly verified DCEEM record losslessly ready for the next safe synchronized public-content build.
+
+## Integration status
+
+Integrated by the guarded 21 August 2026 workflow after the Hyper-NLOS / rough-surface passive milestone update had landed on `master`. The workflow synchronizes README, the canonical V2 corpus/timeline, passive-survey prose, merged bibliography, and the rebuilt survey PDF, and validates citation resolution and rendered PDF endpoints before committing.

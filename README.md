@@ -64,10 +64,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 20 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 21 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [Enhancing passive non-line-of-sight imaging via dynamic channel optimization](https://doi.org/10.1016/j.optcom.2026.133626) — Wang et al. | Optics Communications 620, 133626 (2026) | Introduces DCEEM for low-SNR passive NLOS: Bayesian multiplicative fusion combines feature statistics with light-transport descriptors to adaptively suppress noise-dominated channels, while hierarchical denoising/refinement and vector-quantization optimization strengthen hidden-scene reconstruction. |
 | 2024 | [Hyper-NLOS: hyperspectral passive non-line-of-sight imaging](https://doi.org/10.1364/OE.532699) — Chen et al. | Optics Express 32(20), 34807–34824 (2024) | HFN-Net exploits wavelength-resolved relay-wall measurements with a hyperspectral full-color autoencoder and spatial–spectral attention, improving passive-NLOS color/structure recovery and introducing the HS-NLOS dataset. |
 | 2025 | [Turning rough surfaces into non-line-of-sight cameras](https://doi.org/10.1364/OPTICA.544275) — Li et al. | Optica 12(5), 626–634 (2025) | Models microscale rough-wall scattering as an invertible passive encoding rather than a nuisance, enabling ordinary-camera high-resolution real-time NLOS imaging, near-90° field of view, full-color recovery, keyhole imaging, and non-invasive calibration. |
 | 2026 | [NLOS-MT: A Hybrid Mamba and Windowed Attention Transformer for Non-Line-of-Sight Imaging](https://doi.org/10.1007/978-3-032-31666-0_20) — Jin et al. | ICPR 2026, LNCS 16816, 297–311 (Springer chapter; first online 3 Aug 2026) | Combines a DeformMamba block for linear-complexity long-range/global transient modeling and robust denoising with a window-attention U-Net for local contextual refinement, extending learned active NLOS reconstruction from pure Transformer or pure Mamba designs to a hybrid state-space/attention architecture. |
@@ -569,6 +570,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
 2025 ── Zhou et al.: 10 m passive NLOS — pattern calibration and low-rank background separation move ordinary-camera computational periscopy to long range [Optics Letters]
    │     Li et al.: a microscale rough-surface scattering model turns an ordinary rough relay wall into a well-conditioned passive camera, enabling real-time high-resolution and keyhole NLOS recovery [Optica]
 2026 ── Liang et al.: HPDI — physics-informed coarse-to-fine reconstruction fused with an implicit data-driven passive pathway [IEEE TCI]
+   │     Wang et al.: DCEEM makes passive feature selection explicitly light-transport-aware, using Bayesian dynamic channel weighting and hierarchical denoising/refinement to suppress low-SNR channel aliasing before vector quantization [Optics Communications]
    │     Liu et al.: geometry-constrained NLOS — shape-operator regularization jointly recovers albedo and hidden surface normals [IEEE TVCG]
    │     Li et al.: Super-FoV NLOS — translated-PSF spatial encoding reconstructs beyond the physical relay scan region [Photonics Research]
 2026 -- Oyama et al.: adaptive spiral relay-wall sampling allocates limited confocal measurements from observed return intensity [IEEE OJSP]
