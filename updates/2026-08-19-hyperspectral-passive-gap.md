@@ -2,6 +2,8 @@
 
 ## Status
 
+**Integrated on 20 August 2026.** The verified paper is now synchronized across README, the canonical V2 corpus/timeline, passive survey prose, merged bibliography, and rebuilt survey PDF. The remainder of this note is retained as provenance for the earlier gap analysis.
+
 A fresh recent-paper search plus Core-paper / milestone forward-citation tracing identified one high-confidence paper that is still missing from the public survey artifacts:
 
 - Mingyang Chen, Hao Liu, Shaohui Jin, Mengge Liu, Ziqin Xu, Xiaoheng Jiang, Ming Liang Xu, **“Hyper-NLOS: hyperspectral passive non-line-of-sight imaging,”** *Optics Express*, 32(20):34807–34824, 2024. DOI: `10.1364/OE.532699`.
