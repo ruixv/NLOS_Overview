@@ -69,7 +69,8 @@ old_marmot_2025 = 'MARMOT made masked transient pretraining and arbitrary-scan c
 new_marmot_2025 = 'The 2025 MARMOT preprint, finalized in Visual Intelligence in 2026, made masked transient pretraining and arbitrary-scan completion reusable across downstream NLOS tasks, while HOLI-1-to-3 combined radiance and transient fields so hidden three-bounce evidence could constrain geometry invisible to a single LOS view.'
 corpus = replace_once(corpus, old_marmot_2025, new_marmot_2025, 'V2 MARMOT final-venue timeline note')
 
-old_2026_tail = 'Wang et al. further made passive feature selection explicitly light-transport-aware with DCEEM, combining Bayesian dynamic channel weighting with hierarchical denoising/refinement and vector quantization for low-SNR reconstruction.'</nnew_2026_tail = old_2026_tail + ' Yu et al. added a formally published enhanced-reflection U-Net reconstruction branch for passive NLOS, extending the supervised encoder–decoder lineage alongside attention- and physics-guided models.'
+old_2026_tail = 'Wang et al. further made passive feature selection explicitly light-transport-aware with DCEEM, combining Bayesian dynamic channel weighting with hierarchical denoising/refinement and vector quantization for low-SNR reconstruction.'
+new_2026_tail = old_2026_tail + ' Yu et al. added a formally published enhanced-reflection U-Net reconstruction branch for passive NLOS, extending the supervised encoder–decoder lineage alongside attention- and physics-guided models.'
 corpus = replace_once(corpus, old_2026_tail, new_2026_tail, 'V2 2026 enhanced-U-Net timeline')
 write('data/papers-source.html', corpus)
 
