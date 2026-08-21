@@ -68,6 +68,9 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [Radar-Based NLoS Pedestrian Localization for Darting-Out Scenarios Near Parked Vehicles with Camera-Assisted Point Cloud Interpretation](https://doi.org/10.1109/IROS60139.2025.11246930) — Kim et al. | IEEE/RSJ IROS 2025, 21352–21359 | Uses monocular vehicle segmentation/depth to infer temporary parked-vehicle occluders, refines that geometry with 2D mmWave radar points, and then interprets reflected/diffracted returns to localize pedestrians before they emerge into line of sight in measured urban driving experiments. |
+| 2026 | [Reflection-Aware Reasoning for Non-Line-of-Sight Pedestrian Localization](https://bingurrr.github.io/reflection-aware-nlos/) — Park, Jeon, Kim | ECCV 2026 (accepted; project page available before proceedings metadata) | Extends automotive mmWave NLOS localization to a moving ego-vehicle: camera/radar cross-attention predicts reflection type and reflective-surface structure in BEV, then physics-guided ray tracing unfolds distorted multipath. The real outdoor benchmark contains 120 scenarios / 12,539 frames and reports 1.23 m localization accuracy. |
+| 2026 | [A dual-branch fusion network for footstep sound source localization in non-line-of-sight corridors](https://doi.org/10.1121/10.0044386) — Wang, Chen, Yin | The Journal of the Acoustical Society of America 160(2), 1400–1412 (2026) | CorridorLocNet fuses Mel-spectrogram and GCC-PHAT cues with residual-CNN and lightweight-Conformer branches plus cross-attention, learning multipath-dependent footstep position directly from a real around-corner corridor dataset; it reports 98.83% classification accuracy and 2.56 m lower average error than the compared reflection-aware localization baseline. |
 | 2026 | [Enhanced reflection U-Net reconstruction for passive Non-Line-of-Sight imaging](https://doi.org/10.37188/OPE.20263409.1496) — Yu et al. | Optics and Precision Engineering 34(9), 1496–1506 (2026) | A formally published passive-NLOS U-Net reconstruction study that extends the supervised encoder–decoder branch represented by early passive U-Net/GAN methods and later attention/physics-guided reconstruction. |
 | 2025 | [Passive Non-Line-of-Sight Imaging via Hyperspectral Autoencoder Net](https://doi.org/10.1117/12.3055610) — Li et al. | Proc. SPIE 13542, 135421R (CITA 2024; published 2025) | HAENet extends Hyper-NLOS with spatial–spectral separation reconstruction and spatial–spectral residual attention, exploiting hyperspectral relay measurements while reducing redundancy across wavelength and spatial dimensions. |
 | 2024 | [Passive non-line-of-sight imaging for hidden target detection](https://doi.org/10.1117/12.3049350) — Wang et al. | Proc. SPIE 13282, 132820R (AIIP 2024) | A task-oriented passive-NLOS study focused on hidden-target detection, complementing full hidden-image reconstruction and marking the broader shift toward semantic/passive sensing objectives. |
@@ -420,6 +423,8 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Li et al.: programmable RIS beam control enables hidden-region respiration and heartbeat sensing [Acta Electronica Sinica]
    │     Tripathy et al.: liquid-crystal RIS + SIL radar experimentally monitors NLOS vital signs [IEEE IMBioC]
    │     Park et al.: camera-derived T-junction geometry conditions mmWave multipath for hidden-pedestrian localization [IEEE/RSJ IROS]
+   │     Jeon et al.: static-point layout inference plus multipath ray tracing localizes multiple hidden pedestrians at real outdoor T-junctions [IEEE IV]
+   │     Kim et al.: camera-derived parked-vehicle geometry plus radar refinement handles temporary darting-out occluders in real urban NLOS driving [IEEE/RSJ IROS]
    │     Isogawa et al.: C2NLOS transient sinograms — 1D circular confocal scanning with far fewer measurements [ECCV]
    │     Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
    │
@@ -533,6 +538,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Yu et al.: an IRS-assisted FDA-MIMO tensor model turns a controllable hidden path into multi-target range/angle localization [Digital Signal Processing]
    │     Xie et al. / Yu et al.: covariance-tensor HOSVD and fast coherent/noncoherent angle estimation extend RIS-assisted hidden-target direction finding [IEEE SPL / TAES]
    │     Yu et al.: cross-regional NLOS localization moves the multipath-detection branch toward joint-GLRT inference across hidden regions [IEEE IGARSS]
+   │     Park et al.: reflection-aware camera/radar BEV fusion plus physics-guided ray tracing extends hidden-pedestrian localization to moving ego-vehicle scenarios [ECCV]
 2026 ── Yin et al.: Si-SPAD and phase-congruency regularization enable 200 m all-day active NLOS under 94,314 lx sunlight [Optics and Lasers in Engineering]
    │     ICT follow-up: industrial 5G/mmWave ISAC adds range--Doppler detection and PHD tracking for reliable fully NLOS intrusion monitoring [ICT 2026]
    │     Doğan: laser–acoustic early fusion and LAO-Net extend hidden-human NLOS sensing from localization/reconstruction toward four-class orientation inference [Scientific Reports]
@@ -541,6 +547,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Cetin et al.: multichannel wall-mediated echoes extend acoustic NLOS semantics from hidden-material recognition to live-human versus debris discrimination, exposing strong representation–classifier inductive-bias interactions [IEEE Access]
    │     Jeon et al.: ASPLE particle filtering and the ARIL/OVAD datasets bring passive acoustic NLOS vehicle localization into road-safety tracking [IEEE T-ITS]
    │     Zhai et al.: Biot–Tolstoy–Medwin edge diffraction supplies a physics-aware steering vector for irregular-grid hidden-source beamforming [Measurement]
+   │     Wang et al.: CorridorLocNet learns real around-corner footstep position from Mel/GCC-PHAT multipath cues with CNN–Conformer cross-attention [JASA]
      │     Zhang et al.: monostatic radar--RIS steering-vector decoupling and Root-MUSIC enable simulated NLOS target-angle estimation [Signal Processing]
    │     Matsubara et al.: joint hidden thermal-source and environment recovery combines real-image reprojection with supervised synthetic learning [VISAPP]
    │     Kozawa et al.: curved vehicle bodies become opportunistic mirrors for camera-only hidden-pedestrian 3D localization [VISAPP]
