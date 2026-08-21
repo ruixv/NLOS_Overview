@@ -17,20 +17,22 @@ jobs:
         with:
           ref: master
           fetch-depth: 0
-      - name: Repair literal newline escape and compile-check
+      - name: Repair literal slash-n corruption and compile-check
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          import re
           p=Path('scripts/integrate_citation_trace_20260822.py')
           s=p.read_text(encoding='utf-8')
           i=s.find('old_2026_tail')
           print('diagnostic:', repr(s[i:i+500]))
-          s2,n=re.subn(r'\\+n(?=new_2026_tail\s*=)', '\n', s)
-          print('literal-newline replacements:', n)
+          bad="</nnew_2026_tail ="
+          good="\nnew_2026_tail ="
+          n=s.count(bad)
+          print('literal slash-n replacements:', n)
           if n != 1:
-              raise RuntimeError(f'Expected one broken literal newline before new_2026_tail, found {n}')
+              raise RuntimeError(f'Expected one broken </n before new_2026_tail, found {n}')
+          s2=s.replace(bad,good,1)
           p.write_text(s2,encoding='utf-8')
           compile(s2,str(p),'exec')
           print('compile check passed')
