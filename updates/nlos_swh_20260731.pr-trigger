@@ -1,0 +1,2 @@
+Trigger the guarded synthetic-wavelength holography integration from a pull-request event.
+Retry after restricting the generated commit to validated public artifacts on 2026-07-31.
