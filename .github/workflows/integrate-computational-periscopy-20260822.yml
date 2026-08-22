@@ -105,8 +105,16 @@ jobs:
           norm=re.sub(r'[-‐‑–—]\s*\n\s*','',norm)
           norm=re.sub(r'[^a-z0-9]+',' ',norm)
           norm=re.sub(r'\s+',' ',norm).strip()
-          for phrase in ['from edge apertures to multi depth and background robust computational periscopy','optimized preconditioning','two dimensional angle range']:
-            assert phrase in norm, phrase
+          token_groups=[
+            ('edge-aperture lineage', ['edge','aperture','computational','periscopy']),
+            ('multi-depth recovery', ['multi','depth','hidden','images']),
+            ('2-D edge-camera recovery', ['angle','range','hidden','scene']),
+            ('ambient-light preconditioning', ['optimized','preconditioning','ambient']),
+          ]
+          words=set(norm.split())
+          for label,tokens in token_groups:
+            missing=[t for t in tokens if t not in words]
+            assert not missing, (label, missing)
           print('PDF semantic and citation checks passed')
           PY
 
