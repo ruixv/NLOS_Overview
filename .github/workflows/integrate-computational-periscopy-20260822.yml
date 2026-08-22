@@ -1,0 +1,127 @@
+name: Integrate computational-periscopy citation lineage
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-computational-periscopy-20260822.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Apply computational-periscopy integration
+        run: |
+          python3 scripts/integrate_computational_periscopy_20260822.py
+
+      - name: Validate source-level synchronization
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          papers=[
+            ('Corner Occluder Computational Periscopy: Estimating a Hidden Scene from a Single Photograph','10.1109/ICCPHOT.2019.8747342','DBLP:conf/iccp/SeidelMMSFYG19'),
+            ('Multi-Depth Computational Periscopy with an Ordinary Camera','10.1109/ICASSP40776.2020.9054518','saundersMultiDepthPeriscopy2020'),
+            ('Two-Dimensional Non-Line-of-Sight Scene Estimation From a Single Edge Occluder','10.1109/TCI.2020.3037405','seidelTwoDimensionalNonLineofSightScene2020'),
+            ('Fast Computational Periscopy in Challenging Ambient Light Conditions through Optimized Preconditioning','10.1109/ICCP51581.2021.9466264','saundersFastPeriscopy2021'),
+          ]
+          readme=Path('README.md').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          passive=Path('article/3passive.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          for title,doi,key in papers:
+            assert title in readme and doi.lower() in readme.lower(), (title,'README')
+            assert title in corpus and doi.lower() in corpus.lower(), (title,'V2 corpus')
+            assert key in passive, (key,'passive survey')
+          for key,doi in [(x[2],x[1]) for x in papers]:
+            assert doi.lower() in bib.lower(), (doi,'merged bibliography')
+          assert len(re.findall(r'(?mi)^@\w+\{seidelTwoDimensionalNonLineofSightScene2020,', bib)) == 1
+          assert 'IEEE Transactions on Computational Imaging' in bib
+          assert '58--72' in bib
+          assert '22 August 2026 computational-periscopy citation trace' in tex
+          assert not Path('egbib_20260822_computational_periscopy_gap.bib').exists()
+          m=re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', corpus)
+          assert m, 'tracked-entry counter missing'
+          assert int(m.group(1)) == corpus.count('{cat:'), (m.group(1), corpus.count('{cat:'))
+          print('source-level synchronization checks passed')
+          PY
+
+      - name: Add LaTeX compatibility shim
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+            if s.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+            p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Install PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Validate rebuilt PDF and citations
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          test "$(stat -c%s bare_jrnl.pdf)" -gt 100000
+          for key in 'DBLP:conf/iccp/SeidelMMSFYG19' saundersMultiDepthPeriscopy2020 seidelTwoDimensionalNonLineofSightScene2020 saundersFastPeriscopy2021; do
+            grep -Fq "$key" bare_jrnl.aux
+            grep -Fq "$key" bare_jrnl.bbl
+          done
+          pdftotext bare_jrnl.pdf /tmp/nlos-periscopy.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, unicodedata
+          txt=Path('/tmp/nlos-periscopy.txt').read_text(encoding='utf-8',errors='ignore')
+          assert len(txt) > 10000, 'PDF text extraction unexpectedly short'
+          norm=unicodedata.normalize('NFKD', txt).casefold()
+          norm=re.sub(r'[-‐‑–—]\s*\n\s*','',norm)
+          norm=re.sub(r'[^a-z0-9]+',' ',norm)
+          norm=re.sub(r'\s+',' ',norm).strip()
+          for phrase in ['from edge apertures to multidepth and backgroundrobust computational periscopy','optimized preconditioning','two dimensional angle range']:
+            assert phrase in norm, phrase
+          print('PDF semantic and citation checks passed')
+          PY
+
+      - name: Render PDF endpoints
+        run: |
+          set -euo pipefail
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test -n "$pages"
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+
+      - name: Commit synchronized artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md data/papers-source.html article/3passive.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-08-22-computational-periscopy-citation-gap.md
+          git add -u egbib_20260822_computational_periscopy_gap.bib || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Integrate computational-periscopy citation lineage'
+          git push origin HEAD:master
