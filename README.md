@@ -68,6 +68,10 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2019 | [Corner Occluder Computational Periscopy: Estimating a Hidden Scene from a Single Photograph](https://doi.org/10.1109/ICCPHOT.2019.8747342) — Seidel et al. | IEEE ICCP 2019 | Uses a known wall edge as a natural aperture so one ordinary-camera penumbra photograph can jointly estimate floor albedo and a 1-D angular representation of the hidden scene. |
+| 2020 | [Multi-Depth Computational Periscopy with an Ordinary Camera](https://doi.org/10.1109/ICASSP40776.2020.9054518) — Saunders et al. | IEEE ICASSP 2020, 9299–9305 | Extends ordinary-camera computational periscopy to a multi-depth hidden scene, recovering two hidden images and their wall-relative depths from a single photograph. |
+| 2021 | [Two-Dimensional Non-Line-of-Sight Scene Estimation From a Single Edge Occluder](https://doi.org/10.1109/TCI.2020.3037405) — Seidel et al. | IEEE Transactions on Computational Imaging 7, 58–72 (2021) | Adds range to edge-occluder angular sensing, reconstructing a 2-D hidden scene from one penumbra photograph with radial-falloff modeling, inversion algorithms, and Cramér–Rao analysis. |
+| 2021 | [Fast Computational Periscopy in Challenging Ambient Light Conditions through Optimized Preconditioning](https://doi.org/10.1109/ICCP51581.2021.9466264) — Saunders and Goyal | IEEE ICCP 2021, 1–9 | Uses optimized preconditioning to reject strong ambient background while improving inverse conditioning, making passive computational periscopy substantially more robust and faster. |
 | 2025 | [Radar-Based NLoS Pedestrian Localization for Darting-Out Scenarios Near Parked Vehicles with Camera-Assisted Point Cloud Interpretation](https://doi.org/10.1109/IROS60139.2025.11246930) — Kim et al. | IEEE/RSJ IROS 2025, 21352–21359 | Uses monocular vehicle segmentation/depth to infer temporary parked-vehicle occluders, refines that geometry with 2D mmWave radar points, and then interprets reflected/diffracted returns to localize pedestrians before they emerge into line of sight in measured urban driving experiments. |
 | 2026 | [Reflection-Aware Reasoning for Non-Line-of-Sight Pedestrian Localization](https://bingurrr.github.io/reflection-aware-nlos/) — Park, Jeon, Kim | ECCV 2026 (accepted; project page available before proceedings metadata) | Extends automotive mmWave NLOS localization to a moving ego-vehicle: camera/radar cross-attention predicts reflection type and reflective-surface structure in BEV, then physics-guided ray tracing unfolds distorted multipath. The real outdoor benchmark contains 120 scenarios / 12,539 frames and reports 1.23 m localization accuracy. |
 | 2026 | [A dual-branch fusion network for footstep sound source localization in non-line-of-sight corridors](https://doi.org/10.1121/10.0044386) — Wang, Chen, Yin | The Journal of the Acoustical Society of America 160(2), 1400–1412 (2026) | CorridorLocNet fuses Mel-spectrogram and GCC-PHAT cues with residual-CNN and lightweight-Conformer branches plus cross-attention, learning multipath-dependent footstep position directly from a real around-corner corridor dataset; it reports 98.83% classification accuracy and 2.56 m lower average error than the compared reflection-aware localization baseline. |
@@ -398,11 +402,13 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Liu et al.: phasor field — NLOS as virtual LOS wave propagation
    │
 2019 ── Tsai et al.: Beyond Volumetric Albedo — direct hidden-surface and reflectance optimization [CVPR]
+   │     Seidel et al.: a single wall edge becomes a natural aperture, enabling one-photograph angular hidden-scene estimation [IEEE ICCP]
    │     Musarra et al.: time-resolved single-pixel capture demonstrates sub-second full-colour 3D NLOS imaging [OSA Imaging Systems and Applications]
    │     Dove and Shapiro: paraxial phasor-field theory — TFSWD propagation formalizes occlusions and specular transport beyond the P-field alone [Optics Express]
    │     Reza et al.: experimental phasor-field waves — interference and independent optical/P-field focusing validate the virtual-wave picture [Optics Express]
    │
 2020 ── Iseringhausen & Hullin: physically based transient analysis-by-synthesis — surface-, BRDF-, and visibility-aware NLOS inverse rendering [ACM TOG]
+   │     Saunders et al.: multi-depth computational periscopy recovers two hidden images together with their wall-relative depths from one ordinary photograph [IEEE ICASSP]
    │     Takatori: stereo virtual-image geometry establishes reflected-obstacle NLOS localization for intelligent vehicles [IEEE IV]
    │     Dove and Shapiro: physical and nonparaxial phasor optics — ordinary lenses manipulate P-fields and Rayleigh--Sommerfeld theory extends them beyond Fresnel geometry [Optics Express]
    │     Chen et al.: learned NLOS feature embeddings — a shared physics-aware representation for reconstruction, detection, and recognition [SIGGRAPH Asia / TOG]
@@ -429,6 +435,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
    │
 2021 ── Nam et al.: real-time diffuse-object NLOS video at 5 fps [Nature Comm.]
+   │     Seidel et al. add angle-and-range 2-D edge-camera reconstruction, while Saunders and Goyal improve strong-background robustness with optimized preconditioning [IEEE TCI / IEEE ICCP]
    │     Zheng et al.: ordinary-camera white-light speckle correlation plus a two-step DNN establishes a broadband learned NLOS branch without coherent illumination [Optics Express]
    │     Peng et al.: NLOS photography — direct high-resolution hidden-view image synthesis from transients [arXiv]
    │

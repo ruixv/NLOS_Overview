@@ -1,5 +1,7 @@
 # 22 August 2026 — computational-periscopy forward-citation gap
 
+**Integrated on 22 August 2026.** README, the canonical V2 corpus/timeline, passive-survey prose/table, final-venue BibTeX, and the rebuilt survey PDF are synchronized by the guarded integration workflow.
+
 ## Why this patch is staged instead of overwriting public artifacts
 
 This run traced the passive computational-periscopy lineage forward from Saunders et al., *Computational periscopy with an ordinary digital camera* (Nature 2019). The current repository already contains two of the resulting works in the survey table / bibliography, but not consistently across README, V2 Paper Explorer, survey prose, and final-venue metadata. Direct whole-file replacement of the large public artifacts is intentionally avoided here. Apply the insertions below in one guarded checkout/build so README, `data/papers-source.html`, survey source, merged BibTeX, and `bare_jrnl.pdf` cannot drift.
