@@ -1,5 +1,7 @@
 # 22 August 2026 — X-band Radar public-artifact consistency repair
 
+**Integrated by guarded workflow.** The public README/V2 regression is repaired; the existing survey citation/BibTeX are preserved and the survey PDF is rebuilt and revalidated.
+
 ## Finding
 
 A repository-wide audit found a cross-artifact regression for **Du et al., “X-band Radar Non-Line-of-Sight Imaging,” CVPR 2026, pp. 5647–5658**. The paper is still correctly integrated in `article/5newscenes.tex` through citation key `duXBandRadarNLOS2026`, remains present as a canonical final-venue BibTeX entry in `egbib_merged_20260711.bib`, and was previously integrated into the public repository in July 2026. However, later public-file rewrites removed its explicit paper entry from both `README.md` and the canonical V2 corpus `data/papers-source.html`.
