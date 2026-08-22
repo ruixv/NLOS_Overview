@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - .github/workflows/repair-xband-public-consistency-20260822.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/xband_public_consistency_20260822.trigger
   workflow_dispatch:
 
 permissions:
