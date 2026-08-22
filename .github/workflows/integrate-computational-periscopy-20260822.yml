@@ -101,7 +101,7 @@ jobs:
           norm=re.sub(r'[-‐‑–—]\s*\n\s*','',norm)
           norm=re.sub(r'[^a-z0-9]+',' ',norm)
           norm=re.sub(r'\s+',' ',norm).strip()
-          for phrase in ['from edge apertures to multidepth and backgroundrobust computational periscopy','optimized preconditioning','two dimensional angle range']:
+          for phrase in ['from edge apertures to multi depth and background robust computational periscopy','optimized preconditioning','two dimensional angle range']:
             assert phrase in norm, phrase
           print('PDF semantic and citation checks passed')
           PY
