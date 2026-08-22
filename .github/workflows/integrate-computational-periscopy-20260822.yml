@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - .github/workflows/integrate-computational-periscopy-20260822.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/computational_periscopy_20260822.trigger
   workflow_dispatch:
 
 permissions:
