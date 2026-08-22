@@ -1,0 +1,118 @@
+name: Repair X-band Radar public consistency
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/repair-xband-public-consistency-20260822.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Apply X-band public-artifact repair
+        run: |
+          python3 scripts/repair_xband_public_consistency_20260822.py
+
+      - name: Validate source-level synchronization
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          title='X-band Radar Non-Line-of-Sight Imaging'
+          key='duXBandRadarNLOS2026'
+          url='https://openaccess.thecvf.com/content/CVPR2026/html/Du_X-band_Radar_Non-Line-of-Sight_Imaging_CVPR_2026_paper.html'
+          readme=Path('README.md').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          survey=Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          assert readme.count(title)==1
+          assert corpus.count(title)==1
+          assert url in readme and url in corpus
+          assert key in survey
+          assert len(re.findall(r'(?mi)^@\w+\{'+re.escape(key)+r',',bib))==1
+          assert 'pages = {5647--5658}' in bib and url in bib
+          assert 'X-band radar extended RF NLOS imaging' in corpus
+          assert '22 August 2026 consistency repair: restored X-band Radar NLOS' in tex
+          m=re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>',corpus)
+          assert m and int(m.group(1))==corpus.count('{cat:')
+          print('X-band source-level consistency checks passed')
+          PY
+
+      - name: Add LaTeX compatibility shim
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+              if s.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+              p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Install PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Validate rebuilt PDF and X-band citation
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          test "$(stat -c%s bare_jrnl.pdf)" -gt 100000
+          grep -Fq 'duXBandRadarNLOS2026' bare_jrnl.aux
+          grep -Fq 'duXBandRadarNLOS2026' bare_jrnl.bbl
+          pdftotext bare_jrnl.pdf /tmp/nlos-xband.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, unicodedata
+          txt=Path('/tmp/nlos-xband.txt').read_text(encoding='utf-8',errors='ignore')
+          assert len(txt)>10000, 'PDF text extraction unexpectedly short'
+          norm=unicodedata.normalize('NFKD',txt).casefold()
+          norm=re.sub(r'[-‐‑–—]\s*\n\s*','',norm)
+          norm=re.sub(r'[^a-z0-9]+',' ',norm)
+          norm=re.sub(r'\s+',' ',norm).strip()
+          assert 'x band radar non line of sight imaging' in norm, 'X-band reference/title missing from rebuilt PDF'
+          for token in ['long','range','radar','40','m']:
+              assert token in norm.split(), ('missing semantic token',token)
+          print('X-band PDF semantic and citation checks passed')
+          PY
+
+      - name: Render PDF endpoints
+        run: |
+          set -euo pipefail
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test -n "$pages"
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+
+      - name: Commit synchronized artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md data/papers-source.html bare_jrnl.tex bare_jrnl.pdf updates/2026-08-22-xband-public-consistency-repair.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Restore X-band radar public survey entry'
+          git push origin HEAD:master
