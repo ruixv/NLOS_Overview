@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - .github/workflows/integrate-plenoptic-thz-ome-20260823.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/plenoptic_thz_ome_20260823.trigger
   workflow_dispatch:
 
 permissions:
