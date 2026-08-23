@@ -1,0 +1,133 @@
+name: Integrate SPAD acquisition-parameter NLOS gap
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-acquisition-parameters-20260823.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Apply verified acquisition-parameter integration
+        run: |
+          python3 scripts/integrate_acquisition_parameters_20260823.py
+
+      - name: Add LaTeX compatibility shim if needed
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+            if s.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+            p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Install PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Validate synchronized public artifacts
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          title='Influence of some acquisition parameters in non-line-of-sight imaging'
+          doi='10.1117/12.3069294'
+          key='christnacherAcquisitionParametersNLOS2025'
+          readme=Path('README.md').read_text(encoding='utf-8')
+          index=Path('index.html').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          active=Path('article/2active.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          aux=Path('bare_jrnl.aux').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.aux').exists() else ''
+          bbl=Path('bare_jrnl.bbl').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.bbl').exists() else ''
+          key_count=len(re.findall(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,flags=re.I))
+          doi_count=bib.lower().count(doi.lower())
+          arr_start=corpus.find('    const papers=['); arr_end=corpus.find('\n    ];',arr_start)
+          arr=corpus[arr_start:arr_end]
+          tracked=arr.count('{cat:')
+          m=re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span>',corpus)
+          displayed=int(m.group(1)) if m else -1
+          checks=[
+            (title in readme and doi in readme,'README final record'),
+            (title in corpus and doi in corpus,'canonical V2 corpus record'),
+            (key in active,'active survey citation/prose'),
+            (key_count==1,f'single BibTeX key (found {key_count})'),
+            (doi_count==1,f'single bibliography DOI (found {doi_count})'),
+            ('Updated 23 Aug 2026' in index,'V2 wrapper date'),
+            ('Last updated: 23 August 2026' in corpus,'canonical corpus footer date'),
+            (displayed==tracked and tracked>0,f'tracked-entry count agrees ({displayed} vs {tracked})'),
+            ('23 August 2026 acquisition/citation trace' in tex,'survey provenance'),
+            (key in aux,'citation resolved into AUX'),
+            ((key in bbl) or ('Influence of Some Acquisition Parameters' in bbl),'bibliography entry emitted into BBL'),
+            (Path('bare_jrnl.pdf').stat().st_size>100000,'rebuilt PDF size'),
+          ]
+          bad=[]
+          for ok,msg in checks:
+            print(('PASS: ' if ok else 'FAIL: ')+msg)
+            if not ok: bad.append(msg)
+          if bad: raise AssertionError('; '.join(bad))
+          PY
+          pdftotext bare_jrnl.pdf /tmp/nlos.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          txt=re.sub(r'\s+',' ',Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore')).lower()
+          required=[r'acquisition[- ]parameter',r'spad',r'exposure time',r'field of view']
+          missing=[x for x in required if not re.search(x,txt,re.I)]
+          if missing: raise AssertionError('rebuilt PDF missing acquisition-parameter semantics: '+', '.join(missing))
+          PY
+
+      - name: Render PDF endpoints
+        run: |
+          set -euo pipefail
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+
+      - name: Record literature update note
+        run: |
+          cat > updates/2026-08-23-spad-acquisition-parameters-integrated.md <<'EOF'
+          # SPAD acquisition-parameter NLOS gap synchronized — 23 August 2026
+
+          Integrated Frank Christnacher, Martin Laurenzis, Stéphane Schertzer, Alexander Spaett, Albert Redo-Sanchez, and Diego Gutierrez, “Influence of some acquisition parameters in non-line-of-sight imaging,” Proc. SPIE 13678, Emerging Technologies and Materials for Security and Defence 2025, 136780E, DOI 10.1117/12.3069294.
+
+          The paper is treated as an acquisition-side complement to reconstruction-side acceleration: it systematically examines SPAD pixel calibration, exposure time, frame accumulation, camera field of view, and focus, and discusses their speed/quality trade-offs before f-k migration, back-propagation, or phasor-field reconstruction. The related 2025 conference paper on SPAD timing-error compensation was not added separately because its expanded final Optics Express 2026 version (DOI 10.1364/OE.584776) is already the canonical repository record.
+
+          This run also synchronized the V2 public date markers to 23 August 2026. README, canonical V2 corpus, active survey prose/table, merged bibliography, LaTeX source, rebuilt PDF, citation resolution, PDF text, and endpoint rendering were validated together before commit.
+          EOF
+
+      - name: Commit synchronized artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md index.html data/papers-source.html article/2active.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-08-23-spad-acquisition-parameters-integrated.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Integrate SPAD acquisition-parameter NLOS study'
+          git push origin HEAD:master
