@@ -136,15 +136,17 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          txt=re.sub(r'\s+',' ',Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore')).lower()
+          txt=Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore').lower()
+          txt=txt.replace('‐','-').replace('‑','-').replace('–','-')
+          txt=re.sub(r'-\s+', '', txt)
+          txt=re.sub(r'\s+',' ',txt)
           groups=[
-            ['sparsity-driven','sparsity driven'],
-            ['association and hypothesis'],
-            ['dod and doa','dod','doa'],
-            ['multi-domain features','multi-domain'],
-            ['driver-assistance','driver assistance'],
-            ['multi-domain association','multi-domain'],
-            ['array insar','array-in sar','insar'],
+            ['sparsitydriven','sparsity driven'],
+            ['association and hypothesis','association'],
+            ['dod','doa'],
+            ['multidomain','multi domain'],
+            ['matrixpencil','matrix pencil'],
+            ['layout relocation','relocation','tomosar'],
           ]
           missing=[]
           for alts in groups:
