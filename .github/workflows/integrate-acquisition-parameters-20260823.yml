@@ -71,7 +71,7 @@ jobs:
           aux=Path('bare_jrnl.aux').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.aux').exists() else ''
           bbl=Path('bare_jrnl.bbl').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.bbl').exists() else ''
           key_count=len(re.findall(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,flags=re.I))
-          doi_count=bib.lower().count(doi.lower())
+          doi_field_count=len(re.findall(r'(?mi)^\s*doi\s*=\s*\{'+re.escape(doi)+r'\}\s*,?\s*$',bib))
           arr_start=corpus.find('    const papers=['); arr_end=corpus.find('\n    ];',arr_start)
           arr=corpus[arr_start:arr_end]
           tracked=arr.count('{cat:')
@@ -82,7 +82,7 @@ jobs:
             (title in corpus and doi in corpus,'canonical V2 corpus record'),
             (key in active,'active survey citation/prose'),
             (key_count==1,f'single BibTeX key (found {key_count})'),
-            (doi_count==1,f'single bibliography DOI (found {doi_count})'),
+            (doi_field_count==1,f'single bibliography DOI field (found {doi_field_count})'),
             ('Updated 23 Aug 2026' in index,'V2 wrapper date'),
             ('Last updated: 23 August 2026' in corpus,'canonical corpus footer date'),
             (displayed==tracked and tracked>0,f'tracked-entry count agrees ({displayed} vs {tracked})'),
