@@ -1,5 +1,7 @@
 # 23 August 2026 — passive plenoptic / THz / beyond-OME gap
 
+**Integrated on 23 August 2026.** README, canonical V2 corpus/timeline, passive-survey prose, final-venue BibTeX, and the rebuilt survey PDF were synchronized by the guarded workflow.
+
 This run combined fresh 2026 keyword/publisher searches with forward-citation and scholarly-index checks around the repository's core active/passive NLOS milestones. Recent active-transient results found through the LCT / f-k / phasor-field citation pass (including consumer-LiDAR, TLTM iteration, arbitrary-relay transient rendering, long-range SPAD systems, and recent learned transient reconstruction) were already represented in the repository and were not duplicated.
 
 The repository audit found a coherent missing passive light-field lineage and one missing 2026 around-corner speckle paper. All records below were verified against final publisher or scholarly-index metadata before staging:

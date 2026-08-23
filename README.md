@@ -64,10 +64,16 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 22 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 23 August 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [Combined geometric and physical optics analysis of passive non-line-of-sight light-field measurement](https://doi.org/10.1364/OE.568818) — Sasaki, Grossman, Leger | Optics Express 33(19), 39194–39217 (2025) | Unifies geometric-optics BRDF and physical-optics Wigner analyses to predict how roughness, wavelength, diffraction, and lens focusing govern retrievable passive NLOS light-field information in LWIR and THz regimes. |
+| 2022 | [Estimation of the 3D spatial location of non-line-of-sight objects using passive THz plenoptic measurements](https://doi.org/10.1364/OE.472069) — Sasaki, Grossman, Leger | Optics Express 30(23), 41911–41921 (2022) | Measures spatial and angular THz radiation reflected from rough walls with a room-temperature sensor and refocuses the resulting plenoptic data to recover the 3D location of hidden human-like thermal targets. |
+| 2022 | [Passive Terahertz Non-Line-of-Sight Imaging](https://doi.org/10.1109/TTHZ.2022.3173168) — Grossman, Sasaki, Leger | IEEE Transactions on Terahertz Science and Technology 12(5), 489–498 (2022) | Demonstrates passive 336-GHz NLOS human imaging from ordinary rough-surface reflections using uncooled direct-detection hardware, recovering target location, orientation, and pose even for weak specular components. |
+| 2021 | [Passive 3D location estimation of non-line-of-sight objects from a scattered thermal infrared light field](https://doi.org/10.1364/OE.445181) — Sasaki, Hashemi, Leger | Optics Express 29(26), 43642–43661 (2021) | Scans an infrared camera to form a scattered LWIR light-field cube, separates the weak information-bearing component, and localizes human-temperature hidden objects in 3D in a life-size diffusive hallway. |
+| 2021 | [Non-line-of-sight object location estimation from scattered light using plenoptic data](https://doi.org/10.1364/JOSAA.394846) — Sasaki, Leger | Journal of the Optical Society of America A 38(2), 211–228 (2021) | Derives depth/transverse localization limits from scattering physics and noise, then uses a projection-slice/light-field formulation and mixed-space-frequency filtering to estimate hidden-object location near the theoretical resolution limit. |
+| 2020 | [Light field reconstruction from scattered light using plenoptic data](https://doi.org/10.1364/JOSAA.378714) — Sasaki, Leger | Journal of the Optical Society of America A 37(4), 653–670 (2020) | Provides the scattered-light plenoptic inverse foundation: a BRDF-aware Fredholm light-field model, regularized reconstruction, and limits on retrievable hidden-scene information after wall scattering. |
 | 2019 | [Corner Occluder Computational Periscopy: Estimating a Hidden Scene from a Single Photograph](https://doi.org/10.1109/ICCPHOT.2019.8747342) — Seidel et al. | IEEE ICCP 2019 | Uses a known wall edge as a natural aperture so one ordinary-camera penumbra photograph can jointly estimate floor albedo and a 1-D angular representation of the hidden scene. |
 | 2020 | [Multi-Depth Computational Periscopy with an Ordinary Camera](https://doi.org/10.1109/ICASSP40776.2020.9054518) — Saunders et al. | IEEE ICASSP 2020, 9299–9305 | Extends ordinary-camera computational periscopy to a multi-depth hidden scene, recovering two hidden images and their wall-relative depths from a single photograph. |
 | 2021 | [Two-Dimensional Non-Line-of-Sight Scene Estimation From a Single Edge Occluder](https://doi.org/10.1109/TCI.2020.3037405) — Seidel et al. | IEEE Transactions on Computational Imaging 7, 58–72 (2021) | Adds range to edge-occluder angular sensing, reconstructing a 2-D hidden scene from one penumbra photograph with radial-falloff modeling, inversion algorithms, and Cramér–Rao analysis. |
@@ -408,6 +414,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Reza et al.: experimental phasor-field waves — interference and independent optical/P-field focusing validate the virtual-wave picture [Optics Express]
    │
 2020 ── Iseringhausen & Hullin: physically based transient analysis-by-synthesis — surface-, BRDF-, and visibility-aware NLOS inverse rendering [ACM TOG]
+   │     Sasaki and Leger formulate wall-scattered plenoptic inversion with a BRDF-aware Fredholm model and explicit limits on retrievable hidden-scene information [JOSA A]
    │     Saunders et al.: multi-depth computational periscopy recovers two hidden images together with their wall-relative depths from one ordinary photograph [IEEE ICASSP]
    │     Takatori: stereo virtual-image geometry establishes reflected-obstacle NLOS localization for intelligent vehicles [IEEE IV]
    │     Dove and Shapiro: physical and nonparaxial phasor optics — ordinary lenses manipulate P-fields and Rayleigh--Sommerfeld theory extends them beyond Fresnel geometry [Optics Express]
@@ -420,6 +427,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Zheng et al.: sectionalized-ellipsoid interpolation converts SPAD-array non-confocal data into semi-confocal histograms [Optics and Lasers in Engineering]
    │     Yu et al.: spherical-slice transform gives a fast high-resolution non-confocal frequency-domain inverse [Optics Letters]
 2025 ── Chen et al.: hierarchical-NeRF implicit ray carving makes two-bounce shadow reconstruction more efficient [Optics Express]
+   │     A unified geometric-/physical-optics light-field analysis connects roughness, wavelength, diffraction, and focusing across passive LWIR and THz NLOS [Optics Express]
    │     Zhang et al.: DCPNet advances two-bounce NLOS from reconstruction to real-time dual-view tracking [Optics Express]
    │     2025 ── Roueinfar & Salmanian: low-cost 808 nm steady-state NIR raster scanning [IEEE ICEE]
    │     Tian et al.: deconvolution and virtual modulated range migration recover 50× super-resolution histograms from nanosecond-resolution ToF data [Optics Letters]
@@ -435,6 +443,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Rapp et al.: edge-resolved transient imaging — 2.5D room-scale recovery from 45 edge-coded scans [Nature Comm.]
    │
 2021 ── Nam et al.: real-time diffuse-object NLOS video at 5 fps [Nature Comm.]
+   │     Plenoptic passive NLOS gains quantitative depth/transverse localization and then life-size 3D LWIR hidden-object localization from scattered thermal light fields [JOSA A / Optics Express]
    │     Seidel et al. add angle-and-range 2-D edge-camera reconstruction, while Saunders and Goyal improve strong-background robustness with optimized preconditioning [IEEE TCI / IEEE ICCP]
    │     Zheng et al.: ordinary-camera white-light speckle correlation plus a two-step DNN establishes a broadband learned NLOS branch without coherent illumination [Optics Express]
    │     Peng et al.: NLOS photography — direct high-resolution hidden-view image synthesis from transients [arXiv]
@@ -442,6 +451,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
     2022 ── CornerRadar: learned RF hint maps enable robust indoor around-corner localization across diverse layouts [PACM IMWUT]
        │     Mosaic: diverse curved and planar urban reflectors broaden automotive around-corner radar coverage [MobiSys]
 2022 ── Grau et al.: Occlusion Fields — implicit recoverability and self-occlusion-aware hidden meshes [arXiv]
+   │     Passive THz NLOS uses rough-wall specular components for hidden-human imaging and plenoptic refocusing for 3D localization with room-temperature sensing [IEEE T-THz / Optics Express]
    │     Xu et al.: product-convolution expansions turn the shift-variant non-confocal ellipsoidal operator into FFT-accelerated local convolutions [Optics Letters]
    │     Wu et al.: an untrained deep decoder is optimized through the passive occluder-aided forward model, avoiding paired training data under strong ambient light [Optics Letters]
    │     Nakamura and Takatori: transparent reflective surfaces extend automotive virtual-image localization with parallax and polarization considerations [IEEE ITSC]
@@ -547,6 +557,7 @@ Key breakthroughs that shaped the NLOS Imaging field:
    │     Yu et al.: cross-regional NLOS localization moves the multipath-detection branch toward joint-GLRT inference across hidden regions [IEEE IGARSS]
    │     Park et al.: reflection-aware camera/radar BEV fusion plus physics-guided ray tracing extends hidden-pedestrian localization to moving ego-vehicle scenarios [ECCV]
 2026 ── Yin et al.: Si-SPAD and phase-congruency regularization enable 200 m all-day active NLOS under 94,314 lx sunlight [Optics and Lasers in Engineering]
+   │     Polarization-encoded spatial multiplexing pushes single-shot speckle around-corner imaging beyond the conventional optical-memory-effect field of view [Optics and Lasers in Engineering]
    │     ICT follow-up: industrial 5G/mmWave ISAC adds range--Doppler detection and PHD tracking for reliable fully NLOS intrusion monitoring [ICT 2026]
    │     Doğan: laser–acoustic early fusion and LAO-Net extend hidden-human NLOS sensing from localization/reconstruction toward four-class orientation inference [Scientific Reports]
    │     Wang et al.: scene-aware audio–visual fusion conditions acoustic spectra on BEV geometry for semantic detection of fully occluded vehicles [IEEE ICASSP]
