@@ -5,6 +5,10 @@ on:
     branches: [master]
     paths:
       - .github/workflows/integrate-acquisition-parameters-20260823.yml
+  pull_request:
+    branches: [master]
+    paths:
+      - updates/.trigger-spad-acquisition-20260823
   workflow_dispatch:
 
 permissions:
@@ -16,6 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
+          ref: master
           fetch-depth: 0
 
       - name: Apply verified acquisition-parameter integration
