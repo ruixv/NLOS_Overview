@@ -1,0 +1,135 @@
+name: Integrate passive plenoptic THz and beyond-OME lineage
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-plenoptic-thz-ome-20260823.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Apply passive plenoptic / THz / OME integration
+        run: |
+          python3 scripts/integrate_plenoptic_thz_ome_20260823.py
+
+      - name: Validate source-level synchronization
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          papers=[
+            ('sasakiPlenopticScatteredLight2020','10.1364/JOSAA.378714'),
+            ('sasakiPlenopticNLOSLocation2021','10.1364/JOSAA.394846'),
+            ('sasakiThermalIRPlenopticNLOS2021','10.1364/OE.445181'),
+            ('grossmanPassiveTHzNLOS2022','10.1109/TTHZ.2022.3173168'),
+            ('sasakiPassiveTHzPlenoptic2022','10.1364/OE.472069'),
+            ('sasakiCombinedOpticsPassiveNLOS2025','10.1364/OE.568818'),
+            ('weiPolarizationEncodedOMEMultiplexing2026','10.1016/j.optlaseng.2026.109602'),
+          ]
+          readme=Path('README.md').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          passive=Path('article/3passive.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          for key,doi in papers:
+            assert doi.lower() in readme.lower(), (doi,'README')
+            assert doi.lower() in corpus.lower(), (doi,'V2 corpus')
+            assert key in passive, (key,'passive survey')
+            assert len(re.findall(r'(?mi)^@\w+\{'+re.escape(key)+r',',bib))==1, (key,'BibTeX key')
+            assert bib.lower().count(doi.lower())==2, (doi,'DOI field + DOI URL')
+          assert 'Updated 23 August 2026' in corpus
+          assert '23 August 2026 citation/modality trace' in tex
+          assert not Path('egbib_20260823_plenoptic_thz_ome_gap.bib').exists()
+          m=re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>',corpus)
+          assert m and int(m.group(1))==corpus.count('{cat:'), (m.group(1) if m else None, corpus.count('{cat:'))
+          print('source-level synchronization checks passed')
+          PY
+
+      - name: Add LaTeX compatibility shim
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+            if s.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+            p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Install PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Validate rebuilt PDF and citations
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          test "$(stat -c%s bare_jrnl.pdf)" -gt 100000
+          for key in sasakiPlenopticScatteredLight2020 sasakiPlenopticNLOSLocation2021 sasakiThermalIRPlenopticNLOS2021 grossmanPassiveTHzNLOS2022 sasakiPassiveTHzPlenoptic2022 sasakiCombinedOpticsPassiveNLOS2025 weiPolarizationEncodedOMEMultiplexing2026; do
+            grep -Fq "$key" bare_jrnl.aux
+            grep -Fq "$key" bare_jrnl.bbl
+          done
+          pdftotext bare_jrnl.pdf /tmp/nlos-plenoptic-thz.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, unicodedata
+          txt=Path('/tmp/nlos-plenoptic-thz.txt').read_text(encoding='utf-8',errors='ignore')
+          assert len(txt)>10000, 'PDF text extraction unexpectedly short'
+          norm=unicodedata.normalize('NFKD',txt).casefold()
+          norm=re.sub(r'[-‐‑–—]\s*\n\s*','',norm)
+          norm=re.sub(r'[^a-z0-9]+',' ',norm)
+          words=set(re.sub(r'\s+',' ',norm).split())
+          groups=[
+            ('plenoptic foundation',['plenoptic','fredholm','brdf']),
+            ('thermal infrared lineage',['thermal','infrared','hallway']),
+            ('terahertz lineage',['thz','terahertz','refocusing']),
+            ('combined optics analysis',['wigner','roughness','wavelength']),
+            ('beyond OME multiplexing',['polarization','multiplexing','speckle']),
+          ]
+          for label,tokens in groups:
+            missing=[t for t in tokens if t not in words]
+            assert not missing,(label,missing)
+          print('PDF semantic and citation checks passed')
+          PY
+
+      - name: Render PDF endpoints
+        run: |
+          set -euo pipefail
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          test -n "$pages"
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+
+      - name: Commit synchronized artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md data/papers-source.html article/3passive.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib updates/2026-08-23-plenoptic-thz-ome-lineage.md
+          git add -u egbib_20260823_plenoptic_thz_ome_gap.bib || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Integrate passive plenoptic and beyond-OME NLOS lineage'
+          git push origin HEAD:master
