@@ -24,6 +24,20 @@ jobs:
           python3 scripts/integrate_radar_unknown_layout_lineage_20260824.py
           git diff --check
 
+      - name: Repair escaped survey newlines
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('article/5newscenes.tex')
+          s=p.read_text(encoding='utf-8')
+          bad='methods below.\\n\\n'
+          if bad in s:
+            s=s.replace(bad, 'methods below.\n\n', 1)
+          if '\\n' in s[s.find('From assumed relay geometry to joint environment and target inference.'):s.find('From assumed relay geometry to joint environment and target inference.')+5000]:
+            raise RuntimeError('literal escaped newline remains in inserted radar lineage prose')
+          p.write_text(s,encoding='utf-8')
+          PY
+
       - name: Add LaTeX compatibility shim if needed
         run: |
           python3 - <<'PY'
@@ -136,15 +150,17 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import re
-          txt=re.sub(r'\s+',' ',Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore')).lower()
+          txt=Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore').lower()
+          txt=txt.replace('‐','-').replace('‑','-').replace('–','-')
+          txt=re.sub(r'-\s+', '', txt)
+          txt=re.sub(r'\s+',' ',txt)
           groups=[
-            ['sparsity-driven','sparsity driven'],
-            ['association and hypothesis'],
-            ['dod and doa','dod','doa'],
-            ['multi-domain features','multi-domain'],
-            ['driver-assistance','driver assistance'],
-            ['multi-domain association','multi-domain'],
-            ['array insar','array-in sar','insar'],
+            ['sparsitydriven','sparsity driven'],
+            ['association and hypothesis','association'],
+            ['dod','doa'],
+            ['multidomain','multi domain'],
+            ['matrixpencil','matrix pencil'],
+            ['layout relocation','relocation','tomosar'],
           ]
           missing=[]
           for alts in groups:
