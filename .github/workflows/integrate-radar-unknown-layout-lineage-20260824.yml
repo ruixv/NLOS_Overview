@@ -161,7 +161,7 @@ jobs:
             ['association and hypothesis','association'],
             ['dod','doa'],
             ['multidomain','multi domain'],
-            ['matrixpencil','matrix pencil'],
+            ['matrix-pencil','matrixpencil','matrix pencil'],
             ['layout relocation','relocation','tomosar'],
           ]
           missing=[]
