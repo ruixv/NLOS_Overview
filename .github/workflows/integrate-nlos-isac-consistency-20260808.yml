@@ -1,0 +1,174 @@
+name: Integrate Aug 8 NLOS ISAC consistency update
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - .github/workflows/integrate-nlos-isac-consistency-20260808.yml
+      - scripts/sync_isac_consistency_20260808.py
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nlos-isac-consistency-20260808
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out reviewed integration branch
+        uses: actions/checkout@v4
+        with:
+          ref: automation/nlos-isac-consistency-20260808
+          fetch-depth: 0
+
+      - name: Apply bounded public-artifact updates
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/sync_isac_consistency_20260808.py
+          python3 scripts/sync_isac_consistency_20260808.py
+
+      - name: Validate synchronized source state
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          readme = Path('README.md').read_text(encoding='utf-8')
+          html = Path('index.html').read_text(encoding='utf-8')
+          a3 = Path('article/3passive.tex').read_text(encoding='utf-8')
+          a5 = Path('article/5newscenes.tex').read_text(encoding='utf-8')
+          bare = Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          update_log = Path('updates/2026-08-08-isac-nlos-final-venue-citation-trace.md').read_text(encoding='utf-8')
+
+          spawc = 'Feasibility of Non-Line-of-Sight Integrated Sensing and Communication at mmWave'
+          ict = 'Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware'
+          sg = 'Structure-guided adaptive total variation for parameter-free passive non-line-of-sight imaging'
+          errors = []
+
+          for title in (spawc, ict, sg):
+              for label, text in [('README', readme), ('website', html)]:
+                  if text.count(title) != 1:
+                      errors.append(f'{label}: title count for {title!r} is {text.count(title)}')
+
+          if a3.count('zhangStructureGuidedATV2026') < 1:
+              errors.append('article/3passive.tex is missing the SG-ATV citation')
+          for key in ('tosiFeasibilityISACNLOS2024', 'tosiReliableISACNLOS2026'):
+              if a5.count(key) != 1:
+                  errors.append(f'article/5newscenes.tex citation {key} count is {a5.count(key)}')
+              if len(re.findall(r'^@\w+\s*\{\s*' + re.escape(key) + r'\s*,', bib, re.M)) != 1:
+                  errors.append(f'bibliography key {key} is not unique')
+
+          required = [
+              ('README SPAWC DOI', readme, '10.1109/SPAWC60668.2024.10694426'),
+              ('README ICT final venue', readme, '32nd International Conference on Telecommunications (ICT 2026), 25–30'),
+              ('website ICT final venue', html, 'venue:"ICT 2026, 25–30"'),
+              ('survey ISAC prose', a5, 'Cellular ISAC hardware for NLOS sensing.'),
+              ('bare integration comment', bare, 'ISAC consistency trace'),
+              ('update applied status', update_log, '## Applied status'),
+              ('SG-ATV DOI', readme, '10.1364/OE.587111'),
+          ]
+          for label, text, needle in required:
+              if needle not in text:
+                  errors.append(f'{label}: missing {needle}')
+
+          if re.search(r'title:"Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware".*?venue:"arXiv 2026"', html):
+              errors.append('website still labels the ICT paper as arXiv 2026')
+          if re.search(r'\[Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware\].*?\| arXiv 2026 \|', readme):
+              errors.append('README still labels the ICT paper as arXiv 2026')
+
+          actual = html.count('{cat:')
+          declared = re.findall(r'<b>(\d+)</b><span>tracked latest entries</span>', html)
+          if actual != 268 or declared != ['268']:
+              errors.append(f'website explorer mismatch: actual={actual}, declared={declared}')
+
+          if errors:
+              raise SystemExit('Source validation failed:\n- ' + '\n- '.join(errors))
+          print('Source synchronization validated: SPAWC addition, ICT final venue, existing SG-ATV coverage, 268 explorer records.')
+          PY
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Rebuild survey PDF
+        run: |
+          set -euo pipefail
+          old_hash=$(git hash-object bare_jrnl.pdf)
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc bare_jrnl.txt
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          new_hash=$(git hash-object bare_jrnl.pdf)
+          echo "PDF blob: $old_hash -> $new_hash"
+          test "$old_hash" != "$new_hash"
+
+      - name: Validate compiled survey and rendering
+        run: |
+          set -euo pipefail
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          log = Path('bare_jrnl.log').read_text(errors='ignore')
+          aux = Path('bare_jrnl.aux').read_text(errors='ignore')
+          bbl = Path('bare_jrnl.bbl').read_text(errors='ignore')
+          raw = Path('bare_jrnl.txt').read_text(errors='ignore').lower()
+          norm = ''.join(c for c in raw if c.isalnum())
+          errors = []
+
+          for key in ('tosiFeasibilityISACNLOS2024', 'tosiReliableISACNLOS2026', 'zhangStructureGuidedATV2026'):
+              if key not in aux or key not in bbl:
+                  errors.append(f'compiled citation missing for {key}')
+          if re.search(r'Citation .* undefined|There were undefined citations|There were undefined references|Repeated entry', log):
+              errors.append('LaTeX/BibTeX log contains unresolved citations/references or repeated entries')
+          for term in ('cellularisachardwarefornlossensing', 'feasibilityofnonlineofsightintegratedsensingandcommunicationatmmwave', 'reliablenonlineofsightintrusiondetection', 'structureguidedadaptivetotalvariation'):
+              if term not in norm:
+                  errors.append(f'PDF text missing normalized term {term}')
+          if errors:
+              raise SystemExit('Compiled validation failed:\n- ' + '\n- '.join(errors))
+          print('Compiled survey citations and semantic checks passed.')
+          PY
+
+          pages=$(awk '/^Pages:/ {print $2}' /tmp/pdfinfo.txt)
+          test -n "$pages"
+          mkdir -p .pdf_render_check
+          pdftoppm -f 1 -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/first >/dev/null 2>&1
+          pdftoppm -f "$pages" -singlefile -png -r 120 bare_jrnl.pdf .pdf_render_check/last >/dev/null 2>&1
+          test -s .pdf_render_check/first.png
+          test -s .pdf_render_check/last.png
+          rm -rf .pdf_render_check bare_jrnl.txt
+
+      - name: Commit only validated public artifacts
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -f scripts/sync_isac_consistency_20260808.py
+          git rm -f .github/workflows/integrate-nlos-isac-consistency-20260808.yml
+          git add -A README.md index.html article/3passive.tex article/5newscenes.tex bare_jrnl.tex bare_jrnl.pdf \
+            egbib_merged_20260711.bib updates/2026-08-08-isac-nlos-final-venue-citation-trace.md \
+            scripts/sync_isac_consistency_20260808.py .github/workflows/integrate-nlos-isac-consistency-20260808.yml
+          git diff --cached --check
+          git diff --cached --stat
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit' >&2
+            exit 1
+          fi
+          git commit -m 'Integrate ISAC NLOS lineage and passive consistency fix'
+          git push origin HEAD:automation/nlos-isac-consistency-20260808
