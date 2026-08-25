@@ -39,7 +39,7 @@ const G=window.NLOSGraphData;
 const familyLabels={active:'Active optical',passive:'Passive optical',learning:'Learning / inverse models',rf:'Radar / RF / mmWave / THz',acoustic:'Acoustic / ultrasound',resource:'Dataset / survey / benchmark',other:'Other / adjacent'};
 const S={graph:null,stats:null,audit:null,fg:null,selected:null,visibleLimit:45,authorOptions:[],authorMatches:[]};
 const $=id=>document.getElementById(id);
-const esc=s=>String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const idOf=x=>typeof x==='object'&&x?x.id:x;
 function tokens(s){return G.normText(s).split(' ').filter(Boolean)}
 function tokenMatch(query,parts){const q=tokens(query);if(!q.length)return true;const hay=new Set(tokens(parts.join(' ')));return q.every(t=>hay.has(t)||[...hay].some(h=>h.startsWith(t)))}
