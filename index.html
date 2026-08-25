@@ -18,6 +18,15 @@
 <section class="section" id="trends"><div class="wrap"><div class="sectionHead"><div><h2>How the field is evolving</h2><p>Use the trends as a guide to the repository's coverage: when activity accelerated, which research families expanded, and which researchers repeatedly appear across the curated literature.</p></div></div><div class="charts"><div class="chart"><h3>Curated papers by year</h3><p>Publication-year distribution within this curated NLOS corpus.</p><svg id="yearChart"></svg></div><div class="chart"><h3>Research-family composition</h3><p>Active, passive, learning, RF/mmWave, acoustic and related directions.</p><svg id="familyChart"></svg></div></div><div class="authors"><div class="card"><h3>Researchers appearing most often in the curated corpus</h3><p>Click a researcher to filter the 3D graph to their papers and collaborations.</p><div id="authorRanks"></div></div></div></div></section>
 <section class="section" id="core"><div class="wrap"><div class="sectionHead"><div><h2>Core Reading Path</h2><p>Start with the field-defining Nature papers, then follow the experimental, algorithmic, learning and modality-expansion trajectory.</p></div></div><div class="natureStrip" id="natureStrip"></div><div class="coreGrid" id="coreGrid"></div></div></section>
 <section class="section" id="explorer"><div class="wrap"><div class="sectionHead"><div><h2>Paper Explorer</h2><p>Search the complete deduplicated corpus without rendering hundreds of large cards at once.</p></div></div><div class="explorerTop"><input id="paperSearch" type="search" placeholder="Search title, author, venue, contribution…"><select id="paperFamily"><option value="all">All families</option><option value="active">Active optical</option><option value="passive">Passive optical</option><option value="learning">Learning / inverse models</option><option value="rf">Radar / RF / mmWave / THz</option><option value="acoustic">Acoustic / ultrasound</option><option value="resource">Dataset / survey</option><option value="other">Other</option></select><select id="paperYear"><option value="all">All years</option></select></div><div id="tableHost"></div><div class="more"><button id="showMore" class="btn" type="button">Show more</button></div><div class="small" id="explorerNote" style="margin-top:8px"></div></div></section>
+<section class="section" id="citation" style="padding-top:0"><div class="wrap"><div class="panel" style="padding:22px 24px"><div class="sectionHead" style="margin-bottom:12px"><div><h2 style="font-size:24px">Citation</h2><p>If you find this website useful in your research, please consider citing our <a href="https://doi.org/10.1561/116.00000019" target="_blank" rel="noopener" style="color:#31508e;font-weight:760;text-decoration:none">survey paper</a>:</p></div></div><pre style="margin:0;overflow-x:auto;padding:16px 18px;border:1px solid #e1e6ef;border-radius:10px;background:#f8fafc;color:#344054;font-size:12px;line-height:1.55;text-align:left"><code>@article{geng2022recent,
+  title   = {Recent Advances on Non-Line-of-Sight Imaging: Conventional Physical Models, Deep Learning, and New Scenes},
+  author  = {Geng, Ruixu and Hu, Yang and Chen, Yan},
+  journal = {APSIPA Transactions on Signal and Information Processing},
+  volume  = {11},
+  number  = {1},
+  year    = {2022},
+  doi     = {10.1561/116.00000019}
+}</code></pre></div></div></section>
 </main>
 <footer class="footer"><div class="wrap">NLOS Overview · peer-reviewed 2022 survey + continuously updated living companion and research map.</div></footer>
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
@@ -30,7 +39,7 @@ const G=window.NLOSGraphData;
 const familyLabels={active:'Active optical',passive:'Passive optical',learning:'Learning / inverse models',rf:'Radar / RF / mmWave / THz',acoustic:'Acoustic / ultrasound',resource:'Dataset / survey / benchmark',other:'Other / adjacent'};
 const S={graph:null,stats:null,audit:null,fg:null,selected:null,visibleLimit:45,authorOptions:[],authorMatches:[]};
 const $=id=>document.getElementById(id);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
 const idOf=x=>typeof x==='object'&&x?x.id:x;
 function tokens(s){return G.normText(s).split(' ').filter(Boolean)}
 function tokenMatch(query,parts){const q=tokens(query);if(!q.length)return true;const hay=new Set(tokens(parts.join(' ')));return q.every(t=>hay.has(t)||[...hay].some(h=>h.startsWith(t)))}
