@@ -1,0 +1,138 @@
+name: Integrate nonconfocal NLOS resolution lineage
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  integrate-and-build:
+    if: github.head_ref == 'automation/nlos-nonconfocal-resolution-20260721'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out update branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 1
+          show-progress: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install bibliography dependency
+        run: python -m pip install --disable-pip-version-check bibtexparser==1.4.1
+
+      - name: Apply guarded source synchronization
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          python scripts/sync_nlos_20260721_nonconfocal_resolution.py > /tmp/nonconfocal-sync.log 2>&1
+          status=$?
+          cat /tmp/nonconfocal-sync.log
+          if [ "$status" -ne 0 ]; then
+            {
+              echo '### Nonconfocal synchronizer diagnostic'
+              echo
+              echo '```text'
+              cat /tmp/nonconfocal-sync.log
+              echo '```'
+            } > /tmp/pr-comment.md
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/pr-comment.md || true
+            exit "$status"
+          fi
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-publishers texlive-science poppler-utils
+
+      - name: Clean-build survey PDF
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          {
+            echo '=== pdflatex pass 1 ==='
+            pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex || exit $?
+            echo '=== bibtex ==='
+            bibtex bare_jrnl || exit $?
+            echo '=== pdflatex pass 2 ==='
+            pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex || exit $?
+            echo '=== pdflatex pass 3 ==='
+            pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex || exit $?
+            test -s bare_jrnl.pdf || exit $?
+            if grep -Eiq 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log; then
+              echo 'LaTeX consistency check failed.'
+              grep -Ein 'undefined citations|Citation .* undefined|There were undefined references|multiply defined' bare_jrnl.log || true
+              exit 91
+            fi
+          } > /tmp/nonconfocal-latex.log 2>&1
+          status=$?
+          cat /tmp/nonconfocal-latex.log
+          if [ "$status" -ne 0 ]; then
+            {
+              echo '### Nonconfocal survey build diagnostic'
+              echo
+              echo '```text'
+              tail -n 220 /tmp/nonconfocal-latex.log
+              echo '```'
+            } > /tmp/pr-comment.md
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/pr-comment.md || true
+            exit "$status"
+          fi
+
+      - name: Validate PDF and cross-artifact consistency
+        run: |
+          set -euo pipefail
+          pdfinfo bare_jrnl.pdf | tee /tmp/pdfinfo.txt
+          grep -Eq '^Pages:[[:space:]]+[1-9][0-9]*' /tmp/pdfinfo.txt
+          pdftotext bare_jrnl.pdf /tmp/bare_jrnl.txt
+          test -s /tmp/bare_jrnl.txt
+          grep -Fqi 'sectionalized-ellipsoid interpolation' /tmp/bare_jrnl.txt
+          grep -Fqi 'instrument-response deconvolution' /tmp/bare_jrnl.txt
+          grep -Fqi 'spherical-slice transform' /tmp/bare_jrnl.txt
+          for doi in 10.1016/j.optlaseng.2024.108067 10.1364/OE.518767 10.1364/OL.528300; do
+            grep -Fq "$doi" README.md
+            grep -Fq "$doi" index.html
+            test "$(grep -Foc "$doi" README.md)" -eq 1
+            test "$(grep -Foc "$doi" index.html)" -eq 1
+            test "$(grep -Eic "^[[:space:]]*doi[[:space:]]*=[[:space:]]*\\{$doi\\}" egbib_merged_20260711.bib)" -eq 1
+          done
+          for key in zhengSemiConfocalNLOS2024 wangIRFDeconvolutionNLOS2024 yuSphericalSliceNonconfocal2024; do
+            grep -Fq "$key" article/2active.tex
+            grep -Fq "$key" egbib_merged_20260711.bib
+            grep -Fq "$key" bare_jrnl.aux
+            test "$(grep -Foc "$key" egbib_merged_20260711.bib)" -eq 1
+          done
+          grep -Fq '<b>178</b><span>tracked latest entries</span>' index.html
+          grep -Fq 'through 21 July 2026' bare_jrnl.tex
+          grep -Fq 'non-confocal resolution trace' bare_jrnl.tex
+
+      - name: Render survey pages for structural validation
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/pdf-pages
+          pdftoppm -png -r 90 bare_jrnl.pdf /tmp/pdf-pages/page >/dev/null 2>&1
+          test "$(find /tmp/pdf-pages -type f -name 'page-*.png' | wc -l)" -gt 0
+          test -s /tmp/pdf-pages/page-01.png
+
+      - name: Commit synchronized sources and regenerated PDF
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo 'No source changes were needed.'
+            exit 0
+          fi
+          git config user.name 'nlos-update-bot'
+          git config user.email 'nlos-update-bot@users.noreply.github.com'
+          git add README.md index.html bare_jrnl.tex bare_jrnl.pdf article/2active.tex egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md
+          git commit -m 'Integrate nonconfocal NLOS resolution lineage and rebuild survey'
+          git push origin HEAD:${{ github.head_ref }}
