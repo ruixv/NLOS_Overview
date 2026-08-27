@@ -22,6 +22,10 @@ def replace_once(text, old, new, label):
     return text.replace(old, new, 1)
 
 
+def doi_field_count(text):
+    return len(re.findall(r"(?mi)^\s*doi\s*=\s*\{" + re.escape(DOI) + r"\}\s*,?\s*$", text))
+
+
 # README: the timeline already mentions the method; close the missing Latest Additions entry.
 readme = read("README.md")
 if DOI not in readme:
@@ -87,18 +91,18 @@ if STAGING_KEY in bib and KEY not in bib:
     bib = bib.replace(STAGING_KEY, KEY)
 
 key_n = len(re.findall(r"@[A-Za-z]+\{" + re.escape(KEY) + r",", bib, flags=re.I))
-doi_n = len(re.findall(re.escape(DOI), bib, flags=re.I))
+doi_n = doi_field_count(bib)
 if key_n == 0 and doi_n == 0:
     stage = read("egbib_20260827_nir_raster_scan_gap.bib")
     stage = stage.replace(STAGING_KEY, KEY)
     bib = bib.rstrip() + "\n\n" + stage.strip() + "\n"
 elif key_n != 1 or doi_n != 1:
-    raise RuntimeError(f"bibliography inconsistent before normalization: key={key_n}, doi={doi_n}")
+    raise RuntimeError(f"bibliography inconsistent before normalization: key={key_n}, doi_field={doi_n}")
 
 key_n = len(re.findall(r"@[A-Za-z]+\{" + re.escape(KEY) + r",", bib, flags=re.I))
-doi_n = len(re.findall(re.escape(DOI), bib, flags=re.I))
+doi_n = doi_field_count(bib)
 if key_n != 1 or doi_n != 1:
-    raise RuntimeError(f"bibliography normalization failed: key={key_n}, doi={doi_n}")
+    raise RuntimeError(f"bibliography normalization failed: key={key_n}, doi_field={doi_n}")
 write("egbib_merged_20260711.bib", bib)
 
 
