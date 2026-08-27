@@ -1,5 +1,6 @@
 name: Integrate final-venue NIR raster-scan NLOS record
 
+# Validation refresh: deduplicate same-DOI legacy BibTeX entries before the guarded build.
 on:
   push:
     branches: [master]
