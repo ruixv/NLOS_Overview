@@ -26,6 +26,43 @@ def doi_field_count(text):
     return len(re.findall(r"(?mi)^\s*doi\s*=\s*\{" + re.escape(DOI) + r"\}\s*,?\s*$", text))
 
 
+def bib_entries(text):
+    """Return (start,end,entry) triples using brace-depth parsing."""
+    out=[]; i=0
+    while True:
+        m=re.search(r"(?m)^@[A-Za-z]+\{", text[i:])
+        if not m: break
+        start=i+m.start(); brace=text.find('{', start); depth=0; j=brace
+        while j < len(text):
+            if text[j]=='{': depth+=1
+            elif text[j]=='}':
+                depth-=1
+                if depth==0:
+                    out.append((start,j+1,text[start:j+1])); i=j+1; break
+            j+=1
+        else: raise RuntimeError('unterminated BibTeX entry')
+    return out
+
+
+def dedupe_doi_keep_key(text):
+    matches=[]
+    for start,end,entry in bib_entries(text):
+        if re.search(r"(?mi)^\s*doi\s*=\s*\{"+re.escape(DOI)+r"\}\s*,?\s*$",entry):
+            km=re.match(r"@[A-Za-z]+\{\s*([^,]+),",entry,re.I|re.S)
+            matches.append((start,end,entry,km.group(1).strip() if km else ''))
+    if len(matches)<=1: return text
+    canonical=[x for x in matches if x[3]==KEY]
+    if len(canonical)!=1:
+        raise RuntimeError(f"cannot safely deduplicate DOI: {len(matches)} entries, canonical={len(canonical)}")
+    removals=[x for x in matches if x[3]!=KEY]
+    for start,end,entry,k in sorted(removals,key=lambda x:x[0],reverse=True):
+        left=start
+        while left>0 and text[left-1]=='\n': left-=1
+        text=text[:left]+'\n\n'+text[end:].lstrip('\n')
+        print(f"Removed duplicate DOI entry with key {k}")
+    return text
+
+
 # README: the timeline already mentions the method; close the missing Latest Additions entry.
 readme = read("README.md")
 if DOI not in readme:
@@ -43,12 +80,10 @@ if DOI not in readme:
 readme = re.sub(r"\*\*Update run: \d{1,2} August 2026\.\*\*", "**Update run: 27 August 2026.**", readme, count=1)
 write("README.md", readme)
 
-
 # Public V2 wrapper date.
 index = read("index.html")
 index = re.sub(r"Updated \d{1,2} Aug 2026", "Updated 27 Aug 2026", index, count=1)
 write("index.html", index)
-
 
 # Canonical paper corpus / Paper Explorer. The 2025 timeline already contains this lineage; do not duplicate it.
 corpus = read("data/papers-source.html")
@@ -62,73 +97,43 @@ if DOI not in corpus:
     )
     anchor = "    const papers=[\n"
     corpus = replace_once(corpus, anchor, anchor + obj, "canonical paper array")
-
-arr_start = corpus.find("    const papers=[")
-arr_end = corpus.find("\n    ];", arr_start)
-if arr_start < 0 or arr_end < 0:
-    raise RuntimeError("canonical paper array boundaries not found")
+arr_start = corpus.find("    const papers=["); arr_end = corpus.find("\n    ];", arr_start)
+if arr_start < 0 or arr_end < 0: raise RuntimeError("canonical paper array boundaries not found")
 tracked = corpus[arr_start:arr_end].count("{cat:")
-corpus, n = re.subn(
-    r'(<div class="stat"><b>)\d+(</b><span>tracked latest entries</span>)',
-    rf'\g<1>{tracked}\g<2>', corpus, count=1,
-)
-if n != 1:
-    raise RuntimeError("tracked-entry counter not found")
+corpus,n=re.subn(r'(<div class="stat"><b>)\d+(</b><span>tracked latest entries</span>)',rf'\g<1>{tracked}\g<2>',corpus,count=1)
+if n != 1: raise RuntimeError("tracked-entry counter not found")
 corpus = re.sub(r"Updated \d{1,2} August 2026", "Updated 27 August 2026", corpus, count=1)
 corpus = re.sub(r"Last updated: \d{1,2} August 2026", "Last updated: 27 August 2026", corpus, count=1)
 write("data/papers-source.html", corpus)
 
-
-# Survey body already uses this canonical key. Fail closed if that integration regressed.
+# Survey body already uses this canonical key.
 active = read("article/2active.tex")
-if KEY not in active or "raster" not in active.lower():
-    raise RuntimeError("existing NIR survey integration/canonical citation key is missing")
+if KEY not in active or "raster" not in active.lower(): raise RuntimeError("existing NIR survey integration/canonical citation key is missing")
 
-
-# Canonical bibliography: normalize any staging-key form to the survey's already-used key.
+# Canonical bibliography: preserve the survey key and remove same-DOI legacy duplicates.
 bib = read("egbib_merged_20260711.bib")
-if STAGING_KEY in bib and KEY not in bib:
-    bib = bib.replace(STAGING_KEY, KEY)
+if STAGING_KEY in bib and KEY not in bib: bib=bib.replace(STAGING_KEY,KEY)
+key_n=len(re.findall(r"@[A-Za-z]+\{"+re.escape(KEY)+r",",bib,flags=re.I)); doi_n=doi_field_count(bib)
+if key_n==0 and doi_n==0:
+    stage=read("egbib_20260827_nir_raster_scan_gap.bib").replace(STAGING_KEY,KEY)
+    bib=bib.rstrip()+"\n\n"+stage.strip()+"\n"
+else:
+    bib=dedupe_doi_keep_key(bib)
+key_n=len(re.findall(r"@[A-Za-z]+\{"+re.escape(KEY)+r",",bib,flags=re.I)); doi_n=doi_field_count(bib)
+if key_n!=1 or doi_n!=1: raise RuntimeError(f"bibliography normalization failed: key={key_n}, doi_field={doi_n}")
+write("egbib_merged_20260711.bib",bib)
 
-key_n = len(re.findall(r"@[A-Za-z]+\{" + re.escape(KEY) + r",", bib, flags=re.I))
-doi_n = doi_field_count(bib)
-if key_n == 0 and doi_n == 0:
-    stage = read("egbib_20260827_nir_raster_scan_gap.bib")
-    stage = stage.replace(STAGING_KEY, KEY)
-    bib = bib.rstrip() + "\n\n" + stage.strip() + "\n"
-elif key_n != 1 or doi_n != 1:
-    raise RuntimeError(f"bibliography inconsistent before normalization: key={key_n}, doi_field={doi_n}")
+# Survey provenance/date marker; no duplicate literature prose is added.
+tex=read("bare_jrnl.tex")
+note="% 27 August 2026 consistency pass: finalized IEEE ICEE venue and synchronized the NIR raster-scan NLOS record across public artifacts.\n"
+if note not in tex: tex=note+tex
+tex=re.sub(r"through \d{1,2} August 2026","through 27 August 2026",tex,count=1)
+write("bare_jrnl.tex",tex)
 
-key_n = len(re.findall(r"@[A-Za-z]+\{" + re.escape(KEY) + r",", bib, flags=re.I))
-doi_n = doi_field_count(bib)
-if key_n != 1 or doi_n != 1:
-    raise RuntimeError(f"bibliography normalization failed: key={key_n}, doi_field={doi_n}")
-write("egbib_merged_20260711.bib", bib)
-
-
-# Survey provenance/date marker; no duplicate literature prose is added because article/2active.tex already contains it.
-tex = read("bare_jrnl.tex")
-note = "% 27 August 2026 consistency pass: finalized IEEE ICEE venue and synchronized the NIR raster-scan NLOS record across public artifacts.\n"
-if note not in tex:
-    tex = note + tex
-tex = re.sub(r"through \d{1,2} August 2026", "through 27 August 2026", tex, count=1)
-write("bare_jrnl.tex", tex)
-
-
-# Final source-level assertions.
-checks = {
-    "README.md": [TITLE, DOI],
-    "data/papers-source.html": [TITLE, DOI],
-    "article/2active.tex": [KEY],
-    "egbib_merged_20260711.bib": [KEY, DOI],
-    "bare_jrnl.tex": ["27 August 2026 consistency pass"],
-}
-for path, needles in checks.items():
-    text = read(path)
+checks={"README.md":[TITLE,DOI],"data/papers-source.html":[TITLE,DOI],"article/2active.tex":[KEY],"egbib_merged_20260711.bib":[KEY,DOI],"bare_jrnl.tex":["27 August 2026 consistency pass"]}
+for path,needles in checks.items():
+    text=read(path)
     for needle in needles:
-        if needle not in text:
-            raise RuntimeError(f"missing {needle!r} from {path}")
-if "raster" not in read("article/2active.tex").lower():
-    raise RuntimeError("NIR raster-scan survey semantics not found")
-
+        if needle not in text: raise RuntimeError(f"missing {needle!r} from {path}")
+if "raster" not in read("article/2active.tex").lower(): raise RuntimeError("NIR raster-scan survey semantics not found")
 print(f"Integrated {TITLE}; canonical key={KEY}; tracked={tracked}")
