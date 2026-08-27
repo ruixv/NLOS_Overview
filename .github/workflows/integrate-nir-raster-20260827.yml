@@ -1,6 +1,6 @@
 name: Integrate final-venue NIR raster-scan NLOS record
 
-# Validation refresh: deduplicate same-DOI legacy BibTeX entries before the guarded build.
+# Validation refresh: require the record in scoped public discovery surfaces, not only timeline prose.
 on:
   push:
     branches: [master]
@@ -66,15 +66,18 @@ jobs:
           tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
           aux=Path('bare_jrnl.aux').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.aux').exists() else ''
           bbl=Path('bare_jrnl.bbl').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.bbl').exists() else ''
+          latest_start=readme.find('## Latest Additions'); latest_end=readme.find('\n## ',latest_start+4)
+          latest=readme[latest_start:latest_end if latest_end>=0 else len(readme)]
           arr_start=corpus.find('    const papers=['); arr_end=corpus.find('\n    ];',arr_start)
-          tracked=corpus[arr_start:arr_end].count('{cat:')
+          array_text=corpus[arr_start:arr_end]
+          tracked=array_text.count('{cat:')
           m=re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span>',corpus)
           displayed=int(m.group(1)) if m else -1
           key_count=len(re.findall(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,flags=re.I))
           doi_count=len(re.findall(r'(?mi)^\s*doi\s*=\s*\{'+re.escape(doi)+r'\}\s*,?\s*$',bib))
           checks=[
-            (title in readme and doi in readme,'README record'),
-            (title in corpus and doi in corpus,'V2 Paper Explorer record'),
+            (title in latest and doi in latest,'README Latest Additions record'),
+            (title in array_text and doi in array_text,'V2 Paper Explorer record'),
             (key in active and 'raster' in active.lower(),'survey integration retained'),
             (key_count==1,f'single canonical BibTeX key ({key_count})'),
             (doi_count==1,f'single canonical DOI field ({doi_count})'),
@@ -119,7 +122,7 @@ jobs:
 
           Integrated Mohammad Roueinfar and Mahdi Salmanian, “Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength,” IEEE ICEE 2025, pp. 1175–1179, DOI 10.1109/ICEE67339.2025.11213924.
 
-          The later arXiv:2607.04183 upload was not treated as the venue because the final IEEE conference publication predates it. The public README and V2 Paper Explorer now expose the record, while the pre-existing survey/table/timeline discussion is retained under canonical citation key `roueinfarNIRRaster2025`. The merged bibliography, LaTeX build, citation resolution, PDF semantic extraction, and endpoint rendering were validated together before commit.
+          The later arXiv:2607.04183 upload was not treated as the venue because the final IEEE conference publication predates it. README Latest Additions and the V2 Paper Explorer now expose the record, while the pre-existing survey/table/timeline discussion is retained under canonical citation key `roueinfarNIRRaster2025`. The merged bibliography, LaTeX build, citation resolution, PDF semantic extraction, and endpoint rendering were validated together before commit.
           EOF
           rm -f egbib_20260827_nir_raster_scan_gap.bib
 
@@ -129,5 +132,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A README.md index.html data/papers-source.html article/2active.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib egbib_20260827_nir_raster_scan_gap.bib updates/2026-08-27-nir-raster-scan-integrated.md
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Synchronize final-venue NIR raster-scan NLOS record'
+          git commit -m 'Expose final-venue NIR raster-scan NLOS record publicly'
           git push origin HEAD:master
