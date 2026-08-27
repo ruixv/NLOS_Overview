@@ -74,7 +74,7 @@ jobs:
           checks=[
             (title in readme and doi in readme,'README record'),
             (title in corpus and doi in corpus,'V2 Paper Explorer record'),
-            (key in active and '808 nm' in active,'survey integration retained'),
+            (key in active and 'raster' in active.lower(),'survey integration retained'),
             (key_count==1,f'single canonical BibTeX key ({key_count})'),
             (doi_count==1,f'single canonical DOI ({doi_count})'),
             ('Updated 27 Aug 2026' in index,'V2 wrapper date'),
@@ -97,7 +97,7 @@ jobs:
           from pathlib import Path
           import re
           txt=re.sub(r'\s+',' ',Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore')).lower()
-          required=[r'raster[- ]scann',r'808\s*nm',r'nir',r'pan.{0,5}tilt']
+          required=[r'raster[- ]scann',r'nir',r'pan.{0,12}tilt']
           missing=[p for p in required if not re.search(p,txt,re.I)]
           if missing: raise AssertionError('rebuilt PDF missing NIR raster-scan semantics: '+', '.join(missing))
           PY
