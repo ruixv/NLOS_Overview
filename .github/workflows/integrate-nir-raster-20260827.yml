@@ -70,13 +70,13 @@ jobs:
           m=re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span>',corpus)
           displayed=int(m.group(1)) if m else -1
           key_count=len(re.findall(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,flags=re.I))
-          doi_count=len(re.findall(re.escape(doi),bib,flags=re.I))
+          doi_count=len(re.findall(r'(?mi)^\s*doi\s*=\s*\{'+re.escape(doi)+r'\}\s*,?\s*$',bib))
           checks=[
             (title in readme and doi in readme,'README record'),
             (title in corpus and doi in corpus,'V2 Paper Explorer record'),
             (key in active and 'raster' in active.lower(),'survey integration retained'),
             (key_count==1,f'single canonical BibTeX key ({key_count})'),
-            (doi_count==1,f'single canonical DOI ({doi_count})'),
+            (doi_count==1,f'single canonical DOI field ({doi_count})'),
             ('Updated 27 Aug 2026' in index,'V2 wrapper date'),
             ('Updated 27 August 2026' in corpus,'V2 canonical date'),
             ('Last updated: 27 August 2026' in corpus,'V2 footer date'),
