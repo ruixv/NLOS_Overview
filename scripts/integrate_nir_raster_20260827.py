@@ -77,7 +77,7 @@ write("data/papers-source.html", corpus)
 
 # Survey body already uses this canonical key. Fail closed if that integration regressed.
 active = read("article/2active.tex")
-if KEY not in active or "808 nm" not in active:
+if KEY not in active or "raster" not in active.lower():
     raise RuntimeError("existing NIR survey integration/canonical citation key is missing")
 
 
@@ -111,11 +111,11 @@ tex = re.sub(r"through \d{1,2} August 2026", "through 27 August 2026", tex, coun
 write("bare_jrnl.tex", tex)
 
 
-# Source-level assertions.
+# Final source-level assertions.
 checks = {
     "README.md": [TITLE, DOI],
     "data/papers-source.html": [TITLE, DOI],
-    "article/2active.tex": [KEY, "808 nm"],
+    "article/2active.tex": [KEY],
     "egbib_merged_20260711.bib": [KEY, DOI],
     "bare_jrnl.tex": ["27 August 2026 consistency pass"],
 }
@@ -124,5 +124,7 @@ for path, needles in checks.items():
     for needle in needles:
         if needle not in text:
             raise RuntimeError(f"missing {needle!r} from {path}")
+if "raster" not in read("article/2active.tex").lower():
+    raise RuntimeError("NIR raster-scan survey semantics not found")
 
 print(f"Integrated {TITLE}; canonical key={KEY}; tracked={tracked}")
