@@ -1,0 +1,132 @@
+name: Integrate final-venue NIR raster-scan NLOS record
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-nir-raster-20260827.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Apply idempotent public-artifact integration
+        run: python3 scripts/integrate_nir_raster_20260827.py
+
+      - name: Add LaTeX compatibility shim if needed
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('bare_jrnl.tex'); s=p.read_text(encoding='utf-8')
+          shim="\\makeatletter\n\\providecommand{\\HyperLocalCurrentHref}{\\@currentHref}\n\\makeatother\n"
+          anchor="\\usepackage{hyperref}\n"
+          if shim not in s:
+              if s.count(anchor)!=1: raise RuntimeError('hyperref anchor not unique')
+              p.write_text(s.replace(anchor,anchor+shim,1),encoding='utf-8')
+          PY
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Install PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Validate synchronized public artifacts
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          title='Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength'
+          doi='10.1109/ICEE67339.2025.11213924'
+          key='roueinfarNIRRaster2025'
+          readme=Path('README.md').read_text(encoding='utf-8')
+          index=Path('index.html').read_text(encoding='utf-8')
+          corpus=Path('data/papers-source.html').read_text(encoding='utf-8')
+          active=Path('article/2active.tex').read_text(encoding='utf-8')
+          bib=Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex=Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          aux=Path('bare_jrnl.aux').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.aux').exists() else ''
+          bbl=Path('bare_jrnl.bbl').read_text(encoding='utf-8',errors='ignore') if Path('bare_jrnl.bbl').exists() else ''
+          arr_start=corpus.find('    const papers=['); arr_end=corpus.find('\n    ];',arr_start)
+          tracked=corpus[arr_start:arr_end].count('{cat:')
+          m=re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span>',corpus)
+          displayed=int(m.group(1)) if m else -1
+          key_count=len(re.findall(r'@[A-Za-z]+\{'+re.escape(key)+r',',bib,flags=re.I))
+          doi_count=len(re.findall(re.escape(doi),bib,flags=re.I))
+          checks=[
+            (title in readme and doi in readme,'README record'),
+            (title in corpus and doi in corpus,'V2 Paper Explorer record'),
+            (key in active and '808 nm' in active,'survey integration retained'),
+            (key_count==1,f'single canonical BibTeX key ({key_count})'),
+            (doi_count==1,f'single canonical DOI ({doi_count})'),
+            ('Updated 27 Aug 2026' in index,'V2 wrapper date'),
+            ('Updated 27 August 2026' in corpus,'V2 canonical date'),
+            ('Last updated: 27 August 2026' in corpus,'V2 footer date'),
+            (displayed==tracked and tracked>0,f'tracked count agrees ({displayed} vs {tracked})'),
+            ('27 August 2026 consistency pass' in tex,'survey provenance'),
+            (key in aux,'citation resolved into AUX'),
+            ((key in bbl) or ('Raster Scanning at NIR Wavelength' in bbl),'bibliography emitted into BBL'),
+            (Path('bare_jrnl.pdf').stat().st_size>100000,'rebuilt PDF size'),
+          ]
+          bad=[]
+          for ok,msg in checks:
+              print(('PASS: ' if ok else 'FAIL: ')+msg)
+              if not ok: bad.append(msg)
+          if bad: raise AssertionError('; '.join(bad))
+          PY
+          pdftotext bare_jrnl.pdf /tmp/nlos.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          txt=re.sub(r'\s+',' ',Path('/tmp/nlos.txt').read_text(encoding='utf-8',errors='ignore')).lower()
+          required=[r'raster[- ]scann',r'808\s*nm',r'nir',r'pan.{0,5}tilt']
+          missing=[p for p in required if not re.search(p,txt,re.I)]
+          if missing: raise AssertionError('rebuilt PDF missing NIR raster-scan semantics: '+', '.join(missing))
+          PY
+
+      - name: Render PDF endpoints
+        run: |
+          set -euo pipefail
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png && test -s /tmp/render/last.png
+
+      - name: Record completed update
+        run: |
+          cat > updates/2026-08-27-nir-raster-scan-integrated.md <<'EOF'
+          # NIR raster-scan NLOS record synchronized — 27 August 2026
+
+          Integrated Mohammad Roueinfar and Mahdi Salmanian, “Non-Line-of-Sight Imaging Using Raster Scanning at NIR Wavelength,” IEEE ICEE 2025, pp. 1175–1179, DOI 10.1109/ICEE67339.2025.11213924.
+
+          The later arXiv:2607.04183 upload was not treated as the venue because the final IEEE conference publication predates it. The public README and V2 Paper Explorer now expose the record, while the pre-existing survey/table/timeline discussion is retained under canonical citation key `roueinfarNIRRaster2025`. The merged bibliography, LaTeX build, citation resolution, PDF semantic extraction, and endpoint rendering were validated together before commit.
+          EOF
+          rm -f egbib_20260827_nir_raster_scan_gap.bib
+
+      - name: Commit synchronized artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A README.md index.html data/papers-source.html article/2active.tex bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib egbib_20260827_nir_raster_scan_gap.bib updates/2026-08-27-nir-raster-scan-integrated.md
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Synchronize final-venue NIR raster-scan NLOS record'
+          git push origin HEAD:master
