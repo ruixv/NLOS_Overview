@@ -1,0 +1,156 @@
+name: Integrate pending verified NLOS papers — 2026-09-02
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/integrate-pending-nlos-20260902.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Apply guarded source integration
+        run: python3 scripts/integrate_pending_nlos_20260902.py
+
+      - name: Build survey PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: bare_jrnl.tex
+          work_in_root_file_dir: true
+          latexmk_use_xelatex: false
+          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+
+      - name: Install PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Validate synchronized artifacts
+        run: |
+          set -euo pipefail
+          test -s bare_jrnl.pdf
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          papers = [
+              ("Non-line-of-sight super-resolution imaging with quasi-constant-delay circular pattern", "tianQCDCQSRNLOS2026", "10.1063/5.0331605"),
+              ("Stereo non-line-of-sight imaging", "luesialahozStereoNLOS2026", "10.1007/s00371-025-04340-7"),
+              ("Memory-efficient GPU pipelines for real-time non-line-of-sight reconstruction", "lopezruizMemoryEfficientGPUNLOS2026", "2608.28183"),
+          ]
+          readme = Path('README.md').read_text(encoding='utf-8')
+          index = Path('index.html').read_text(encoding='utf-8')
+          corpus = Path('data/papers-source.html').read_text(encoding='utf-8')
+          active = Path('article/2active.tex').read_text(encoding='utf-8')
+          bib = Path('egbib_merged_20260711.bib').read_text(encoding='utf-8')
+          tex = Path('bare_jrnl.tex').read_text(encoding='utf-8')
+          aux = Path('bare_jrnl.aux').read_text(encoding='utf-8', errors='ignore') if Path('bare_jrnl.aux').exists() else ''
+          bbl = Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore') if Path('bare_jrnl.bbl').exists() else ''
+
+          checks = []
+          for title, key, token in papers:
+              checks += [
+                  (title.lower() in readme.lower(), f'README contains {title}'),
+                  (title.lower() in corpus.lower(), f'Paper Explorer contains {title}'),
+                  (key in active, f'survey prose cites {key}'),
+                  (len(re.findall(r"@[A-Za-z]+\\{" + re.escape(key) + r",", bib, flags=re.I)) == 1, f'unique canonical BibTeX key {key}'),
+                  (key in aux, f'AUX resolves {key}'),
+                  ((key in bbl) or (title[:28].lower() in bbl.lower()), f'BBL emits {key}'),
+                  (token.lower() in (bib + readme + corpus).lower(), f'metadata token retained for {key}'),
+              ]
+
+          arr_start = corpus.find('    const papers=[')
+          arr_end = corpus.find('\n    ];', arr_start)
+          if arr_start < 0 or arr_end < 0:
+              raise RuntimeError('Paper Explorer array bounds missing')
+          tracked = corpus[arr_start:arr_end].count('{cat:')
+          m = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span>', corpus)
+          displayed = int(m.group(1)) if m else -1
+          checks += [
+              ('Updated 2 Sep 2026' in index, 'website wrapper date'),
+              ('Updated 2 September 2026' in corpus, 'canonical website date'),
+              ('Last updated: 2 September 2026' in corpus, 'canonical website footer date'),
+              ('2 September 2026 consistency pass' in tex, 'survey provenance/date'),
+              (displayed == tracked and tracked > 0, f'Paper Explorer count agrees ({displayed} vs {tracked})'),
+              (Path('bare_jrnl.pdf').stat().st_size > 100000, 'rebuilt survey PDF size'),
+          ]
+          bad = []
+          for ok, msg in checks:
+              print(('PASS: ' if ok else 'FAIL: ') + msg)
+              if not ok:
+                  bad.append(msg)
+          if bad:
+              raise AssertionError('; '.join(bad))
+          PY
+
+          pdftotext bare_jrnl.pdf /tmp/nlos-survey.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          txt = re.sub(r'\s+', ' ', Path('/tmp/nlos-survey.txt').read_text(encoding='utf-8', errors='ignore')).lower()
+          required = [
+              r'quasi.?constant.?delay',
+              r'stereo',
+              r'gpu.{0,80}(phasor|migration)|memory.{0,80}gpu',
+          ]
+          missing = [pat for pat in required if not re.search(pat, txt, re.I)]
+          if missing:
+              raise AssertionError('rebuilt PDF missing integrated semantics: ' + ', '.join(missing))
+          PY
+
+      - name: Render PDF endpoints
+        run: |
+          set -euo pipefail
+          pages=$(pdfinfo bare_jrnl.pdf | awk '/^Pages:/ {print $2}')
+          mkdir -p /tmp/render
+          pdftoppm -f 1 -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/first
+          pdftoppm -f "$pages" -singlefile -png -r 100 bare_jrnl.pdf /tmp/render/last
+          test -s /tmp/render/first.png
+          test -s /tmp/render/last.png
+
+      - name: Record completed synchronization
+        run: |
+          cat > updates/2026-09-02-pending-nlos-integrated.md <<'EOF'
+          # Pending verified NLOS papers synchronized — 2 September 2026
+
+          A fresh keyword and forward-citation pass around the active NLOS core (LCT, f-k migration, phasor fields), passive computational periscopy, learned transient reconstruction, consumer LiDAR, acoustic, RF/mmWave, and related modality-expansion branches did not identify an additional high-confidence paper beyond the recent verified staging backlog.
+
+          This run therefore closed the three remaining high-value public-integration gaps:
+
+          1. Xiaorui Tian et al., “Non-line-of-sight super-resolution imaging with quasi-constant-delay circular pattern,” APL Photonics 11(7), 076122 (2026), DOI 10.1063/5.0331605.
+          2. Pablo Luesia-Lahoz, Sergio Cartiel, and Adolfo Muñoz, “Stereo non-line-of-sight imaging,” The Visual Computer 42, 148 (2026), DOI 10.1007/s00371-025-04340-7.
+          3. Alfonso López-Ruiz and Diego Royo, “Memory-efficient GPU pipelines for real-time non-line-of-sight reconstruction,” arXiv:2608.28183 (2026); no final venue verified as of 2 September 2026.
+
+          README Latest Additions/timeline, the website Paper Explorer, active-NLOS survey prose, the canonical merged bibliography, and the rebuilt survey PDF were validated together. The literature-review integration emphasizes acquisition/temporal-resolution co-design, multi-relay phasor-field apertures and missing-cone mitigation, and reconstruction throughput/memory as an emerging bottleneck for high-rate SPAD NLOS systems.
+          EOF
+          rm -f \
+            egbib_20260830_qcdc_qsr_nlos_gap.bib \
+            egbib_20260901_stereo_nlos_gap.bib \
+            egbib_20260901_gpu_pipeline_gap.bib \
+            egbib_20260831_gpu_pipeline_gap.bib
+
+      - name: Commit synchronized public artifacts
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A \
+            README.md index.html data/papers-source.html article/2active.tex \
+            bare_jrnl.tex bare_jrnl.pdf egbib_merged_20260711.bib \
+            updates/2026-09-02-pending-nlos-integrated.md \
+            egbib_20260830_qcdc_qsr_nlos_gap.bib \
+            egbib_20260901_stereo_nlos_gap.bib \
+            egbib_20260901_gpu_pipeline_gap.bib \
+            egbib_20260831_gpu_pipeline_gap.bib
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Synchronize pending verified NLOS papers'
+          git push origin HEAD:master
