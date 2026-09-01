@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - .github/workflows/integrate-pending-nlos-20260902.yml
+      - scripts/integrate_pending_nlos_20260902.py
   workflow_dispatch:
 
 permissions:
@@ -44,10 +45,22 @@ jobs:
           import re
 
           papers = [
-              ("Non-line-of-sight super-resolution imaging with quasi-constant-delay circular pattern", "tianQCDCQSRNLOS2026", "10.1063/5.0331605"),
-              ("Stereo non-line-of-sight imaging", "luesialahozStereoNLOS2026", "10.1007/s00371-025-04340-7"),
-              ("Memory-efficient GPU pipelines for real-time non-line-of-sight reconstruction", "lopezruizMemoryEfficientGPUNLOS2026", "2608.28183"),
+              ("Non-line-of-sight super-resolution imaging with quasi-constant-delay circular pattern", "10.1063/5.0331605"),
+              ("Stereo non-line-of-sight imaging", "10.1007/s00371-025-04340-7"),
+              ("Memory-efficient GPU pipelines for real-time non-line-of-sight reconstruction", "2608.28183"),
           ]
+          def norm(s):
+              s = re.sub(r'[{}\\]', '', s.lower())
+              return re.sub(r'[^a-z0-9]+', ' ', s).strip()
+          def blocks(text):
+              starts = list(re.finditer(r'(?m)^@[A-Za-z]+\{', text))
+              return [text[m.start():(starts[i+1].start() if i+1 < len(starts) else len(text))].strip()
+                      for i,m in enumerate(starts)]
+          def key(block):
+              m = re.match(r'@[A-Za-z]+\{\s*([^,]+),', block)
+              if not m: raise AssertionError('malformed BibTeX block')
+              return m.group(1).strip()
+
           readme = Path('README.md').read_text(encoding='utf-8')
           index = Path('index.html').read_text(encoding='utf-8')
           corpus = Path('data/papers-source.html').read_text(encoding='utf-8')
@@ -56,23 +69,25 @@ jobs:
           tex = Path('bare_jrnl.tex').read_text(encoding='utf-8')
           aux = Path('bare_jrnl.aux').read_text(encoding='utf-8', errors='ignore') if Path('bare_jrnl.aux').exists() else ''
           bbl = Path('bare_jrnl.bbl').read_text(encoding='utf-8', errors='ignore') if Path('bare_jrnl.bbl').exists() else ''
-
+          all_blocks = blocks(bib)
           checks = []
-          for title, key, token in papers:
+          for title, token in papers:
+              found = [b for b in all_blocks if token.lower() in b.lower() or norm(title) in norm(b)]
+              if len(found) != 1:
+                  raise AssertionError(f'{title}: expected one canonical BibTeX record, found {len(found)}')
+              cite_key = key(found[0])
               checks += [
                   (title.lower() in readme.lower(), f'README contains {title}'),
                   (title.lower() in corpus.lower(), f'Paper Explorer contains {title}'),
-                  (key in active, f'survey prose cites {key}'),
-                  (len(re.findall(r"@[A-Za-z]+\\{" + re.escape(key) + r",", bib, flags=re.I)) == 1, f'unique canonical BibTeX key {key}'),
-                  (key in aux, f'AUX resolves {key}'),
-                  ((key in bbl) or (title[:28].lower() in bbl.lower()), f'BBL emits {key}'),
-                  (token.lower() in (bib + readme + corpus).lower(), f'metadata token retained for {key}'),
+                  (cite_key in active, f'survey prose cites canonical key {cite_key}'),
+                  (cite_key in aux, f'AUX resolves {cite_key}'),
+                  ((cite_key in bbl) or (norm(title)[:28] in norm(bbl)), f'BBL emits {cite_key}'),
+                  (token.lower() in (bib + readme + corpus).lower(), f'metadata token retained for {title}'),
               ]
 
           arr_start = corpus.find('    const papers=[')
           arr_end = corpus.find('\n    ];', arr_start)
-          if arr_start < 0 or arr_end < 0:
-              raise RuntimeError('Paper Explorer array bounds missing')
+          if arr_start < 0 or arr_end < 0: raise RuntimeError('Paper Explorer array bounds missing')
           tracked = corpus[arr_start:arr_end].count('{cat:')
           m = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span>', corpus)
           displayed = int(m.group(1)) if m else -1
@@ -87,10 +102,8 @@ jobs:
           bad = []
           for ok, msg in checks:
               print(('PASS: ' if ok else 'FAIL: ') + msg)
-              if not ok:
-                  bad.append(msg)
-          if bad:
-              raise AssertionError('; '.join(bad))
+              if not ok: bad.append(msg)
+          if bad: raise AssertionError('; '.join(bad))
           PY
 
           pdftotext bare_jrnl.pdf /tmp/nlos-survey.txt
@@ -98,14 +111,9 @@ jobs:
           from pathlib import Path
           import re
           txt = re.sub(r'\s+', ' ', Path('/tmp/nlos-survey.txt').read_text(encoding='utf-8', errors='ignore')).lower()
-          required = [
-              r'quasi.?constant.?delay',
-              r'stereo',
-              r'gpu.{0,80}(phasor|migration)|memory.{0,80}gpu',
-          ]
-          missing = [pat for pat in required if not re.search(pat, txt, re.I)]
-          if missing:
-              raise AssertionError('rebuilt PDF missing integrated semantics: ' + ', '.join(missing))
+          required = [r'quasi.?constant.?delay', r'stereo', r'(gpu|cuda).{0,120}(phasor|migration)|(phasor|migration).{0,120}(gpu|cuda)']
+          missing = [p for p in required if not re.search(p, txt, re.I)]
+          if missing: raise AssertionError('rebuilt PDF missing integrated semantics: ' + ', '.join(missing))
           PY
 
       - name: Render PDF endpoints
@@ -125,13 +133,9 @@ jobs:
 
           A fresh keyword and forward-citation pass around the active NLOS core (LCT, f-k migration, phasor fields), passive computational periscopy, learned transient reconstruction, consumer LiDAR, acoustic, RF/mmWave, and related modality-expansion branches did not identify an additional high-confidence paper beyond the recent verified staging backlog.
 
-          This run therefore closed the three remaining high-value public-integration gaps:
+          This run therefore closed three high-value public-integration gaps: Tian et al., “Non-line-of-sight super-resolution imaging with quasi-constant-delay circular pattern,” APL Photonics 11(7), 076122 (2026), DOI 10.1063/5.0331605; Luesia-Lahoz et al., “Stereo non-line-of-sight imaging,” The Visual Computer 42, 148 (2026), DOI 10.1007/s00371-025-04340-7; and López-Ruiz and Royo, “Memory-efficient GPU pipelines for real-time non-line-of-sight reconstruction,” arXiv:2608.28183 (2026), for which no final venue was verified as of 2 September 2026.
 
-          1. Xiaorui Tian et al., “Non-line-of-sight super-resolution imaging with quasi-constant-delay circular pattern,” APL Photonics 11(7), 076122 (2026), DOI 10.1063/5.0331605.
-          2. Pablo Luesia-Lahoz, Sergio Cartiel, and Adolfo Muñoz, “Stereo non-line-of-sight imaging,” The Visual Computer 42, 148 (2026), DOI 10.1007/s00371-025-04340-7.
-          3. Alfonso López-Ruiz and Diego Royo, “Memory-efficient GPU pipelines for real-time non-line-of-sight reconstruction,” arXiv:2608.28183 (2026); no final venue verified as of 2 September 2026.
-
-          README Latest Additions/timeline, the website Paper Explorer, active-NLOS survey prose, the canonical merged bibliography, and the rebuilt survey PDF were validated together. The literature-review integration emphasizes acquisition/temporal-resolution co-design, multi-relay phasor-field apertures and missing-cone mitigation, and reconstruction throughput/memory as an emerging bottleneck for high-rate SPAD NLOS systems.
+          README Latest Additions/timeline, the website Paper Explorer, active-NLOS survey prose, the canonical merged bibliography, and the rebuilt survey PDF were validated together. Existing canonical BibTeX keys were reused when a matching DOI/title was already present, preventing duplicate bibliography records.
           EOF
           rm -f \
             egbib_20260830_qcdc_qsr_nlos_gap.bib \
