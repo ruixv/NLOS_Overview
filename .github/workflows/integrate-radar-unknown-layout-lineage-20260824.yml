@@ -24,6 +24,22 @@ jobs:
           python3 scripts/integrate_radar_unknown_layout_lineage_20260824.py
           git diff --check
 
+      - name: Repair escaped survey newlines
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('article/5newscenes.tex')
+          s=p.read_text(encoding='utf-8')
+          bad='methods below.\\n\\n'
+          if bad in s:
+            s=s.replace(bad, 'methods below.\n\n', 1)
+          start=s.find('From assumed relay geometry to joint environment and target inference.')
+          section=s[start:start+5000] if start >= 0 else ''
+          if r'\n\n' in section:
+            raise RuntimeError('literal escaped paragraph newline remains in inserted radar lineage prose')
+          p.write_text(s,encoding='utf-8')
+          PY
+
       - name: Add LaTeX compatibility shim if needed
         run: |
           python3 - <<'PY'
@@ -145,7 +161,7 @@ jobs:
             ['association and hypothesis','association'],
             ['dod','doa'],
             ['multidomain','multi domain'],
-            ['matrixpencil','matrix pencil'],
+            ['matrix-pencil','matrixpencil','matrix pencil'],
             ['layout relocation','relocation','tomosar'],
           ]
           missing=[]
