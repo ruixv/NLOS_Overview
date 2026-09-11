@@ -1,0 +1,98 @@
+name: Integrate two-bounce NLOS auto-calibration citation trace
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - updates/twobounce_autocalibration_20260911.trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-twobounce-autocalibration-20260911
+  cancel-in-progress: false
+
+jobs:
+  integrate-build-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out current master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Install Python bibliography dependency
+        run: python3 -m pip install --user bibtexparser
+
+      - name: Apply synchronized source integration
+        run: |
+          python3 -m py_compile scripts/integrate_twobounce_autocalibration_20260911.py
+          python3 scripts/integrate_twobounce_autocalibration_20260911.py
+          python3 scripts/merge_nlos_bibliography.py
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources || true
+          sudo apt-get -o Acquire::Retries=5 update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers \
+            ghostscript poppler-utils
+
+      - name: Cleanly rebuild survey PDF
+        run: |
+          rm -f bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          bibtex bare_jrnl
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+          pdflatex -interaction=nonstopmode -halt-on-error bare_jrnl.tex
+
+      - name: Validate synchronized sources, citations, website, and PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          title='Automatic calibration under non-planar illumination wall in two-bounce non-line-of-sight imaging'
+          doi='10.1016/j.optlastec.2026.116183'
+          key='chenAutoCalibrationTwoBounce2026'
+          test "$(grep -Fi -c "$doi" README.md)" -eq 1
+          test "$(grep -Fi -c "$doi" index.html)" -ge 1
+          test "$(grep -Fi -c "$doi" data/papers-source.html)" -ge 1
+          test "$(grep -F -c "$key" article/5newscenes.tex)" -ge 1
+          test "$(grep -Ei -c "^@article\\{$key," egbib_merged_20260711.bib)" -eq 1
+          grep -F -q "$key" bare_jrnl.aux
+          grep -F -q "$key" bare_jrnl.bbl
+          grep -F -q '11 September 2026 forward-citation trace' bare_jrnl.tex
+          grep -F -q 'through 11 September 2026' bare_jrnl.tex
+          ! grep -E -q 'Citation .* undefined|There were undefined citations|Repeated entry' bare_jrnl.log
+          pdfinfo bare_jrnl.pdf | grep -q '^Pages:'
+          pdftotext -layout bare_jrnl.pdf bare_jrnl.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          text = ''.join(ch for ch in Path('bare_jrnl.txt').read_text(errors='ignore').lower() if ch.isalnum())
+          needles = [
+              'automaticcalibrationundernonplanarilluminationwallintwobouncenonlineofsightimaging',
+              'selfcalibratingtwobounceimagingonnonplanarrelaywalls',
+          ]
+          missing = [n for n in needles if n not in text]
+          if missing:
+              raise SystemExit(f'PDF semantic checks missing: {missing}')
+          PY
+          rm -f bare_jrnl.txt
+
+      - name: Commit and push validated public artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md index.html data/papers-source.html article/5newscenes.tex bare_jrnl.tex \
+            egbib_merged_20260711.bib bare_jrnl.pdf updates/2026-07-11-bibliography-deduplication.md
+          if git diff --cached --quiet; then
+            echo "No generated public-artifact changes to commit"
+            exit 1
+          fi
+          git commit -m "Integrate two-bounce NLOS auto-calibration citation trace"
+          git push origin HEAD:master
