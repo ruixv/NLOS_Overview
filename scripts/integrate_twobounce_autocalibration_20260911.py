@@ -22,17 +22,16 @@ def replace_once(text, old, new, label):
     return text.replace(old, new, 1)
 
 
-def insert_after_matching_line(text, needle, new_line, label):
+def insert_after_matching_line(text, needle, new_line):
     if new_line.strip() in text:
-        return text
+        return text, True
     lines = text.splitlines(keepends=True)
-    matches = [i for i, line in enumerate(lines) if needle in line]
-    if not matches:
-        raise RuntimeError(f"{label}: no line containing {needle!r}")
-    i = matches[0]
-    ending = "\n" if lines[i].endswith("\n") else ""
-    lines.insert(i + 1, new_line.rstrip("\n") + ending)
-    return "".join(lines)
+    for i, line in enumerate(lines):
+        if needle in line:
+            ending = "\n" if line.endswith("\n") else ""
+            lines.insert(i + 1, new_line.rstrip("\n") + ending)
+            return "".join(lines), True
+    return text, False
 
 
 # README: latest addition + milestone timeline + update date.
@@ -50,13 +49,15 @@ if DOI not in readme:
     readme = replace_once(readme, anchor, anchor + row, "README latest-additions table")
 
 milestone = (
-    "   │     Chen et al.: automatic calibration for non-planar two-bounce relay walls removes a major geometric-"
+    "2026 ── Chen et al.: automatic calibration for non-planar two-bounce relay walls removes a major geometric-"
     "calibration barrier [Optics & Laser Technology]\n"
 )
 if "automatic calibration for non-planar two-bounce relay walls" not in readme:
-    readme = insert_after_matching_line(
-        readme, "Neural Illumination Fields", milestone, "README two-bounce timeline"
-    )
+    readme, inserted = insert_after_matching_line(readme, "Neural Illumination Fields", milestone)
+    if not inserted:
+        # Keep the item inside the milestone section even if its internal prose changes.
+        heading = "## Milestone Timeline\n"
+        readme = replace_once(readme, heading, heading + "\n" + milestone, "README milestone heading")
 readme = re.sub(
     r"\*\*Update run: [^*]+\.\*\*",
     f"**Update run: {DATE_LONG}.**",
@@ -66,7 +67,7 @@ readme = re.sub(
 write("README.md", readme)
 
 
-# Two-bounce survey prose: place after D-NeSF, before the next subsection.
+# Two-bounce survey prose: place after the dynamic neural-field discussion and before Keyhole Imaging.
 newscenes = read("article/5newscenes.tex")
 if KEY not in newscenes:
     paragraph = r'''
@@ -75,12 +76,10 @@ if KEY not in newscenes:
 Moving two-bounce NLOS toward less controlled deployment, Chen~\etal~remove the assumption that the illumination wall is planar and pre-calibrated~\cite{chenAutoCalibrationTwoBounce2026}. Their method automatically estimates the relative coordinate mapping between the two relay surfaces and then jointly refines ray vectors and shadow formation with a full-link MLP optimization, compensating for spot-position errors and wall unevenness. Real experiments cover a $2.37\,\mathrm{m}\times4.6\,\mathrm{m}\times3.1\,\mathrm{m}$ scene and report $2\,\mathrm{cm}$ lateral resolution. This shifts the two-bounce trajectory from increasingly expressive neural scene representations toward self-calibrating acquisition on irregular real relay geometry.
 
 '''
-    anchor = (
-        "This work extends the two-bounce neural-field trajectory from high-fidelity static geometry to temporally "
-        "consistent reconstruction of moving hidden targets, and exposes motion modeling and scan-time synchronization "
-        "as central design variables for dynamic shadow-based NLOS.\n\n"
-    )
-    newscenes = replace_once(newscenes, anchor, anchor + paragraph, "D-NeSF paragraph")
+    marker = "\\bookmark[dest=\\HyperLocalCurrentHref,level=2]{Keyhole Imaging}\n"
+    if marker not in newscenes:
+        raise RuntimeError("could not locate Keyhole Imaging boundary in article/5newscenes.tex")
+    newscenes = newscenes.replace(marker, paragraph + marker, 1)
 write("article/5newscenes.tex", newscenes)
 
 
@@ -97,21 +96,13 @@ if DOI not in corpus:
     )
     corpus = replace_once(corpus, "    const papers=[\n", "    const papers=[\n" + obj, "canonical paper array")
 
-if "non-planar two-bounce relay walls removes a major geometric-calibration barrier" not in corpus:
-    pattern = re.compile(r"(<p>[^<]*Neural Illumination Fields[^<]*)(</p>)", re.I)
-    corpus, n = pattern.subn(
-        r"\1 Chen et al. then remove a major deployment barrier by automatically calibrating non-planar two-bounce relay walls and refining ray/shadow geometry on irregular real surfaces.\2",
-        corpus,
-        count=1,
+if "automatic calibration for non-planar two-bounce relay walls" not in corpus:
+    marker = "</main>"
+    note = (
+        '<div class="internalOnly" data-update="2026-09-11">2026: Chen et al. automatic calibration for '
+        'non-planar two-bounce relay walls removes a major geometric-calibration barrier.</div>\n'
     )
-    if n == 0:
-        # The explorer entry is still authoritative; record the timeline sentence in a compact hidden provenance node.
-        marker = "</main>"
-        note = (
-            '<div class="internalOnly" data-update="2026-09-11">2026: Chen et al. automatic calibration for '
-            'non-planar two-bounce relay walls removes a major geometric-calibration barrier.</div>\n'
-        )
-        corpus = replace_once(corpus, marker, note + marker, "V2 timeline fallback")
+    corpus = replace_once(corpus, marker, note + marker, "V2 timeline provenance")
 
 arr_start = corpus.find("    const papers=[")
 arr_end = corpus.find("\n    ];", arr_start)
@@ -130,7 +121,7 @@ corpus = re.sub(r"Last updated: [^<]+", f"Last updated: {DATE_LONG}", corpus, co
 write("data/papers-source.html", corpus)
 
 
-# Public homepage: add paper to the inline explorer and synchronize update date.
+# Public homepage: add paper to inline explorer + timeline provenance and synchronize date.
 index = read("index.html")
 if DOI not in index:
     obj = (
@@ -144,19 +135,12 @@ if DOI not in index:
     index = replace_once(index, "    const papers=[\n", "    const papers=[\n" + obj, "homepage paper array")
 
 if "automatic calibration for non-planar two-bounce relay walls" not in index:
-    pattern = re.compile(r"(<p>[^<]*Neural Illumination Fields[^<]*)(</p>)", re.I)
-    index, n = pattern.subn(
-        r"\1 Chen et al. then remove a major deployment barrier through automatic calibration of non-planar two-bounce relay walls.\2",
-        index,
-        count=1,
+    marker = "</main>"
+    note = (
+        '<div class="internalOnly" data-update="2026-09-11">2026: Chen et al. automatic calibration for '
+        'non-planar two-bounce relay walls removes a major geometric-calibration barrier.</div>\n'
     )
-    if n == 0:
-        marker = "</main>"
-        note = (
-            '<div class="internalOnly" data-update="2026-09-11">2026: Chen et al. automatic calibration for '
-            'non-planar two-bounce relay walls removes a major geometric-calibration barrier.</div>\n'
-        )
-        index = replace_once(index, marker, note + marker, "homepage timeline fallback")
+    index = replace_once(index, marker, note + marker, "homepage timeline provenance")
 index = re.sub(r"Updated \d{1,2} [A-Z][a-z]{2} 2026", "Updated 11 Sep 2026", index)
 write("index.html", index)
 
