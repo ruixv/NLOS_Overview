@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Python bibliography dependency
-        run: python3 -m pip install --user bibtexparser
+        run: python3 -m pip install --user 'bibtexparser==1.4.3'
 
       - name: Apply synchronized source integration
         run: |
@@ -54,7 +54,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          title='Automatic calibration under non-planar illumination wall in two-bounce non-line-of-sight imaging'
           doi='10.1016/j.optlastec.2026.116183'
           key='chenAutoCalibrationTwoBounce2026'
           test "$(grep -Fi -c "$doi" README.md)" -eq 1
