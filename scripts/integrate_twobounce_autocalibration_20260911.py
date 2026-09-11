@@ -55,7 +55,6 @@ milestone = (
 if "automatic calibration for non-planar two-bounce relay walls" not in readme:
     readme, inserted = insert_after_matching_line(readme, "Neural Illumination Fields", milestone)
     if not inserted:
-        # Keep the item inside the milestone section even if its internal prose changes.
         heading = "## Milestone Timeline\n"
         readme = replace_once(readme, heading, heading + "\n" + milestone, "README milestone heading")
 readme = re.sub(
@@ -121,26 +120,19 @@ corpus = re.sub(r"Last updated: [^<]+", f"Last updated: {DATE_LONG}", corpus, co
 write("data/papers-source.html", corpus)
 
 
-# Public homepage: add paper to inline explorer + timeline provenance and synchronize date.
+# Public homepage wrapper. Its explorer content is sourced from data/papers-source.html;
+# keep date/provenance synchronized without assuming an inline paper array exists here.
 index = read("index.html")
 if DOI not in index:
-    obj = (
-        '      {cat:"latest active two-bounce shadow calibration irregular-relay neural",'
-        'title:"Automatic calibration under non-planar illumination wall in two-bounce non-line-of-sight imaging",'
-        'authors:"Chen et al.",year:2026,venue:"Optics & Laser Technology 204, 116183 (2026)",'
-        'url:"https://doi.org/10.1016/j.optlastec.2026.116183",'
-        'key:"Automatically estimates the relative mapping between two relay surfaces and refines ray/shadow geometry '
-        'with a full-link MLP, enabling two-bounce NLOS on a non-planar illumination wall without prior planar calibration."},\n'
-    )
-    index = replace_once(index, "    const papers=[\n", "    const papers=[\n" + obj, "homepage paper array")
-
-if "automatic calibration for non-planar two-bounce relay walls" not in index:
     marker = "</main>"
-    note = (
-        '<div class="internalOnly" data-update="2026-09-11">2026: Chen et al. automatic calibration for '
-        'non-planar two-bounce relay walls removes a major geometric-calibration barrier.</div>\n'
+    metadata = (
+        '<div class="internalOnly" data-paper-update="2026-09-11">'
+        'Automatic calibration under non-planar illumination wall in two-bounce non-line-of-sight imaging — '
+        'Optics &amp; Laser Technology 204, 116183 (2026), DOI 10.1016/j.optlastec.2026.116183. '
+        'Automatic calibration for non-planar two-bounce relay walls removes a major geometric-calibration barrier.'
+        '</div>\n'
     )
-    index = replace_once(index, marker, note + marker, "homepage timeline provenance")
+    index = replace_once(index, marker, metadata + marker, "homepage update provenance")
 index = re.sub(r"Updated \d{1,2} [A-Z][a-z]{2} 2026", "Updated 11 Sep 2026", index)
 write("index.html", index)
 
