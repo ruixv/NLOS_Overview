@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 95 source files and keeps one highest-priority record for each of 563 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 120 source files and keeps one highest-priority record for each of 608 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 1098
-- Case-insensitive duplicate replacements: 535
+- Parsed source records: 1160
+- Case-insensitive duplicate replacements: 552
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -500,7 +500,6 @@ This update generates `egbib_merged_20260711.bib` from 95 source files and keeps
 - `liuPtychographyCorrelographyNLOS2026` / `liuPtychographyCorrelographyNLOS2026`: `egbib_20260719_ptycho_venue_updates.bib` → `egbib_20260724_ptychography_correlography.bib`
 - `yeThermalRoughNLOS2026` / `yeThermalRoughNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
 - `albertEyeSafeNLOS2026` / `albertEyeSafeNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
-- `roueinfarNIRRasterNLOS2025` / `roueinfarNIRRasterNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
 - `marcoComprehensiveToFNLOS2026` / `marcoComprehensiveToFNLOS2026`: `egbib_2026_updates.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
 - `zhangNeuralIlluminationFields2026` / `zhangNeuralIlluminationFields2026`: `egbib_20260711_run15_updates.bib` → `egbib_20260725_nif_scisa.bib`
 - `daiSCISANet2026` / `daiSCISANet2026`: `egbib_merged_20260711.bib` → `egbib_20260725_nif_scisa.bib`
@@ -545,6 +544,24 @@ This update generates `egbib_merged_20260711.bib` from 95 source files and keeps
 - `tripathyLCRISVitalSign2025` / `tripathyLCRISVitalSign2025`: `egbib_merged_20260711.bib` → `egbib_20260811_ris_vitalsign_updates.bib`
 - `yasmeenDualBeamRIS2026` / `yasmeenDualBeamRIS2026`: `egbib_20260702_updates.bib` → `egbib_20260811_ris_vitalsign_updates.bib`
 - `parkTjunctionPedestrian2025` / `parkTjunctionPedestrian2025`: `egbib_2026_updates.bib` → `egbib_20260811_ris_vitalsign_updates.bib`
+- `albertEyeSafeNLOS2026` / `albertEyeSafeNLOS2026`: `egbib_20260725_missing_modalities_and_benchmark.bib` → `egbib_20260824_eye_safe_pose_gap.bib`
+- `xiaoNLOSHumanPose2026` / `xiaoNLOSHumanPose2026`: `egbib_20260718_reconstruction_pose_consistency.bib` → `egbib_20260824_eye_safe_pose_gap.bib`
+- `zhouPolarizationSpeckleNLOS2026` / `zhouPolarizationSpeckleNLOS2026`: `egbib_20260720_polarization_single_pixel.bib` → `egbib_20260826_polarization_speckle_gap.bib`
+- `alakusANLOSR2026` / `alakusANLOSR2026`: `egbib_merged_20260711.bib` → `egbib_20260828_acoustic_material_consistency.bib`
+- `alakusAcousticMaterialNLOS2026` / `alakusAcousticMaterialNLOS2026`: `egbib_20260803_acoustic_material.bib` → `egbib_20260828_acoustic_material_consistency.bib`
+- `zengCompactLongRangeNLOS2026` / `zengCompactLongRangeNLOS2026`: `egbib_20260717_stereo_longrange_updates.bib` → `egbib_20260828_compact_long_range_nlos_gap.bib`
+- `daiSCISANet2026` / `daiSCISANet2026`: `egbib_20260725_nif_scisa.bib` → `egbib_20260829_scisa_semantic_nlos_gap.bib`
+- `spaettSPADTimingNLOS2026` / `spaettSPADTimingNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260830_spad_timing_correction_gap.bib`
+- `luSeeingThroughBoxes2026` / `luSeeingThroughBoxes2026`: `egbib_20260717_frontier_updates.bib` → `egbib_20260831_rf_acoustic_missing_gap.bib`
+- `sommerPassiveAcousticNLOS2026` / `sommerPassiveAcousticNLOS2026`: `egbib_20260718_acoustic_modality_updates.bib` → `egbib_20260831_rf_acoustic_missing_gap.bib`
+- `zhouPolarizationSpeckleNLOS2026` / `zhouPolarizationSpeckleNLOS2026`: `egbib_20260826_polarization_speckle_gap.bib` → `egbib_20260901_missing_nlos_roundup.bib`
+- `xiaoNLOSHumanPose2026` / `xiaoNLOSHumanPose2026`: `egbib_20260824_eye_safe_pose_gap.bib` → `egbib_20260901_missing_nlos_roundup.bib`
+- `wangNoiseAdaptedNeuralOperator2025` / `wangNoiseAdaptedNeuralOperator2025`: `egbib_merged_20260711.bib` → `egbib_20260901_missing_nlos_roundup.bib`
+- `miaoAdaptiveWindowingNLOS2025` / `miaoAdaptiveWindowingNLOS2025`: `egbib_20260727_adaptive_windowing.bib` → `egbib_20260902_incremental_nlos_gaps.bib`
+- `celebiActiveNLOSHumanDetection2026` / `celebiActiveNLOSHumanDetection2026`: `egbib_20260828_active_human_detection_gap.bib` → `egbib_20260902_incremental_nlos_gaps.bib`
+- `lingSymmetryAwareNLOS2026` / `lingSymmetryAwareNLOS2026`: `egbib_20260829_symmetry_gradient_coordination_gap.bib` → `egbib_20260902_incremental_nlos_gaps.bib`
+- `zhangStructureGuidedATV2026` / `zhangStructureGuidedATV2026`: `egbib_20260718_core_citation_updates.bib` → `egbib_20260902_verified_missing_roundup.bib`
+- `wangDiffuseAwarePassive2026` / `wangDiffuseAwarePassive2026`: `egbib_20260718_reconstruction_pose_consistency.bib` → `egbib_20260911_diffuse_aware_passive.bib`
 - `jeonSoundVehicleNLOS2025` / `jeonSoundVehicleNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
 - `zhaiIrregularGridAcousticNLOS2025` / `zhaiIrregularGridAcousticNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
 

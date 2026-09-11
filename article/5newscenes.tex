@@ -22,6 +22,11 @@ A complementary steady-state trajectory replaces binary shadow carving with a co
 \noindent \textbf{Dynamic neural shadow fields for moving two-bounce scenes.}
 The static-scene assumption remains restrictive when hidden people or objects move during a cyclic multi-position scan. Zhang~\etal~addressed this regime with D-NeSF~\cite{zhangDynamicNeuralShadowFields2026}, decomposing the four-dimensional hidden volume into six spatiotemporal feature planes whose interpolated features are mapped by an MLP to time-varying voxel density. A cyclic acquisition strategy aligns repeated illumination positions with periodic shadow observations, while a cumulative-transmittance constraint enables self-supervised fitting to captured binary shadow sequences. This work extends the two-bounce neural-field trajectory from high-fidelity static geometry to temporally consistent reconstruction of moving hidden targets, and exposes motion modeling and scan-time synchronization as central design variables for dynamic shadow-based NLOS.
 
+
+\vspace{0.8mm}
+\noindent \textbf{Self-calibrating two-bounce imaging on non-planar relay walls.}
+Moving two-bounce NLOS toward less controlled deployment, Chen~\etal~remove the assumption that the illumination wall is planar and pre-calibrated~\cite{chenAutoCalibrationTwoBounce2026}. Their method automatically estimates the relative coordinate mapping between the two relay surfaces and then jointly refines ray vectors and shadow formation with a full-link MLP optimization, compensating for spot-position errors and wall unevenness. Real experiments cover a $2.37\,\mathrm{m}\times4.6\,\mathrm{m}\times3.1\,\mathrm{m}$ scene and report $2\,\mathrm{cm}$ lateral resolution. This shifts the two-bounce trajectory from increasingly expressive neural scene representations toward self-calibrating acquisition on irregular real relay geometry.
+
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Keyhole Imaging}
 \subsection{Keyhole Imaging}
 For all the NLOS imaging systems introduced above, there is a limitation that a large illumination/imaging area is required.
