@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: integrate-twobounce-autocalibration-20260911
+  group: integrate-twobounce-autocalibration-20260911-final
   cancel-in-progress: false
 
 jobs:
