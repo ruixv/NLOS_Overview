@@ -1,5 +1,6 @@
 name: Integrate pending 18-Aug NLOS records
 
+# PR trigger for the two verified 18-Aug citation-traced gaps.
 on:
   workflow_dispatch:
   pull_request:
