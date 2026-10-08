@@ -8,7 +8,7 @@
 [![Papers](https://img.shields.io/badge/Papers-210+-green)]()
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Last Updated](https://img.shields.io/badge/Last_Updated-September_2026-red)]()
+[![Last Updated](https://img.shields.io/badge/Last_Updated-October_2026-red)]()
 
 *Authors: Ruixu Geng · Yang Hu · Yan Chen*
 
@@ -19,7 +19,7 @@
 | | Link |
 |---|---|
 | **Original Survey** (peer-reviewed, APSIPA TSIP 2022) | [![APSIPA](https://img.shields.io/badge/APSIPA_TSIP_2022-10.1561%2F116.00000019-blue)](https://doi.org/10.1561/116.00000019) [![arXiv](https://img.shields.io/badge/arXiv-2104.13807-b31b1b)](https://arxiv.org/pdf/2104.13807) |
-| **Updated Survey** (2022–2026 extension, *not peer-reviewed*) | [![PDF](https://img.shields.io/badge/PDF-Updated_2026-orange)](https://ruixv.github.io/NLOS_Overview/bare_jrnl.pdf) |
+| **Updated Survey** (2022–2026 extension, *not peer-reviewed*; PDF rebuild pending for 8 October source additions) | [![PDF](https://img.shields.io/badge/PDF-Updated_2026-orange)](https://ruixv.github.io/NLOS_Overview/bare_jrnl.pdf) |
 | **Interactive Project Homepage** | [![Homepage](https://img.shields.io/badge/Homepage-ruixv.github.io%2FNLOS__Overview-teal)](https://ruixv.github.io/NLOS_Overview/) |
 
 </div>
@@ -64,10 +64,13 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 11 September 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 8 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [Cascaded Non-Line-of-Sight Imaging](https://doi.org/10.1145/3842503) — Royo et al. | ACM Transactions on Graphics 45(6), Article 205; SIGGRAPH Asia 2026 | Cascades a virtual NLOS projector/camera onto a hidden secondary relay wall, exploiting fourth- and fifth-bounce transport for challenging orientations and two-corner imaging. |
+| 2026 | [Trapezoidal Grid Reconstruction for Efficient Non-Line-of-Sight Imaging](https://doi.org/10.1109/ICCP69532.2026.11668867) — Sultan et al. | IEEE ICCP 2026 | Scaled Rayleigh--Sommerfeld diffraction reconstructs on depth-adaptive trapezoidal grids, reducing far-range voxel oversampling while retaining FFT-like per-voxel efficiency. |
+| 2026 | [Reconstruction and Range Characterization for a Directional Confocal Non-Line-of-Sight Imaging Model](https://arxiv.org/abs/2609.26846) — Qiu et al. | arXiv 2026 (no verified final venue) | Characterizes directional-albedo identifiability: transient data determine divergence but not divergence-free components; gives Fourier--sine reconstruction, weighted range characterization and local uniqueness for partial relay apertures. |
 | 2026 | [Automatic calibration under non-planar illumination wall in two-bounce non-line-of-sight imaging](https://doi.org/10.1016/j.optlastec.2026.116183) — Chen et al. | Optics & Laser Technology 204, 116183 (2026) | Removes the pre-calibrated planar-wall assumption from two-bounce shadow NLOS by automatically estimating the relative mapping between two relay surfaces and refining ray/shadow geometry with a full-link MLP; real experiments cover a 2.37 m × 4.6 m × 3.1 m scene with 2 cm lateral resolution. |
 | 2026 | [Topological-spectral fusion of secondary acoustic echoes for identity recognition in non-line-of-sight environments](https://doi.org/10.1038/s41598-026-68944-2) — Olgun | Scientific Reports 16 (2026), published 31 Aug 2026 | Treats delayed secondary acoustic echoes as information rather than nuisance multipath: an 8-speaker/8-microphone blocked-path setup combines STFT spectral features with LPVG topological features for NLOS person identification, reaching 96.17% ± 4.07% mean accuracy under leave-one-scene-out evaluation and extending acoustic NLOS from localization/material/liveness sensing toward identity-level semantics. |
 | 2026 | [Non-line-of-sight super-resolution imaging with quasi-constant-delay circular pattern](https://doi.org/10.1063/5.0331605) — Tian et al. | APL Photonics 11(7), 076122 (2026) | Jointly designs QCDC relay-wall sampling and QSR temporal super-resolution, computationally lifting 200 ps measurements to about 20 ps effective timing resolution while retaining compatibility with standard f-k and phasor-field reconstruction backends. |
@@ -396,6 +399,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Milestone Timeline
 
+2026 ── Cascaded NLOS: fourth/fifth-bounce multi-corner imaging [ACM TOG / SIGGRAPH Asia]; Scaled RSD: depth-adaptive trapezoidal grids [IEEE ICCP]; directional confocal: identifiable divergence and range [arXiv]
 2026 ── Chen et al.: automatic calibration for non-planar two-bounce relay walls removes a major geometric-calibration barrier [Optics & Laser Technology]
 
 Key breakthroughs that shaped the NLOS Imaging field:
