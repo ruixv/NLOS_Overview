@@ -71,6 +71,10 @@ Raji and Murray-Bruce generalized ordinary-camera computational periscopy from l
 \noindent \textbf{Fisher-equalized edge-resolved depth sampling.}
 The two-edge-resolved doorway camera gains depth information because orthogonal penumbrae encode complementary hidden coordinates, but uniform range discretization wastes variables where the measurement is insensitive. Czajkowski and Murray-Bruce used Fisher information to equalize the discretization of the hidden range axis~\cite{czajkowskiFisherTERI2024}, providing a compact conditioning-oriented companion to their full-colour TERI system. This analysis clarifies how computational-aperture geometry should determine the numerical representation rather than only the forward model.
 
+\noindent \textbf{Doorway apertures and volumetric computational periscopy.}
+Czajkowski and Murray-Bruce demonstrated that two orthogonal doorway edges encode complementary angular and depth information, enabling three-dimensional hidden-scene reconstruction from an ordinary intensity photograph~\cite{czajkowskiTwoEdgeResolved3DNLOS2024}. Their subsequent EUSIPCO study treats visible doorway occluders as opportunistic computational apertures and extends the reconstruction to a wide $180^\circ$ horizontal field of view with greater depth extent~\cite{czajkowskiVisibleOccludersNLOS2025}. Together with Fisher-equalized range sampling, these methods turn ordinary architectural edges into both sensing apertures and reconstruction constraints without requiring active illumination.
+
+\vspace{0.8mm}
 \noindent \textbf{Long-range passive NLOS under severe background.}
 The practical range of ordinary-camera passive NLOS is commonly limited by geometric attenuation and ambient illumination. Zhou~\etal~combined pattern-based calibration with low-rank matrix decomposition to enhance the wall-encoded indirect component and separate slowly varying background contributions~\cite{zhouPassiveNLOS10m2025}. Their experiment placed the camera 10~m from the relay wall and the hidden object 4.5~m from the wall, retaining centimeter-scale resolution at an SBR as low as $-13$~dB. This result extends the computational-periscopy trajectory from laboratory-scale conditioning improvements toward long-range passive sensing with inexpensive hardware.
 
@@ -80,7 +84,7 @@ Passive computational periscopy has primarily reconstructed static hidden intens
 
 \vspace{0.8mm}
 \noindent \textbf{Event-camera passive NLOS for moving objects.}
-Wang~\etal~used an event camera to isolate asynchronous motion-induced changes in relay-wall diffusion patterns and combined them with a physics-embedded reconstruction network~\cite{wangEventEnhancedPassiveNLOS2024}. Simulation-based pretraining models dynamic light transport and sensor behavior, followed by fine-tuning on limited measured data. This extends frame-based passive NLOS toward neuromorphic acquisition, emphasizing weak temporal changes that would otherwise be attenuated or aliased in conventional video.
+An earlier event-camera formulation explored passive NLOS recovery of moving targets from asynchronous measurements rather than conventional frame sequences~\cite{wangEventCameraNLOS2022}. Wang~\etal~used an event camera to isolate asynchronous motion-induced changes in relay-wall diffusion patterns and combined them with a physics-embedded reconstruction network~\cite{wangEventEnhancedPassiveNLOS2024}. Simulation-based pretraining models dynamic light transport and sensor behavior, followed by fine-tuning on limited measured data. This extends frame-based passive NLOS toward neuromorphic acquisition, emphasizing weak temporal changes that would otherwise be attenuated or aliased in conventional video.
 
 \vspace{0.8mm}
 \noindent \textbf{Structure-guided adaptive total variation.}
