@@ -3,7 +3,7 @@
 ## Verified literature addition
 Aiping Zhai, Wenjing Ji, Yan Wang, Xiyuan Luo, Wenjing Zhao, Dong Wang, and Fei Liu, “Non-Invasively Tracking an Arbitrary Deformable Object Through Scattering Media and Around Corners via Speckle Correlations,” *Advanced Science*, vol. 13, no. 34, article e75072 (2026). DOI: https://doi.org/10.1002/advs.75072. First published 3 April 2026 (publisher record).
 
-SCCLM uses centroids of successive speckle auto- and cross-correlations to recover relative displacements despite hidden-object deformation. The authors demonstrate an around-corner case as well as tracking through static/dynamic scattering media. This is **passive NLOS trajectory tracking**, not full hidden-image reconstruction; it is classified as tightly adjacent NLOS sensing rather than a core volumetric reconstruction milestone.
+SCCLM uses centroids of successive speckle auto- and cross-correlations to recover relative displacements despite hidden-object deformation. The authors demonstrate an around-corner case as well as tracking through static/dynamic scattering media. This is **steady-state camera-based NLOS trajectory tracking** (including emitting and LED-illuminated targets), not full hidden-image reconstruction; it is classified as tightly adjacent NLOS sensing rather than a core volumetric reconstruction milestone.
 
 ## Canonical source changes
 - README.md: latest additions, main literature table, 2026 milestone timeline.
