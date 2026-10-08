@@ -120,6 +120,14 @@ Yu~\etal~subsequently made the inverse operator itself trainable by introducing 
 The original LCT obtains computational efficiency from a closed-form resampling and Wiener-deconvolution pipeline, but fixed low-pass filtering can suppress fine geometry. Gao~\etal~proposed a learned light-cone transform (L2CT) that retains the analytic LCT structure while replacing its frequency response with high-frequency-enhanced learnable Wiener filtering and adding spatiotemporal feature-extraction and volume-projection modules~\cite{gaoLearnedLCT2026}. Its improvement on measurements from different acquisition systems illustrates a useful middle ground between fixed analytic inverses and unconstrained end-to-end networks: the milestone operator remains recognizable, while the poorly conditioned spectral components are learned from data.
 
 \vspace{0.8mm}
+\noindent \textbf{Fermat-point representations for cross-system generalization.}
+Shen~\etal~introduced FermatFormer, a physics-guided NLOS architecture that represents transient measurements through stable Fermat points~\cite{shenFermatFormer2026}. By retaining light-path structure, this representation aims to improve transfer from synthetic training data to measured scenes and complements learned LCT and phasor-field inversion.
+
+\vspace{0.8mm}
+\noindent \textbf{Graph and temporal-attention reconstruction.}
+DG-NLOS converts dense transient grids into sparse graph features and uses separate albedo and depth branches to recover complementary hidden-scene attributes~\cite{suDualBranchGraphNLOS2025}. Time-Resolved Transformer instead models spatiotemporal dependencies across transient measurements for three-dimensional reconstruction~\cite{liTimeResolvedTransformer2025}. These approaches complement fixed-grid convolutional inversion by emphasizing either sparse geometry or global temporal context.
+
+\vspace{0.8mm}
 \noindent \textbf{Diffusion-based transient video interpolation.}
 Dynamic NLOS systems face coupled spatial and temporal undersampling before reconstruction begins. Sun~\etal~introduced TransVID, which uses a spatial--temporal attention encoder and latent conditional diffusion to interpolate transient videos jointly across scan position and time~\cite{sunTransVID2026}. The method maps $16\times16$ measurements at 4~fps to $128\times128$ transient videos at 16~fps, providing a measurement-domain complement to ST-Mamba and TransiT: instead of reconstructing hidden video directly from sparse captures, it first synthesizes a dense, high-frame-rate transient sequence that can feed existing physical or learned inverses.
 

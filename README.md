@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [FermatFormer: A Fermat Optics Based Neural Architecture for Non-line-of-sight Imaging](https://openreview.net/forum?id=DwPgaoaxWd) — Shen et al. | IEEE TPAMI (acceptance reported by authors; publisher metadata pending); ICCP 2026 Best Paper Honorable Mention | Represents transient measurements through stable Fermat points to inject light-path physics into neural NLOS reconstruction and improve synthetic-to-real transfer across acquisition systems. |
 | 2026 | [Cascaded Non-Line-of-Sight Imaging](https://doi.org/10.1145/3842503) — Royo et al. | ACM Transactions on Graphics 45(6), Article 205; SIGGRAPH Asia 2026 | Cascades a virtual NLOS projector/camera onto a hidden secondary relay wall, exploiting fourth- and fifth-bounce transport for challenging orientations and two-corner imaging. |
 | 2026 | [Trapezoidal Grid Reconstruction for Efficient Non-Line-of-Sight Imaging](https://doi.org/10.1109/ICCP69532.2026.11668867) — Sultan et al. | IEEE ICCP 2026 | Scaled Rayleigh--Sommerfeld diffraction reconstructs on depth-adaptive trapezoidal grids, reducing far-range voxel oversampling while retaining FFT-like per-voxel efficiency. |
 | 2026 | [Reconstruction and Range Characterization for a Directional Confocal Non-Line-of-Sight Imaging Model](https://arxiv.org/abs/2609.26846) — Qiu et al. | arXiv 2026 (no verified final venue) | Characterizes directional-albedo identifiability: transient data determine divergence but not divergence-free components; gives Fourier--sine reconstruction, weighted range characterization and local uniqueness for partial relay apertures. |
@@ -399,7 +400,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Milestone Timeline
 
-2026 ── Cascaded NLOS: fourth/fifth-bounce multi-corner imaging [ACM TOG / SIGGRAPH Asia]; Scaled RSD: depth-adaptive trapezoidal grids [IEEE ICCP]; directional confocal: identifiable divergence and range [arXiv]
+2026 ── FermatFormer: physics-guided Fermat-point learning for synthetic-to-real transient NLOS [ICCP 2026; TPAMI acceptance reported by authors]; Cascaded NLOS: fourth/fifth-bounce multi-corner imaging [ACM TOG / SIGGRAPH Asia]; Scaled RSD: depth-adaptive trapezoidal grids [IEEE ICCP]; directional confocal: identifiable divergence and range [arXiv]
 2026 ── Chen et al.: automatic calibration for non-planar two-bounce relay walls removes a major geometric-calibration barrier [Optics & Laser Technology]
 
 Key breakthroughs that shaped the NLOS Imaging field:
