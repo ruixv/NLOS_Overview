@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2024 | [Sound source localization in non-line-of-sight environment based on equivalent source method combined with time reversal method](https://doi.org/10.1177/09574565241279070) — Tian, Peng, Jin, Wu | Noise & Vibration Worldwide 55(9–10), 553–559 (2024) | Equivalent-source acoustic transfer modeling and time-reversal focusing localize obstructed sound sources; validated in simulation and experiment. Acoustic NLOS source localization, not 3D scene reconstruction. |
 | 2026 | [Physics-informed localization of sound sources in reflective environments including hidden sources](https://doi.org/10.1121/10.0046471) — Sroka, Sarradj, Lemke | Journal of the Acoustical Society of America 160(3), 2237–2248 (2026) | An adjoint acoustic inverse model with volume-penalized rigid boundaries accounts for reflected/diffracted waves; localizes a fully hidden source in space and time and analyzes measured moving-vehicle sound. Adjacent NLOS source localization, not hidden-scene image reconstruction. |
 | 2025 | [Practical Design and Orchestration of Frequency-Shifting RIS for NLoS mmWave Sensing](https://doi.org/10.1145/3704413.3764440) — Madnaik, Sundaresan | ACM MobiHoc 2025, 91–100 | PRISM programs a time-varying RIS to encode hidden-target angle as frequency shifts in ordinary mmWave radar returns without real-time radar–RIS synchronization; reports 31 cm median localization error, 80% detection of up to six targets, and 12× faster configuration computation. Adjacent NLOS localization, not 3D scene imaging. |
 | 2026 | [Non-Line-of-Sight Human Vital Signs Detection and Perception Based on Reconfigurable Intelligent Surfaces](https://doi.org/10.1109/IWS69027.2026.11674465) — Mao et al. | IEEE MTT-S International Wireless Symposium (IWS 2026) | A broadband 1-bit RIS redirects radar energy into an obstructed region; enhanced VMD separates breathing and heartbeat, with reported mean errors of 2.82 RPM and 5.49 BPM. Adjacent physiological NLOS sensing, not hidden-scene reconstruction. |
@@ -413,6 +414,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 2026 ── Zhai et al.: speckle-correlation centroid tracking of deformable hidden objects, including around-corner tests [Advanced Science]
 2026 ── Sroka et al.: boundary-aware adjoint acoustics localizes fully hidden sound sources [JASA]
 2025 ── PRISM: RIS frequency-shift encoding makes commodity mmWave radar NLOS multi-target localization more practical [ACM MobiHoc]
+2024 ── Tian et al.: equivalent-source transfer modeling plus time reversal for hidden acoustic-source localization [Noise & Vibration Worldwide]
 
 Key breakthroughs that shaped the NLOS Imaging field:
 
