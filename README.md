@@ -68,6 +68,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2009 | [Non-Line-of-Sight Localization of a Controlled Sound Source](https://doi.org/10.1109/AIM.2009.5229967) — Mak, Furukawa | IEEE/ASME AIM 2009, 475–480 | Map-corrected acoustic time-of-arrival measurements locate controlled sources despite obstructed direct paths; an early acoustic NLOS localization precursor, not hidden-scene imaging. |
+| 2012 | [Non-line-of-sight sound source localization using matched-field processing](https://doi.org/10.1121/1.3664089) — Singh et al. | JASA 131(1), 292–302 (2012) | Diffraction-aware matched-field processing localizes sources using microphone arrays fully shadowed by a wedge; demonstrates physics-based acoustic NLOS sensing. |
+| 2014 | [Hearing behind walls: Localizing sources in the room next door with cosparsity](https://doi.org/10.1109/ICASSP.2014.6854168) — Kitić, Bertin, Gribonval | IEEE ICASSP 2014, 3087–3091 | A cosparse wave-equation inverse model recovers source positions in an adjacent room when direct-path cues fail. |
+| 2016 | [Non-field-of-view sound source localization using diffraction and reflection signals](https://doi.org/10.1109/IROS.2016.7759049) — Takami et al. | IEEE/RSJ IROS 2016, 157–162 | Microphone-array and RGB-D geometry fusion explicitly models reflected/diffracted sound for mobile-robot hidden-source localization. |
+| 2019 | [Diffraction-Aware Sound Localization for a Non-Line-of-Sight Source](https://doi.org/10.1109/ICRA.2019.8794093) — An et al. | IEEE ICRA 2019, 4061–4067 | UTD diffraction modeling, acoustic ray tracing and particle filtering estimate hidden-source 3D position; a bridge to geometry-aware acoustic NLOS perception. |
 | 2024 | [Sound source localization in non-line-of-sight environment based on equivalent source method combined with time reversal method](https://doi.org/10.1177/09574565241279070) — Tian, Peng, Jin, Wu | Noise & Vibration Worldwide 55(9–10), 553–559 (2024) | Equivalent-source acoustic transfer modeling and time-reversal focusing localize obstructed sound sources; validated in simulation and experiment. Acoustic NLOS source localization, not 3D scene reconstruction. |
 | 2026 | [Physics-informed localization of sound sources in reflective environments including hidden sources](https://doi.org/10.1121/10.0046471) — Sroka, Sarradj, Lemke | Journal of the Acoustical Society of America 160(3), 2237–2248 (2026) | An adjoint acoustic inverse model with volume-penalized rigid boundaries accounts for reflected/diffracted waves; localizes a fully hidden source in space and time and analyzes measured moving-vehicle sound. Adjacent NLOS source localization, not hidden-scene image reconstruction. |
 | 2025 | [Practical Design and Orchestration of Frequency-Shifting RIS for NLoS mmWave Sensing](https://doi.org/10.1145/3704413.3764440) — Madnaik, Sundaresan | ACM MobiHoc 2025, 91–100 | PRISM programs a time-varying RIS to encode hidden-target angle as frequency shifts in ordinary mmWave radar returns without real-time radar–RIS synchronization; reports 31 cm median localization error, 80% detection of up to six targets, and 12× faster configuration computation. Adjacent NLOS localization, not 3D scene imaging. |
@@ -415,6 +420,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 2026 ── Sroka et al.: boundary-aware adjoint acoustics localizes fully hidden sound sources [JASA]
 2025 ── PRISM: RIS frequency-shift encoding makes commodity mmWave radar NLOS multi-target localization more practical [ACM MobiHoc]
 2024 ── Tian et al.: equivalent-source transfer modeling plus time reversal for hidden acoustic-source localization [Noise & Vibration Worldwide]
+2019 ── An et al.: diffraction-aware ray tracing and particle filtering for hidden sound-source 3D localization [IEEE ICRA]
+2016 ── Takami et al.: reflected/diffracted acoustic paths with RGB-D robot geometry [IEEE IROS]
+2014 ── Kitić et al.: cosparse wave-equation localization of sound sources in the room next door [IEEE ICASSP]
+2012 ── Singh et al.: matched-field localization with a fully shadowed microphone array [JASA]
+2009 ── Mak and Furukawa: controlled sound-source NLOS time-of-arrival localization [IEEE/ASME AIM]
 
 Key breakthroughs that shaped the NLOS Imaging field:
 
