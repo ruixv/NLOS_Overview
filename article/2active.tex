@@ -66,6 +66,10 @@ Combined with time-correlated single-photon counting technology, SPAD can be use
 Moreover, SPAD has been widely used in commercial LiDAR systems, and the SPAD array, which can avoid the mechanical raster scan process, has the potential to save scanning time and realize real-time data collection for active NLOS imaging.
 
 \vspace{0.8mm}
+\noindent \textbf{Gradient-gated SPAD arrays for transient capture.}
+Zhao~\etal~demonstrated a reconfigurable $256\times128$ SPAD imager for single-photon counting, LiDAR, and NLOS imaging~\cite{zhaoGradientGatingSPAD2025}. Its 16-phase spatially graded time gates (with 0.12--3.8~ns intervals) and 39~ps timestamp quantization support selective capture of weak delayed returns. Unlike algorithmic transient inversion, this hardware contribution controls the photon arrival windows recorded and demonstrates NLOS acquisition experimentally.
+
+\vspace{0.8mm}
 \noindent \textbf{Acquisition-parameter sensitivity for practical SPAD NLOS.}
 Beyond accelerating only the inverse solver, Christnacher \etal~\cite{christnacherAcquisitionParametersNLOS2025} systematically examined the measurement parameters that determine how quickly a usable transient data cube can be collected. Their study considers SPAD-pixel calibration, exposure time, the number of images accumulated per frame, camera field of view, and focus adjustment, and evaluates how these choices trade acquisition time against transient quality and ultimately reconstruction fidelity. Because the downstream examples are framed around established back-projection, $f$-$k$ migration, and phasor-field reconstruction, this work complements later detector-timing calibration~\cite{spaettSPADTimingNLOS2026}: the former asks which acquisition settings should be spent in the first place, while the latter corrects timing-grid errors once SPAD-array data have been captured.
 

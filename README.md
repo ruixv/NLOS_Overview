@@ -64,10 +64,13 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 11 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 12 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [TriNLOS: Triplane Representations for Neural Non-line-of-Sight Imaging](https://doi.org/10.1007/978-3-032-37359-5_27) — Do, Nam | ECCV 2026, LNCS 17050, 483–501 | Learnable enhanced LCT initializes a hidden volume; triplane features with ConvNeXt, Restormer, and axis-aware attention replace cubic-cost dense 3D processing with quadratic-cost representations for transient NLOS reconstruction. |
+| 2025 | [NLOSdiffuser: Generalized Steady-State Non-Line-of-sight Imaging toward Indoor Scenarios](https://doi.org/10.1109/ICME59968.2025.11210160) — Gao et al. | IEEE ICME 2025, 1–6 | Two-stage steady-state indoor reconstruction combines coarse pixel-level inversion of relay-wall images with a pretrained diffusion model for semantic refinement and improved generalization. |
+| 2025 | [A Reconfigurable 256 × 128 SPAD Imager with Gradient Gating for Single-Photon Counting, LiDAR, and Non-Line-of-Sight Imaging](https://doi.org/10.1109/ESSERC66193.2025.11214008) — Zhao et al. | IEEE ESSERC 2025, 677–680 | Reconfigurable 16-phase gradient time gating and 39 ps timestamp quantization enable flexible single-photon, LiDAR, and experimentally demonstrated NLOS transient capture. |
 | 2009 | [Non-Line-of-Sight Localization of a Controlled Sound Source](https://doi.org/10.1109/AIM.2009.5229967) — Mak, Furukawa | IEEE/ASME AIM 2009, 475–480 | Map-corrected acoustic time-of-arrival measurements locate controlled sources despite obstructed direct paths; an early acoustic NLOS localization precursor, not hidden-scene imaging. |
 | 2012 | [Non-line-of-sight sound source localization using matched-field processing](https://doi.org/10.1121/1.3664089) — Singh et al. | JASA 131(1), 292–302 (2012) | Diffraction-aware matched-field processing localizes sources using microphone arrays fully shadowed by a wedge; demonstrates physics-based acoustic NLOS sensing. |
 | 2014 | [Hearing behind walls: Localizing sources in the room next door with cosparsity](https://doi.org/10.1109/ICASSP.2014.6854168) — Kitić, Bertin, Gribonval | IEEE ICASSP 2014, 3087–3091 | A cosparse wave-equation inverse model recovers source positions in an adjacent room when direct-path cues fail. |
@@ -414,6 +417,9 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Milestone Timeline
 
+2026 ── Do and Nam: TriNLOS combines learnable enhanced LCT with O(N²) triplane hidden-scene reconstruction [ECCV]
+2025 ── Gao et al.: NLOSdiffuser adds pretrained diffusion priors to coarse steady-state indoor NLOS inversion [IEEE ICME]
+2025 ── Zhao et al.: gradient-gated 256×128 SPAD sensor supports programmable transient NLOS capture [IEEE ESSERC]
 2026 ── FermatFormer: physics-guided Fermat-point learning for synthetic-to-real transient NLOS [ICCP 2026; TPAMI acceptance reported by authors]; Cascaded NLOS: fourth/fifth-bounce multi-corner imaging [ACM TOG / SIGGRAPH Asia]; Scaled RSD: depth-adaptive trapezoidal grids [IEEE ICCP]; directional confocal: identifiable divergence and range [arXiv]
 2026 ── Chen et al.: automatic calibration for non-planar two-bounce relay walls removes a major geometric-calibration barrier [Optics & Laser Technology]
 2026 ── Zhai et al.: speckle-correlation centroid tracking of deformable hidden objects, including around-corner tests [Advanced Science]

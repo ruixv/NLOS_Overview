@@ -1,5 +1,5 @@
-# Pending NLOS integration
+# 12 October 2026 integration status
 
-Two verified 2025 entries are staged in `egbib_20261012_verified_gaps_staging.bib`.
+The two papers originally staged here (NLOSdiffuser, ICME 2025; gradient-gated SPAD, ESSERC 2025) and TriNLOS (ECCV 2026) have been integrated into the development-branch README, website, LaTeX chapters and merged bibliography. See updates/2026-10-12-trinlos-diffuser-spad-integration.md.
 
-Add NLOSdiffuser to README, website, and `article/4datadriven.tex` (steady-state learned reconstruction). Add gradient-gated SPAD to README, website, and `article/2active.tex` (SPAD hardware). Add both citations to merged bibliography. Rebuild `bare_jrnl.pdf` after source updates. PDF is not updated.
+PDF rebuild is still pending; bare_jrnl.pdf is unchanged.
