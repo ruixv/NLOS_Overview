@@ -127,6 +127,10 @@ Recent RF/mmWave work further expands the meaning of NLOS perception beyond mono
 
 
 \vspace{0.8mm}
+\noindent \textbf{Road-layout-aware IRS localization for automotive radar.}
+Chakraborty~\etal~use road geometry to guide intelligent reflecting surface beam-pattern synthesis, while sparse Bayesian estimation identifies multiple hidden radar targets~\cite{chakraborty2025irsautomotivenlos}. The simulation-based method optimizes spatial coverage and remains NLOS localization rather than volumetric imaging.
+
+\vspace{0.8mm}
 \noindent \textbf{Frequency-shifting RIS for practical NLOS mmWave localization.}
 Madnaik and Sundaresan introduce PRISM, which applies space--time modulation at a reconfigurable intelligent surface so that the angular direction of a hidden target is encoded as a frequency shift in a monostatic mmWave radar return~\cite{madnaikPRISMRISNLOS2025}. The resulting angle-dependent frequency labels permit multiple-target detection and localization without tight real-time synchronization between a commodity radar and the RIS. A narrowband approximation and genetic configuration search reduce offline design computation; reported experiments achieve 31\,cm median localization error and detect up to six NLOS targets with approximately 80\% accuracy. This advances the RIS branch from static beam redirection toward programmable propagation coding, but remains target sensing rather than full hidden-scene reconstruction.
 
@@ -206,6 +210,10 @@ Alaku{\c{s}} and T{\"u}rko{\u{g}}lu first introduced ANLOS-R as a dedicated mult
 \vspace{0.8mm}
 \noindent \textbf{Foundations of acoustic hidden-source localization.}
 Before modern acoustic NLOS reconstruction, Mak and Furukawa used map-corrected time-of-arrival measurements to localize controlled sound sources beyond direct visibility~\cite{makControlledAcousticNLOS2009}. Singh~\etal~then demonstrated diffraction-aware matched-field localization using microphone arrays fully shadowed by a wedge~\cite{singhMatchedFieldAcousticNLOS2012}. Kiti{\'c}~\etal~formulated through-wall source inference as a cosparse wave-equation inverse problem~\cite{kiticCosparseAcousticNLOS2014}. For mobile robots, Takami~\etal~fused microphone-array signals with RGB-D geometry to account for reflected and diffracted paths~\cite{takamiDiffractionReflectionAcousticNLOS2016}, while An~\etal~combined the uniform theory of diffraction, acoustic ray tracing, and particle filtering to estimate hidden source positions~\cite{anDiffractionAwareAcousticNLOS2019}. These studies establish an acoustic localization lineage that precedes later around-corner scene imaging and physics-informed hidden-source reconstruction; their primary output is a source position rather than volumetric geometry.
+
+\vspace{0.8mm}
+\noindent \textbf{Audio--visual geometry for acoustic NLOS localization.}
+King~\etal~combine four-channel microphone time-difference-of-arrival estimates with robot-acquired LiDAR maps and reverse acoustic ray tracing to infer a hidden sound-source location~\cite{king2021audiovisualnlos}. Feasibility experiments reported localization within approximately 0.5\,m; the result is source localization rather than volumetric scene reconstruction.
 
 \vspace{0.8mm}
 \noindent \textbf{Equivalent-source time reversal for hidden acoustic sources.}
