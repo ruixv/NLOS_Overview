@@ -64,10 +64,13 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 13 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 14 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [Joint Localization of LOS and NLOS Targets With Clutter Mitigation via Multipath Exploitation Radar](https://doi.org/10.1109/TRS.2025.3550023) — Chen et al. | IEEE Transactions on Radar Systems 3, 549–561 (2025) | Joint low-rank, sparse, and group-sparse inversion suppresses corner clutter and localizes visible and hidden radar targets; localization rather than dense 3D reconstruction. |
+| 2026 | [Exploiting Double-Bounce Paths in Snapshot Radio SLAM: Bounds, Algorithms and Experiments](https://doi.org/10.1109/TWC.2026.3713594) — Zhang et al. | IEEE Transactions on Wireless Communications 25, 20836–20851 (2026) | Final journal venue verified; measured 5G mmWave double-bounce paths reveal landmarks missed by single-bounce radio SLAM. |
+| 2026 | [NLOS-Aided Joint OTA Synchronization and Off-Grid Imaging for Distributed MIMO Systems](https://doi.org/10.1109/TWC.2026.3732875) — Tong et al. | IEEE Transactions on Wireless Communications (2026, early access) | Final journal acceptance verified; alternating NLOS-aided synchronization and off-grid sparse imaging improve distributed MIMO/ISAC environment sensing. |
 | 2023 | [PI-NLOS: polarized infrared non-line-of-sight imaging](https://doi.org/10.1364/OE.507875) — Liu et al. | Optics Express 31(26), 44113–44126 (2023) | Polarized LWIR intensity and degree-of-polarization contours are fused by a dual-channel network to recover hidden people at approximately 6 m from the relay wall. |
 | 2025 | [Multispectral non-line-of-sight imaging via deep fusion photography](https://doi.org/10.1007/s11432-024-4256-3) — Liu et al. | Science China Information Sciences 68(4), 140407 (2025) | Deep fusion of visible, SWIR, and LWIR measurements improves passive hidden-person imaging beyond 5 m. |
 | 2023 | [Non-line-of-sight imaging at infrared wavelengths using a superconducting nanowire single-photon detector](https://doi.org/10.1364/OE.497802) — Feng et al. | Optics Express 31(25), 42240–42254 (2023) | Corrects an inaccurate SNSPD bibliography record: fractal nanowire detection at 1560 and 1997 nm with wavelet-denoised LCT. |
@@ -347,9 +350,9 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2026 | [Reliable Non-Line-of-Sight Intrusion Detection with Integrated Sensing and Communications Hardware](https://arxiv.org/abs/2604.07032) — Tosi et al. | International Conference on Telecommunications (ICT 2026), 25–30 | Uses 5G/mmWave ISAC hardware and large-surface reflections for fully occluded industrial intrusion sensing; range–Doppler processing and PHD-based tracking improve target persistence and false-alarm robustness beyond the earlier feasibility study. |
 | 2026 | [Radar Cross Section Characterization of Quantized Reconfigurable Intelligent Surfaces](https://arxiv.org/abs/2603.27961) — Yasmeen et al. | arXiv 2026 | Complements RIS around-corner radar sensing by characterizing one-bit/quantized RIS RCS and experimentally recovering micro-Doppler signatures in non-specular or shadowed regions. |
 | 2026 | [DENALI: A Dataset Enabling Non-Line-of-Sight Spatial Reasoning with Low-Cost LiDARs](https://openaccess.thecvf.com/CVPR2026?day=2026-06-05) — Behari et al. | CVPR 2026 | Provides a large-scale low-cost LiDAR space-time-histogram dataset and benchmark for data-driven NLOS spatial reasoning, lowering the barrier to learning with commodity depth sensors. |
-| 2026 | [NLOS-Aided Joint OTA Synchronization and Off-Grid Imaging for Distributed MIMO Systems](https://arxiv.org/abs/2603.13981) — Tong et al. | arXiv 2026 | Jointly refines over-the-air synchronization and sparse off-grid environment imaging in distributed MIMO/ISAC by exploiting reconstructed NLOS components. |
+| 2026 | [NLOS-Aided Joint OTA Synchronization and Off-Grid Imaging for Distributed MIMO Systems](https://doi.org/10.1109/TWC.2026.3732875) — Tong et al. | IEEE Transactions on Wireless Communications 2026 (early access) | Jointly refines over-the-air synchronization and sparse off-grid environment imaging in distributed MIMO/ISAC by exploiting reconstructed NLOS components. |
 | 2026 | [A comprehensive study of time-of-flight non-line-of-sight imaging](https://arxiv.org/abs/2603.09548) — Marco et al. | arXiv 2026 | Benchmark-style comparative study unifying ToF NLOS forward/inverse models under common hardware constraints. |
-| 2026 | [Exploiting Double-Bounce Paths in Snapshot Radio SLAM: Bounds, Algorithms and Experiments](https://arxiv.org/abs/2603.02832) — Zhang et al. | arXiv 2026 | Shows that higher-order NLoS radio paths can improve snapshot mmWave SLAM and reveal landmarks hidden to single-bounce models. |
+| 2026 | [Exploiting Double-Bounce Paths in Snapshot Radio SLAM: Bounds, Algorithms and Experiments](https://doi.org/10.1109/TWC.2026.3713594) — Zhang et al. | IEEE Transactions on Wireless Communications 25, 20836–20851 (2026) | Shows that higher-order NLoS radio paths can improve snapshot mmWave SLAM and reveal landmarks hidden to single-bounce models. |
 | 2026 | [Cramer-Rao Bounds for Target Parameter Estimation in a Bi-Static IRS-Assisted Radar Configuration](https://arxiv.org/abs/2603.01660) — Sanjeeva Reddy S, Vinod Veera Reddy | arXiv 2026 | Characterizes angle-estimation limits for a passive-IRS bistatic NLOS radar geometry, clarifying what reconfigurable RF relay surfaces can theoretically recover. |
 | 2024 | [Around-the-corner Radar Sensing Using Reconfigurable Intelligent Surface](https://doi.org/10.1109/MAPCON61407.2024.10923061) — Yasmeen et al. | IEEE MAPCON 2024 | RIS-assisted around-corner radar sensing; steers energy into NLOS regions and recovers human micro-Doppler signatures. |
 | 2025 | [Radar Sensing using Dual-Beam Reconfigurable Intelligent Surface](https://doi.org/10.1109/RadarConf2559087.2025.11205052) — Yasmeen et al. | IEEE RadarConf25 2025 | Benchmarks a practical 1-bit dual-beam RIS against a metal plate and an ideal single-beam RIS in simulations and measurements, widening NLOS radar coverage and supporting simultaneous multi-direction sensing. |
@@ -429,6 +432,10 @@ measurement → physical forward model → inverse solver / neural prior → hid
 ---
 
 ## Milestone Timeline
+
+2025 ── Chen et al.: joint LOS/NLOS radar localization with low-rank and sparse clutter suppression [IEEE TRS]
+2026 ── Zhang et al.: double-bounce mmWave radio SLAM reveals hidden landmarks [IEEE TWC]
+2026 ── Tong et al.: NLOS-assisted phase synchronization and off-grid distributed-MIMO imaging [IEEE TWC]
 
 2023 ── Liu et al.: polarized LWIR intensity and degree-of-polarization fusion for hidden-person imaging [Optics Express]
 2025 ── Liu et al.: visible/SWIR/LWIR deep fusion for passive NLOS [Science China Information Sciences]
