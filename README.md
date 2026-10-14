@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [Joint Localisation of Line-of-Sight and Non-Line-of-Sight Targets via Deep Learning-Assisted Millimetre-Wave Radar](https://doi.org/10.1049/rsn2.70242) — Su et al. | IET Radar, Sonar & Navigation 20(1), e70242 (2026; 22 Sep online) | Region-weighted range–angle–Doppler sparse inversion and IAA-Net/RIRM-Net deep unfolding jointly localize weak NLOS and strong LOS targets in simulated and measured urban-corner radar scenes; localization rather than dense 3D shape imaging. |
 | 2026 | [Bounded Hidden-Screen Reconstruction from Diffuse Wall Reflections via Survivability-Guided Representation Learning](https://doi.org/10.3390/photonics13090895) — Zhou et al. | Photonics 13(9), 895 (2026) | SGRL uses complementary learned feature paths and content-conditioned fusion to recover coarse hidden-display layout from a single passive diffuse-wall RGB image. Controlled-setting structure recovery only; not validated for exact text or cross-scene generalization. |
 | 2025 | [Joint Localization of LOS and NLOS Targets With Clutter Mitigation via Multipath Exploitation Radar](https://doi.org/10.1109/TRS.2025.3550023) — Chen et al. | IEEE Transactions on Radar Systems 3, 549–561 (2025) | Joint low-rank, sparse, and group-sparse inversion suppresses corner clutter and localizes visible and hidden radar targets; localization rather than dense 3D reconstruction. |
 | 2026 | [Exploiting Double-Bounce Paths in Snapshot Radio SLAM: Bounds, Algorithms and Experiments](https://doi.org/10.1109/TWC.2026.3713594) — Zhang et al. | IEEE Transactions on Wireless Communications 25, 20836–20851 (2026) | Final journal venue verified; measured 5G mmWave double-bounce paths reveal landmarks missed by single-bounce radio SLAM. |
@@ -434,6 +435,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Milestone Timeline
 
+2026 ── Su et al.: deep-unfolded mmWave radar jointly localizes LOS and hidden targets under echo-power imbalance [IET Radar, Sonar & Navigation]
 2026 ── Zhou et al.: bounded hidden-screen structure recovery from a single passive diffuse-wall RGB photograph using SGRL [Photonics]
 2025 ── Chen et al.: joint LOS/NLOS radar localization with low-rank and sparse clutter suppression [IEEE TRS]
 2026 ── Zhang et al.: double-bounce mmWave radio SLAM reveals hidden landmarks [IEEE TWC]
