@@ -1,3 +1,5 @@
+> **Resolved on 2026-10-16.** This is a historical staging audit. The final reconciliation found **seven distinct missing works**, not nine: the SSD and diffuse-aware attention entries were already cited under their verified canonical keys. See [2026-10-16 reconciliation](2026-10-16-survey-backfill-reconciliation.md). The PDF remains pending rebuild.
+
 # 2026-10-15 NLOS survey backfill audit
 
 ## Verified gap

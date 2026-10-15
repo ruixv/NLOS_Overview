@@ -128,6 +128,10 @@ Yu~\etal~subsequently made the inverse operator itself trainable by introducing 
 The original LCT obtains computational efficiency from a closed-form resampling and Wiener-deconvolution pipeline, but fixed low-pass filtering can suppress fine geometry. Gao~\etal~proposed a learned light-cone transform (L2CT) that retains the analytic LCT structure while replacing its frequency response with high-frequency-enhanced learnable Wiener filtering and adding spatiotemporal feature-extraction and volume-projection modules~\cite{gaoLearnedLCT2026}. Its improvement on measurements from different acquisition systems illustrates a useful middle ground between fixed analytic inverses and unconstrained end-to-end networks: the milestone operator remains recognizable, while the poorly conditioned spectral components are learned from data.
 
 \vspace{0.8mm}
+\noindent \textbf{Frequency-domain expert regularization.}
+Zhang~\etal~introduce multi-regularization-experts fusion for robust transient NLOS reconstruction~\cite{zhangFMoENLOS2026}. Complementary spectral regularizers replace reliance on a single fixed prior, continuing the transition from analytic inverse filtering to adaptive, physics-structured reconstruction.
+
+\vspace{0.8mm}
 \noindent \textbf{Physics-initialized triplane reconstruction.}
 Do and Nam proposed TriNLOS~\cite{doTriNLOS2026}, which initializes a hidden-scene volume using a learnable enhanced light-cone transform and replaces cubic-cost dense 3D processing with quadratic-cost triplane features. ConvNeXt-style convolutions, Restormer attention, and axis-aware cross-attention refine hidden geometry. This ECCV work connects the milestone LCT inverse to compact neural representations and complements transient transformers by reducing volumetric representation cost.
 

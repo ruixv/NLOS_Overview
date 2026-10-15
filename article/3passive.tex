@@ -274,6 +274,10 @@ A practically important task for passive NLOS imaging is real-time tracking of m
 Data-driven scene priors are another common constraint, which can be exploited by deep learning methods. Although data-driven passive methods~\cite{DBLP:journals/corr/abs-1810-11710,zhouNonlineofsightImagingPhong2020,yuNonLineofSightImagingDeep2019} also belong to passive NLOS imaging, this article will explain it in Sec.~\ref{sec4} together with active data-driven NLOS methods to highlight the application of deep learning in this field.
 Besides, in Sec.~\ref{sec4}, unsupervised passive NLOS imaging algorithms~\cite{aittalaComputationalMirrorsBlind2019} based on physical constraints (matrix factorization) are also introduced.
 
+\vspace{0.8mm}
+\noindent \textbf{Adaptive regularization for passive NLOS.}
+Zhang~\etal~proposed structure-guided adaptive total variation for passive NLOS reconstruction~\cite{zhangSGATVPassiveNLOS2026}. By deriving spatially varying regularization weights from an initial hidden-scene estimate, the method adapts the inverse prior to the recovered structure rather than relying on a manually selected global TV penalty. This complements the existing shadow-transport decomposition and diffuse-aware attention methods, which respectively encode geometric and learned light-transport constraints.
+
 % 今天上午
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Challenges and prospects}
 \subsection{Challenges and prospects}
