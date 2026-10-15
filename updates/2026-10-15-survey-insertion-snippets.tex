@@ -1,0 +1,31 @@
+% 2026-10-15 NLOS survey backfill: verified LaTeX insertion snippets.
+% STAGING ONLY: this file is not currently \input by bare_jrnl.tex.
+% Insert each block at the stated anchor in the existing survey chapter.
+
+% article/3passive.tex: immediately before "Challenges and prospects".
+\vspace{0.8mm}
+\noindent \textbf{Structure-aware passive reconstruction.}
+Raji and Murray-Bruce extend computational periscopy to three-dimensional hidden scenes by separating light-occluding and non-occluding transport contributions in a nonlinear inverse model, and comparing direct optimization with physics-inspired Soft Shadow Diffusion~\cite{rajiSoftShadowDiffusion2026}. Structure-guided adaptive total variation derives spatially varying regularization weights from an initial hidden-scene estimate~\cite{zhangSGATVPassiveNLOS2026}, whereas diffuse-aware attention encodes anisotropic wall scattering and channel-wise signal-to-noise disparities in a learned passive reconstruction model~\cite{wangDAAMPassiveNLOS2026}. These developments connect geometric shadow priors, adaptive optimization, and physics-aware attention for ordinary-camera NLOS.
+
+% article/4datadriven.tex: after "Learning the light-cone inverse".
+\vspace{0.8mm}
+\noindent \textbf{Frequency-domain expert regularization.}
+Zhang~\etal~introduce multi-regularization-experts fusion for robust transient NLOS reconstruction~\cite{zhangFMoENLOS2026}. Complementary spectral regularizers replace reliance on a single fixed prior, continuing the transition from analytic inverse filtering to adaptive, physics-structured reconstruction.
+
+% article/2active.tex: after wave-based methods and before "It should be noted".
+\vspace{0.8mm}
+\noindent \textbf{Non-confocal reference-function phase compensation.}
+Yu~\etal~transfer a frequency-domain single-input/multiple-output imaging formulation from millimeter-wave sensing to optical non-confocal NLOS~\cite{yuFrequencyDomainPhaseNLOS2026}. Reference-function phase compensation and FFT reconstruction reduce artifacts and shape distortion without requiring a dense iterative inverse.
+
+% article/2active.tex: before "Neural implicit surface reconstruction".
+\vspace{0.8mm}
+\noindent \textbf{Geometry-constrained hidden surfaces.}
+Liu~\etal~regularize the variation of hidden-surface normals with a shape-operator prior while jointly recovering reflectance and geometry~\cite{liuGeometryConstrainedNLOS2026}, extending transient reconstruction beyond volumetric albedo priors toward differential-geometric surface constraints.
+
+% article/2active.tex: before "Limited resolution".
+\vspace{0.8mm}
+\noindent \textbf{Long-range tomography and FMCW acquisition.}
+Wang~\etal~replace dense relay-wall scanning with laser reflective tomography, using the wall as a natural beam expander and target rotation for tomographic projections~\cite{wangLRTNLOS2026}. Their 3.3-km outdoor demonstration extends active NLOS range, subject to the target-rotation assumption. Qian~\etal~explore predistorted frequency-modulated continuous-wave LiDAR for high-speed NLOS capture in a conference demonstration~\cite{qianHighSpeedNLOSFMCW2026}.
+
+% article/2active.tex: "Limited resolution", after the existing feature-visibility discussion.
+Romanelli~\etal~quantify finite-aperture yaw observability for a planar confocal target using a relay-wall switch-line criterion and Fisher information~\cite{romanelliFiniteApertureNLOS2026}, distinguishing the geometric ambiguity threshold from gradual loss of angular sensitivity.
