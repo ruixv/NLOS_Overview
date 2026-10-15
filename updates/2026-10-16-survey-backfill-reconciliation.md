@@ -1,7 +1,7 @@
 # 2026-10-16 NLOS survey source reconciliation
 
 ## Scope and literature status
-Reviewed the existing README, website paper explorer, bibliography, and included LaTeX chapters against the 2026-10-15 staging audit. Checked recent active, passive, transient, acoustic, and RF/mmWave NLOS results and representative forward-citation lineages (LCT, f-k migration, phasor fields, computational periscopy). No additional publication was confirmed as missing from the public paper catalog during this pass.
+Reviewed the existing README, website paper explorer, bibliography, and included LaTeX chapters against the 2026-10-15 staging audit. Checked recent active, passive, transient, acoustic, and RF/mmWave NLOS results and representative forward-citation lineages (LCT, f-k migration, phasor fields, computational periscopy). One additional **existing-bibliography but missing-public-catalog** work was confirmed: Qian et al., *High-speed non-line-of-sight imaging via predistorted FMCW LiDAR*, SPIE Photonics Europe 2026 (Proc. SPIE 14083, 1408311). The SPIE official conference program confirms the 14 April presentation and approximately 0.2 s acquisition per frame. This record was added to README, website Paper Explorer, timeline, and the index reading path.
 
 ## Corrected staging diagnosis
 The prior staging note called for nine missing citation keys, but two were aliases of already-cited works, **not new survey gaps**:
@@ -19,7 +19,7 @@ Accordingly, **seven distinct works** required missing-prose backfill. The integ
 - Both aliases for diffuse-aware attention remain available for backward compatibility, but only the already-cited `wangDiffuseAwarePassive2026` is used in the survey.
 
 ## Public-artifact and PDF status
-All seven works were already present in README and the paper explorer, so no duplicate paper records were added. `bare_jrnl.tex` includes the changed chapter files through existing `\\input` directives. The survey PDF **must be rebuilt** after merging the source updates: the existing PDF is stale and is not claimed to contain the newly integrated prose. A complete checkout with figures and bibliography is required. Build with `latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex`; verify no undefined citations or duplicate BibTeX keys, then commit the resulting `bare_jrnl.pdf`. This run could not obtain the complete repository in the local container because external GitHub DNS resolution failed.
+Six of the seven backfilled works were already present in README and the paper explorer; the **predistorted FMCW LiDAR** conference work was present only in BibTeX and is now also added to README and both website surfaces. No duplicate records were added. `bare_jrnl.tex` includes the changed chapter files through existing `\\input` directives. The survey PDF **must be rebuilt** after merging the source updates: the existing PDF is stale and is not claimed to contain the newly integrated prose. A complete checkout with figures and bibliography is required. Build with `latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex`; verify no undefined citations or duplicate BibTeX keys, then commit the resulting `bare_jrnl.pdf`. This run could not obtain the complete repository in the local container because external GitHub DNS resolution failed.
 
 ## Verified metadata
 - ACM publisher: https://doi.org/10.1145/3811030
@@ -27,3 +27,4 @@ All seven works were already present in README and the paper explorer, so no dup
 - ECCV proceedings: https://doi.org/10.1007/978-3-031-72989-8_22
 - Optics Express diffuse-aware attention: https://doi.org/10.1364/OE.601398
 - Journal of Imaging finite-aperture analysis: https://doi.org/10.3390/jimaging12060248
+- SPIE Photonics Europe 2026 official program (paper 14083-71): https://www.spiecareercenter.org/EPE/conferencedetails/unconventional-optical-imaging
