@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2021 | [Fast non-line-of-sight imaging with high-resolution and wide field of view using synthetic wavelength holography](https://doi.org/10.1038/s41467-021-26776-w) — Willomitzer et al. | *Nature Communications* 12, 6647 (2021) | Coherent synthetic-wavelength holography exploits optical interference to recover hidden scenes with high resolution and wide field of view, complementing pulsed transient ToF reconstruction. |
 | 2026 | [Photonic sensing of hidden vital signs](https://doi.org/10.1364/OPTICA.606728) — Chen et al. | *Optica* 13(9), 1742–1750 (2026) | Optical sensing of hidden physiological signals extends NLOS beyond image/shape reconstruction toward contactless biomedical inference; an adjacent NLOS sensing result, not a dense 3D imaging method. |
 | 2023 | [Parallax-Driven Denoising of Passive Non-Line-of-Sight Thermal Imagery](https://doi.org/10.1109/ICCP56744.2023.10233749) — Hashemi, Sasaki, Leger | IEEE ICCP 2023, 1–12 | Uses multiple LWIR views and four-dimensional light-field parallax to suppress relay-surface/sensor interference and improve weak-contrast hidden-human localization through spatially inhomogeneous reflectors. |
 | 2022 | [Double Your Corners, Double Your Fun: The Doorway Camera](https://doi.org/10.1109/ICCP54855.2022.9887738) — Krska et al. | IEEE ICCP 2022, 1–12 | A computational-periscopy successor exploring doorway/corner geometry as an indirect optical sensing aperture, extending ordinary-camera occlusion cues beyond a single edge. |
@@ -441,6 +442,8 @@ measurement → physical forward model → inverse solver / neural prior → hid
 ---
 
 ## Milestone Timeline
+
+2021 ── Willomitzer et al.: coherent synthetic-wavelength holography enables high-resolution, wide-field hidden-scene imaging [Nature Communications 12:6647]
 
 2026 ── Chen et al.: photonic NLOS sensing of hidden vital signs extends the field to optical physiological inference [Optica 13(9)]
 2024 ── Raji and Murray-Bruce: passive occlusion-aided 3D NLOS without time-resolved capture [IEEE RAPID]
