@@ -64,10 +64,13 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 16 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 17 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [Transient non-line-of-sight temporal super-resolution based on temporal decoupling](https://doi.org/10.1016/j.optlaseng.2026.110054) — Shi et al. | *Optics and Lasers in Engineering* (2026), article 110054 | Studies temporal decoupling for transient NLOS temporal super-resolution; full-text performance metrics not independently checked. |
+| 2022 | [Turning Door Frames into Cameras for 3D Non-Line-of-Sight Imaging](https://doi.org/10.1109/RAPID54472.2022.9911582) — Czajkowski, Murray-Bruce | IEEE RAPID 2022, 1–2 | Two-page passive 3D doorway-frame/ceiling-camera precursor, distinct from the full 2024 TERI journal paper. |
+| 2019 | [Occlusion-Based Computational Periscopy with Consumer Cameras](https://doi.org/10.1117/12.2528322) — Murray-Bruce, Saunders, Goyal | SPIE Wavelets and Sparsity XVIII 11138, 111380X (2019) | Conference study of inexpensive ordinary-camera occlusion-coded computational periscopy. |
 | 2021 | [Fast non-line-of-sight imaging with high-resolution and wide field of view using synthetic wavelength holography](https://doi.org/10.1038/s41467-021-26776-w) — Willomitzer et al. | *Nature Communications* 12, 6647 (2021) | Coherent synthetic-wavelength holography exploits optical interference to recover hidden scenes with high resolution and wide field of view, complementing pulsed transient ToF reconstruction. |
 | 2026 | [Photonic sensing of hidden vital signs](https://doi.org/10.1364/OPTICA.606728) — Chen et al. | *Optica* 13(9), 1742–1750 (2026) | Optical sensing of hidden physiological signals extends NLOS beyond image/shape reconstruction toward contactless biomedical inference; an adjacent NLOS sensing result, not a dense 3D imaging method. |
 | 2023 | [Parallax-Driven Denoising of Passive Non-Line-of-Sight Thermal Imagery](https://doi.org/10.1109/ICCP56744.2023.10233749) — Hashemi, Sasaki, Leger | IEEE ICCP 2023, 1–12 | Uses multiple LWIR views and four-dimensional light-field parallax to suppress relay-surface/sensor interference and improve weak-contrast hidden-human localization through spatially inhomogeneous reflectors. |
@@ -442,6 +445,10 @@ measurement → physical forward model → inverse solver / neural prior → hid
 ---
 
 ## Milestone Timeline
+
+2019 ── Murray-Bruce et al.: consumer-camera occlusion-coded computational periscopy [SPIE Wavelets and Sparsity XVIII]
+2022 ── Czajkowski and Murray-Bruce: early passive 3D doorway-frame sensing [IEEE RAPID]
+2026 ── Shi et al.: temporal-decoupling super-resolution for transient NLOS [Optics and Lasers in Engineering]
 
 2021 ── Willomitzer et al.: coherent synthetic-wavelength holography enables high-resolution, wide-field hidden-scene imaging [Nature Communications 12:6647]
 

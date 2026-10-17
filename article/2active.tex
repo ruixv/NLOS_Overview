@@ -448,6 +448,10 @@ Fixed circular and spiral trajectories reduce acquisition relative to dense rast
 Sparse transient acquisition reduces scan time but usually shifts the computational burden to large regularized inverse problems. Yang~\etal~formulated MD-NLOS as a spectrally filtered non-negative LASSO problem and decomposed it into smaller updates suited to parallel GPU execution~\cite{yangModelDecompositionNLOS2026}. Their experiments reconstruct $128\times128$ hidden images from only 64 relay measurements in 4.6~s. In the development from analytic LCT and structured scan paths toward learned completion, this work occupies a complementary optimization route: it preserves an explicit linear transport model and sparsity prior while restructuring the solver for practical low-sample latency.
 
 \vspace{0.8mm}
+\noindent \textbf{Temporal decoupling for transient super-resolution.}
+Shi~\etal~investigated temporal super-resolution of transient NLOS measurements through temporal decoupling~\cite{shiTemporalDecouplingNLOS2026}. This complements structured relay-wall sampling and Bayesian deconvolution by treating temporal information recovery as a separate computational bottleneck. Quantitative performance comparisons require further full-text verification.
+
+\vspace{0.8mm}
 \noindent \textbf{Sparse Bayesian transient restoration.}
 Analytic inverses cannot recover temporal detail that has already been buried by photon noise or broadened by the instrument response. Tian~\etal~introduced sparse Bayesian learning as a geometry-independent deconvolution stage before LCT or $f$--$k$ migration~\cite{tianSparseBayesianNLOS2026}. Adaptive sparsity inference suppresses background fluctuations while retaining physically plausible multipath peaks, improving boundary sharpness and robustness without changing the acquisition geometry or downstream reconstruction. This signal-domain route complements spatial undersampling methods by treating transient fidelity itself as a deployment bottleneck.
 
