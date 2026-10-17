@@ -64,10 +64,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 17 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 18 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2021 | [Edge-Resolved Transient Imaging: Performance Analyses, Optimizations, and Simulations](https://doi.org/10.1109/ICIP42928.2021.9506590) — Saunders et al. | IEEE ICIP 2021, 2858–2862 | Follow-up to ERTI (Nature Communications 2020): analyzes photon/SNR sensitivity to illumination, dwell time, range and azimuth; optimizes angular dwell times and evaluates coaxial-model error. |
 | 2026 | [Transient non-line-of-sight temporal super-resolution based on temporal decoupling](https://doi.org/10.1016/j.optlaseng.2026.110054) — Shi et al. | *Optics and Lasers in Engineering* (2026), article 110054 | Studies temporal decoupling for transient NLOS temporal super-resolution; full-text performance metrics not independently checked. |
 | 2022 | [Turning Door Frames into Cameras for 3D Non-Line-of-Sight Imaging](https://doi.org/10.1109/RAPID54472.2022.9911582) — Czajkowski, Murray-Bruce | IEEE RAPID 2022, 1–2 | Two-page passive 3D doorway-frame/ceiling-camera precursor, distinct from the full 2024 TERI journal paper. |
 | 2019 | [Occlusion-Based Computational Periscopy with Consumer Cameras](https://doi.org/10.1117/12.2528322) — Murray-Bruce, Saunders, Goyal | SPIE Wavelets and Sparsity XVIII 11138, 111380X (2019) | Conference study of inexpensive ordinary-camera occlusion-coded computational periscopy. |
@@ -340,6 +341,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 | 2018 | [Revealing hidden scenes by photon-efficient occlusion-based opportunistic active imaging](https://doi.org/10.1364/OE.26.009945) — Xu et al. | Optics Express 2018 | Converts the occlusion-coding theory into a photon-efficient room-scale system: a binomial single-photon forward model reconstructs hidden reflectivity from non-time-resolved three-bounce counts and needs about 16× fewer detected photons than the earlier Gaussian model. |
 | 2019 | [Enhancing Passive Non-Line-of-Sight Imaging Using Polarization Cues](https://arxiv.org/abs/1911.12906) — Tanaka, Mukaigawa, Kadambi | arXiv 2019 | Adds a camera-mounted polarizer to passive NLOS capture: polarization-axis rotation makes oblique indirect paths more discriminative, improves the conditioning of the light-transport inverse problem, and enhances hidden-image recovery both with and without occluders. |
 | 2020 | [Seeing Around Corners with Edge-Resolved Transient Imaging](https://doi.org/10.1038/s41467-020-19727-4) — Rapp et al. | Nature Communications 2020 | Combines a vertical edge occluder with pulsed SPAD transients: differencing adjacent photon-arrival histograms isolates angular wedges and enables 2.5D room-scale reconstruction over a 180° field of view from only 45 illumination positions. |
+| 2021 | [Edge-Resolved Transient Imaging: Performance Analyses, Optimizations, and Simulations](https://doi.org/10.1109/ICIP42928.2021.9506590) — Saunders et al. | IEEE ICIP 2021, 2858–2862 | Quantifies ERTI performance under realistic signal/background, range, reflectivity and azimuth conditions; adapts laser dwell times and analyzes coaxial approximation errors. |
 | 2026 | [X-band Radar Non-Line-of-Sight Imaging](https://openaccess.thecvf.com/content/CVPR2026/html/Du_X-band_Radar_Non-Line-of-Sight_Imaging_CVPR_2026_paper.html) — Du et al. | CVPR 2026 | Introduces a learned, geometry-aware X-band radar NLOS reconstruction system; converts normally diffuse optical transport into predominantly specular long-wavelength transport and experimentally reconstructs hidden objects at ranges up to 40 m. |
 | 2026 | [Neural illumination fields: High-fidelity and ambient-robust stereo reconstruction for two-bounce non-line-of-sight imaging](https://doi.org/10.1016/j.optlaseng.2025.109514) — Zhang et al. | Optics and Lasers in Engineering 2026 | Uses a self-supervised continuous neural illumination field and differentiable intensity rendering for two-bounce NLOS reconstruction without binary shadow segmentation, reaching centimeter-scale detail in large hidden spaces under low-contrast and ambient-light interference. |
 | 2026 | [CUDA-accelerated non-line-of-sight imaging with irregular relay surfaces](https://doi.org/10.1016/j.optlaseng.2025.109591) — Sun et al. | Optics and Lasers in Engineering 2026 | GPU-accelerated filtered backprojection for measurements acquired on irregular, non-planar relay surfaces, reducing the practical cost of geometry-aware active NLOS reconstruction. |
@@ -447,6 +449,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 ## Milestone Timeline
 
 2019 ── Murray-Bruce et al.: consumer-camera occlusion-coded computational periscopy [SPIE Wavelets and Sparsity XVIII]
+2021 ── Saunders et al.: ERTI performance bounds and adaptive angular acquisition [IEEE ICIP 2021]
 2022 ── Czajkowski and Murray-Bruce: early passive 3D doorway-frame sensing [IEEE RAPID]
 2026 ── Shi et al.: temporal-decoupling super-resolution for transient NLOS [Optics and Lasers in Engineering]
 
