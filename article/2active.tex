@@ -448,6 +448,10 @@ Fixed circular and spiral trajectories reduce acquisition relative to dense rast
 Sparse transient acquisition reduces scan time but usually shifts the computational burden to large regularized inverse problems. Yang~\etal~formulated MD-NLOS as a spectrally filtered non-negative LASSO problem and decomposed it into smaller updates suited to parallel GPU execution~\cite{yangModelDecompositionNLOS2026}. Their experiments reconstruct $128\times128$ hidden images from only 64 relay measurements in 4.6~s. In the development from analytic LCT and structured scan paths toward learned completion, this work occupies a complementary optimization route: it preserves an explicit linear transport model and sparsity prior while restructuring the solver for practical low-sample latency.
 
 \vspace{0.8mm}
+\vspace{0.8mm}
+\noindent \textbf{Temporal encoding beyond detector jitter.}
+Miao~\etal~introduced temporal-encoding NLOS (TE-NLOS)~\cite{miaoTemporalEncodingNLOS2023}, combining high-frequency temporal modulation and spatial--temporal correlations to computationally recover fine transient structure from coarse single-photon timing responses. In their evaluated setting, the method reconstructed 20-ps transients using a detector with nanosecond-scale single-photon timing resolution, enabling subsequent light-cone-transform recovery of hidden geometry. Rather than improving the detector's physical timing jitter, this line trades structured modulation and inverse computation for effective temporal resolution and anticipates later pulse-multiplexing and temporal-decoupling approaches.
+
 \noindent \textbf{Temporal decoupling for transient super-resolution.}
 Shi~\etal~investigated temporal super-resolution of transient NLOS measurements through temporal decoupling~\cite{shiTemporalDecouplingNLOS2026}. This complements structured relay-wall sampling and Bayesian deconvolution by treating temporal information recovery as a separate computational bottleneck. Quantitative performance comparisons require further full-text verification.
 
