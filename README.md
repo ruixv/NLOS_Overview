@@ -64,10 +64,11 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 18 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 19 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [Overview of Non-line-of-sight Sound Source Localization Techniques](https://doi.org/10.16337/j.1004-9037.2026.04.008) — Wang, Chen, Yin | *Journal of Data Acquisition and Processing* 41(4), 1026–1040 (2026) | Surveys multi-sensor, geometric-acoustics and statistical-acoustics methods for localizing occluded sound sources; adjacent acoustic NLOS localization, not 3D scene reconstruction. |
 | 2026 | [RIS-aided Radar Detection Architectures with Application to Low-RCS Targets](https://doi.org/10.1109/TAES.2026.3736025) — Yan et al. | *IEEE Transactions on Aerospace and Electronic Systems* (2026, early access; venue correction) | Journal DOI replaces the earlier arXiv-only label; the work analyzes RIS-assisted low-RCS detection and belongs to adjacent RF NLOS sensing, not dense hidden-scene imaging. |
 | 2023 | [Super-resolution non-line-of-sight imaging based on temporal encoding](https://doi.org/10.1364/OE.504894) — Miao et al. | *Optics Express* 31(24), 40235–40248 (2023) | TE-NLOS uses high-frequency temporal modulation and spatial–temporal correlations to computationally recover 20-ps transients from nanosecond-scale detector timing, then reconstructs hidden geometry with LCT; effective temporal resolution, not a hardware SPTR improvement. |
 | 2021 | [Edge-Resolved Transient Imaging: Performance Analyses, Optimizations, and Simulations](https://doi.org/10.1109/ICIP42928.2021.9506590) — Saunders et al. | IEEE ICIP 2021, 2858–2862 | Follow-up to ERTI (Nature Communications 2020): analyzes photon/SNR sensitivity to illumination, dwell time, range and azimuth; optimizes angular dwell times and evaluates coaxial-model error. |
@@ -451,6 +452,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Milestone Timeline
 
+2026 ── Wang et al.: acoustic NLOS source-localization survey organizes multi-sensor, geometric, and statistical approaches [Journal of Data Acquisition and Processing]
 2019 ── Murray-Bruce et al.: consumer-camera occlusion-coded computational periscopy [SPIE Wavelets and Sparsity XVIII]
 2021 ── Saunders et al.: ERTI performance bounds and adaptive angular acquisition [IEEE ICIP 2021]
 2022 ── Czajkowski and Murray-Bruce: early passive 3D doorway-frame sensing [IEEE RAPID]
