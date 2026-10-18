@@ -1,0 +1,1 @@
+Retry the guarded DCEEM integration after correcting the BibTeX validation to count the canonical key and DOI field rather than duplicated DOI text in the URL.

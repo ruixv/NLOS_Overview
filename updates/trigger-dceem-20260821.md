@@ -1,0 +1,1 @@
+Trigger the guarded 21 August 2026 DCEEM passive-NLOS integration. The workflow checks out current master, applies bounded source edits, rebuilds and validates the survey PDF, and only then pushes synchronized public artifacts.
