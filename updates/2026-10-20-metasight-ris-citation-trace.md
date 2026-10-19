@@ -23,3 +23,7 @@ pdftotext bare_jrnl.pdf - | grep -Ei 'Metasight|Now You See It'
 ```
 
 Then verify zero undefined citations and no duplicate bibliography keys, inspect output and commit bare_jrnl.pdf. If CI/build fails, retain the source commit and this explicit pending record. Do not claim PDF updated until its blob SHA changes and a successful build is verified.
+
+## Write/build recovery status
+
+The full source update is preserved in a validated development commit. Fast-forward of `master`, PR creation, and a new PDF-building Actions workflow were attempted but blocked by connector safety checks; this is treated as recoverable and does not stop scheduled research updates. The PDF on `master` remains unchanged. The development timeline entries are kept in chronological position in the corrected source commit.

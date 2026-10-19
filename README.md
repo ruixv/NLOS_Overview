@@ -463,11 +463,10 @@ measurement → physical forward model → inverse solver / neural prior → hid
 ## Milestone Timeline
 
 2023 ── Woodford et al.: Metasight passive encoded metasurface relay for automotive NLOS radar [ACM SenSys 2023]
-2026 ── Angjo et al.: programmable 28-GHz RIS reveals static NLOS radar targets [ACM MobiCom 2026 accepted demo]
-
 2025 ── Li et al.: image-guided 4D-radar semantic target tracking [IEEE ITSC 2025]
 2025 ── Liu and Li: physical-prior dual-branch attention for active reconstruction [IEEE ICCEA 2025]
 
+2026 ── Angjo et al.: programmable 28-GHz RIS reveals static NLOS radar targets [ACM MobiCom 2026 accepted demo]
 2026 ── Wang et al.: acoustic NLOS source-localization survey organizes multi-sensor, geometric, and statistical approaches [Journal of Data Acquisition and Processing]
 2019 ── Murray-Bruce et al.: consumer-camera occlusion-coded computational periscopy [SPIE Wavelets and Sparsity XVIII]
 2021 ── Saunders et al.: ERTI performance bounds and adaptive angular acquisition [IEEE ICIP 2021]
