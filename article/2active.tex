@@ -579,6 +579,10 @@ Figure~\ref{fig:activeresult} illustrates the measurement with a dragon as the h
 Motivated by the success of transformers and implicit neural representations in computer vision, recent works have brought these advances into NLOS reconstruction.
 
 \vspace{0.8mm}
+\noindent \textbf{Physics-prior fusion with dual-branch attention.}
+Liu and Li~\cite{liuPhysicalPriorActiveNLOS2025} combined physical priors with channel/spatial attention and dilated multi-scale large-kernel features for active hidden-target reconstruction. Their synthetic and real-measurement experiments provide an attention-based alternative to dense volumetric neural inversion, distinct from later transient-transformer and neural-operator approaches.
+
+\vspace{0.8mm}
 \noindent \textbf{Transformer-based reconstruction.}
 Li~\etal~proposed NLOST, the first transformer-based network for NLOS reconstruction~\cite{liNLOST2023}. NLOST extracts shallow features with physics-based priors, then employs two spatial-temporal self-attention encoders to capture both local and global correlations within 3D NLOS measurement volumes at different scales. A cross-attention decoder integrates these features, enabling superior reconstruction of complex hidden scenes on both confocal and non-confocal real-world data. Building on this line, Yu~\etal~proposed enhancing physics-based NLOS reconstruction by introducing a learnable inverse kernel in the Fourier domain combined with an attention mechanism, allowing the network to better capture high-frequency details that are difficult to recover due to spectral bias~\cite{yuEnhancingLearnable2023}. On the sensor side, Cho~\etal~proposed to enhance the aperture phasor field representation using a learned network, achieving state-of-the-art performance~\cite{choAperturePhasor2024}, while Shim~\etal~introduced a domain reduction strategy that identifies the most likely occupied regions in the 3D volume and focuses reconstruction effort there, reducing computational cost by an order of magnitude~\cite{shimDomainReduction2024}.
 
