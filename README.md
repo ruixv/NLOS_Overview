@@ -68,6 +68,8 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2024 | [Path Tracing-Inspired Modeling of Non-Line-of-Sight SPAD Data](https://doi.org/10.3390/s24206522) — Scholes, Leach | *Sensors* 24(20), 6522 (10 Oct 2024) | Path-tracing-inspired forward simulation predicts dToF SPAD photon-arrival histograms with reflectance, occlusion, extended surfaces and secondary scattering. **Active / sensor simulation**, not a new reconstruction algorithm. |
+| 2023 | [Poisson Noise Suppression for Single-Photon Non-Line-of-Sight Imaging Based on Deep Learning](https://doi.org/10.3788/LOP222969) — Tu et al. | *Laser & Optoelectronics Progress* 60(20), 2011003 (2023) | Monte Carlo-simulated photon paths train an attention-based feature-enhancement denoiser (AEF-Net) for Poisson-corrupted single-photon NLOS reconstruction, validated on a physical NLOS system. **Active / learned noise suppression.** |
 | 2026 | [Classification of Paired-Object Combinations in Non-Line-of-Sight Environments from Secondary Acoustic Reflections: Multi-Seed Evaluation of Spectral Representations and Multi-Channel Strategies](https://doi.org/10.3390/app162010293) — Çalışan | *Applied Sciences* 16(20), 10293 (published 17 Oct 2026) | Wall-mediated acoustic NLOS classification of four paired-object combinations using 120 recordings and STFT features; random forest reached 98.5% mean accuracy across repeated recording-level folds. Single-room study, **not** verified cross-session generalization or 3D imaging. **Acoustic / multi-object semantic sensing.** |
 | 2023 | [An Efficient Way for Active None-Line-of-Sight: End-to-End Learned Compressed NLOS Imaging](https://doi.org/10.1007/978-981-99-8537-1_3) — Chang, Yue, Ni, Hu | PRCV 2023, LNCS 14430, 28–40 | Jointly learns the compressed measurement matrix and active transient reconstruction, reducing scanning burden and improving depth-map PSNR by at least 1.4 dB over partial Hadamard sensing. **Active / learned acquisition.** |
 | 2023 | [DFAR-Net: Dual-Input Three-Branch Attention Fusion Reconstruction Network for Polarized Non-Line-of-Sight Imaging](https://doi.org/10.1007/978-981-99-8537-1_4) — Liu et al. | PRCV 2023, LNCS 14430, 41–52 | Fuses polarized infrared intensity and degree-of-polarization images with a three-branch attention network and multi-scale loss, validated on PI-ND. **Passive / polarized learned reconstruction.** |
@@ -466,6 +468,8 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Milestone Timeline
 
+2023 ── Tu et al.: Monte Carlo-simulated single-photon NLOS and AEF-Net attention denoising [Laser & Optoelectronics Progress 60(20), 2011003]
+2024 ── Scholes and Leach: path-tracing-inspired dToF SPAD transient likelihood simulation with occlusion and higher-order scattering [Sensors 24(20), 6522]
 2023 ── Chang et al.: jointly learned compressive active NLOS measurement masks [PRCV 2023]; Liu et al.: polarized infrared intensity/degree-of-polarization attention fusion [PRCV 2023].
 2023 ── Woodford et al.: Metasight passive encoded metasurface relay for automotive NLOS radar [ACM SenSys 2023]
 2025 ── Li et al.: image-guided 4D-radar semantic target tracking [IEEE ITSC 2025]
