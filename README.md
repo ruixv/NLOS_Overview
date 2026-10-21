@@ -64,10 +64,15 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 21 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 22 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2018 | [Reconstruction of multiple non-line-of-sight objects using back projection based on ellipsoid mode decomposition](https://doi.org/10.1364/OE.26.020089) — Jin et al. | *Optics Express* 26(16), 20089–20101 | Separates overlapping ellipsoidal back-projection modes by hidden object, reducing cross-object aliasing in multi-target transient reconstructions. **Active / multi-object inverse geometry.** |
+| 2018 | [Richardson–Lucy deconvolution of time histograms for high-resolution non-line-of-sight imaging based on a back-projection method](https://doi.org/10.1364/OL.43.005885) — Jin et al. | *Optics Letters* 43(23), 5885–5888 | Deconvolves time histograms using line-of-sight backscatter as a prior before 3D back-projection; improves spatial detail under noise. **Active / transient deconvolution.** |
+| 2020 | [Edge re-projection method for high-quality edge reconstruction in non-line-of-sight imaging](https://doi.org/10.1364/AO.376403) — Shi et al. | *Applied Optics* 59(6), 1793–1800 | Reweights relay-wall measurements using estimated edge-voxel contributions, then re-projects to sharpen hidden-object boundaries. **Active / edge-aware inverse reconstruction.** |
+| 2020 | [Improving non-line-of-sight image reconstruction with weighting factors](https://doi.org/10.1364/OL.394742) — Feng, Gao | *Optics Letters* 45(14), 3921–3924 | Adds aperture apodization and spatial-coherence weighting to filtered backprojection, suppressing streaks and photon noise. **Active / robust backprojection.** |
+| 2023 | [Long-Range Non-Line-of-Sight Imaging Based on Projected Images from Multiple Light Fields](https://doi.org/10.3390/photonics10010025) — Chen et al. | *Photonics* 10(1), 25 (published online 26 Dec 2022; 2023 issue) | Learns to reconstruct hidden targets from multi-light-field projections; reports experiments with camera-to-relay distance above 50 m. **Active / long-range learned reconstruction.** |
 | 2024 | [Path Tracing-Inspired Modeling of Non-Line-of-Sight SPAD Data](https://doi.org/10.3390/s24206522) — Scholes, Leach | *Sensors* 24(20), 6522 (10 Oct 2024) | Path-tracing-inspired forward simulation predicts dToF SPAD photon-arrival histograms with reflectance, occlusion, extended surfaces and secondary scattering. **Active / sensor simulation**, not a new reconstruction algorithm. |
 | 2023 | [Poisson Noise Suppression for Single-Photon Non-Line-of-Sight Imaging Based on Deep Learning](https://doi.org/10.3788/LOP222969) — Tu et al. | *Laser & Optoelectronics Progress* 60(20), 2011003 (2023) | Monte Carlo-simulated photon paths train an attention-based feature-enhancement denoiser (AEF-Net) for Poisson-corrupted single-photon NLOS reconstruction, validated on a physical NLOS system. **Active / learned noise suppression.** |
 | 2026 | [Classification of Paired-Object Combinations in Non-Line-of-Sight Environments from Secondary Acoustic Reflections: Multi-Seed Evaluation of Spectral Representations and Multi-Channel Strategies](https://doi.org/10.3390/app162010293) — Çalışan | *Applied Sciences* 16(20), 10293 (published 17 Oct 2026) | Wall-mediated acoustic NLOS classification of four paired-object combinations using 120 recordings and STFT features; random forest reached 98.5% mean accuracy across repeated recording-level folds. Single-room study, **not** verified cross-session generalization or 3D imaging. **Acoustic / multi-object semantic sensing.** |
@@ -468,6 +473,9 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Milestone Timeline
 
+2018 ── Jin et al.: ellipsoid-mode decomposition for multi-object transient backprojection [Optics Express 26(16), 20089–20101]; Richardson–Lucy deconvolution of time histograms before backprojection [Optics Letters 43(23), 5885–5888].
+2020 ── Shi et al.: edge-guided re-projection [Applied Optics 59(6), 1793–1800]; Feng and Gao: aperture/coherence weighting for noise-robust filtered backprojection [Optics Letters 45(14), 3921–3924].
+2023 ── Chen et al.: long-range hidden-object reconstruction from projected multi-light-field images [Photonics 10(1), 25].
 2023 ── Tu et al.: Monte Carlo-simulated single-photon NLOS and AEF-Net attention denoising [Laser & Optoelectronics Progress 60(20), 2011003]
 2024 ── Scholes and Leach: path-tracing-inspired dToF SPAD transient likelihood simulation with occlusion and higher-order scattering [Sensors 24(20), 6522]
 2023 ── Chang et al.: jointly learned compressive active NLOS measurement masks [PRCV 2023]; Liu et al.: polarized infrared intensity/degree-of-polarization attention fusion [PRCV 2023].
