@@ -64,10 +64,12 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 20 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 21 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2023 | [An Efficient Way for Active None-Line-of-Sight: End-to-End Learned Compressed NLOS Imaging](https://doi.org/10.1007/978-981-99-8537-1_3) — Chang, Yue, Ni, Hu | PRCV 2023, LNCS 14430, 28–40 | Jointly learns the compressed measurement matrix and active transient reconstruction, reducing scanning burden and improving depth-map PSNR by at least 1.4 dB over partial Hadamard sensing. **Active / learned acquisition.** |
+| 2023 | [DFAR-Net: Dual-Input Three-Branch Attention Fusion Reconstruction Network for Polarized Non-Line-of-Sight Imaging](https://doi.org/10.1007/978-981-99-8537-1_4) — Liu et al. | PRCV 2023, LNCS 14430, 41–52 | Fuses polarized infrared intensity and degree-of-polarization images with a three-branch attention network and multi-scale loss, validated on PI-ND. **Passive / polarized learned reconstruction.** |
 | 2026 | [Demo: Now You See It! RIS-Assisted mmWave Radar for NLOS Sensing](https://www.tkn.tu-berlin.de/bib/angjo2026now/) — Angjo et al. | ACM MobiCom 2026, accepted demo (3 pp.; conference 26–30 Oct; publisher record pending) | A 28-GHz monostatic FMCW radar and steerable RIS reveal a static passive target hidden behind an obstacle; calibration-versus-target differential range/RIS-angle maps yield a 6.5-dB peak at the target direction. Experimental NLOS detection/approximate localization, **not** 3D imaging. |
 | 2023 | [Metasight: High-Resolution NLoS Radar with Efficient Metasurface Encoding](https://doi.org/10.1145/3625687.3625803) — Woodford, Qian, Zhang | ACM SenSys 2023, 308–321 | Passive, low-cost printed mmWave metasurfaces encode angle information so automotive radar can sense occluded road users with reduced reflector size; an engineered-relay NLOS sensing milestone, not dense hidden-scene reconstruction. |
 | 2025 | [SG-NLOSTrack: Semantic-Guided Non-Line-of-Sight Target Tracking](https://doi.org/10.1109/ITSC60802.2025.11423163) — Li et al. | IEEE ITSC 2025, 3510–3516 | Fuses image semantics, 4D radar point-cloud segmentation, first-order reflection geometry and Kalman filtering for hidden-target tracking (0.419 m MAE, 80% success on UT-NLOS); adjacent NLOS localization, not dense 3D reconstruction. |
@@ -462,6 +464,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Milestone Timeline
 
+2023 ── Chang et al.: jointly learned compressive active NLOS measurement masks [PRCV 2023]; Liu et al.: polarized infrared intensity/degree-of-polarization attention fusion [PRCV 2023].
 2023 ── Woodford et al.: Metasight passive encoded metasurface relay for automotive NLOS radar [ACM SenSys 2023]
 2025 ── Li et al.: image-guided 4D-radar semantic target tracking [IEEE ITSC 2025]
 2025 ── Liu and Li: physical-prior dual-branch attention for active reconstruction [IEEE ICCEA 2025]

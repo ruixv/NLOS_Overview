@@ -255,6 +255,10 @@ Tanaka~\etal~showed that a camera-mounted polarizer can improve passive NLOS rec
 \noindent \textbf{Polarized infrared passive NLOS.}
 Liu~\etal~extended polarization-conditioned passive imaging to long-wavelength infrared measurements in PI-NLOS~\cite{liuPolarizedInfraredNLOS2023}. A dual-channel network fuses polarized LWIR intensity with degree-of-polarization contours to reconstruct hidden people at relay-wall distances of approximately 6~m. This complements physics-based polarizer transport with learned thermal-band feature fusion.
 
+\vspace{0.8mm}
+\noindent \textbf{Learned polarization feature fusion.}
+In the same passive polarization-reconstruction lineage, Liu~\etal~proposed DFAR-Net, which jointly processes infrared polarization intensity and degree-of-polarization images through a dual-input, three-branch attention-fusion network~\cite{liuDFARPolarizedNLOS2023}. Split-kernel channel attention and multi-scale losses are evaluated on the PI-ND dataset, showing how polarization cues can be fused in learned feature space rather than only by an explicit transport inverse.
+
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Coherence}
 \subsubsection{Coherence} \label{memoryEffect}
 Three types of coherence, speckle coherence, spatial coherence and time coherence, have been used in passive non-line-of-sight imaging. Among them, speckle coherence does not require a special interferometer, but needs a narrowband incoherent light source as illumination. 
