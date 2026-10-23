@@ -64,10 +64,12 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 22 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 23 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2023 | [Non-line-of-sight imaging with absorption backprojection](https://doi.org/10.1063/5.0156149) — Zhou et al. | *Applied Physics Letters* 123(5), 054001 | Absorption backprojection (ABP) gathers low-confidence voxel responses into high-confidence structures, reducing reconstruction artifacts in simulations and laboratory measurements. **Active / classical inverse / backprojection refinement.** |
+| 2023 | [Reconstruction of Non-Line-of-Sight Depth Data Using Genetic Algorithm-Lucy-Richardson Based on Time of Flight Camera](https://doi.org/10.3788/AOS230870) — Fang, Wang, Su | *Acta Optica Sinica* 43(21), 2111002 | Estimates non-Lambertian relay scattering with genetic calibration, then applies Lucy–Richardson deconvolution to low-cost ToF-camera hidden depth images through PP/PMMA relays. **Active / commodity ToF / relay calibration.** |
 | 2023 | [Imaging operator in indirect imaging correlography](https://doi.org/10.1364/OE.488520) — Balaji et al. | *Optics Express* 31(13), 21689–21705 | Derives the scene- and pose-dependent coherent correlography imaging operator and resolution limits; self-supervised autocorrelation inversion recovers approximately 250-µm hidden features at 1 m. **Active coherent / indirect imaging correlography.** |
 | 2023 | [Weak non-line-of-sight target echoes extraction without accumulation](https://doi.org/10.1364/OE.499869) — Li et al. | *Optics Express* 31(22), 36209–36218 | Extracts weak hidden-target echoes without indiscriminate histogram accumulation using dual-detector temporal correlation and sequential tracking, mitigating noise accumulation. **Active / photon-starved target detection and tracking.** |
 | 2023 | [Non-line-of-sight imaging based on Archimedean spiral scanning](https://doi.org/10.1016/j.optcom.2023.129450) — Zhang et al. | *Optics Communications* 537, 129450 | Introduces fixed confocal Archimedean-spiral sampling of the relay wall, a structured-scan precursor to adaptive spiral acquisition in 2026. **Active / efficient acquisition.** |
@@ -476,6 +478,8 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Milestone Timeline
 
+2023 ── Zhou et al.: absorption backprojection suppresses low-confidence voxel artifacts in hidden 3D reconstruction [Applied Physics Letters 123(5), 054001].
+2023 ── Fang et al.: genetic relay-scattering calibration plus Lucy–Richardson deconvolution enables commodity-ToF NLOS depth reconstruction with non-Lambertian PP/PMMA reflectors [Acta Optica Sinica 43(21), 2111002].
 2018 ── Jin et al.: ellipsoid-mode decomposition for multi-object transient backprojection [Optics Express 26(16), 20089–20101]; Richardson–Lucy deconvolution of time histograms before backprojection [Optics Letters 43(23), 5885–5888].
 2020 ── Shi et al.: edge-guided re-projection [Applied Optics 59(6), 1793–1800]; Feng and Gao: aperture/coherence weighting for noise-robust filtered backprojection [Optics Letters 45(14), 3921–3924].
 2023 ── Chen et al.: long-range hidden-object reconstruction from projected multi-light-field images [Photonics 10(1), 25].
