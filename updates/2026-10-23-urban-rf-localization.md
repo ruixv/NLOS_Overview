@@ -23,3 +23,7 @@ bare_jrnl.pdf was **not** regenerated in this update. The execution container ha
 ## Screening context
 
 Keyword and forward-citation-oriented searches covered LCT, f-k, phasor fields, computational periscopy, learned transient reconstruction, active/passive optical NLOS, acoustic/thermal NLOS, consumer LiDAR and RF/mmWave. PICL (JOSA A 2026), NLOSdiffuser (ICME 2025), Cascaded NLOS (ACM TOG 2026), NIGHT (ECCV 2024 Workshops) and MALCT (arXiv 2026) were checked against the current public corpus and already covered. Exhaustive forward-citation pagination remains incomplete.
+
+## PDF rebuild recovery attempt (23 October 2026)
+
+The existing workflow `.github/workflows/rebuild_nlos_citation_gap_pdf_20260718.yml` was updated on `master` to trigger on future edits to `bare_jrnl.tex`, `article/*.tex`, and `egbib_merged_20260711.bib`. GitHub Actions accepted a push-triggered rebuild, [run 39966480148](https://github.com/ruixv/NLOS_Overview/actions/runs/39966480148), started at 2026-10-23 14:04 UTC. **At the last check the workflow was still installing LaTeX dependencies; no new PDF has been verified.** A successful workflow must pass LaTeX/BibTeX validation and push an updated `bare_jrnl.pdf` blob. Until that happens, the PDF remains stale; inspect the run logs if the job fails.
