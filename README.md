@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2026 | [A Hybrid Raytracing and Deep Learning-Based Approach for Single-Site Localization of Radio Emitters in Urban Environment](https://doi.org/10.3390/s26196261) — Gajewski and Łopatka | *Sensors* 26(19), 6261 (2 Oct 2026) | Uses five-element circular-array CM-MUSIC, map-based backward ray tracing, and CNN sector masking to localize NLOS urban radio emitters from field measurements. Median error 9.22 m; mean 55.52 m with outliers to 410.68 m. **Adjacent passive RF NLOS localization, not hidden-scene imaging.** |
 | 2023 | [Non-line-of-sight imaging with absorption backprojection](https://doi.org/10.1063/5.0156149) — Zhou et al. | *Applied Physics Letters* 123(5), 054001 | Absorption backprojection (ABP) gathers low-confidence voxel responses into high-confidence structures, reducing reconstruction artifacts in simulations and laboratory measurements. **Active / classical inverse / backprojection refinement.** |
 | 2023 | [Reconstruction of Non-Line-of-Sight Depth Data Using Genetic Algorithm-Lucy-Richardson Based on Time of Flight Camera](https://doi.org/10.3788/AOS230870) — Fang, Wang, Su | *Acta Optica Sinica* 43(21), 2111002 | Estimates non-Lambertian relay scattering with genetic calibration, then applies Lucy–Richardson deconvolution to low-cost ToF-camera hidden depth images through PP/PMMA relays. **Active / commodity ToF / relay calibration.** |
 | 2023 | [Imaging operator in indirect imaging correlography](https://doi.org/10.1364/OE.488520) — Balaji et al. | *Optics Express* 31(13), 21689–21705 | Derives the scene- and pose-dependent coherent correlography imaging operator and resolution limits; self-supervised autocorrelation inversion recovers approximately 250-µm hidden features at 1 m. **Active coherent / indirect imaging correlography.** |
@@ -478,6 +479,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Milestone Timeline
 
+2026 ── Gajewski and Łopatka: measured single-site urban RF NLOS emitter localization combines CM-MUSIC, backward ray tracing and CNN sector masking; classifier errors cause severe outliers [Sensors 26(19), 6261; localization, not 3D imaging].
 2023 ── Zhou et al.: absorption backprojection suppresses low-confidence voxel artifacts in hidden 3D reconstruction [Applied Physics Letters 123(5), 054001].
 2023 ── Fang et al.: genetic relay-scattering calibration plus Lucy–Richardson deconvolution enables commodity-ToF NLOS depth reconstruction with non-Lambertian PP/PMMA reflectors [Acta Optica Sinica 43(21), 2111002].
 2018 ── Jin et al.: ellipsoid-mode decomposition for multi-object transient backprojection [Optics Express 26(16), 20089–20101]; Richardson–Lucy deconvolution of time histograms before backprojection [Optics Letters 43(23), 5885–5888].
