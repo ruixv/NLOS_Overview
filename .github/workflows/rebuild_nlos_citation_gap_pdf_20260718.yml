@@ -5,6 +5,9 @@ on:
     branches: [master]
     paths:
       - .github/workflows/rebuild_nlos_citation_gap_pdf_20260718.yml
+      - 'bare_jrnl.tex'
+      - 'article/*.tex'
+      - 'egbib_merged_20260711.bib'
   workflow_dispatch:
 
 permissions:
