@@ -19,7 +19,7 @@
 | | Link |
 |---|---|
 | **Original Survey** (peer-reviewed, APSIPA TSIP 2022) | [![APSIPA](https://img.shields.io/badge/APSIPA_TSIP_2022-10.1561%2F116.00000019-blue)](https://doi.org/10.1561/116.00000019) [![arXiv](https://img.shields.io/badge/arXiv-2104.13807-b31b1b)](https://arxiv.org/pdf/2104.13807) |
-| **Updated Survey** (2022–2026 extension, *not peer-reviewed*; PDF rebuild pending for October source additions) | [![PDF](https://img.shields.io/badge/PDF-Updated_2026-orange)](https://ruixv.github.io/NLOS_Overview/bare_jrnl.pdf) |
+| **Updated Survey** (2022–2026 extension, *not peer-reviewed*; PDF regenerated and validated on 24 October 2026) | [![PDF](https://img.shields.io/badge/PDF-Rebuilt_Oct_2026-green)](https://ruixv.github.io/NLOS_Overview/bare_jrnl.pdf) |
 | **Interactive Project Homepage** | [![Homepage](https://img.shields.io/badge/Homepage-ruixv.github.io%2FNLOS__Overview-teal)](https://ruixv.github.io/NLOS_Overview/) |
 
 </div>
