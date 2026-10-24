@@ -287,6 +287,10 @@ Zhang~\etal~proposed to improve passive NLOS reconstruction quality by modulatin
 \subsubsection{Real-Time Passive NLOS Tracking}
 A practically important task for passive NLOS imaging is real-time tracking of moving persons. Wang~\etal~proposed PAC-Net (Propagate-and-Calibrate), a purely passive method that tracks a person walking in an invisible room by observing only a relay wall~\cite{wangPropagateCalibrate2023}. PAC-Net uses difference frames as carriers of temporal-local motion information and alternates propagation and calibration modules to leverage both dynamic and static cues at frame-level granularity. The authors also released NLOS-Track, the first large-scale dynamic passive NLOS tracking dataset containing thousands of video clips with corresponding trajectories, enabling systematic evaluation of passive NLOS tracking methods.
 
+\vspace{0.8mm}
+\noindent \textbf{Moving-camera passive NLOS tracking.}
+Kannapiran~\etal~introduced PathFinder, which processes ordinary RGB sequences from a moving mobile robot or drone and selects informative visible relay planes before attention-based inference of a hidden person's two-dimensional trajectory~\cite{kannapiranPathFinder2024}. Unlike fixed-view passive trackers such as PAC-Net, this approach explicitly accommodates sensor motion and was evaluated on outdoor drone observations. It emphasizes dynamic target tracking rather than dense hidden-scene reconstruction.
+
 3D passive NLOS reconstruction has also advanced significantly. Czajkowski and Murray-Bruce demonstrated full-color, three-dimensional passive NLOS imaging with an ordinary camera by exploiting two orthogonal edges of an occluding structure for transverse resolution and an information-orthogonal scene representation for range resolution~\cite{czajkowskiTwoEdge2024}. This work achieves accurate 3D reconstruction from inexpensive, ubiquitous hardware without calibration images, opening passive NLOS to practical indoor applications such as reconnaissance and search-and-rescue.
 
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Deep Learning}
