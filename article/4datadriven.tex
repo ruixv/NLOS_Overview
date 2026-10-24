@@ -132,6 +132,10 @@ The original LCT obtains computational efficiency from a closed-form resampling 
 Zhang~\etal~introduce multi-regularization-experts fusion for robust transient NLOS reconstruction~\cite{zhangFMoENLOS2026}. Complementary spectral regularizers replace reliance on a single fixed prior, continuing the transition from analytic inverse filtering to adaptive, physics-structured reconstruction.
 
 \vspace{0.8mm}
+\noindent \textbf{Gradient-coordinated physics-guided reconstruction.}
+Ling~\etal~reformulate multi-constraint transient NLOS training as a gradient-coordination problem rather than a single weighted scalar objective~\cite{lingSymmetryAwareGradientNLOS2026}. Their approach combines soft conflict projection, physical-gradient routing, learnable sensor calibration, and staged optimization to improve low-SNR reconstruction. Evaluations include held-out synthetic scenes and qualitative comparisons on seven measured scenes. In contrast to learned inverse filters or neural reconstruction backbones, this line of work addresses how data, physical, and calibration constraints interact during training; broader cross-system and multi-seed validation remains important.
+
+\vspace{0.8mm}
 \noindent \textbf{Physics-initialized triplane reconstruction.}
 Do and Nam proposed TriNLOS~\cite{doTriNLOS2026}, which initializes a hidden-scene volume using a learnable enhanced light-cone transform and replaces cubic-cost dense 3D processing with quadratic-cost triplane features. ConvNeXt-style convolutions, Restormer attention, and axis-aware cross-attention refine hidden geometry. This ECCV work connects the milestone LCT inverse to compact neural representations and complements transient transformers by reducing volumetric representation cost.
 
