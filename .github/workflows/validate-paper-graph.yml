@@ -6,6 +6,8 @@ on:
       - 'overview-v2.html'
       - 'index.html'
       - 'assets/paper-graph-data.js'
+      - 'assets/paper-graph-data-core.js'
+      - 'data/papers-source.html'
       - 'scripts/validate_paper_graph.mjs'
       - 'egbib*.bib'
       - '.github/workflows/validate-paper-graph.yml'
