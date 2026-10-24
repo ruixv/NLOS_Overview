@@ -3,7 +3,7 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 
 const require=createRequire(import.meta.url);
-const Graph=require('../assets/paper-graph-data.js');
+const Graph=require('../assets/paper-graph-data-core.js');
 const root=path.resolve(path.dirname(new URL(import.meta.url).pathname),'..');
 const read=(p)=>fs.readFileSync(path.join(root,p),'utf8');
 
@@ -15,7 +15,7 @@ const bibliographyCandidates=[
 const sources=bibliographyCandidates.filter(p=>fs.existsSync(path.join(root,p))).map(p=>({name:p,text:read(p)}));
 if(!sources.length) throw new Error('No bibliography source files found');
 
-const result=Graph.buildFromTexts(read('index.html'),sources);
+const result=Graph.buildFromTexts(read('data/papers-source.html'),sources);
 const {graph,stats,audit}=result;
 console.log(JSON.stringify({stats,audit},null,2));
 
