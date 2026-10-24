@@ -68,6 +68,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2020 | [Non-line-of-sight-imaging using dynamic relay surfaces](https://doi.org/10.1364/OE.383586) — La Manna, Nam, Reza, Velten | *Optics Express* 28(4), 5331–5339 (2020) | Two time-resolved detectors separately estimate the changing non-planar relay geometry and hidden-scene photon returns, making active NLOS reconstruction possible with a moving relay surface. **Active / dynamic-relay acquisition and calibration.** |
 | 2025 | [CMTI: Non-Line-of-Sight Radar Imaging for Non-Cooperative Corner Motion Target](https://doi.org/10.1109/TVT.2024.3398218) — Wen et al. | *IEEE Transactions on Vehicular Technology 74(1), 179–190 (2025)* | CMTI combines clutter/echo separation, PFA, autofocus and mirror-symmetry recovery to form images of non-cooperative moving targets around corners. **Radar / dynamic-target imaging.** |
 | 2025 | [Confocal non-line-of-sight imaging based on Lissajous scanning](https://doi.org/10.1117/12.3055473) — Wang, Zhang, Shi | *Proceedings of SPIE 13542, 1354210 (2025)* | Examines structured Lissajous confocal relay scanning as an alternative to dense raster acquisition. **Active / structured acquisition.** |
 | 2024 | [Curvature Regularization for Non-Line-of-Sight Imaging From Under-Sampled Data](https://doi.org/10.1109/TPAMI.2024.3409414) — Ding et al. | *IEEE TPAMI 46(12), 8474–8485 (2024)* | Object- and dual-domain curvature priors with GPU ADMM and backtracking stabilize sparse and noisy transient 3D reconstruction. **Active / regularized inverse imaging.** |
@@ -496,6 +497,7 @@ measurement → physical forward model → inverse solver / neural prior → hid
 2023 ── Zhou et al.: absorption backprojection suppresses low-confidence voxel artifacts in hidden 3D reconstruction [Applied Physics Letters 123(5), 054001].
 2023 ── Fang et al.: genetic relay-scattering calibration plus Lucy–Richardson deconvolution enables commodity-ToF NLOS depth reconstruction with non-Lambertian PP/PMMA reflectors [Acta Optica Sinica 43(21), 2111002].
 2018 ── Jin et al.: ellipsoid-mode decomposition for multi-object transient backprojection [Optics Express 26(16), 20089–20101]; Richardson–Lucy deconvolution of time histograms before backprojection [Optics Letters 43(23), 5885–5888].
+2020 ── La Manna et al.: a dual-detector transient system reconstructs hidden scenes through a moving non-planar relay surface, preceding later arbitrary-relay 3D-RSD and GPU backprojection [Optics Express 28(4), 5331–5339].
 2020 ── Shi et al.: edge-guided re-projection [Applied Optics 59(6), 1793–1800]; Feng and Gao: aperture/coherence weighting for noise-robust filtered backprojection [Optics Letters 45(14), 3921–3924].
 2023 ── Chen et al.: long-range hidden-object reconstruction from projected multi-light-field images [Photonics 10(1), 25].
 2023 ── Tu et al.: Monte Carlo-simulated single-photon NLOS and AEF-Net attention denoising [Laser & Optoelectronics Progress 60(20), 2011003]
