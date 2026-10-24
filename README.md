@@ -64,10 +64,16 @@ measurement → physical forward model → inverse solver / neural prior → hid
 
 ## Latest Additions
 
-**Update run: 23 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
+**Update run: 24 October 2026.** This section tracks newly found or newly completed entries that were not explicitly covered in the previous README / homepage snapshot.
 
 | Year | Paper | Venue / Status | Why it matters |
 |------|-------|----------------|----------------|
+| 2025 | [CMTI: Non-Line-of-Sight Radar Imaging for Non-Cooperative Corner Motion Target](https://doi.org/10.1109/TVT.2024.3398218) — Wen et al. | *IEEE Transactions on Vehicular Technology 74(1), 179–190 (2025)* | CMTI combines clutter/echo separation, PFA, autofocus and mirror-symmetry recovery to form images of non-cooperative moving targets around corners. **Radar / dynamic-target imaging.** |
+| 2025 | [Confocal non-line-of-sight imaging based on Lissajous scanning](https://doi.org/10.1117/12.3055473) — Wang, Zhang, Shi | *Proceedings of SPIE 13542, 1354210 (2025)* | Examines structured Lissajous confocal relay scanning as an alternative to dense raster acquisition. **Active / structured acquisition.** |
+| 2024 | [Curvature Regularization for Non-Line-of-Sight Imaging From Under-Sampled Data](https://doi.org/10.1109/TPAMI.2024.3409414) — Ding et al. | *IEEE TPAMI 46(12), 8474–8485 (2024)* | Object- and dual-domain curvature priors with GPU ADMM and backtracking stabilize sparse and noisy transient 3D reconstruction. **Active / regularized inverse imaging.** |
+| 2024 | [Efficient Circular and Confocal Non-Line-of-Sight Imaging With Transient Sinogram Super Resolution](https://doi.org/10.1109/ICIP51287.2024.10648011) — Yang and Isogawa | *IEEE ICIP 2024, 2751–2757* | E-C²NLOS uses synthetic transient data and learned super-resolution to correct measurement bias from circular confocal scanning. **Active / transient super-resolution.** |
+| 2024 | [Expanding non-line-of-sight imaging distance without compromising resolution](https://doi.org/10.1117/12.3023661) — Wang et al. | *Proceedings of SPIE 13104, 1310457 (2024)* | Investigates optical NLOS imaging-distance extension while preserving spatial resolution. **Active / long-range optical system design.** |
+| 2024 | [Non-Line-of-Sight Sparse Aperture ISAR Imaging via a Novel Detail-Aware Regularization](https://doi.org/10.1109/TGRS.2024.3447900) — Wen et al. | *IEEE TGRS 62, 1–18 (2024)* | Clutter filtering and detail-aware regularization recover high-resolution hidden moving-target reflectivity from sparse ISAR radar apertures. **Radar / sparse aperture.** |
 | 2026 | [A Hybrid Raytracing and Deep Learning-Based Approach for Single-Site Localization of Radio Emitters in Urban Environment](https://doi.org/10.3390/s26196261) — Gajewski and Łopatka | *Sensors* 26(19), 6261 (2 Oct 2026) | Uses five-element circular-array CM-MUSIC, map-based backward ray tracing, and CNN sector masking to localize NLOS urban radio emitters from field measurements. Median error 9.22 m; mean 55.52 m with outliers to 410.68 m. **Adjacent passive RF NLOS localization, not hidden-scene imaging.** |
 | 2023 | [Non-line-of-sight imaging with absorption backprojection](https://doi.org/10.1063/5.0156149) — Zhou et al. | *Applied Physics Letters* 123(5), 054001 | Absorption backprojection (ABP) gathers low-confidence voxel responses into high-confidence structures, reducing reconstruction artifacts in simulations and laboratory measurements. **Active / classical inverse / backprojection refinement.** |
 | 2023 | [Reconstruction of Non-Line-of-Sight Depth Data Using Genetic Algorithm-Lucy-Richardson Based on Time of Flight Camera](https://doi.org/10.3788/AOS230870) — Fang, Wang, Su | *Acta Optica Sinica* 43(21), 2111002 | Estimates non-Lambertian relay scattering with genetic calibration, then applies Lucy–Richardson deconvolution to low-cost ToF-camera hidden depth images through PP/PMMA relays. **Active / commodity ToF / relay calibration.** |
@@ -478,6 +484,12 @@ measurement → physical forward model → inverse solver / neural prior → hid
 ---
 
 ## Milestone Timeline
+
+2024 ── Ding et al.: curvature priors stabilize under-sampled 3D transient inversion with GPU ADMM [IEEE TPAMI 46(12), 8474–8485].
+2024 ── Yang and Isogawa: learned transient-sinogram super-resolution compensates circular confocal measurement bias [IEEE ICIP 2024]; Wang et al.: extended-range imaging with resolution preservation [SPIE 13104].
+2024 ── Wen et al.: detail-aware sparse-aperture ISAR reconstructs hidden moving targets [IEEE TGRS 62, 1–18].
+2025 ── Wang et al.: fixed Lissajous confocal relay scanning [SPIE 13542]; Wen et al.: CMTI moving-target NLOS radar imaging with polar-format and autofocus processing [IEEE TVT 74(1), 179–190].
+
 
 2026 ── Gajewski and Łopatka: measured single-site urban RF NLOS emitter localization combines CM-MUSIC, backward ray tracing and CNN sector masking; classifier errors cause severe outliers [Sensors 26(19), 6261; localization, not 3D imaging].
 2023 ── Zhou et al.: absorption backprojection suppresses low-confidence voxel artifacts in hidden 3D reconstruction [Applied Physics Letters 123(5), 054001].
