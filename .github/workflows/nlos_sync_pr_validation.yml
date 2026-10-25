@@ -157,10 +157,10 @@ jobs:
           if geometry_key not in source or files['bib'].lower().count('{' + geometry_key.lower() + ',') != 1:
               raise SystemExit('Geometry-constrained survey or bibliography record is inconsistent')
 
-          displayed = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', files['index'])
+          displayed = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', files['source'])
           if not displayed:
               raise SystemExit('Homepage tracked-count stat is missing')
-          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', files['index'], flags=re.MULTILINE))
+          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', files['source'], flags=re.MULTILINE))
           if int(displayed.group(1)) != paper_count:
               raise SystemExit(f'Homepage count mismatch: stat={displayed.group(1)}, objects={paper_count}')
 
