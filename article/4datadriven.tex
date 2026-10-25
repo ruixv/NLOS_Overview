@@ -180,6 +180,10 @@ Aittala \etal~regarded the measurement data as the product of the hidden object 
 Technically, such unsupervised learning methods~\cite{aittalaComputationalMirrorsBlind2019,shenNonlineofsightImagingNeural2021} are not data-driven methods, but the idea of using deep neural networks to simulate matrix factorization is instructive.
 
 \vspace{0.8mm}
+\noindent \textbf{Physically informed, hash-encoded neural transient fields.}
+Xu~\etal~extend the neural transient-field branch with a physically informed reconstruction architecture that replaces conventional coordinate positional encoding by a hash-based representation~\cite{xuPhysicallyInformedNeuralTransient2026}. This published 2026 conference study seeks more efficient implicit modeling of NLOS transients. The development is complementary to NeTF's physically constrained continuous scene representation, SDF-based NLOS-NeuS, and the more recent transformer- or Gaussian-based transient reconstructions; performance gains depend on the reported evaluation setup.
+
+\vspace{0.8mm}
 \noindent \textbf{From hidden reconstruction to holistic 3D completion.}
 HOLI-1-to-3 uses NLOS transients not only to reconstruct an isolated hidden scene, but to resolve the invisible side of an object observed from one conventional viewpoint~\cite{shenHOLI1to3TPAMI2025}. Its neural plenoptic representation unifies an LOS radiance field with an NLOS transient field, and a two-stage optimization combines diffusion and transient priors to recover continuous visible and occluded geometry. Relative to NeTF, the trajectory expands from representing spherical hidden transport to fusing straight-ray and multi-bounce evidence for holistic generation; relative to purely RGB diffusion, measured transients provide physical constraints on otherwise ambiguous unseen shape.
 
