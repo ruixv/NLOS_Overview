@@ -166,7 +166,7 @@ jobs:
 
           if '25 October 2026' not in files['readme'] or '25 October 2026' not in files['index']:
               raise SystemExit('Public update dates are not synchronized')
-          if 'advances from 2022 through 18 July 2026' not in files['main']:
+          if 'advances from 2022 through 25 October 2026' not in files['main']:
               raise SystemExit('Survey update horizon is not explicit')
 
           normalized_pdf = re.sub(r'\s+', ' ', files['pdf']).lower()
