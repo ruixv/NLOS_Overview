@@ -215,6 +215,10 @@ Su~\etal~proposed a model-guided iterative diffusion sampling approach for NLOS 
 Fu~\etal~combined Fourier single-pixel acquisition with a generative diffusion prior for hidden imaging under severe scattering and extreme undersampling~\cite{fuFourierSinglePixelDiffusion2026}. Measured low-frequency Fourier coefficients remain enforced as a data-consistency constraint during iterative denoising, while the learned prior supplies the missing high-frequency structure. Experiments through multiple paper layers at sampling rates down to 3\% illustrate a distinct diffusion trajectory from transient-volume reconstruction: the generative prior operates directly on compressed single-pixel spectral measurements.
 
 \vspace{0.8mm}
+\noindent \textbf{Coded illumination as a learned reconstruction variable.}
+Alongside post-acquisition diffusion priors, frequency-domain dynamic awareness (FDDA) jointly learns binary single-pixel illumination codes and a frequency-aware reconstruction architecture~\cite{yangFDDASinglePixelNLOS2026}. Rather than recovering details solely from fixed undersampled measurements, the sensing and inverse stages are co-designed against the low-pass effects of diffuse relay transport, complementing the transient-domain neural reconstruction pipelines.
+
+\vspace{0.8mm}
 \noindent \textbf{Plug-and-Play for dynamic NLOS.}
 Ye~\etal~introduced a plug-and-play (PnP) framework for dynamic NLOS video reconstruction~\cite{yePnPDynamic2024}, incorporating a frequency-filtering step based on wave physics and a pre-trained deep neural network denoiser as an implicit prior. The flexible PnP structure allows easy integration of different denoisers and adapts to different NLOS imaging configurations, achieving superior temporal consistency over existing frame-by-frame reconstruction methods.
 
