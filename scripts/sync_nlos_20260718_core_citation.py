@@ -204,7 +204,9 @@ def paper_object(paper: dict[str, object]) -> str:
 
 
 def update_index() -> None:
-    path = ROOT / "index.html"
+    # The paper explorer owns the live `const papers=[...]` dataset; the
+    # root index.html is now a compact overview and no longer contains that array.
+    path = ROOT / "data/papers-source.html"
     text = path.read_text(encoding="utf-8")
     text = text.replace("17 July 2026", DATE)
 
