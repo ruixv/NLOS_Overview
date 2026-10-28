@@ -3,7 +3,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-INDEX = ROOT / "index.html"
+INDEX = ROOT / "data/papers-source.html"
 SENTENCE = (
     " Zhou et al. extended ordinary-camera computational periscopy to 10 m through pattern calibration "
     "and low-rank separation of weak indirect signals from ambient background."
