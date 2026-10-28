@@ -28,7 +28,7 @@ The consolidated bibliography already contained verified records for both newly 
 Result: successful clean LaTeX/BibTeX rebuild and PDF-text validation.
 
 - GitHub Actions build: https://github.com/ruixv/NLOS_Overview/actions/runs/40766638214
-- GitHub Pages deployment: https://github.com/ruixv/NLOS_Overview/actions/runs/40766915826
+- GitHub Pages deployment: https://github.com/ruixv/NLOS_Overview/actions/runs/40767083623
 - PDF: 72 pages; 2,383,677 bytes.
 - PDF blob SHA: 707e83934476cebb747aae8d53816708cb20f12b.
 - The workflow reported zero missing cited keys, no undefined citations/references, and no missing/repeated BibTeX records. The generated PDF passed the required text checks.
