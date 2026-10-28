@@ -73,10 +73,12 @@ def append_homepage_timeline(text: str) -> str:
     lines = text.splitlines(keepends=True)
     needle = '<div class="year">2026</div>'
     matches = [i for i, line in enumerate(lines) if needle in line]
-    if len(matches) != 1:
-        raise RuntimeError(f"Expected one homepage 2026 timeline row, found {len(matches)}")
+    if not matches:
+        raise RuntimeError("No 2026 timeline row found in the Paper Explorer")
+    # The Paper Explorer contains several dated 2026 milestones; append to the
+    # latest card instead of assuming a single homepage timeline row.
     closing = "</p></div></div>"
-    line = lines[matches[0]]
+    line = lines[matches[-1]]
     if closing not in line:
         raise RuntimeError("Homepage 2026 timeline row has an unexpected structure")
     sentence = (
@@ -121,7 +123,9 @@ def paper_object(paper: dict[str, object]) -> str:
 
 
 def update_index() -> None:
-    path = ROOT / "index.html"
+    # The live paper array and timeline are maintained in the Paper Explorer source;
+    # root index.html is a compact overview and no longer contains the legacy array.
+    path = ROOT / "data/papers-source.html"
     text = path.read_text(encoding="utf-8")
     new_lines = ""
     for paper in PAPERS:
