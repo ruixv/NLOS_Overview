@@ -28,4 +28,12 @@ The Doppler-aided mmWave position–velocity tracking preprint found in the prec
 
 ## Build status
 
-The source changes are prepared on branch `nlos-citation-trace-2026-10-28-diffraction-ris`. The PDF workflow is configured to rebuild `bare_jrnl.pdf` after the changes reach `master`. Do not treat this note or a triggered workflow as proof of a successful build; the regenerated PDF blob, page count, clean LaTeX log, and citation-key checks must be verified after merge.
+The source changes were merged through [PR #169](https://github.com/ruixv/NLOS_Overview/pull/169) at merge commit `55e2d8a3ddd371748fc6ffbf6f0d98dc64757f2f`. The repository PDF workflow [run #40654782621](https://github.com/ruixv/NLOS_Overview/actions/runs/40654782621) completed successfully on 28 October 2026.
+
+- Clean `latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex` build passed.
+- PDF validation passed; regenerated `bare_jrnl.pdf` is **72 pages** and **2,382,471 bytes**.
+- PDF Git blob SHA: `8c3eab0042281fc2026c14877e88dee7e090c471`.
+- The regenerated PDF was committed by the build workflow at [`c13b215`](https://github.com/ruixv/NLOS_Overview/commit/c13b21525cd92dc0e6b44adb6836ac898ed057f6).
+- The final build passed the no-undefined-citation/reference check, the no-missing-or-repeated-BibTeX-entry check, and the explicit `.aux` checks for all four new citation keys.
+
+The README and homepage status labels now point to this 72-page build. The active LaTeX source, survey prose, bibliography, explorer records, and PDF are synchronized for the four additions in this run.
