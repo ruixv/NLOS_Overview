@@ -60,6 +60,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
 
+      - name: Validate synchronized source records
+        run: |
+          grep -Fq '2610.37519' README.md
+          grep -Fq '2610.37519' index.html
+          grep -Fq '2610.37519' data/papers-source.html
+          grep -Fq 'mursiaDistributedHDCNLOS2026' article/5newscenes.tex
+          grep -Fq 'mursiaDistributedHDCNLOS2026' egbib_2026_updates.bib
+
       - name: Rebuild and validate the survey PDF
         shell: bash
         run: |
@@ -117,6 +125,7 @@ jobs:
           PY
 
       - name: Commit regenerated survey artifacts
+        if: github.event_name == 'push'
         shell: bash
         run: |
           set -euo pipefail
