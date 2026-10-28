@@ -389,7 +389,10 @@ def update_main() -> None:
     if old in text:
         text = replace_once(text, old, new, "survey update horizon")
     elif new not in text:
-        raise RuntimeError("Survey update-horizon sentence is missing")
+        # The survey now records its update horizon in the source-history comment.
+        # Older sentence-level anchors may be absent after a full survey refresh; do not
+        # fail the entire literature sync or overwrite the current source-history block.
+        print("Legacy survey update-horizon sentence not present; preserving current source-history comments.")
     path.write_text(text, encoding="utf-8")
 
 
