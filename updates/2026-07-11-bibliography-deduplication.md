@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 120 source files and keeps one highest-priority record for each of 608 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 220 source files and keeps one highest-priority record for each of 743 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 1160
-- Case-insensitive duplicate replacements: 552
+- Parsed source records: 1384
+- Case-insensitive duplicate replacements: 641
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -301,7 +301,6 @@ This update generates `egbib_merged_20260711.bib` from 120 source files and keep
 - `wangEventCameraNLOS2022` / `wangEventCameraNLOS2022`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `wangEventEnhancedPassiveNLOS2024` / `wangEventEnhancedPassiveNLOS2024`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `rajiSoftShadowDiffusion2026` / `rajiSoftShadowDiffusion2026`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
-- `sultanIteratingTLTM2024` / `sultanIteratingTLTM2024`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `liuArbitraryPatternNLOS2023` / `liuArbitraryPatternNLOS2023`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `liuFewShotSSCR2022` / `liuFewShotSSCR2022`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `tornielliEMSkinsNLOS2024` / `tornielliEMSkinsNLOS2024`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
@@ -309,7 +308,6 @@ This update generates `egbib_merged_20260711.bib` from 120 source files and keep
 - `liTRT2025` / `liTRT2025`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `liTransiT2025` / `liTransiT2025`: `egbib.bib` → `egbib_2026_updates.bib`
 - `wangNANO2025` / `wangNANO2025`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
-- `sommerPassiveAcousticNLOS2025` / `sommerPassiveAcousticNLOS2025`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `somasundaramRoleTransients2023` / `somasundaramRoleTransients2023`: `egbib.bib` → `egbib_2026_updates.bib`
 - `sultanOptimizedSamplingNLOS2025` / `sultanOptimizedSamplingNLOS2025`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `marcoComprehensiveToFNLOS2026` / `marcoComprehensiveToFNLOS2026`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
@@ -324,6 +322,12 @@ This update generates `egbib_merged_20260711.bib` from 120 source files and keep
 - `ruttikBackscatterNLOS2026` / `ruttikBackscatterNLOS2026`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `somasundaramConsumerLiDARNLOS2026` / `somasundaramConsumerLiDARNLOS2026`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `behariDENALI2026` / `behariDENALI2026`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
+- `zhaiSpeckleCentroidTracking2026` / `zhaiSpeckleCentroidTracking2026`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
+- `linArrayInSARNLOSTargetRelocation2024` / `linArrayInSARNLOSTargetRelocation2024`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
+- `chenPolygonalObstacleDiffractionNLOS2026` / `chenPolygonalObstacleDiffractionNLOS2026`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
+- `daiRISScalableFluidVectorNLOS2026` / `daiRISScalableFluidVectorNLOS2026`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
+- `baoInverseScatteringDiffractedWaves2026` / `baoInverseScatteringDiffractedWaves2026`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
+- `baoInverseGeometricDiffractionCone2026` / `baoInverseGeometricDiffractionCone2026`: `egbib_merged_20260711.bib` → `egbib_2026_updates.bib`
 - `songPtychographicNLOS2024` / `songPtychographicNLOS2024`: `egbib_merged_20260711.bib` → `egbib_20260701_updates.bib`
 - `youngNavigationNLOS2024` / `youngNavigationNLOS2024`: `egbib_merged_20260711.bib` → `egbib_20260701_updates.bib`
 - `sunGeneralizable2025` / `sunGeneralizable2025`: `egbib.bib` → `egbib_20260701_updates.bib`
@@ -500,6 +504,7 @@ This update generates `egbib_merged_20260711.bib` from 120 source files and keep
 - `liuPtychographyCorrelographyNLOS2026` / `liuPtychographyCorrelographyNLOS2026`: `egbib_20260719_ptycho_venue_updates.bib` → `egbib_20260724_ptychography_correlography.bib`
 - `yeThermalRoughNLOS2026` / `yeThermalRoughNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
 - `albertEyeSafeNLOS2026` / `albertEyeSafeNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
+- `roueinfarNIRRasterNLOS2025` / `roueinfarNIRRasterNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
 - `marcoComprehensiveToFNLOS2026` / `marcoComprehensiveToFNLOS2026`: `egbib_2026_updates.bib` → `egbib_20260725_missing_modalities_and_benchmark.bib`
 - `zhangNeuralIlluminationFields2026` / `zhangNeuralIlluminationFields2026`: `egbib_20260711_run15_updates.bib` → `egbib_20260725_nif_scisa.bib`
 - `daiSCISANet2026` / `daiSCISANet2026`: `egbib_merged_20260711.bib` → `egbib_20260725_nif_scisa.bib`
@@ -546,22 +551,106 @@ This update generates `egbib_merged_20260711.bib` from 120 source files and keep
 - `parkTjunctionPedestrian2025` / `parkTjunctionPedestrian2025`: `egbib_2026_updates.bib` → `egbib_20260811_ris_vitalsign_updates.bib`
 - `albertEyeSafeNLOS2026` / `albertEyeSafeNLOS2026`: `egbib_20260725_missing_modalities_and_benchmark.bib` → `egbib_20260824_eye_safe_pose_gap.bib`
 - `xiaoNLOSHumanPose2026` / `xiaoNLOSHumanPose2026`: `egbib_20260718_reconstruction_pose_consistency.bib` → `egbib_20260824_eye_safe_pose_gap.bib`
+- `chenJointLOSNLOSClutter2025` / `chenJointLOSNLOSClutter2025`: `egbib_merged_20260711.bib` → `egbib_20260824_joint_los_nlos_clutter_gap.bib`
 - `zhouPolarizationSpeckleNLOS2026` / `zhouPolarizationSpeckleNLOS2026`: `egbib_20260720_polarization_single_pixel.bib` → `egbib_20260826_polarization_speckle_gap.bib`
+- `wangLRTNLOS2026` / `wangLRTNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260827_lrt_3p3km_gap.bib`
 - `alakusANLOSR2026` / `alakusANLOSR2026`: `egbib_merged_20260711.bib` → `egbib_20260828_acoustic_material_consistency.bib`
 - `alakusAcousticMaterialNLOS2026` / `alakusAcousticMaterialNLOS2026`: `egbib_20260803_acoustic_material.bib` → `egbib_20260828_acoustic_material_consistency.bib`
+- `celebiActiveNLOSHumanDetection2026` / `celebiActiveNLOSHumanDetection2026`: `egbib_merged_20260711.bib` → `egbib_20260828_active_human_detection_gap.bib`
 - `zengCompactLongRangeNLOS2026` / `zengCompactLongRangeNLOS2026`: `egbib_20260717_stereo_longrange_updates.bib` → `egbib_20260828_compact_long_range_nlos_gap.bib`
+- `zhiMultiSolitonMicrocombNLOS2026` / `zhiMultiSolitonMicrocombNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260828_multisoliton_microcomb_nlos_gap.bib`
+- `wangAcousticNLOSLocalizationReview2026` / `wangAcousticNLOSLocalizationReview2026`: `egbib_merged_20260711.bib` → `egbib_20260829_acoustic_nlos_localization_review_gap.bib`
 - `daiSCISANet2026` / `daiSCISANet2026`: `egbib_20260725_nif_scisa.bib` → `egbib_20260829_scisa_semantic_nlos_gap.bib`
+- `lingSymmetryAwareNLOS2026` / `lingSymmetryAwareNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260829_symmetry_gradient_coordination_gap.bib`
+- `wangDAAMPassiveNLOS2026` / `wangDAAMPassiveNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260830_daam_passive_nlos_gap.bib`
 - `spaettSPADTimingNLOS2026` / `spaettSPADTimingNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260830_spad_timing_correction_gap.bib`
+- `doganLaserAcousticNLOSOrientation2026` / `doganLaserAcousticNLOSOrientation2026`: `egbib_merged_20260711.bib` → `egbib_20260831_laser_acoustic_orientation_gap.bib`
+- `luGeRaF2025` / `luGeRaF2025`: `egbib_merged_20260711.bib` → `egbib_20260831_rf_acoustic_missing_gap.bib`
 - `luSeeingThroughBoxes2026` / `luSeeingThroughBoxes2026`: `egbib_20260717_frontier_updates.bib` → `egbib_20260831_rf_acoustic_missing_gap.bib`
 - `sommerPassiveAcousticNLOS2026` / `sommerPassiveAcousticNLOS2026`: `egbib_20260718_acoustic_modality_updates.bib` → `egbib_20260831_rf_acoustic_missing_gap.bib`
+- `liTimeResolvedTransformer2025` / `liTimeResolvedTransformer2025`: `egbib_merged_20260711.bib` → `egbib_20260831_trt_nlos_gap.bib`
 - `zhouPolarizationSpeckleNLOS2026` / `zhouPolarizationSpeckleNLOS2026`: `egbib_20260826_polarization_speckle_gap.bib` → `egbib_20260901_missing_nlos_roundup.bib`
 - `xiaoNLOSHumanPose2026` / `xiaoNLOSHumanPose2026`: `egbib_20260824_eye_safe_pose_gap.bib` → `egbib_20260901_missing_nlos_roundup.bib`
+- `romanelliFiniteApertureNLOS2026` / `romanelliFiniteApertureNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260901_missing_nlos_roundup.bib`
 - `wangNoiseAdaptedNeuralOperator2025` / `wangNoiseAdaptedNeuralOperator2025`: `egbib_merged_20260711.bib` → `egbib_20260901_missing_nlos_roundup.bib`
+- `liuGeometryConstrainedNLOS2026` / `liuGeometryConstrainedNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260902_geometry_acoustic_gaps.bib`
+- `wangCorridorLocNetNLOS2026` / `wangCorridorLocNetNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260902_geometry_acoustic_gaps.bib`
 - `miaoAdaptiveWindowingNLOS2025` / `miaoAdaptiveWindowingNLOS2025`: `egbib_20260727_adaptive_windowing.bib` → `egbib_20260902_incremental_nlos_gaps.bib`
 - `celebiActiveNLOSHumanDetection2026` / `celebiActiveNLOSHumanDetection2026`: `egbib_20260828_active_human_detection_gap.bib` → `egbib_20260902_incremental_nlos_gaps.bib`
 - `lingSymmetryAwareNLOS2026` / `lingSymmetryAwareNLOS2026`: `egbib_20260829_symmetry_gradient_coordination_gap.bib` → `egbib_20260902_incremental_nlos_gaps.bib`
+- `yuFrequencyDomainPhaseNLOS2026` / `yuFrequencyDomainPhaseNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260902_verified_missing_roundup.bib`
 - `zhangStructureGuidedATV2026` / `zhangStructureGuidedATV2026`: `egbib_20260718_core_citation_updates.bib` → `egbib_20260902_verified_missing_roundup.bib`
+- `lingSymmetryAwareGradientNLOS2026` / `lingSymmetryAwareGradientNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260902_verified_missing_roundup.bib`
+- `wangDiffuseAwarePassiveNLOS2026` / `wangDiffuseAwarePassiveNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260903_daam_passive_gap.bib`
+- `qianHighSpeedNLOSFMCW2026` / `qianHighSpeedNLOSFMCW2026`: `egbib_merged_20260711.bib` → `egbib_20260904_fmcw_lidar_gap.bib`
+- `olgunAcousticIdentityNLOS2026` / `olgunAcousticIdentityNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260909_acoustic_identity.bib`
+- `chenAutoCalibrationTwoBounce2026` / `chenAutoCalibrationTwoBounce2026`: `egbib_merged_20260711.bib` → `egbib_20260910_twobounce_autocalibration.bib`
 - `wangDiffuseAwarePassive2026` / `wangDiffuseAwarePassive2026`: `egbib_20260718_reconstruction_pose_consistency.bib` → `egbib_20260911_diffuse_aware_passive.bib`
+- `weiQuasiFresnel2026` / `weiQuasiFresnel2026`: `egbib_merged_20260711.bib` → `egbib_20260911_quasifresnel_final.bib`
+- `lingSymmetryAwareGradientNLOS2026` / `lingSymmetryAwareGradientNLOS2026`: `egbib_20260902_verified_missing_roundup.bib` → `egbib_20260911_symmetry_gradient_coordination.bib`
+- `yeThermalNLOSFormer2026` / `yeThermalNLOSFormer2026`: `egbib_20260717_frontier_updates.bib` → `egbib_20260912_thermal_nlosformer.bib`
+- `gaoLearnedLCT2026` / `gaoLearnedLCT2026`: `egbib_20260717_optics_followup_updates.bib` → `egbib_20260913_core_forward_citations.bib`
+- `gaoNLOSdiffuser2025` / `gaoNLOSdiffuser2025`: `egbib_merged_20260711.bib` → `egbib_20260913_nlosdiffuser.bib`
+- `zengCompactLongRangeNLOS2026` / `zengCompactLongRangeNLOS2026`: `egbib_20260828_compact_long_range_nlos_gap.bib` → `egbib_20260913_practical_optical_nlos_systems.bib`
+- `albertEyeSafeNLOS2026` / `albertEyeSafeNLOS2026`: `egbib_20260824_eye_safe_pose_gap.bib` → `egbib_20260913_practical_optical_nlos_systems.bib`
+- `celebiActiveNLOSHumanDetection2026` / `celebiActiveNLOSHumanDetection2026`: `egbib_20260902_incremental_nlos_gaps.bib` → `egbib_20260914_missing_sensing_systems.bib`
+- `roueinfarNIRRasterNLOS2025` / `roueinfarNIRRasterNLOS2025`: `egbib_20260725_missing_modalities_and_benchmark.bib` → `egbib_20260914_missing_sensing_systems.bib`
+- `sultanIteratingTLTM2026` / `sultanIteratingTLTM2026`: `egbib_20260723_tltm_iteration.bib` → `egbib_20260916_tltm_final_venue.bib`
+- `Royo2026Cascaded` / `royo2026cascaded`: `egbib_merged_20260711.bib` → `egbib_20260917_cascaded_nlos_siggraphasia.bib`
+- `royo2026cascaded` / `royo2026cascaded`: `egbib_20260917_cascaded_nlos_siggraphasia.bib` → `egbib_20260920_cascaded_nlos.bib`
+- `wei2026quasifresnel` / `wei2026quasifresnel`: `egbib_20260915_quasi_fresnel_optica.bib` → `egbib_20260920_quasi_fresnel_optica.bib`
+- `dogan2026early` / `dogan2026early`: `egbib_20260914_multimodal_acoustic_nlos_sensing.bib` → `egbib_20260921_laser_acoustic_orientation.bib`
+- `zhang2026structureguided` / `zhang2026structureguided`: `egbib_20260915_passive_physics_guided_gaps.bib` → `egbib_20260921_sg_atv_passive_nlos.bib`
+- `royo2026cascaded` / `royo2026cascaded`: `egbib_20260920_cascaded_nlos.bib` → `egbib_20260922_cascaded_nlos_tog_siggraph_asia.bib`
+- `shen2026marmot` / `shen2026marmot`: `egbib_20260917_marmot_visual_intelligence.bib` → `egbib_20260922_marmot_visual_intelligence.bib`
+- `gao2026learnedlct` / `gao2026learnedlct`: `egbib_20260917_learned_lct_prapplied.bib` → `egbib_20260923_learned_lct_prapplied.bib`
+- `qiu2026directional` / `qiu2026directional`: `egbib_merged_20260711.bib` → `egbib_20260924_directional_confocal_range.bib`
+- `shen2026marmot` / `shen2026marmot`: `egbib_20260922_marmot_visual_intelligence.bib` → `egbib_20260925_missing_nlos_batch3.bib`
+- `sultan2026iterating` / `sultan2026iterating`: `egbib_20260921_tltm_nature_communications.bib` → `egbib_20260925_tltm_nature_communications.bib`
+- `marco2026comprehensive` / `marco2026comprehensive`: `egbib_20260920_tof_nlos_comprehensive_study.bib` → `egbib_20260925_tof_nlos_comprehensive_study.bib`
+- `royo2026cascaded` / `Royo2026Cascaded`: `egbib_20260922_cascaded_nlos_tog_siggraph_asia.bib` → `egbib_20260926_cascaded_nlos.bib`
+- `gao2026learnedlct` / `gao2026learnedlct`: `egbib_20260923_learned_lct_prapplied.bib` → `egbib_20260926_missing_nlos_batch5.bib`
+- `wang2026diffuseaware` / `wang2026diffuseaware`: `egbib_20260916_daam_passive_nlos.bib` → `egbib_20260926_missing_nlos_batch5.bib`
+- `wang2026breaking` / `wang2026breaking`: `egbib_20260915_laser_reflective_tomography.bib` → `egbib_20260927_laser_reflective_tomography.bib`
+- `albert2026eyesafe` / `albert2026eyesafe`: `egbib_20260918_eye_safe_spad_nlos.bib` → `egbib_20260927_practical_nlos_batch.bib`
+- `zeng2026compact` / `zeng2026compact`: `egbib_20260923_compact_long_range_nlos.bib` → `egbib_20260927_practical_nlos_batch.bib`
+- `wei2026quasifresnel` / `wei2026quasifresnel`: `egbib_20260920_quasi_fresnel_optica.bib` → `egbib_20260927_quasi_fresnel_optica.bib`
+- `spaett2026fast` / `spaett2026fast`: `egbib_20260915_spad_timing_correction.bib` → `egbib_20260927_spad_timing_correction.bib`
+- `shen2026marmot` / `shen2026marmot`: `egbib_20260925_missing_nlos_batch3.bib` → `egbib_20260928_marmot_final_venue.bib`
+- `marco2026comprehensive` / `marco2026comprehensive`: `egbib_20260925_tof_nlos_comprehensive_study.bib` → `egbib_20260928_tof_comprehensive_study.bib`
+- `wang2026diffuseaware` / `wang2026diffuseaware`: `egbib_20260926_missing_nlos_batch5.bib` → `egbib_20260929_diffuse_aware_passive_nlos.bib`
+- `zhang2026sgatv` / `zhang2026sgatv`: `egbib_20260924_sg_atv_passive_nlos.bib` → `egbib_20260929_frequency_sgatv_gap.bib`
+- `zeng2026compact` / `zeng2026compact`: `egbib_20260927_practical_nlos_batch.bib` → `egbib_20260930_compact_long_range_nlos.bib`
+- `sun2026cuda` / `sun2026cuda`: `egbib_20260925_missing_nlos_batch4.bib` → `egbib_20260930_missing_nlos_batch.bib`
+- `spaett2026fast` / `spaett2026fast`: `egbib_20260927_spad_timing_correction.bib` → `egbib_20260930_spad_timing_correction.bib`
+- `ye2026thermal` / `ye2026thermal`: `egbib_20260922_thermal_nlosformer_tog.bib` → `egbib_20260930_thermal_nlosformer.bib`
+- `qiu2026directional` / `qiu2026directional`: `egbib_20260924_directional_confocal_range.bib` → `egbib_20261001_directional_confocal_range.bib`
+- `sultan2026iterating` / `sultan2026iterating`: `egbib_20260925_tltm_nature_communications.bib` → `egbib_20261001_iterative_tltm_nlos.bib`
+- `wang2026breaking` / `wang2026breaking`: `egbib_20260927_laser_reflective_tomography.bib` → `egbib_20261001_lrt_nlos_gap.bib`
+- `marco2026comprehensive` / `marco2026comprehensive`: `egbib_20260928_tof_comprehensive_study.bib` → `egbib_20261001_tof_comprehensive_study.bib`
+- `alakus2026material` / `alakus2026material`: `egbib_20260914_multimodal_acoustic_nlos_sensing.bib` → `egbib_20261002_acoustic_material_nlos_gap.bib`
+- `roueinfar2025nirnlos` / `roueinfar2025nirnlos`: `egbib_20260919_nir_raster_icee.bib` → `egbib_20261002_nir_raster_scanning_gap.bib`
+- `Royo2026Cascaded` / `Royo2026Cascaded`: `egbib_20260926_cascaded_nlos.bib` → `egbib_20261003_cascaded_nlos_gap.bib`
+- `albert2026eyesafe` / `albert2026eyesafe`: `egbib_20260927_practical_nlos_batch.bib` → `egbib_20261003_eyesafe_spad_gap.bib`
+- `romanelli2026finite` / `romanelli2026finite`: `egbib_20260924_finite_aperture_yaw_jimaging.bib` → `egbib_20261003_finite_aperture_yaw_gap.bib`
+- `yu2026nonconfocal` / `yu2026nonconfocal`: `egbib_20260914_nonconfocal_radar_gaps.bib` → `egbib_20261003_multi_gap.bib`
+- `roueinfar2025nirnlos` / `roueinfar2025nirnlos`: `egbib_20261002_nir_raster_scanning_gap.bib` → `egbib_20261004_nir_raster_gap.bib`
+- `zhang2026sgatv` / `zhang2026sgatv`: `egbib_20260929_frequency_sgatv_gap.bib` → `egbib_20261004_sg_atv_passive_gap.bib`
+- `shen2026marmot` / `shen2026marmot`: `egbib_20260928_marmot_final_venue.bib` → `egbib_20261005_marmot_gap.bib`
+- `sun2026transvid` / `sun2026transvid`: `egbib_20260923_transvid_optics_express.bib` → `egbib_20261005_transvid_gap.bib`
+- `sultan2026trapezoidal` / `sultan2026trapezoidal`: `egbib_merged_20260711.bib` → `egbib_20261005_trapezoidal_grid_gap.bib`
+- `qiu2026directional` / `qiu2026directional`: `egbib_20261001_directional_confocal_range.bib` → `egbib_20261006_directional_confocal_gap.bib`
+- `maoRISVitalSignsIWS2026` / `maoRISVitalSignsIWS2026`: `egbib_merged_20260711.bib` → `egbib_20261009_ris_vital_signs_staging.bib`
+- `madnaikPRISMRISNLOS2025` / `madnaikPRISMRISNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20261010_prism_staging.bib`
+- `makControlledAcousticNLOS2009` / `makControlledAcousticNLOS2009`: `egbib_merged_20260711.bib` → `egbib_20261011_acoustic_foundations_staging.bib`
+- `singhMatchedFieldAcousticNLOS2012` / `singhMatchedFieldAcousticNLOS2012`: `egbib_merged_20260711.bib` → `egbib_20261011_acoustic_foundations_staging.bib`
+- `kiticCosparseAcousticNLOS2014` / `kiticCosparseAcousticNLOS2014`: `egbib_merged_20260711.bib` → `egbib_20261011_acoustic_foundations_staging.bib`
+- `takamiDiffractionReflectionAcousticNLOS2016` / `takamiDiffractionReflectionAcousticNLOS2016`: `egbib_merged_20260711.bib` → `egbib_20261011_acoustic_foundations_staging.bib`
+- `anDiffractionAwareAcousticNLOS2019` / `anDiffractionAwareAcousticNLOS2019`: `egbib_merged_20260711.bib` → `egbib_20261011_acoustic_foundations_staging.bib`
+- `chakraborty2025irsautomotivenlos` / `chakraborty2025irsautomotivenlos`: `egbib_merged_20260711.bib` → `egbib_20261012_citation_gaps_staging.bib`
+- `king2021audiovisualnlos` / `king2021audiovisualnlos`: `egbib_merged_20260711.bib` → `egbib_20261012_citation_gaps_staging.bib`
+- `gaoNLOSdiffuser2025` / `gaoNLOSdiffuser2025`: `egbib_20260913_nlosdiffuser.bib` → `egbib_20261012_verified_gaps_staging.bib`
+- `zhaoGradientGatingSPAD2025` / `zhaoGradientGatingSPAD2025`: `egbib_merged_20260711.bib` → `egbib_20261012_verified_gaps_staging.bib`
 - `jeonSoundVehicleNLOS2025` / `jeonSoundVehicleNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
 - `zhaiIrregularGridAcousticNLOS2025` / `zhaiIrregularGridAcousticNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
 
