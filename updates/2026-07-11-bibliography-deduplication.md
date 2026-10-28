@@ -4,8 +4,8 @@ The survey previously passed chronological `egbib*.bib` supplements directly to 
 
 This update generates `egbib_merged_20260711.bib` from 220 source files and keeps one highest-priority record for each of 742 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 1453
-- Case-insensitive duplicate replacements: 711
+- Parsed source records: 1454
+- Case-insensitive duplicate replacements: 712
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -524,6 +524,7 @@ This update generates `egbib_merged_20260711.bib` from 220 source files and keep
 - `oyamaPaintedReflectionDetection2025` / `oyamaPaintedReflectionDetection2025`: `egbib_merged_20260711.bib` → `egbib_20260728_vehicle_reflection_lineage.bib`
 - `shengVehicleReflectionObstacle2026` / `shengVehicleReflectionObstacle2026`: `egbib_merged_20260711.bib` → `egbib_20260728_vehicle_reflection_lineage.bib`
 - `jiUnifiedRealTimeNLOS2026` / `jiUnifiedRealTimeNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260729_transient_pretraining_holistic_nlos.bib`
+- `shenMARMOT2025` / `shenMARMOT2025`: `egbib_merged_20260711.bib` → `egbib_20260729_transient_pretraining_holistic_nlos.bib`
 - `shenHOLI1to3TPAMI2025` / `shenHOLI1to3TPAMI2025`: `egbib_merged_20260711.bib` → `egbib_20260729_transient_pretraining_holistic_nlos.bib`
 - `linCASlotNetNLOS2025` / `linCASlotNetNLOS2025`: `egbib_merged_20260711.bib` → `egbib_20260730_ca_slotnet.bib`
 - `wangAudioVisualNLOS2026` / `wangAudioVisualNLOS2026`: `egbib_merged_20260711.bib` → `egbib_20260731_audio_visual_nlos.bib`
