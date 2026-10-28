@@ -64,9 +64,25 @@ jobs:
         run: |
           grep -Fq '2610.37519' README.md
           grep -Fq '2610.37519' index.html
+          grep -Fq 'advances from 2022 through 28 October 2026' bare_jrnl.tex
+          grep -Fq '28 October 2026' README.md
+          grep -Fq '28 October 2026' index.html
           grep -Fq '2610.37519' data/papers-source.html
           grep -Fq 'mursiaDistributedHDCNLOS2026' article/5newscenes.tex
           grep -Fq 'mursiaDistributedHDCNLOS2026' egbib_2026_updates.bib
+          grep -Fq 'caiEquivariantNLOSmmWSAR2025' article/5newscenes.tex
+          grep -Fq 'yangOpenPitNLOS2026' article/5newscenes.tex
+          grep -Fq 'chenTHzDeepUnfolding2026' article/5newscenes.tex
+          grep -Fq 'okazakiNLOSPedestrianRecognition2025' article/5newscenes.tex
+          grep -Fq 'okazakiNLOSPedestrianRecognition2025' egbib_2026_updates.bib
+          grep -Fq 'fuWidebandNLOSRadarSoC2026' article/5newscenes.tex
+          grep -Fq 'fuWidebandNLOSRadarSoC2026' egbib_2026_updates.bib
+          grep -Fq 'A 1.6-to-3.8GHz Reconfigurable FMCW Radar SoC with 81.5% Relative-Bandwidth PLL for Real-Time Life Detection in Disaster Response' README.md
+          grep -Fq 'A 1.6-to-3.8GHz Reconfigurable FMCW Radar SoC with 81.5% Relative-Bandwidth PLL for Real-Time Life Detection in Disaster Response' data/papers-source.html
+          grep -Fq 'Non-Line-of-Sight Pedestrian Recognition Approach Using Multiple Reflections' README.md
+          grep -Fq 'Non-Line-of-Sight Pedestrian Recognition Approach Using Multiple Reflections' data/papers-source.html
+          ! grep -Fq 'yasmeenRISRadar2026' egbib_2026_updates.bib
+          ! grep -Fq 'sultanIteratingTLTM2024' egbib_2026_updates.bib
 
       - name: Rebuild and validate the survey PDF
         shell: bash
@@ -94,6 +110,11 @@ jobs:
               'recent advances on non-line-of-sight imaging',
               'hyperdimensional computing',
               'passive perception',
+              'self-supervised mmwave sar under multipath',
+              'blind-spot completion for open-pit mining',
+              'multiple-reflection signatures for hidden pedestrian recognition',
+              'deep-unfolded terahertz radar reconstruction',
+              'integrated wideband radar hardware for through-wall life detection',
           )
           missing = [token for token in required if token not in text]
           if missing:

@@ -114,6 +114,10 @@ Lu~\etal~introduced GeRaF, a differentiable radio-frequency inverse-rendering fr
 Wen~\etal~reconstructed hidden moving-target reflectivity from sparse ISAR apertures using clutter suppression and detail-aware regularized inverse imaging~\cite{wenSparseApertureISARNLOS2024}. Their complementary CMTI system targeted non-cooperative corner motion: after separating background clutter and NLOS echoes, a polar-format imaging chain, prominent-point-assisted autofocus, and mirror-symmetry recovery formed high-resolution two-dimensional images of hidden moving objects~\cite{wenCMTICornerMotion2025}. These target-centric radar images complement HoloRadar's scene-scale three-dimensional reconstruction and RF localization-only systems.
 
 \vspace{0.8mm}
+\noindent \textbf{Self-supervised mmWave SAR under multipath.}
+Cai~\etal~introduce an equivariant-imaging framework for two- and three-dimensional mmWave SAR reconstruction from partial NLOS echoes~\cite{caiEquivariantNLOSmmWSAR2025}. A deep-unfolded inverse solver combines total-variation constraints with an adaptive peak-convolution threshold module, using signal-distribution symmetries to learn from measured data without clean LOS training pairs. The experiments target specular, isolated hidden objects, so the method is best understood as a self-supervised reconstruction advance within a defined multipath regime rather than a universal NLOS inverse model.
+
+\vspace{0.8mm}
 \noindent \textbf{UAV-borne array-InSAR for urban-canyon NLOS relocation.}
 Lin~\etal~use a spherical-wavefront three-dimensional model for low-altitude UAV-borne array-InSAR, fit the building reflection planes, determine multipath-reachable regions, and relocate virtual NLOS targets to their physical positions~\cite{linArrayInSARNLOSTargetRelocation2024}. Simulation and real-data experiments report errors typically below 0.5~m, with a 41.62\% expansion in imageable ground range and a 76.57\% expansion in imageable 3D area. Unlike mobile mmWave systems that reconstruct room-scale geometry, this work exploits airborne SAR's volumetric urban mapping capability and explicitly corrects multipath-induced ghost locations.
 
@@ -122,12 +126,24 @@ Lin~\etal~use a spherical-wavefront three-dimensional model for low-altitude UAV
 Li~\etal~\cite{liSGNLOSTrack2025} use camera semantics and 4D radar multipath to localize hidden targets (0.419~m MAE; 80\% tracking success), rather than reconstructing full 3D scenes.
 
 \vspace{0.8mm}
+\noindent \textbf{Blind-spot completion for open-pit mining.}
+Yang~\etal~combine 4D mmWave radar with 3D LiDAR in a blind-spot complementary-fusion framework for autonomous haul trucks~\cite{yangOpenPitNLOS2026}. Geometric consistency filtering suppresses multipath-corrupted radar points and selectively adds high-confidence evidence inside LiDAR-occluded regions. Their real mine experiments quantify partial target-envelope evidence with a volume-recovery proxy; this is practical NLOS perception, not full hidden-surface reconstruction.
+
+\vspace{0.8mm}
+\noindent \textbf{Multiple-reflection signatures for hidden pedestrian recognition.}
+Okazaki~\etal~use complex slow-time measurements from a 24~GHz FMCW radar to distinguish a pedestrian from a dummy in a real-road NLOS setting~\cite{okazakiNLOSPedestrianRecognition2025}. Rather than relying on weak diffraction alone, the method exploits stronger multiple-scattering signatures and classifies their temporal features with SVM or LSTM models. The output is target recognition rather than an image, but the study shows how human micro-motion can remain observable through multipath.
+
+\vspace{0.8mm}
 \noindent \textbf{Cellular ISAC hardware for NLOS sensing.}
 A complementary 5G/6G ISAC trajectory asks whether communication hardware can use multipath as an around-corner sensor rather than treating it only as a channel impairment. Tosi~\etal~first demonstrated the feasibility of NLOS target detection with a 27.4~GHz commercial mmWave ISAC proof-of-concept, including channel-state-information processing that suppresses spectral replicas caused by time-division-duplex gaps~\cite{tosiFeasibilityISACNLOS2024}. The later ICT study moved from feasibility to reliable intrusion monitoring of fully occluded moving targets, adding range--Doppler detection and probability-hypothesis-density filtering for tracking and false-alarm rejection in an industrial testbed~\cite{tosiReliableISACNLOS2026}. Together, these works connect radar NLOS with standards-compatible cellular infrastructure and show a deployment path in which communication radios become opportunistic hidden-region sensors.
 
 \vspace{0.8mm}
 \noindent \textbf{Distributed passive-object sensing beyond the robot field of view.}
 Mursia~\etal~extend the ISAC/NLOS branch from active radar returns toward passive perception from distributed communication-channel measurements~\cite{mursiaDistributedHDCNLOS2026}. Their framework embeds multi-device channel features in high-dimensional representations and performs risk-aware classification with hyperdimensional computing, avoiding explicit channel reconstruction; ray-tracing simulations and ROS-based smart-factory tests report up to 89\% accuracy under severe occlusion. This is best classified as adjacent NLOS object sensing and robot safety rather than hidden-scene image or 3D-shape reconstruction, but it broadens the modality frontier toward infrastructure-assisted perception beyond a robot's direct field of view.
+
+\vspace{0.8mm}
+\noindent \textbf{Integrated wideband radar hardware for through-wall life detection.}
+Fu~\etal~present a 1.6--3.8~GHz FMCW radar system-on-chip for real-time NLOS life detection in disaster-response settings~\cite{fuWidebandNLOSRadarSoC2026}. Implemented in 40-nm CMOS, the 7.65~mm$^2$ chip integrates a wide-relative-bandwidth PLL and an on-chip RISC-V processing core, with reported detection of people behind up to six walls and vital signs behind two while consuming 0.395~W. This is a hardware and through-wall sensing milestone rather than a hidden-image reconstruction method, but it expands the deployable RF NLOS frontier.
 
 A parallel RF/mmWave lineage has progressively broadened the task from around-corner localization to practical hidden-shape and full-scene reconstruction. CornerRadar learned a propagation hint map for robust indoor localization across diverse layouts~\cite{yueCornerRadar2022}, while Mosaic exploited curved and planar urban reflectors to widen automotive-radar blind-spot coverage~\cite{woodfordMosaic2022}. RFlect then used practical environmental reflectors, including poles and curved/composite surfaces, for around-corner shape imaging~\cite{doddsRFlect2024}. The geometry branch advanced with mmNorm, which estimates mmWave surface normals and integrates them into hidden 3D shape~\cite{doddsMmNorm2025}, and with Jeon~\etal, who infer T-junction layout from static radar points and ray-trace dynamic multipath to localize multiple hidden pedestrians in measured outdoor scenes~\cite{jeonTJunctionMmWaveNLOS2025}. Attention-based BiScalar-AA and its related two-stage attention network convert sparse radar points to pseudo-images for learned NLOS object detection and tracking~\cite{yuBiScalarAA2025,yuTSANNLOS2025}. Most recently, Wave-Former introduced physics-aware wireless shape completion for complete 3D geometry of fully occluded objects~\cite{doddsWaveFormer2026}, whereas RISE combines AoA/AoD multipath enhancement with hierarchical diffusion for layout reconstruction and object detection from a single static radar~\cite{zhouRISE2026}. Together, these works show a clear RF trajectory from point localization, through reflector-aware imaging and surface-normal recovery, to learned full-object and scene-level geometry.
 
@@ -308,6 +324,10 @@ A parallel 2026 trend is the use of consumer or low-cost LiDAR hardware for NLOS
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Terahertz NLOS Imaging}
 \subsection{Terahertz NLOS Imaging}
 Terahertz and sub-terahertz waves provide another route to around-obstacle perception. Cui and Trichopoulos~\cite{cuiActiveTHzNLOS2024} showed that building surfaces can act as lossy mirrors for sub-THz signals, enabling hidden-object reconstruction by mirror-folding the propagation geometry around the obstacle. This modality sits between optical and RF NLOS: it has shorter wavelength and potentially higher spatial resolution than many RF systems, while still interacting with common environmental surfaces in a way that can be exploited for around-corner imaging.
+
+\vspace{0.8mm}
+\noindent \textbf{Deep-unfolded terahertz radar reconstruction.}
+Chen~\etal~advance model-driven THz NLOS imaging with a measured 121~GHz radar platform~\cite{chenTHzDeepUnfolding2026}. Their FISTA-Net embeds a fast frequency-domain imaging operator and a multipath echo model to suppress phase error, aperture shadowing, and clutter without explicitly storing a prohibitively large sensing matrix. This work extends around-corner radar from RF reflection geometry toward learned, computationally efficient 3D reconstruction at shorter wavelengths.
 
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{NLOS Human Pose Estimation}
 \subsection{NLOS Human Pose Estimation}
