@@ -59,17 +59,30 @@ def append_timeline_sentence(text: str, year: int, marker: str, sentence: str) -
     lines = text.splitlines(keepends=True)
     needle = f'<div class="year">{year}</div>'
     matches = [i for i, line in enumerate(lines) if needle in line]
-    if len(matches) != 1:
-        raise RuntimeError(f"Expected one homepage timeline row for {year}, found {len(matches)}")
-    line = lines[matches[0]]
-    closing = "</p></div></div>"
-    if closing not in line:
-        raise RuntimeError(f"Homepage timeline row for {year} has an unexpected structure")
-    ending = "\n" if line.endswith("\n") else ""
-    core = line[:-1] if ending else line
-    core = core.replace(closing, " " + sentence + closing, 1)
-    lines[matches[0]] = core + ending
-    return "".join(lines)
+    if len(matches) == 1:
+        line = lines[matches[0]]
+        closing = "</p></div></div>"
+        if closing not in line:
+            raise RuntimeError(f"Homepage timeline row for {year} has an unexpected structure")
+        ending = "\n" if line.endswith("\n") else ""
+        core = line[:-1] if ending else line
+        core = core.replace(closing, " " + sentence + closing, 1)
+        lines[matches[0]] = core + ending
+        return "".join(lines)
+    if len(matches) > 1:
+        raise RuntimeError(f"Expected at most one homepage timeline row for {year}, found {len(matches)}")
+
+    # The current homepage uses dated narrative paragraphs rather than the old
+    # year-row markup. Keep these older synchronization scripts compatible with
+    # the current layout by appending an idempotent note to the timeline block.
+    anchor = '</div></section>\n<section class="section" id="explorer">'
+    if anchor not in text:
+        raise RuntimeError("Current homepage timeline insertion anchor is missing")
+    paragraph = (
+        f'<p class="small" style="margin:12px 0"><strong>{year} · {marker}:</strong> '
+        f'{sentence}</p>'
+    )
+    return text.replace(anchor, paragraph + anchor, 1)
 
 
 def update_readme() -> None:
