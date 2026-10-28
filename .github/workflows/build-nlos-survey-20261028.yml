@@ -67,6 +67,15 @@ jobs:
           grep -Fq '2610.37519' data/papers-source.html
           grep -Fq 'mursiaDistributedHDCNLOS2026' article/5newscenes.tex
           grep -Fq 'mursiaDistributedHDCNLOS2026' egbib_2026_updates.bib
+          grep -Fq 'caiEquivariantNLOSmmWSAR2025' article/5newscenes.tex
+          grep -Fq 'yangOpenPitNLOS2026' article/5newscenes.tex
+          grep -Fq 'chenTHzDeepUnfolding2026' article/5newscenes.tex
+          grep -Fq 'okazakiNLOSPedestrianRecognition2025' article/5newscenes.tex
+          grep -Fq 'okazakiNLOSPedestrianRecognition2025' egbib_2026_updates.bib
+          grep -Fq 'Non-Line-of-Sight Pedestrian Recognition Approach Using Multiple Reflections' README.md
+          grep -Fq 'Non-Line-of-Sight Pedestrian Recognition Approach Using Multiple Reflections' data/papers-source.html
+          ! grep -Fq 'yasmeenRISRadar2026' egbib_2026_updates.bib
+          ! grep -Fq 'sultanIteratingTLTM2024' egbib_2026_updates.bib
 
       - name: Rebuild and validate the survey PDF
         shell: bash
