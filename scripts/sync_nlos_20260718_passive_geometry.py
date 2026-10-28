@@ -59,17 +59,30 @@ def append_timeline_sentence(text: str, year: int, marker: str, sentence: str) -
     lines = text.splitlines(keepends=True)
     needle = f'<div class="year">{year}</div>'
     matches = [i for i, line in enumerate(lines) if needle in line]
-    if len(matches) != 1:
-        raise RuntimeError(f"Expected one homepage timeline row for {year}, found {len(matches)}")
-    line = lines[matches[0]]
-    closing = "</p></div></div>"
-    if closing not in line:
-        raise RuntimeError(f"Homepage timeline row for {year} has an unexpected structure")
-    ending = "\n" if line.endswith("\n") else ""
-    core = line[:-1] if ending else line
-    core = core.replace(closing, " " + sentence + closing, 1)
-    lines[matches[0]] = core + ending
-    return "".join(lines)
+    if len(matches) == 1:
+        line = lines[matches[0]]
+        closing = "</p></div></div>"
+        if closing not in line:
+            raise RuntimeError(f"Homepage timeline row for {year} has an unexpected structure")
+        ending = "\n" if line.endswith("\n") else ""
+        core = line[:-1] if ending else line
+        core = core.replace(closing, " " + sentence + closing, 1)
+        lines[matches[0]] = core + ending
+        return "".join(lines)
+    if len(matches) > 1:
+        raise RuntimeError(f"Expected at most one homepage timeline row for {year}, found {len(matches)}")
+
+    # The current homepage uses dated narrative paragraphs rather than the old
+    # year-row markup. Keep these older synchronization scripts compatible with
+    # the current layout by appending an idempotent note to the timeline block.
+    anchor = '</div></section>\n<section class="section" id="explorer">'
+    if anchor not in text:
+        raise RuntimeError("Current homepage timeline insertion anchor is missing")
+    paragraph = (
+        f'<p class="small" style="margin:12px 0"><strong>{year} · {marker}:</strong> '
+        f'{sentence}</p>'
+    )
+    return text.replace(anchor, paragraph + anchor, 1)
 
 
 def update_readme() -> None:
@@ -130,6 +143,10 @@ def update_index() -> None:
     path = ROOT / "index.html"
     text = path.read_text(encoding="utf-8")
     text = text.replace(DATE_OLD, DATE_NEW)
+    # The current homepage loads paper records from data/papers-source.html;
+    # keep the narrative timeline in index.html but mutate the catalog source here.
+    source_path = ROOT / "data/papers-source.html"
+    source_text = source_path.read_text(encoding="utf-8")
 
     geometry_obj = paper_object(
         GEOMETRY,
@@ -140,9 +157,9 @@ def update_index() -> None:
         "latest active reconstruction",
         "Shape-operator regularization controls hidden surface-normal variation during joint albedo and normal recovery, improving geometric detail while substantially reducing optimization cost.",
     )
-    if f'title:"{GEOMETRY_OLD}"' in text:
-        text = replace_line_containing(text, f'title:"{GEOMETRY_OLD}"', geometry_obj, "homepage geometry venue correction")
-    elif f'title:"{GEOMETRY}"' not in text:
+    if f'title:"{GEOMETRY_OLD}"' in source_text:
+        source_text = replace_line_containing(source_text, f'title:"{GEOMETRY_OLD}"', geometry_obj, "paper-source geometry venue correction")
+    elif f'title:"{GEOMETRY}"' not in source_text:
         raise RuntimeError("Existing geometry-constrained homepage record is missing")
 
     objects = [
@@ -177,11 +194,11 @@ def update_index() -> None:
     inserted = 0
     new_lines = ""
     for obj, title in zip(objects, (PASSIVE_10M, HPDI, SUPERFOV)):
-        if f'title:"{title}"' not in text:
+        if f'title:"{title}"' not in source_text:
             new_lines += obj + "\n"
             inserted += 1
     if new_lines:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + new_lines, "homepage paper array")
+        source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + new_lines, "paper-source array")
 
     if inserted:
         pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
@@ -204,6 +221,7 @@ def update_index() -> None:
         "HPDI adaptively fuses physics-informed and implicit data-driven passive reconstruction, geometry-constrained inversion regularizes hidden surface normals with a shape operator, and translated-PSF spatial encoding expands transient NLOS beyond the physical detection region.",
     )
     path.write_text(text, encoding="utf-8")
+    source_path.write_text(source_text, encoding="utf-8")
 
 
 def update_passive() -> None:

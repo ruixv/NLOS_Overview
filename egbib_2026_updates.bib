@@ -1,8 +1,9 @@
-% Additional 2021--2026 NLOS references integrated during the June 2026 update cycle.
-% To include these entries in the survey build, change bare_jrnl.tex from
-%   \bibliography{egbib}
-% to
-%   \bibliography{egbib,egbib_2026_updates,egbib_20260701_updates}
+% Supplemental NLOS bibliography source (2021--2026).
+% This file is merged by scripts/merge_nlos_bibliography.py into
+% egbib_merged_20260711.bib, the bibliography database used by bare_jrnl.tex.
+% Prefer final published venues when verified; retain arXiv as a source link
+% only when no final venue can be verified.
+
 
 @article{wangPicosecondNLOS2021,
   title   = {Non-line-of-sight imaging with picosecond temporal resolution},
@@ -65,15 +66,6 @@
   url     = {https://arxiv.org/abs/2404.05977}
 }
 
-@misc{rajiSoftShadowDiffusion2026,
-  title   = {Soft Shadow Diffusion (SSD): Physics-inspired Learning for 3D Computational Periscopy},
-  author  = {Raji, Fadlullah and Murray-Bruce, John},
-  year    = {2026},
-  eprint  = {2601.12257},
-  archivePrefix = {arXiv},
-  url     = {https://arxiv.org/abs/2601.12257}
-}
-
 @misc{sultanIteratingTLTM2024,
   title   = {Iterating the Transient Light Transport Matrix for Non-Line-of-Sight Imaging},
   author  = {Sultan, Talha and Brandt, Eric and Masumnia-Bisheh, Khadijeh and Riccardo, Simone and Polynkin, Pavel and Tosi, Alberto and Velten, Andreas},
@@ -112,15 +104,6 @@
   eprint  = {2401.06891},
   archivePrefix = {arXiv},
   url     = {https://arxiv.org/abs/2401.06891}
-}
-
-@misc{shenMARMOT2025,
-  title   = {MARMOT: Masked Autoencoder for Modeling Transient Imaging},
-  author  = {Shen, Siye and others},
-  year    = {2025},
-  eprint  = {2506.08470},
-  archivePrefix = {arXiv},
-  url     = {https://arxiv.org/abs/2506.08470}
 }
 
 @misc{liTRT2025,
@@ -369,3 +352,27 @@
   note      = {Accepted; to appear. arXiv:2610.37519, submitted 27 October 2026},
   url       = {https://arxiv.org/abs/2610.37519}
 }
+
+@inproceedings{rajiSoftShadowDiffusion2024,
+  author    = {Raji, Fadlullah A. and Murray-Bruce, John},
+  booktitle = {Computer Vision -- ECCV 2024},
+  doi       = {10.1007/978-3-031-72989-8_22},
+  pages     = {382--400},
+  publisher = {Springer Nature Switzerland},
+  series    = {Lecture Notes in Computer Science},
+  title     = {{Soft Shadow Diffusion (SSD): Physics-Inspired Learning for 3D Computational Periscopy}},
+  url       = {https://doi.org/10.1007/978-3-031-72989-8_22},
+  year      = {2024}
+}
+
+@article{shen2026marmot,
+  author  = {Shen, Siyuan and Wang, Ziheng and Peng, Xingyue and Li, Ruiqian and Sun, Qilin and Li, Shiying and Yu, Jingyi},
+  doi     = {10.1007/s44267-026-00125-1},
+  journal = {Visual Intelligence},
+  pages   = {22},
+  title   = {{MARMOT}: Masked Autoencoder for Modeling Transient Imaging},
+  url     = {https://doi.org/10.1007/s44267-026-00125-1},
+  volume  = {4},
+  year    = {2026}
+}
+

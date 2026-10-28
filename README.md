@@ -26,6 +26,8 @@
 
 ---
 
+> **28 October 2026 citation-trace audit:** Forward-citation checks of the field-defining active, passive, transient-learning, acoustic, radar/RF, and consumer-LiDAR papers found no additional verified paper missing from the catalog. The survey now cites MARMOT through its final *Visual Intelligence* (2026) record; the later arXiv upload of Soft Shadow Diffusion is not treated as a separate paper from its ECCV 2024 publication. See [the audit note](updates/2026-10-28-core-citation-audit.md).
+
 ## What is NLOS Imaging?
 
 **Non-Line-of-Sight (NLOS) imaging** reconstructs or senses hidden scenes that cannot be directly observed — for example, around corners, behind walls, inside occluded spaces, or through scattering/opaque media. The key idea is that light, sound, radio-frequency waves, or other signals interact with visible relay surfaces, hidden objects, tags, or environmental reflectors; the indirect measurements encode recoverable information about hidden geometry, albedo, motion, identity, or position.
