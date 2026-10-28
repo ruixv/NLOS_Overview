@@ -404,6 +404,10 @@ Similarly, fusing the surface reconstruction into the convolution kernel of the 
 \noindent \textbf{Geometric constraints on hidden surface normals.}
 Liu~\etal~extended the LCT/DLCT line toward sparse and short-exposure surface reconstruction by jointly optimizing transient consistency, volumetric albedo, and projected depth/albedo maps~\cite{liuGeometricConstrainedNLOS2025}. Instead of estimating a free three-dimensional normal field, their model regularizes the Frobenius norm of the shape operator of the depth map, directly constraining spatial variation of hidden-surface normals while retaining geometric detail. This reduces the dimensional burden of joint albedo--normal estimation and, on measurements acquired within 15 seconds, was reported to recover more accurate surfaces with roughly a thirty-fold speedup over a prior surface-reconstruction baseline. The method marks a model-based trajectory complementary to neural implicit surfaces: stronger geometric priors can make under-sampled transient inversion both more detailed and computationally practical.
 
+\vspace{0.8mm}
+\noindent \textbf{Structure-sparse directional light-cone inversion.}
+Huang~\etal~added nuclear-norm structure-sparsity regularization to the directional light-cone transform (DLCT), exploiting neighborhood structure in directional albedo and solving the resulting objective with FISTA~\cite{huangStructureSparsityNLOS2023}. Their synthetic and experimental results show improved reconstruction under low-SNR and short-exposure conditions. Complementing explicit normal-field constraints, this approach regularizes the structure of the albedo representation itself, stabilizing transient inversion without introducing a full surface parameterization.
+
 The above methods restore the surface of the hidden object directly, while other methods adopt the concept of reverse rendering, i.e., to reconstruct the hidden surface by finding the surface parameters (such as BRDF and surface normal) of the hidden object that can fit the measurement data. Considering that accurate reverse rendering methods are time-consuming, a differential renderer can be used to speed up rendering\cite{tsaiVolumetricAlbedoSurface2019}.
 
 \begin{figure*}[!h]
@@ -520,6 +524,14 @@ Surface orientation supplies geometric and illumination cues that are discarded 
 Iseringhausen and Hullin established an early physically grounded inverse-rendering formulation for transient NLOS surface reconstruction~\cite{iseringhausen:2018}. Instead of backprojecting measurements into an unoriented voxel volume, their method represents the hidden object as an implicit level-set surface, renders wall--object--wall transport with a custom GPU transient renderer, and globally optimizes the scene to match measured transients. The forward model explicitly includes surface orientation, BRDF-dependent scattering, shading, visibility, and self-occlusion, allowing detailed recovery under substantial noise and non-diffuse reflectance. This analysis-by-synthesis milestone supplied the conceptual and computational bridge from surface optimization to later differentiable transient renderers, neural transient fields, self-calibrating inverse rendering, and Gaussian transient scene representations.
 
 \vspace{0.8mm}
+\noindent \textbf{Joint scene reconstruction and scan autocalibration.}
+Sadhu~\etal~made the ToF forward model differentiable with respect to hidden-scene albedo and virtual illumination/detection coordinates, allowing a single measurement-residual objective to jointly recover scene content and correct relay-wall misregistration~\cite{sadhuAutomaticCalibrationToFNLOS2021}. Their arXiv study reports recognizable reconstructions on synthetic and real measurements under calibration errors that defeat fixed-geometry baselines. This early result establishes calibration as part of the inverse problem, preceding later path-space approaches that jointly tune additional optical and temporal parameters.
+
+\vspace{0.8mm}
+\noindent \textbf{General differentiable transient rendering.}
+Yi~\etal~derived a physically based differentiable transient path-integral framework using a generalized transport theorem and a correlated-importance term to handle time-of-flight coupling and discontinuities~\cite{yiDifferentiableTransientRendering2022}. Beyond general transient inverse problems, they demonstrated optimization and NLOS tracking with non-planar relay walls and around two corners. Published in ACM Transactions on Graphics, this general renderer provides the differentiable light-transport foundation that later NLOS-specific renderers optimized for practical runtime.
+
+\vspace{0.8mm}
 \noindent \textbf{Fast differentiable transient rendering.}
 Plack~\etal~introduced a physically based differentiable transient renderer tailored to NLOS reconstruction~\cite{plackFastDifferentiableTransient2023}. By making gradients through time-resolved light transport efficient enough for consumer hardware, their analysis-by-synthesis pipeline reduces inverse-rendering runtimes from hours to minutes while improving optimization stability. The same renderer also supports self-supervised learning, forming an important bridge between explicit transient inverse rendering and later self-calibrating or learned NLOS reconstruction pipelines.
 
@@ -545,6 +557,10 @@ Two works extend frequency-domain NLOS reconstruction without assuming that acqu
 
 Besides, Liu~ \etal~\cite{liuPhasorFieldDiffraction2020,liuVirtualWaveOptics2018}~and Reza~\etal~\cite{rezaPhasorFieldWaves2019}~introduced virtual wave phasor to NLOS imaging. Based on the phasor field, NLOS imaging can be transformed into a LOS optical imaging problem and then solved by the existing algorithm in diffraction imaging. 
 Different from other methods, phasor field methods~\cite{liuPhasorFieldDiffraction2020,liuVirtualWaveOptics2018} transform the relay wall into a virtual aperture (or lens of any LOS system). The reconstruction is the diffraction integral of the wavefront of the virtual aperture, which is equivalent to the forward propagation process of the measurement data. Therefore, phasor field methods~\cite{liuPhasorFieldDiffraction2020,liuVirtualWaveOptics2018} do not need to reverse the forward process like inverse methods~\cite{otooleConfocalNonlineofsightImaging2018,veltenRecoveringThreedimensionalShape2012} -- they can directly complete the reconstruction through wavefront propagation.
+
+\vspace{0.8mm}
+\noindent \textbf{Partial-coherence limits of phasor-field imaging.}
+Reza, Bauer, and Velten quantified how partial spatial coherence of the optical carrier creates a spurious phasor-field component that is absent from the ideal incoherent Huygens-like integral~\cite{rezaPartialCoherencePhasor2020}. By relating the error to relay-aperture roughness and defining a phasor-field signal-to-noise measure, their analysis turns coherence from an implicit modeling assumption into a practical validity condition for wave-based NLOS reconstruction. It therefore complements the ideal virtual-aperture model with a way to reason about when real optical systems may depart from it.
 
 \vspace{0.8mm}
 \noindent \textbf{Virtual light-transport analysis.}
