@@ -26,7 +26,7 @@
 
 ---
 
-> **29 October 2026 survey-gap audit:** Forward-citation and publisher-index checks found several recent works already cataloged in the README/Paper Explorer but not yet cited in the survey body. The survey source now integrates Cascaded NLOS (ACM TOG/SIGGRAPH Asia 2026), MD-NLOS (*iScience* 2026), learned LCT (*Physical Review Applied* 2026), Quasi-Fresnel inversion (*Optica* 2026), trapezoidal-grid reconstruction (ICCP 2026), MALCT (arXiv:2610.22847; no final venue verified), TransVID (*Optics Express* 2026), passive MDUNet/DAAM/SGATV/HPDI, low-cost NIR raster scanning (IEEE ICEE 2025), and X-band radar NLOS (CVPR 2026). No duplicate catalog records were created; PDF/build status will be recorded only after the automated validation succeeds. See [the survey-gap audit note](updates/2026-10-29-survey-gap-integration.md).
+> **29 October 2026 survey-gap audit:** A cross-chapter check against the paper catalog, update logs, and citation keys found two genuine survey omissions: diffuse-aware attention (DAAM) for passive NLOS and CVPR 2026 X-band radar NLOS imaging. Both are now integrated into their semantically appropriate survey sections. Recent methods including Cascaded NLOS, MD-NLOS, learned LCT, Quasi-Fresnel inversion, trapezoidal-grid reconstruction, MALCT, TransVID, MDUNet, SGATV, HPDI, NIR raster scanning, transient simulation, TRT/NANO, TriNLOS, NLOS-MT, NLOSdiffuser, D-NeSF, and RIS-assisted radar demo were confirmed already cited in the active, passive, data-driven, or new-scenes chapters, so no duplicate prose or catalog entries were added. See [the survey-gap audit note](updates/2026-10-29-survey-gap-integration.md).
 
 ## What is NLOS Imaging?
 
