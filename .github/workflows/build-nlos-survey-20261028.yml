@@ -1,0 +1,136 @@
+name: Build and validate NLOS survey PDF
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'README.md'
+      - 'index.html'
+      - 'data/papers-source.html'
+      - 'article/**/*.tex'
+      - 'bare_jrnl.tex'
+      - 'egbib*.bib'
+      - 'updates/2026-10-28-distributed-hdc-nlos.md'
+      - '.github/workflows/build-nlos-survey-20261028.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'README.md'
+      - 'index.html'
+      - 'data/papers-source.html'
+      - 'article/**/*.tex'
+      - 'bare_jrnl.tex'
+      - 'egbib*.bib'
+      - 'updates/2026-10-28-distributed-hdc-nlos.md'
+      - '.github/workflows/build-nlos-survey-20261028.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install bibliography parser
+        run: python -m pip install bibtexparser==1.4.3
+
+      - name: Merge bibliography and audit cited keys
+        run: |
+          python scripts/merge_nlos_bibliography.py
+          if grep -Eq 'Truly missing citation keys: [1-9][0-9]*' updates/2026-07-11-bibliography-deduplication.md; then
+            echo 'The survey contains citation keys with no bibliography record.' >&2
+            exit 1
+          fi
+
+      - name: Install LaTeX and PDF validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y latexmk texlive-latex-extra texlive-fonts-recommended texlive-science texlive-pictures texlive-publishers texlive-bibtex-extra poppler-utils
+
+      - name: Rebuild and validate the survey PDF
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f bare_jrnl.pdf bare_jrnl.aux bare_jrnl.bbl bare_jrnl.blg bare_jrnl.log bare_jrnl.out bare_jrnl.toc
+          latexmk -pdf -interaction=nonstopmode -halt-on-error bare_jrnl.tex > /tmp/latexmk.log 2>&1
+          test -s bare_jrnl.pdf
+          test -s bare_jrnl.bbl
+          pdfinfo bare_jrnl.pdf > /tmp/pdfinfo.txt
+          pdftotext -layout bare_jrnl.pdf /tmp/bare_jrnl.txt
+          if grep -Eiq 'Citation .* undefined|There were undefined references|undefined citations' bare_jrnl.log; then
+            echo 'Undefined citations/references remain in bare_jrnl.log.' >&2
+            exit 1
+          fi
+          if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then
+            echo 'BibTeX reports a missing or repeated entry.' >&2
+            exit 1
+          fi
+          grep -Fq 'mursiaDistributedHDCNLOS2026' bare_jrnl.bbl
+          python - <<'PY'
+          from pathlib import Path
+          text = ' '.join(Path('/tmp/bare_jrnl.txt').read_text(encoding='utf-8', errors='ignore').split()).casefold()
+          required = (
+              'recent advances on non-line-of-sight imaging',
+              'hyperdimensional computing',
+              'passive object sensing',
+          )
+          missing = [token for token in required if token not in text]
+          if missing:
+              raise SystemExit('Required survey text missing from generated PDF: ' + ', '.join(missing))
+          print('PDF text validation passed for the survey title and the new HDC/ISAC citation.')
+          PY
+
+      - name: Record build result in the audit note
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          import re
+          info = Path('/tmp/pdfinfo.txt').read_text(encoding='utf-8', errors='ignore')
+          pages = re.search(r'^Pages:\s+(\d+)', info, re.M).group(1)
+          pdf_bytes = Path('bare_jrnl.pdf').stat().st_size
+          p = Path('updates/2026-10-28-distributed-hdc-nlos.md')
+          text = p.read_text(encoding='utf-8')
+          text = re.sub(r'\n## Build verification[\s\S]*$', '', text)
+          text += (
+              '\n\n## Build verification\n\n'
+              'Result: successful clean LaTeX/BibTeX rebuild. bare_jrnl.pdf was regenerated; '
+              'undefined citations/references and missing/repeated BibTeX records were not detected. '
+              'The new citation key and HDC/passive-object-sensing text were verified in the output. '
+              f'PDF pages: {pages}; size: {pdf_bytes:,} bytes. '
+              f'Workflow run: https://github.com/{os.environ.get("GITHUB_REPOSITORY", "")}/actions/runs/{os.environ.get("GITHUB_RUN_ID", "")}.\n'
+          )
+          p.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit regenerated survey artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add bare_jrnl.pdf bare_jrnl.tex egbib_merged_20260711.bib updates/2026-07-11-bibliography-deduplication.md updates/2026-10-28-distributed-hdc-nlos.md
+          if git diff --cached --quiet; then
+            echo 'The generated survey artifacts are already current.'
+            exit 0
+          fi
+          git commit -m '[skip ci] Rebuild NLOS survey PDF after literature update'
+          if [ "$GITHUB_EVENT_NAME" = 'pull_request' ]; then
+            target="$GITHUB_HEAD_REF"
+          else
+            target='master'
+          fi
+          git push origin "HEAD:$target"
