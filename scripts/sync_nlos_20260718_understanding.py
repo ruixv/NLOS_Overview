@@ -57,17 +57,24 @@ def paper_object(paper: dict[str, object]) -> str:
 
 
 def append_to_timeline_year(text: str, year: int, sentence: str) -> str:
+    if sentence.strip() in text:
+        return text
     lines = text.splitlines(keepends=True)
     matches = [i for i, line in enumerate(lines) if f'<div class="year">{year}</div>' in line]
-    if len(matches) != 1:
-        raise RuntimeError(f"Expected one homepage timeline row for {year}, found {len(matches)}")
-    if sentence.strip() not in lines[matches[0]]:
+    if len(matches) == 1:
         closing = "</p></div></div>"
-        if closing not in lines[matches[0]]:
+        line = lines[matches[0]]
+        if closing not in line:
             raise RuntimeError(f"Timeline closing marker missing for {year}")
-        lines[matches[0]] = lines[matches[0]].replace(closing, " " + sentence.strip() + closing, 1)
-    return "".join(lines)
-
+        lines[matches[0]] = line.replace(closing, " " + sentence.strip() + closing, 1)
+        return "".join(lines)
+    if len(matches) > 1:
+        raise RuntimeError(f"Expected at most one homepage timeline row for {year}, found {len(matches)}")
+    anchor = '</div></section>\n<section class="section" id="explorer">'
+    if anchor not in text:
+        raise RuntimeError("Current homepage timeline insertion anchor is missing")
+    paragraph = f'<p class="small" style="margin:12px 0"><strong>{year} · NLOS understanding:</strong> {sentence.strip()}</p>'
+    return text.replace(anchor, paragraph + anchor, 1)
 
 def update_readme() -> None:
     path = ROOT / "README.md"
@@ -98,15 +105,17 @@ def update_readme() -> None:
 def update_index() -> None:
     path = ROOT / "index.html"
     text = path.read_text(encoding="utf-8")
-    additions = [paper_object(p) for p in PAPERS if f'title:"{p["title"]}"' not in text]
+    source_path = ROOT / "data/papers-source.html"
+    source_text = source_path.read_text(encoding="utf-8")
+    additions = [paper_object(p) for p in PAPERS if f'title:"{p["title"]}"' not in source_text]
     if additions:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + "\n".join(additions) + "\n", "homepage paper array")
+        source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + "\n".join(additions) + "\n", "paper-source array")
 
     stat_pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
     match = stat_pattern.search(text)
     if not match:
         raise RuntimeError("Homepage tracked-entry statistic not found")
-    expected = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', text, flags=re.MULTILINE))
+    expected = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', source_text, flags=re.MULTILINE))
     current = int(match.group(2))
     if current != expected:
         text = stat_pattern.sub(lambda m: m.group(1) + str(expected) + m.group(3), text, count=1)
@@ -122,7 +131,7 @@ def update_index() -> None:
         "NCR-MVC and QSS-Net broadened learned NLOS from reconstruction toward photon-robust clustering and efficient semantic classification.",
     )
     path.write_text(text, encoding="utf-8")
-
+    source_path.write_text(source_text, encoding="utf-8")
 
 def insert_passive_table_row(text: str) -> str:
     if "sunAdaptiveMotionNLOS2025" in text:
