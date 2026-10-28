@@ -127,15 +127,33 @@ def update_index() -> None:
     # root index.html is a compact overview and no longer contains the legacy array.
     path = ROOT / "data/papers-source.html"
     text = path.read_text(encoding="utf-8")
+
+    # Keep this synchronizer idempotent across older Paper Explorer snapshots:
+    # preserve one object per title (case-insensitively) and remove stale duplicates.
+    lines = text.splitlines(keepends=True)
+    seen: set[str] = set()
+    for i, line in enumerate(lines):
+        for paper in PAPERS:
+            title = str(paper["title"])
+            token = 'title:"' + title + '"'
+            if token.casefold() in line.casefold():
+                folded = title.casefold()
+                if folded in seen:
+                    lines[i] = ""
+                else:
+                    seen.add(folded)
+                break
+    text = "".join(lines)
+
     new_lines = ""
     for paper in PAPERS:
-        if f'title:"{paper["title"]}"' not in text:
+        token = 'title:"' + str(paper["title"]) + '"'
+        if token.casefold() not in text.casefold():
             new_lines += paper_object(paper) + "\n"
     if new_lines:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + new_lines, "homepage paper array")
+        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + new_lines, "Paper Explorer paper array")
     text = append_homepage_timeline(text)
     path.write_text(text, encoding="utf-8")
-
 
 def update_active() -> None:
     path = ROOT / "article/2active.tex"
@@ -185,8 +203,9 @@ def validate() -> None:
         key = str(paper["key"])
         if files["readme"].lower().count("[" + title.lower() + "]") != 1:
             raise RuntimeError(f"README entry missing or duplicated: {title}")
-        if files["index"].lower().count('title:"' + title.lower() + '"') != 1:
-            raise RuntimeError(f"Homepage entry missing or duplicated: {title}")
+        index_count = files["index"].lower().count('title:"' + title.lower() + '"')
+        if index_count != 1:
+            raise RuntimeError(f"Paper Explorer entry count for {title}: {index_count}")
         if key not in files["active"]:
             raise RuntimeError(f"Survey citation missing: {key}")
         if files["bib"].lower().count("{" + key.lower() + ",") != 1:
