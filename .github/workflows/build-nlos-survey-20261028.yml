@@ -72,6 +72,10 @@ jobs:
           grep -Fq 'chenTHzDeepUnfolding2026' article/5newscenes.tex
           grep -Fq 'okazakiNLOSPedestrianRecognition2025' article/5newscenes.tex
           grep -Fq 'okazakiNLOSPedestrianRecognition2025' egbib_2026_updates.bib
+          grep -Fq 'fuWidebandNLOSRadarSoC2026' article/5newscenes.tex
+          grep -Fq 'fuWidebandNLOSRadarSoC2026' egbib_2026_updates.bib
+          grep -Fq 'A 1.6-to-3.8GHz Reconfigurable FMCW Radar SoC with 81.5% Relative-Bandwidth PLL for Real-Time Life Detection in Disaster Response' README.md
+          grep -Fq 'A 1.6-to-3.8GHz Reconfigurable FMCW Radar SoC with 81.5% Relative-Bandwidth PLL for Real-Time Life Detection in Disaster Response' data/papers-source.html
           grep -Fq 'Non-Line-of-Sight Pedestrian Recognition Approach Using Multiple Reflections' README.md
           grep -Fq 'Non-Line-of-Sight Pedestrian Recognition Approach Using Multiple Reflections' data/papers-source.html
           ! grep -Fq 'yasmeenRISRadar2026' egbib_2026_updates.bib
