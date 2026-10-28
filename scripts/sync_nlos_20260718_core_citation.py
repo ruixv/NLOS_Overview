@@ -208,21 +208,25 @@ def update_index() -> None:
     text = path.read_text(encoding="utf-8")
     text = text.replace("17 July 2026", DATE)
 
+    # The paper explorer moved to data/papers-source.html. Keep the dated
+    # narrative timeline on the homepage, but insert catalog records in the
+    # actual source array so the counter and explorer remain aligned.
+    source_path = ROOT / "data/papers-source.html"
+    source_text = source_path.read_text(encoding="utf-8")
+    source_text = source_text.replace("17 July 2026", DATE)
+
     new_lines = ""
-    inserted = 0
     for paper in PAPERS:
-        if f'title:"{paper["title"]}"' in text:
+        if f'title:"{paper["title"]}"' in source_text:
             continue
         new_lines += paper_object(paper) + "\n"
-        inserted += 1
     if new_lines:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + new_lines, "homepage paper array")
-    if inserted:
-        pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
-        match = pattern.search(text)
-        if not match:
-            raise RuntimeError("Homepage tracked-count anchor is missing")
-        text = pattern.sub(lambda m: f"{m.group(1)}{int(m.group(2)) + inserted}{m.group(3)}", text, count=1)
+        source_text = replace_once(
+            source_text,
+            "    const papers=[\n",
+            "    const papers=[\n" + new_lines,
+            "paper-source array",
+        )
 
     text = append_timeline_sentence(
         text,
@@ -231,6 +235,7 @@ def update_index() -> None:
         "Adaptive spiral sampling redirects confocal measurements toward measured return intensity; calibrated FMCW interferometry introduces submillimeter coherent ranging; laser reflective tomography removes relay-wall scanning at 3.3 km; reference-function phase compensation accelerates non-confocal inversion; sparse Bayesian deconvolution improves transient inputs; polarization speckles enable scanning-free single-pixel keyhole imaging; adaptive-TV and multi-attention models broaden passive recovery; and diffusion priors extend Fourier single-pixel NLOS under extreme undersampling.",
     )
     path.write_text(text, encoding="utf-8")
+    source_path.write_text(source_text, encoding="utf-8")
 
 
 def add_active_table_keys(text: str) -> str:
@@ -383,11 +388,14 @@ def update_main() -> None:
     path = ROOT / "bare_jrnl.tex"
     text = path.read_text(encoding="utf-8")
     old = "This update extends coverage to include significant advances from 2022 to 2026."
-    new = "This update extends coverage to include significant advances from 2022 through 18 July 2026."
+    july = "This update extends coverage to include significant advances from 2022 through 18 July 2026."
+    current = "This update extends coverage to include significant advances from 2022 through 28 October 2026."
     if old in text:
-        text = replace_once(text, old, new, "survey update horizon")
-    elif new not in text:
-        raise RuntimeError("Survey update-horizon sentence is missing")
+        text = replace_once(text, old, current, "survey update horizon")
+    elif july in text:
+        text = replace_once(text, july, current, "survey update horizon")
+    elif current not in text:
+        raise RuntimeError("Survey update-horizon sentence is missing or has an unexpected date")
     path.write_text(text, encoding="utf-8")
 
 
