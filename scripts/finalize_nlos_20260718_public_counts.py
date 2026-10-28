@@ -5,7 +5,7 @@ import re
 import runpy
 
 ROOT = Path(__file__).resolve().parents[1]
-INDEX = ROOT / "index.html"
+INDEX = ROOT / "data/papers-source.html"
 FOLLOWUPS = [
     ROOT / "scripts" / "sync_nlos_20260718_visibility_detection.py",
     ROOT / "scripts" / "sync_nlos_20260718_reconstruction_pose_consistency.py",

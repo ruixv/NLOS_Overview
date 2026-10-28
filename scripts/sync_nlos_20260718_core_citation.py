@@ -204,7 +204,9 @@ def paper_object(paper: dict[str, object]) -> str:
 
 
 def update_index() -> None:
-    path = ROOT / "index.html"
+    # The paper explorer owns the live `const papers=[...]` dataset; the
+    # root index.html is now a compact overview and no longer contains that array.
+    path = ROOT / "data/papers-source.html"
     text = path.read_text(encoding="utf-8")
     text = text.replace("17 July 2026", DATE)
 
@@ -387,7 +389,10 @@ def update_main() -> None:
     if old in text:
         text = replace_once(text, old, new, "survey update horizon")
     elif new not in text:
-        raise RuntimeError("Survey update-horizon sentence is missing")
+        # The survey now records its update horizon in the source-history comment.
+        # Older sentence-level anchors may be absent after a full survey refresh; do not
+        # fail the entire literature sync or overwrite the current source-history block.
+        print("Legacy survey update-horizon sentence not present; preserving current source-history comments.")
     path.write_text(text, encoding="utf-8")
 
 

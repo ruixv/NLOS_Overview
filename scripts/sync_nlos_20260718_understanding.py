@@ -59,13 +59,15 @@ def paper_object(paper: dict[str, object]) -> str:
 def append_to_timeline_year(text: str, year: int, sentence: str) -> str:
     lines = text.splitlines(keepends=True)
     matches = [i for i, line in enumerate(lines) if f'<div class="year">{year}</div>' in line]
-    if len(matches) != 1:
-        raise RuntimeError(f"Expected one homepage timeline row for {year}, found {len(matches)}")
-    if sentence.strip() not in lines[matches[0]]:
+    if not matches:
+        raise RuntimeError(f"No timeline row for {year} found in the Paper Explorer")
+    # The Paper Explorer contains several cards per year; append to the latest card.
+    target = matches[-1]
+    if sentence.strip() not in lines[target]:
         closing = "</p></div></div>"
-        if closing not in lines[matches[0]]:
+        if closing not in lines[target]:
             raise RuntimeError(f"Timeline closing marker missing for {year}")
-        lines[matches[0]] = lines[matches[0]].replace(closing, " " + sentence.strip() + closing, 1)
+        lines[target] = lines[target].replace(closing, " " + sentence.strip() + closing, 1)
     return "".join(lines)
 
 
@@ -96,7 +98,8 @@ def update_readme() -> None:
 
 
 def update_index() -> None:
-    path = ROOT / "index.html"
+    # The live paper array and timeline are in the Paper Explorer source.
+    path = ROOT / "data/papers-source.html"
     text = path.read_text(encoding="utf-8")
     additions = [paper_object(p) for p in PAPERS if f'title:"{p["title"]}"' not in text]
     if additions:
