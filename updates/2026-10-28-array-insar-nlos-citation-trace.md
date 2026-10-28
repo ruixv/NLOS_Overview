@@ -17,8 +17,9 @@ Metadata verification:
 - Added a catalog row and a 2024 milestone to `README.md`.
 - Added a searchable paper record to `data/papers-source.html` and a linked milestone paragraph to `index.html`.
 - Integrated the paper in the radar NLOS imaging section of `article/5newscenes.tex`.
-- Added `linArrayInSARNLOSTargetRelocation2024` to `egbib_merged_20260711.bib`.
+- Added `linArrayInSARNLOSTargetRelocation2024` to both `egbib_2026_updates.bib` (included by the survey bibliography list) and `egbib_merged_20260711.bib` (used by the paper explorer).
 - Updated the survey's stated coverage date in `bare_jrnl.tex` to 28 October 2026.
+- Updated the PDF build workflow to watch `egbib_2026_updates.bib` and require the new citation key in the build validation.
 
 ## Build status
-The existing master-branch survey-build workflow is expected to rebuild and validate `bare_jrnl.pdf` after these source changes are merged. The PDF must not be considered refreshed until the workflow run and resulting PDF commit are verified.
+The master-branch survey-build workflow completed successfully in [Actions run 40619668025](https://github.com/ruixv/NLOS_Overview/actions/runs/40619668025) on 28 October 2026. The clean LaTeX build and validation passed: the PDF is non-empty, `pdftotext` extraction succeeded, no undefined citations or missing/repeated BibTeX entries were detected, and the new citation key was present in the auxiliary file. The regenerated `bare_jrnl.pdf` is 71 pages (2,391,983 bytes), committed at master commit `361e9ef1734defdbca86119f5f7f73161628b2da`; PDF blob SHA `5bb602d7ba68eb04e80f7c9ff28749e7fef0b5a3`.
