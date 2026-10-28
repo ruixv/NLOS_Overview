@@ -300,7 +300,11 @@ Besides, in Sec.~\ref{sec4}, unsupervised passive NLOS imaging algorithms~\cite{
 
 \vspace{0.8mm}
 \noindent \textbf{Adaptive regularization for passive NLOS.}
-Zhang~\etal~proposed structure-guided adaptive total variation for passive NLOS reconstruction~\cite{zhangSGATVPassiveNLOS2026}. By deriving spatially varying regularization weights from an initial hidden-scene estimate, the method adapts the inverse prior to the recovered structure rather than relying on a manually selected global TV penalty. This complements the existing shadow-transport decomposition and diffuse-aware attention methods, which respectively encode geometric and learned light-transport constraints.
+Zhang~\etal~proposed structure-guided adaptive total variation for passive NLOS reconstruction~\cite{zhangSGATVPassiveNLOS2026}. By deriving spatially varying regularization weights from an initial hidden-scene estimate, the method adapts the inverse prior to the recovered structure rather than relying on a manually selected global TV penalty. This provides a parameter-free alternative to global TV penalties and complements learned passive NLOS methods.
+
+\vspace{0.8mm}
+\noindent \textbf{Diffuse-aware attention for passive NLOS.}
+Wang~\etal~introduce diffuse-aware attention (DAAM), explicitly modeling anisotropic diffuse transport and channel-wise signal-to-noise disparities to preserve weak hidden-scene evidence in ordinary-camera passive NLOS~\cite{wangDAAMPassiveNLOS2026}. Published in \emph{Optics Express} in 2026, DAAM adds a transport-aware attention mechanism to the passive branch, complementing geometry-adaptive regularization with a learned model of how diffuse relay-wall evidence varies across channels.
 
 % 今天上午
 \bookmark[dest=\HyperLocalCurrentHref,level=2]{Challenges and prospects}
