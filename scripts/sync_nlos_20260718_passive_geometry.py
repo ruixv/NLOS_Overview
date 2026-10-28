@@ -130,6 +130,10 @@ def update_index() -> None:
     path = ROOT / "index.html"
     text = path.read_text(encoding="utf-8")
     text = text.replace(DATE_OLD, DATE_NEW)
+    # The current homepage loads paper records from data/papers-source.html;
+    # keep the narrative timeline in index.html but mutate the catalog source here.
+    source_path = ROOT / "data/papers-source.html"
+    source_text = source_path.read_text(encoding="utf-8")
 
     geometry_obj = paper_object(
         GEOMETRY,
@@ -140,9 +144,9 @@ def update_index() -> None:
         "latest active reconstruction",
         "Shape-operator regularization controls hidden surface-normal variation during joint albedo and normal recovery, improving geometric detail while substantially reducing optimization cost.",
     )
-    if f'title:"{GEOMETRY_OLD}"' in text:
-        text = replace_line_containing(text, f'title:"{GEOMETRY_OLD}"', geometry_obj, "homepage geometry venue correction")
-    elif f'title:"{GEOMETRY}"' not in text:
+    if f'title:"{GEOMETRY_OLD}"' in source_text:
+        source_text = replace_line_containing(source_text, f'title:"{GEOMETRY_OLD}"', geometry_obj, "paper-source geometry venue correction")
+    elif f'title:"{GEOMETRY}"' not in source_text:
         raise RuntimeError("Existing geometry-constrained homepage record is missing")
 
     objects = [
@@ -177,11 +181,11 @@ def update_index() -> None:
     inserted = 0
     new_lines = ""
     for obj, title in zip(objects, (PASSIVE_10M, HPDI, SUPERFOV)):
-        if f'title:"{title}"' not in text:
+        if f'title:"{title}"' not in source_text:
             new_lines += obj + "\n"
             inserted += 1
     if new_lines:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + new_lines, "homepage paper array")
+        source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + new_lines, "paper-source array")
 
     if inserted:
         pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
@@ -204,6 +208,7 @@ def update_index() -> None:
         "HPDI adaptively fuses physics-informed and implicit data-driven passive reconstruction, geometry-constrained inversion regularizes hidden surface normals with a shape operator, and translated-PSF spatial encoding expands transient NLOS beyond the physical detection region.",
     )
     path.write_text(text, encoding="utf-8")
+    source_path.write_text(source_text, encoding="utf-8")
 
 
 def update_passive() -> None:
