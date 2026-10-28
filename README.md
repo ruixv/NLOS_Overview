@@ -26,7 +26,7 @@
 
 ---
 
-> **28 October 2026 citation-trace audit:** Forward-citation checks of the field-defining active, passive, transient-learning, acoustic, radar/RF, and consumer-LiDAR papers found no additional verified paper missing from the catalog. The survey now cites MARMOT through its final *Visual Intelligence* (2026) record; the later arXiv upload of Soft Shadow Diffusion is not treated as a separate paper from its ECCV 2024 publication. See [the audit note](updates/2026-10-28-core-citation-audit.md).
+> **29 October 2026 survey-gap audit:** Forward-citation and publisher-index checks found several recent works already cataloged in the README/Paper Explorer but not yet cited in the survey body. The survey source now integrates Cascaded NLOS (ACM TOG/SIGGRAPH Asia 2026), MD-NLOS (*iScience* 2026), learned LCT (*Physical Review Applied* 2026), Quasi-Fresnel inversion (*Optica* 2026), trapezoidal-grid reconstruction (ICCP 2026), MALCT (arXiv:2610.22847; no final venue verified), TransVID (*Optics Express* 2026), passive MDUNet/DAAM/SGATV/HPDI, low-cost NIR raster scanning (IEEE ICEE 2025), and X-band radar NLOS (CVPR 2026). No duplicate catalog records were created; PDF/build status will be recorded only after the automated validation succeeds. See [the survey-gap audit note](updates/2026-10-29-survey-gap-integration.md).
 
 ## What is NLOS Imaging?
 
