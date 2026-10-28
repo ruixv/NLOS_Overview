@@ -23,6 +23,15 @@ The following were checked and deliberately not duplicated because they are alre
 
 The consolidated bibliography already contained verified records for both newly integrated papers. The citations use the existing keys and no duplicate BibTeX entries were added. The build workflow regenerates the merged bibliography and checks the full survey citation inventory.
 
-## Build status
+## Build verification
 
-The earlier draft revision passed the LaTeX/BibTeX build, but this corrected revision still requires its own validation. The PDF is not claimed updated until the current branch's build passes and the regenerated PDF is committed.
+Result: successful clean LaTeX/BibTeX rebuild and PDF-text validation.
+
+- GitHub Actions build: https://github.com/ruixv/NLOS_Overview/actions/runs/40766638214
+- GitHub Pages deployment: https://github.com/ruixv/NLOS_Overview/actions/runs/40766915826
+- PDF: 72 pages; 2,383,677 bytes.
+- PDF blob SHA: 707e83934476cebb747aae8d53816708cb20f12b.
+- The workflow reported zero missing cited keys, no undefined citations/references, and no missing/repeated BibTeX records. The generated PDF passed the required text checks.
+- The PDF, consolidated bibliography, and survey source were committed to master at build commit 756a4fbfb5afa4d486774736c9790482636aaae9.
+
+The update is complete; the recurring literature scan remains enabled.
