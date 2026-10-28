@@ -128,7 +128,8 @@ def update_readme() -> None:
 
 
 def update_index() -> None:
-    path = ROOT / "index.html"
+    # Paper records and timeline now live in the Paper Explorer source.
+    path = ROOT / "data/papers-source.html"
     text = path.read_text(encoding="utf-8")
     new_lines = "\n".join(
         paper_object(paper) for paper in NEW_PUBLIC
@@ -143,13 +144,14 @@ def update_index() -> None:
     if "Pulse multiplexing computationally exceeds detector timing resolution" not in text:
         lines = text.splitlines(keepends=True)
         ids = [i for i, line in enumerate(lines) if '<div class="year">2026</div>' in line]
-        if len(ids) != 1:
-            raise RuntimeError("2026 timeline row mismatch")
+        if not ids:
+            raise RuntimeError("No 2026 timeline row found in the Paper Explorer")
+        # The Paper Explorer has multiple 2026 cards; use the most recent one.
         closing = "</p></div></div>"
         sentence = (
             " Pulse multiplexing computationally exceeds detector timing resolution; frequency-expert and Canny-guided solvers improve robust inversion; specular-flight-path priors strengthen non-confocal recovery; and active transients advance from geometry to semantic human-pose estimation."
         )
-        lines[ids[0]] = lines[ids[0]].replace(closing, sentence + closing, 1)
+        lines[ids[-1]] = lines[ids[-1]].replace(closing, sentence + closing, 1)
         text = "".join(lines)
     path.write_text(text, encoding="utf-8")
 
@@ -243,7 +245,7 @@ def validate() -> None:
         name: (ROOT / path).read_text(encoding="utf-8")
         for name, path in {
             "readme": "README.md",
-            "index": "index.html",
+            "index": "data/papers-source.html",
             "active": "article/2active.tex",
             "learning": "article/4datadriven.tex",
             "new": "article/5newscenes.tex",
