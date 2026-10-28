@@ -102,6 +102,7 @@ jobs:
           files = {
               'readme': read('README.md'),
               'index': read('index.html'),
+              'source': read('data/papers-source.html'),
               'active': read('article/2active.tex'),
               'passive': read('article/3passive.tex'),
               'learning': read('article/4datadriven.tex'),
@@ -125,11 +126,16 @@ jobs:
               ('Non-Line-of-Sight Single-Pixel Imaging Using Polarization Speckle Modulation', 'zhouPolarizationSpeckleNLOS2026'),
               ('High-resolution Fourier single-pixel non-line-of-sight imaging employing diffusion model', 'fuFourierSinglePixelDiffusion2026'),
               ('Multiple-object passive non-line-of-sight imaging', 'chenMultipleObjectPassiveNLOS2026'),
+              ('Non-Line-of-Sight mmW SAR Imaging With Equivariant Adaptive Threshold Learning', 'caiEquivariantNLOSmmWSAR2025'),
+              ('Learning to See Around Corners: A Deep Unfolding Framework for Terahertz Radar Non-Line-of-Sight 3D Imaging', 'chenTHzDeepUnfolding2026'),
+              ('Non-Line-of-Sight Perception Method for Autonomous Haul Trucks in Open-Pit Mines Based on 4D mmWave Radar and LiDAR Fusion', 'yangOpenPitNLOS2026'),
+              ('Non-Line-of-Sight Pedestrian Recognition Approach Using Multiple Reflections for Millimeter Wave Radar Sensing Applications', 'okazakiNLOSPedestrianRecognition2025'),
+              ('A 1.6-to-3.8GHz Reconfigurable FMCW Radar SoC with 81.5% Relative-Bandwidth PLL for Real-Time Life Detection in Disaster Response', 'fuWidebandNLOSRadarSoC2026'),
           ]
           for title, key in records:
               if files['readme'].lower().count('[' + title.lower() + ']') != 1:
                   raise SystemExit(f'README entry missing or duplicated: {title}')
-              if files['index'].lower().count('title:"' + title.lower() + '"') != 1:
+              if files['source'].lower().count('title:"' + title.lower() + '"') != 1:
                   raise SystemExit(f'Homepage entry missing or duplicated: {title}')
               if key not in source:
                   raise SystemExit(f'Survey citation missing: {key}')
@@ -146,7 +152,7 @@ jobs:
                   raise SystemExit('A geometry-constrained README record retains preliminary metadata')
           if '[Geometric Constrained Non-Line-of-Sight Imaging]' in files['readme']:
               raise SystemExit('Preliminary geometry-constrained title remains public')
-          if files['index'].lower().count('title:"' + geometry_title.lower() + '"') != 1:
+          if files['source'].lower().count('title:"' + geometry_title.lower() + '"') != 1:
               raise SystemExit('Final geometry-constrained homepage record is missing or duplicated')
           if geometry_key not in source or files['bib'].lower().count('{' + geometry_key.lower() + ',') != 1:
               raise SystemExit('Geometry-constrained survey or bibliography record is inconsistent')
@@ -154,13 +160,13 @@ jobs:
           displayed = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', files['index'])
           if not displayed:
               raise SystemExit('Homepage tracked-count stat is missing')
-          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', files['index'], flags=re.MULTILINE))
+          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', files['source'], flags=re.MULTILINE))
           if int(displayed.group(1)) != paper_count:
               raise SystemExit(f'Homepage count mismatch: stat={displayed.group(1)}, objects={paper_count}')
 
-          if '18 July 2026' not in files['readme'] or '18 July 2026' not in files['index']:
+          if '28 October 2026' not in files['readme'] or '28 October 2026' not in files['index']:
               raise SystemExit('Public update dates are not synchronized')
-          if 'advances from 2022 through 18 July 2026' not in files['main']:
+          if 'advances from 2022 through 28 October 2026' not in files['main']:
               raise SystemExit('Survey update horizon is not explicit')
 
           normalized_pdf = re.sub(r'\s+', ' ', files['pdf']).lower()
@@ -174,6 +180,11 @@ jobs:
               'polarization-speckle single-pixel imaging',
               'diffusion-prior fourier single-pixel imaging',
               'multi-object passive reconstruction',
+              'self-supervised mmwave sar under multipath',
+              'blind-spot completion for open-pit mining',
+              'multiple-reflection signatures for hidden pedestrian recognition',
+              'deep-unfolded terahertz radar reconstruction',
+              'integrated wideband radar hardware for through-wall life detection',
           ]
           for phrase in expected_pdf:
               if phrase not in normalized_pdf:
@@ -186,7 +197,7 @@ jobs:
               if probe not in normalized_bbl:
                   raise SystemExit(f'Generated bibliography is missing: {title}')
 
-          print('18 July 2026 README, homepage, survey sources, bibliography, and regenerated PDF are mutually consistent.')
+          print('28 October 2026 README, homepage, survey sources, bibliography, and regenerated PDF are mutually consistent.')
           PY
 
       - name: Upload LaTeX build diagnostics
@@ -235,7 +246,7 @@ jobs:
           if git diff --cached --quiet; then
             echo 'All artifacts already synchronized.'
           else
-            git commit -m 'Synchronize 18 July NLOS literature and rebuild survey'
+            git commit -m 'Synchronize 28 October NLOS literature and rebuild survey'
             git push --force-with-lease origin HEAD:${{ github.head_ref }}
           fi
 
