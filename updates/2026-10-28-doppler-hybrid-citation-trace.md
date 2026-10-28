@@ -23,7 +23,7 @@ Keyword and publisher-index checks also revisited:
 - Website homepage and Paper Explorer: added the preprint with an explicit arXiv-only status; added a timeline milestone.
 - Survey: integrated the Photonics Research hybrid color paper in the passive/appearance discussion and the new radar tracking preprint in the mmWave section.
 - Bibliography: added `cheonDopplerPositionVelocityNLOS2026`; retained the existing DOI-backed `shiHybridActivePassiveColor2026`.
-- PDF: rebuild/validation is tracked by [GitHub Actions run 40616025858](https://github.com/ruixv/NLOS_Overview/actions/runs/40616025858). The PDF is considered updated only after that run succeeds and the resulting PDF blob is verified.
+- PDF: rebuild/validation is tracked by [GitHub Actions run 40616025858](https://github.com/ruixv/NLOS_Overview/actions/runs/40616025858). The clean build and validation succeeded. The regenerated `bare_jrnl.pdf` is committed on `master` with blob SHA `12be7a3e5b9817bd9020a4671d6f5b0a6ffa6e58`.
 
 ## Scope decisions
 
