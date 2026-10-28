@@ -73,19 +73,24 @@ def append_homepage_timeline(text: str) -> str:
     lines = text.splitlines(keepends=True)
     needle = '<div class="year">2026</div>'
     matches = [i for i, line in enumerate(lines) if needle in line]
-    if len(matches) != 1:
-        raise RuntimeError(f"Expected one homepage 2026 timeline row, found {len(matches)}")
-    closing = "</p></div></div>"
-    line = lines[matches[0]]
-    if closing not in line:
-        raise RuntimeError("Homepage 2026 timeline row has an unexpected structure")
     sentence = (
-        " Finite-aperture theory quantifies yaw observability and relay-wall design limits, "
+        "Finite-aperture theory quantifies yaw observability and relay-wall design limits, "
         "while real SPAD-TCSPC data supports learned hidden-human detection without full scene reconstruction."
     )
-    lines[matches[0]] = line.replace(closing, sentence + closing, 1)
-    return "".join(lines)
-
+    if len(matches) == 1:
+        closing = "</p></div></div>"
+        line = lines[matches[0]]
+        if closing not in line:
+            raise RuntimeError("Homepage 2026 timeline row has an unexpected structure")
+        lines[matches[0]] = line.replace(closing, " " + sentence + closing, 1)
+        return "".join(lines)
+    if len(matches) > 1:
+        raise RuntimeError(f"Expected at most one homepage 2026 timeline row, found {len(matches)}")
+    anchor = '</div></section>\n<section class="section" id="explorer">'
+    if anchor not in text:
+        raise RuntimeError("Current homepage timeline insertion anchor is missing")
+    paragraph = f'<p class="small" style="margin:12px 0"><strong>2026 · visibility and hidden-human detection:</strong> {sentence}</p>'
+    return text.replace(anchor, paragraph + anchor, 1)
 
 def update_readme() -> None:
     path = ROOT / "README.md"
@@ -123,15 +128,25 @@ def paper_object(paper: dict[str, object]) -> str:
 def update_index() -> None:
     path = ROOT / "index.html"
     text = path.read_text(encoding="utf-8")
+    source_path = ROOT / "data/papers-source.html"
+    source_text = source_path.read_text(encoding="utf-8")
     new_lines = ""
+    inserted = 0
     for paper in PAPERS:
-        if f'title:"{paper["title"]}"' not in text:
+        if f'title:"{paper["title"]}"' not in source_text:
             new_lines += paper_object(paper) + "\n"
+            inserted += 1
     if new_lines:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + new_lines, "homepage paper array")
+        source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + new_lines, "paper-source array")
+    if inserted:
+        pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
+        match = pattern.search(text)
+        if not match:
+            raise RuntimeError("Homepage tracked-count anchor is missing")
+        text = pattern.sub(lambda m: f"{m.group(1)}{int(m.group(2)) + inserted}{m.group(3)}", text, count=1)
     text = append_homepage_timeline(text)
     path.write_text(text, encoding="utf-8")
-
+    source_path.write_text(source_text, encoding="utf-8")
 
 def update_active() -> None:
     path = ROOT / "article/2active.tex"
@@ -172,7 +187,7 @@ Celebi and Turkoglu built an active SPAD--TCSPC NLOS sensing system and collecte
 def validate() -> None:
     files = {
         "readme": (ROOT / "README.md").read_text(encoding="utf-8"),
-        "index": (ROOT / "index.html").read_text(encoding="utf-8"),
+        "index": (ROOT / "data/papers-source.html").read_text(encoding="utf-8"),
         "active": (ROOT / "article/2active.tex").read_text(encoding="utf-8"),
         "bib": (ROOT / "egbib_20260718_visibility_detection_updates.bib").read_text(encoding="utf-8"),
     }
