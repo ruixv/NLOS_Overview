@@ -114,6 +114,10 @@ Lu~\etal~introduced GeRaF, a differentiable radio-frequency inverse-rendering fr
 Wen~\etal~reconstructed hidden moving-target reflectivity from sparse ISAR apertures using clutter suppression and detail-aware regularized inverse imaging~\cite{wenSparseApertureISARNLOS2024}. Their complementary CMTI system targeted non-cooperative corner motion: after separating background clutter and NLOS echoes, a polar-format imaging chain, prominent-point-assisted autofocus, and mirror-symmetry recovery formed high-resolution two-dimensional images of hidden moving objects~\cite{wenCMTICornerMotion2025}. These target-centric radar images complement HoloRadar's scene-scale three-dimensional reconstruction and RF localization-only systems.
 
 \vspace{0.8mm}
+\noindent \textbf{UAV-borne array-InSAR for urban-canyon NLOS relocation.}
+Lin~\etal~use a spherical-wavefront three-dimensional model for low-altitude UAV-borne array-InSAR, fit the building reflection planes, determine multipath-reachable regions, and relocate virtual NLOS targets to their physical positions~\cite{linArrayInSARNLOSTargetRelocation2024}. Simulation and real-data experiments report errors typically below 0.5~m, with a 41.62\% expansion in imageable ground range and a 76.57\% expansion in imageable 3D area. Unlike mobile mmWave systems that reconstruct room-scale geometry, this work exploits airborne SAR's volumetric urban mapping capability and explicitly corrects multipath-induced ghost locations.
+
+\vspace{0.8mm}
 \noindent \textbf{Semantic-guided radar NLOS tracking.}
 Li~\etal~\cite{liSGNLOSTrack2025} use camera semantics and 4D radar multipath to localize hidden targets (0.419~m MAE; 80\% tracking success), rather than reconstructing full 3D scenes.
 
