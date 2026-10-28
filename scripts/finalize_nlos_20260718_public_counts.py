@@ -6,6 +6,7 @@ import runpy
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "index.html"
+PAPER_SOURCE = ROOT / "data/papers-source.html"
 FOLLOWUPS = [
     ROOT / "scripts" / "sync_nlos_20260718_visibility_detection.py",
     ROOT / "scripts" / "sync_nlos_20260718_reconstruction_pose_consistency.py",
@@ -26,7 +27,8 @@ def main() -> None:
     if len(matches) != 1:
         raise RuntimeError(f"Expected one homepage tracked-count stat, found {len(matches)}")
 
-    paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', text, flags=re.MULTILINE))
+    source_text = PAPER_SOURCE.read_text(encoding="utf-8")
+    paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', source_text, flags=re.MULTILINE))
     if paper_count <= 0:
         raise RuntimeError("Homepage paper explorer contains no records")
 
