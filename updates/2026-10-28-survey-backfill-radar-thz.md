@@ -12,9 +12,11 @@ Repeated the forward-citation audit from the field-defining active ToF/NLOS mile
 
 - **Non-Line-of-Sight Perception Method for Autonomous Haul Trucks in Open-Pit Mines Based on 4D mmWave Radar and LiDAR Fusion** — Jianjian Yang et al., *Sensors* 26(14), 4615 (2026), [DOI 10.3390/s26144615](https://doi.org/10.3390/s26144615). Blind-Spot Complementary Fusion filters multipath-corrupted radar points and injects high-confidence cues into LiDAR blind regions in real mine data. The survey explicitly classifies this as adjacent NLOS perception, not full image or shape reconstruction.
 
-## Newly cataloged adjacent NLOS sensing paper
+## Newly cataloged adjacent NLOS sensing papers
 
 - **Non-Line-of-Sight Pedestrian Recognition Approach Using Multiple Reflections for Millimeter Wave Radar Sensing Applications** — Junya Okazaki, Takeru Matsuoka, Jianghaomiao He, and Shouhei Kidera, *IEICE Transactions on Communications* E108-B(11), 1338–1348 (published 1 November 2025), [DOI 10.23919/transcom.2025EBP3011](https://doi.org/10.23919/transcom.2025EBP3011). A 24-GHz FMCW radar uses slow-time multiple-reflection signatures and SVM/LSTM classification to distinguish a pedestrian from a dummy in a real-road NLOS setting. It is cataloged as target recognition, not imaging.
+
+- **A 1.6-to-3.8GHz Reconfigurable FMCW Radar SoC with 81.5% Relative-Bandwidth PLL for Real-Time Life Detection in Disaster Response** — Renjie Fu et al., *2026 IEEE International Solid-State Circuits Conference (ISSCC)*, pp. 582–584, [DOI 10.1109/ISSCC49663.2026.11408988](https://doi.org/10.1109/ISSCC49663.2026.11408988). The 40-nm 1.6–3.8 GHz FMCW radar SoC reports life detection behind up to six walls and vital-sign sensing behind two at 0.395 W. It is recorded as adjacent through-wall NLOS sensing hardware, not image reconstruction.
 
 ## Venue and duplicate cleanup
 
@@ -23,6 +25,8 @@ Repeated the forward-citation audit from the field-defining active ToF/NLOS mile
 - Recent ToF comparison, cascaded higher-order NLOS, 3D-GTR, consumer-LiDAR, MARMOT, PICL, thermal rough-surface NLOS, passive diffuse-aware attention, and other listed recent papers were checked and were already represented in the repository or survey; no duplicate catalog rows were added for them.
 
 ## Files synchronized
+
+The additional ISSCC record is included in the catalog, Paper Explorer, survey prose, and both bibliography sources; CI checks now require its citation key and public metadata.
 
 - `README.md`: new catalog row, timeline milestone, and corrected audit summary.
 - `index.html`: visible timeline entry describing the survey backfill.
