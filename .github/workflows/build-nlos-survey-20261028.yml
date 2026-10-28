@@ -93,7 +93,7 @@ jobs:
           required = (
               'recent advances on non-line-of-sight imaging',
               'hyperdimensional computing',
-              'passive object sensing',
+              'passive perception',
           )
           missing = [token for token in required if token not in text]
           if missing:
@@ -117,7 +117,7 @@ jobs:
               '\n\n## Build verification\n\n'
               'Result: successful clean LaTeX/BibTeX rebuild. bare_jrnl.pdf was regenerated; '
               'undefined citations/references and missing/repeated BibTeX records were not detected. '
-              'The new citation key and HDC/passive-object-sensing text were verified in the output. '
+              'The new citation key and HDC/passive-perception text were verified in the output. '
               f'PDF pages: {pages}; size: {pdf_bytes:,} bytes. '
               f'Workflow run: https://github.com/{os.environ.get("GITHUB_REPOSITORY", "")}/actions/runs/{os.environ.get("GITHUB_RUN_ID", "")}.\n'
           )
