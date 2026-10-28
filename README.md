@@ -26,7 +26,7 @@
 
 ---
 
-> **28 October 2026 citation-trace audit:** Forward-citation checks of the field-defining active, passive, transient-learning, acoustic, radar/RF, and consumer-LiDAR papers found no additional verified paper missing from the catalog. The survey now cites MARMOT through its final *Visual Intelligence* (2026) record; the later arXiv upload of Soft Shadow Diffusion is not treated as a separate paper from its ECCV 2024 publication. See [the audit note](updates/2026-10-28-core-citation-audit.md).
+> **29 October 2026 survey-gap audit:** A cross-chapter check against the paper catalog, update logs, and citation keys found two genuine survey omissions: diffuse-aware attention (DAAM) for passive NLOS and CVPR 2026 X-band radar NLOS imaging. Both are now integrated into their semantically appropriate survey sections. Recent methods including Cascaded NLOS, MD-NLOS, learned LCT, Quasi-Fresnel inversion, trapezoidal-grid reconstruction, MALCT, TransVID, MDUNet, SGATV, HPDI, NIR raster scanning, transient simulation, TRT/NANO, TriNLOS, NLOS-MT, NLOSdiffuser, D-NeSF, and RIS-assisted radar demo were confirmed already cited in the active, passive, data-driven, or new-scenes chapters, so no duplicate prose or catalog entries were added. See [the survey-gap audit note](updates/2026-10-29-survey-gap-integration.md).
 
 ## What is NLOS Imaging?
 
