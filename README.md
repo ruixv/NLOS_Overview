@@ -509,18 +509,24 @@ measurement → physical forward model → inverse solver / neural prior → hid
 2026 ── Bao et al.: a single pulse and diffracted-wave measurements uniquely determine visible polygonal geometry in 2D [arXiv:2607.22174; theory-only].
 2026 ── Xu et al.: physically informed hash-encoded neural transient fields improve efficiency of implicit active NLOS reconstruction [ICCPA 2026, Proceedings of SPIE 14296, 1429608].
 2026 ── Yang et al.: co-designed binary optical modulation and frequency-aware learned inversion improve intensity-only single-pixel NLOS under extreme undersampling [Journal of Electronic Imaging 35(5), 053013].
+2026 ── Spaett et al.: SPAD-array bin-width correction and intrinsic diffraction/lens-flare time referencing sharpen measured NLOS reconstructions [Optics Express 34(12), 22596–22613].
+2026 ── Yang et al.: Poisson-likelihood transient inversion reaches competitive reconstruction at 1.56% sampling with GPU-accelerated proximal-gradient updates [Proceedings of SPIE 13992, 1399223; AOMATT 2025].
+2026 ── Wang et al.: semantic-guided relay-wall scan planning reduces measured area to one quarter and then sparsifies samples to one fifth [Proceedings of SPIE 14000, 140004W; CITA 2025].
 2024 ── Ding et al.: curvature priors stabilize under-sampled 3D transient inversion with GPU ADMM [IEEE TPAMI 46(12), 8474–8485].
 2024 ── Yang and Isogawa: learned transient-sinogram super-resolution compensates circular confocal measurement bias [IEEE ICIP 2024]; Wang et al.: extended-range imaging with resolution preservation [SPIE 13104].
 2024 ── Wen et al.: detail-aware sparse-aperture ISAR reconstructs hidden moving targets [IEEE TGRS 62, 1–18].
 2024 ── Lin et al.: UAV-borne array-InSAR turns building-reflected multipath into 3D NLOS target relocation in urban canyons, expanding imageable ground range and 3D area [IEEE TGRS 62, article 4708414].
+2024 ── Cui and Trichopoulos: active terahertz imaging exploits lossy-mirror building surfaces and mirror-folding reconstruction for around-obstacle imaging [IEEE Transactions on Terahertz Science and Technology 14(4), 433–445].
 2025 ── Wang et al.: fixed Lissajous confocal relay scanning [SPIE 13542]; Wen et al.: CMTI moving-target NLOS radar imaging with polar-format and autofocus processing [IEEE TVT 74(1), 179–190].
 
 
 2026 ── Gajewski and Łopatka: measured single-site urban RF NLOS emitter localization combines CM-MUSIC, backward ray tracing and CNN sector masking; classifier errors cause severe outliers [Sensors 26(19), 6261; localization, not 3D imaging].
 2023 ── Zhou et al.: absorption backprojection suppresses low-confidence voxel artifacts in hidden 3D reconstruction [Applied Physics Letters 123(5), 054001].
+2023 ── Huang et al.: nuclear-norm structure-sparsity regularization stabilizes directional light-cone inversion under low-SNR and short-exposure measurements [Optics Letters 48(18), 4881–4884].
 2023 ── Fang et al.: genetic relay-scattering calibration plus Lucy–Richardson deconvolution enables commodity-ToF NLOS depth reconstruction with non-Lambertian PP/PMMA reflectors [Acta Optica Sinica 43(21), 2111002].
 2018 ── Jin et al.: ellipsoid-mode decomposition for multi-object transient backprojection [Optics Express 26(16), 20089–20101]; Richardson–Lucy deconvolution of time histograms before backprojection [Optics Letters 43(23), 5885–5888].
 2020 ── La Manna et al.: a dual-detector transient system reconstructs hidden scenes through a moving non-planar relay surface, preceding later arbitrary-relay 3D-RSD and GPU backprojection [Optics Express 28(4), 5331–5339].
+2020 ── Reza et al.: partial spatial coherence introduces measurable limits to ideal phasor-field propagation and reconstruction [arXiv:2006.02600; final venue unverified].
 2020 ── Shi et al.: edge-guided re-projection [Applied Optics 59(6), 1793–1800]; Feng and Gao: aperture/coherence weighting for noise-robust filtered backprojection [Optics Letters 45(14), 3921–3924].
 2023 ── Chen et al.: long-range hidden-object reconstruction from projected multi-light-field images [Photonics 10(1), 25].
 2023 ── Tu et al.: Monte Carlo-simulated single-photon NLOS and AEF-Net attention denoising [Laser & Optoelectronics Progress 60(20), 2011003]
@@ -536,7 +542,10 @@ measurement → physical forward model → inverse solver / neural prior → hid
 2026 ── Çalışan: paired-object classification from wall-mediated acoustic echoes, with recording-level validation limitations [Applied Sciences 16(20), 10293]
 2019 ── Murray-Bruce et al.: consumer-camera occlusion-coded computational periscopy [SPIE Wavelets and Sparsity XVIII]
 2021 ── Saunders et al.: ERTI performance bounds and adaptive angular acquisition [IEEE ICIP 2021]
+2021 ── Sadhu et al.: differentiable ToF autocalibration jointly estimates hidden-scene content and relay/scan geometry [arXiv:2105.10603; final venue unverified].
+2021 ── Yi et al.: differentiable transient path-integral rendering demonstrates non-planar-relay and two-corner NLOS tracking [ACM Transactions on Graphics 40(6), Article 286].
 2022 ── Czajkowski and Murray-Bruce: early passive 3D doorway-frame sensing [IEEE RAPID]
+2022 ── Esmaeilbeig et al.: multi-IRS radar phase design is guided by hidden moving-target Cramér–Rao bounds and Doppler-aware A-optimality [IEEE Signal Processing Letters 29, 2422–2426].
 2023 ── Miao et al.: TE-NLOS recovers fine temporal transients from coarse detector jitter via temporal encoding [Optics Express]
 2026 ── Shi et al.: temporal-decoupling super-resolution for transient NLOS [Optics and Lasers in Engineering]
 
