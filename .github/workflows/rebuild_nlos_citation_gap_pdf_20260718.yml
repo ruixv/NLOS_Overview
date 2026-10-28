@@ -39,7 +39,7 @@ jobs:
           grep -qi "Kolmogorov" bare_jrnl.txt
           if grep -Eiq "undefined citations|Citation .* undefined|There were undefined references" bare_jrnl.log; then exit 1; fi
           if grep -Eiq "Warning--I didn't find a database entry|Repeated entry" bare_jrnl.blg; then exit 1; fi
-          for key in liuKANTransformerNLOS2025 xuGraphLatentNLOS2025 zhouAdaptiveArtifactCancellation2025 zhangAdaptiveMixtureZeroShot2025 chenLTMDPassiveNLOS2025 fangScalableScatteringTOF2025 shiDualSpectralEdgeNLOS2026 ultrasoundNLOS2025 sommerPassiveAcousticNLOS2026 linArrayInSARNLOSTargetRelocation2024 chenPolygonalObstacleDiffractionNLOS2026 daiRISScalableFluidVectorNLOS2026; do
+          for key in liuKANTransformerNLOS2025 xuGraphLatentNLOS2025 zhouAdaptiveArtifactCancellation2025 zhangAdaptiveMixtureZeroShot2025 chenLTMDPassiveNLOS2025 fangScalableScatteringTOF2025 shiDualSpectralEdgeNLOS2026 ultrasoundNLOS2025 sommerPassiveAcousticNLOS2026 linArrayInSARNLOSTargetRelocation2024 chenPolygonalObstacleDiffractionNLOS2026 daiRISScalableFluidVectorNLOS2026 baoInverseScatteringDiffractedWaves2026 baoInverseGeometricDiffractionCone2026; do
             grep -qi "$key" bare_jrnl.aux
           done
       - name: Commit regenerated PDF
