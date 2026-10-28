@@ -145,18 +145,23 @@ def append_timeline_sentence(text: str, year: int, marker: str, sentence: str) -
     lines = text.splitlines(keepends=True)
     needle = f'<div class="year">{year}</div>'
     matches = [i for i, line in enumerate(lines) if needle in line]
-    if len(matches) != 1:
-        raise RuntimeError(f"Expected one homepage timeline row for {year}, found {len(matches)}")
-    line = lines[matches[0]]
-    closing = "</p></div></div>"
-    if closing not in line:
-        raise RuntimeError(f"Homepage timeline row for {year} has an unexpected structure")
-    ending = "\n" if line.endswith("\n") else ""
-    core = line[:-1] if ending else line
-    core = core.replace(closing, " " + sentence + closing, 1)
-    lines[matches[0]] = core + ending
-    return "".join(lines)
-
+    if len(matches) == 1:
+        line = lines[matches[0]]
+        closing = "</p></div></div>"
+        if closing not in line:
+            raise RuntimeError(f"Homepage timeline row for {year} has an unexpected structure")
+        ending = "\n" if line.endswith("\n") else ""
+        core = line[:-1] if ending else line
+        core = core.replace(closing, " " + sentence + closing, 1)
+        lines[matches[0]] = core + ending
+        return "".join(lines)
+    if len(matches) > 1:
+        raise RuntimeError(f"Expected at most one homepage timeline row for {year}, found {len(matches)}")
+    anchor = '</div></section>\n<section class="section" id="explorer">'
+    if anchor not in text:
+        raise RuntimeError("Current homepage timeline insertion anchor is missing")
+    paragraph = f'<p class="small" style="margin:12px 0"><strong>{year} · {marker}:</strong> {sentence}</p>'
+    return text.replace(anchor, paragraph + anchor, 1)
 
 def update_readme() -> None:
     path = ROOT / "README.md"
@@ -205,18 +210,19 @@ def paper_object(paper: dict[str, object]) -> str:
 
 def update_index() -> None:
     path = ROOT / "index.html"
-    text = path.read_text(encoding="utf-8")
-    text = text.replace("17 July 2026", DATE)
+    text = path.read_text(encoding="utf-8").replace("17 July 2026", DATE)
+    source_path = ROOT / "data/papers-source.html"
+    source_text = source_path.read_text(encoding="utf-8")
 
     new_lines = ""
     inserted = 0
     for paper in PAPERS:
-        if f'title:"{paper["title"]}"' in text:
+        if f'title:"{paper["title"]}"' in source_text:
             continue
         new_lines += paper_object(paper) + "\n"
         inserted += 1
     if new_lines:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + new_lines, "homepage paper array")
+        source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + new_lines, "paper-source array")
     if inserted:
         pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
         match = pattern.search(text)
@@ -231,7 +237,7 @@ def update_index() -> None:
         "Adaptive spiral sampling redirects confocal measurements toward measured return intensity; calibrated FMCW interferometry introduces submillimeter coherent ranging; laser reflective tomography removes relay-wall scanning at 3.3 km; reference-function phase compensation accelerates non-confocal inversion; sparse Bayesian deconvolution improves transient inputs; polarization speckles enable scanning-free single-pixel keyhole imaging; adaptive-TV and multi-attention models broaden passive recovery; and diffusion priors extend Fourier single-pixel NLOS under extreme undersampling.",
     )
     path.write_text(text, encoding="utf-8")
-
+    source_path.write_text(source_text, encoding="utf-8")
 
 def add_active_table_keys(text: str) -> str:
     keys = [
