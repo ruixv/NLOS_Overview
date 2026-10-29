@@ -128,30 +128,39 @@ def update_readme() -> None:
 
 
 def update_index() -> None:
-    path = ROOT / "index.html"
-    text = path.read_text(encoding="utf-8")
+    source_path = ROOT / "data/papers-source.html"
+    index_path = ROOT / "index.html"
+    source_text = source_path.read_text(encoding="utf-8")
+    index_text = index_path.read_text(encoding="utf-8")
     new_lines = "\n".join(
         paper_object(paper) for paper in NEW_PUBLIC
-        if f'title:"{paper["title"]}"' not in text
+        if f'title:"{paper["title"]}"' not in source_text
     )
     if new_lines:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + new_lines + "\n", "paper array")
-    text = text.replace(
-        "https://opg.optica.org/oe/abstract.cfm?uri=oe-34-14-26271",
-        "https://doi.org/10.1364/OE.601398",
-    )
-    if "Pulse multiplexing computationally exceeds detector timing resolution" not in text:
-        lines = text.splitlines(keepends=True)
-        ids = [i for i, line in enumerate(lines) if '<div class="year">2026</div>' in line]
-        if len(ids) != 1:
-            raise RuntimeError("2026 timeline row mismatch")
-        closing = "</p></div></div>"
-        sentence = (
-            " Pulse multiplexing computationally exceeds detector timing resolution; frequency-expert and Canny-guided solvers improve robust inversion; specular-flight-path priors strengthen non-confocal recovery; and active transients advance from geometry to semantic human-pose estimation."
+        source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + new_lines + "\n", "paper-source array")
+
+    for value_name, value in (("paper source", source_text), ("index", index_text)):
+        value = value.replace(
+            "https://opg.optica.org/oe/abstract.cfm?uri=oe-34-14-26271",
+            "https://doi.org/10.1364/OE.601398",
         )
-        lines[ids[0]] = lines[ids[0]].replace(closing, sentence + closing, 1)
-        text = "".join(lines)
-    path.write_text(text, encoding="utf-8")
+        if "Pulse multiplexing computationally exceeds detector timing resolution" not in value:
+            lines = value.splitlines(keepends=True)
+            ids = [i for i, line in enumerate(lines) if '<div class="year">2026</div>' in line]
+            if len(ids) != 1:
+                raise RuntimeError(f"{value_name}: 2026 timeline row mismatch")
+            closing = "</p></div></div>"
+            sentence = (
+                " Pulse multiplexing computationally exceeds detector timing resolution; frequency-expert and Canny-guided solvers improve robust inversion; specular-flight-path priors strengthen non-confocal recovery; and active transients advance from geometry to semantic human-pose estimation."
+            )
+            lines[ids[0]] = lines[ids[0]].replace(closing, sentence + closing, 1)
+            value = "".join(lines)
+        if value_name == "paper source":
+            source_text = value
+        else:
+            index_text = value
+    source_path.write_text(source_text, encoding="utf-8")
+    index_path.write_text(index_text, encoding="utf-8")
 
 
 def update_active() -> None:
