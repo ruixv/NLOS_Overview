@@ -224,7 +224,6 @@ def update_index() -> None:
         "Adaptive spiral sampling redirects confocal measurements toward measured return intensity; calibrated FMCW interferometry introduces submillimeter coherent ranging; laser reflective tomography removes relay-wall scanning at 3.3 km; reference-function phase compensation accelerates non-confocal inversion; sparse Bayesian deconvolution improves transient inputs; polarization speckles enable scanning-free single-pixel keyhole imaging; adaptive-TV and multi-attention models broaden passive recovery; and diffusion priors extend Fourier single-pixel NLOS under extreme undersampling."
     )
     source_text = append_timeline_sentence(source_text, 2026, "Adaptive spiral sampling", sentence)
-    index_text = append_timeline_sentence(index_text, 2026, "Adaptive spiral sampling", sentence)
 
     pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
     count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', source_text, flags=re.MULTILINE))
