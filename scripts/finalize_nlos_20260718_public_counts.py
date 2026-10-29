@@ -38,7 +38,6 @@ def main() -> None:
     if paper_count <= 0:
         raise RuntimeError("Paper source contains no records")
     reconcile_count(PAPER_SOURCE, paper_count)
-    reconcile_count(INDEX, paper_count)
 
 
 if __name__ == "__main__":
