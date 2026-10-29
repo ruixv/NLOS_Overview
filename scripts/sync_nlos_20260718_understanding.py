@@ -106,17 +106,12 @@ def update_index() -> None:
 
     stat_pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
     expected = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', source_text, flags=re.MULTILINE))
-    for value_name, value in (("paper source", source_text), ("index", index_text)):
-        match = stat_pattern.search(value)
-        if not match:
-            raise RuntimeError(f"{value_name} tracked-entry statistic not found")
-        current = int(match.group(2))
-        if current != expected:
-            value = stat_pattern.sub(lambda m: m.group(1) + str(expected) + m.group(3), value, count=1)
-        if value_name == "paper source":
-            source_text = value
-        else:
-            index_text = value
+    match = stat_pattern.search(source_text)
+    if not match:
+        raise RuntimeError("paper-source tracked-entry statistic not found")
+    current = int(match.group(2))
+    if current != expected:
+        source_text = stat_pattern.sub(lambda m: m.group(1) + str(expected) + m.group(3), source_text, count=1)
 
     source_text = append_to_timeline_year(
         source_text, 2025,
