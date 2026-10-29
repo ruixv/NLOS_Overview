@@ -96,32 +96,46 @@ def update_readme() -> None:
 
 
 def update_index() -> None:
-    path = ROOT / "index.html"
-    text = path.read_text(encoding="utf-8")
-    additions = [paper_object(p) for p in PAPERS if f'title:"{p["title"]}"' not in text]
+    source_path = ROOT / "data/papers-source.html"
+    index_path = ROOT / "index.html"
+    source_text = source_path.read_text(encoding="utf-8")
+    index_text = index_path.read_text(encoding="utf-8")
+    additions = [paper_object(p) for p in PAPERS if f'title:"{p["title"]}"' not in source_text]
     if additions:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + "\n".join(additions) + "\n", "homepage paper array")
+        source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + "\n".join(additions) + "\n", "paper-source array")
 
     stat_pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
-    match = stat_pattern.search(text)
-    if not match:
-        raise RuntimeError("Homepage tracked-entry statistic not found")
-    expected = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', text, flags=re.MULTILINE))
-    current = int(match.group(2))
-    if current != expected:
-        text = stat_pattern.sub(lambda m: m.group(1) + str(expected) + m.group(3), text, count=1)
+    expected = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', source_text, flags=re.MULTILINE))
+    for value_name, value in (("paper source", source_text), ("index", index_text)):
+        match = stat_pattern.search(value)
+        if not match:
+            raise RuntimeError(f"{value_name} tracked-entry statistic not found")
+        current = int(match.group(2))
+        if current != expected:
+            value = stat_pattern.sub(lambda m: m.group(1) + str(expected) + m.group(3), value, count=1)
+        if value_name == "paper source":
+            source_text = value
+        else:
+            index_text = value
 
-    text = append_to_timeline_year(
-        text,
-        2025,
+    source_text = append_to_timeline_year(
+        source_text, 2025,
         "AME-Net and NLOS-Action moved ordinary-camera passive sensing from hidden-image recovery toward robust hidden-action recognition from subtle relay-wall motion.",
     )
-    text = append_to_timeline_year(
-        text,
-        2026,
+    source_text = append_to_timeline_year(
+        source_text, 2026,
         "NCR-MVC and QSS-Net broadened learned NLOS from reconstruction toward photon-robust clustering and efficient semantic classification.",
     )
-    path.write_text(text, encoding="utf-8")
+    index_text = append_to_timeline_year(
+        index_text, 2025,
+        "AME-Net and NLOS-Action moved ordinary-camera passive sensing from hidden-image recovery toward robust hidden-action recognition from subtle relay-wall motion.",
+    )
+    index_text = append_to_timeline_year(
+        index_text, 2026,
+        "NCR-MVC and QSS-Net broadened learned NLOS from reconstruction toward photon-robust clustering and efficient semantic classification.",
+    )
+    source_path.write_text(source_text, encoding="utf-8")
+    index_path.write_text(index_text, encoding="utf-8")
 
 
 def insert_passive_table_row(text: str) -> str:
