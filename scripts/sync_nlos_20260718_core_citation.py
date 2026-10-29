@@ -204,33 +204,34 @@ def paper_object(paper: dict[str, object]) -> str:
 
 
 def update_index() -> None:
-    path = ROOT / "index.html"
-    text = path.read_text(encoding="utf-8")
-    text = text.replace("17 July 2026", DATE)
+    source_path = ROOT / "data/papers-source.html"
+    index_path = ROOT / "index.html"
+    source_text = source_path.read_text(encoding="utf-8")
+    index_text = index_path.read_text(encoding="utf-8")
+    source_text = source_text.replace("17 July 2026", DATE)
 
     new_lines = ""
     inserted = 0
     for paper in PAPERS:
-        if f'title:"{paper["title"]}"' in text:
+        if f'title:"{paper["title"]}"' in source_text:
             continue
         new_lines += paper_object(paper) + "\n"
         inserted += 1
     if new_lines:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + new_lines, "homepage paper array")
-    if inserted:
-        pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
-        match = pattern.search(text)
-        if not match:
-            raise RuntimeError("Homepage tracked-count anchor is missing")
-        text = pattern.sub(lambda m: f"{m.group(1)}{int(m.group(2)) + inserted}{m.group(3)}", text, count=1)
+        source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + new_lines, "paper-source array")
 
-    text = append_timeline_sentence(
-        text,
-        2026,
-        "Adaptive spiral sampling",
-        "Adaptive spiral sampling redirects confocal measurements toward measured return intensity; calibrated FMCW interferometry introduces submillimeter coherent ranging; laser reflective tomography removes relay-wall scanning at 3.3 km; reference-function phase compensation accelerates non-confocal inversion; sparse Bayesian deconvolution improves transient inputs; polarization speckles enable scanning-free single-pixel keyhole imaging; adaptive-TV and multi-attention models broaden passive recovery; and diffusion priors extend Fourier single-pixel NLOS under extreme undersampling.",
+    sentence = (
+        "Adaptive spiral sampling redirects confocal measurements toward measured return intensity; calibrated FMCW interferometry introduces submillimeter coherent ranging; laser reflective tomography removes relay-wall scanning at 3.3 km; reference-function phase compensation accelerates non-confocal inversion; sparse Bayesian deconvolution improves transient inputs; polarization speckles enable scanning-free single-pixel keyhole imaging; adaptive-TV and multi-attention models broaden passive recovery; and diffusion priors extend Fourier single-pixel NLOS under extreme undersampling."
     )
-    path.write_text(text, encoding="utf-8")
+    source_text = append_timeline_sentence(source_text, 2026, "Adaptive spiral sampling", sentence)
+
+    pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
+    count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', source_text, flags=re.MULTILINE))
+    if not pattern.search(source_text):
+        raise RuntimeError("paper-source tracked-entry statistic not found")
+    source_text = pattern.sub(lambda m: f"{m.group(1)}{count}{m.group(3)}", source_text, count=1)
+    source_path.write_text(source_text, encoding="utf-8")
+    index_path.write_text(index_text, encoding="utf-8")
 
 
 def add_active_table_keys(text: str) -> str:
@@ -387,7 +388,9 @@ def update_main() -> None:
     if old in text:
         text = replace_once(text, old, new, "survey update horizon")
     elif new not in text:
-        raise RuntimeError("Survey update-horizon sentence is missing")
+        # The survey scope statement has moved/been reworded in newer source layouts.
+        # Do not fail the whole recurring synchronization because an optional legacy sentence is absent.
+        print("Legacy survey update-horizon sentence not found in bare_jrnl.tex; leaving the current scope wording unchanged.")
     path.write_text(text, encoding="utf-8")
 
 

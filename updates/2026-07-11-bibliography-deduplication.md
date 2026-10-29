@@ -2,10 +2,10 @@
 
 The survey previously passed chronological `egbib*.bib` supplements directly to BibTeX. Several correction files repeat keys, and the legacy Zotero export lower-cased many identifiers that remain mixed-case in the LaTeX sources. Both conditions can prevent a reproducible clean build.
 
-This update generates `egbib_merged_20260711.bib` from 220 source files and keeps one highest-priority record for each of 742 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
+This update generates `egbib_merged_20260711.bib` from 221 source files and keeps one highest-priority record for each of 742 case-insensitively unique keys. The existing consolidated database is loaded first as a compatibility snapshot; `egbib.bib`, `egbib_2026_updates.bib`, and dated supplements then override it deterministically. The selected records are renamed to the exact citation spelling used by the survey whenever the mapping is unambiguous. `bare_jrnl.tex` uses only the consolidated bibliography.
 
-- Parsed source records: 1454
-- Case-insensitive duplicate replacements: 712
+- Parsed source records: 1467
+- Case-insensitive duplicate replacements: 725
 - Citation-key case normalizations: 81
 - Ambiguous citation spellings: 0
 - Truly missing citation keys: 0
@@ -724,6 +724,19 @@ This update generates `egbib_merged_20260711.bib` from 220 source files and keep
 - `zhaoGradientGatingSPAD2025` / `zhaoGradientGatingSPAD2025`: `egbib_merged_20260711.bib` → `egbib_20261012_verified_gaps_staging.bib`
 - `jeonSoundVehicleNLOS2025` / `jeonSoundVehicleNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
 - `zhaiIrregularGridAcousticNLOS2025` / `zhaiIrregularGridAcousticNLOS2025`: `egbib_merged_20260711.bib` → `egbib_acoustic_nlos_20260801.bib`
+- `zhuTwoStepRemapping2022` / `zhuTwoStepRemapping2022`: `egbib.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `zhuFastNonlineofsightImaging2021a` / `zhuFastNonlineofsightImaging2021a`: `egbib_20260703_updates.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `cuiTerahertzNLOS2022` / `cuiTerahertzNLOS2022`: `egbib_2026_updates.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `metzlerKeyholeImaging2019` / `metzlerKeyholeImaging2019`: `egbib_20260708_updates.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `sultanIteratingTLTM2024` / `sultanIteratingTLTM2024`: `egbib_2026_updates.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `liuArbitraryPatternNLOS2023` / `liuArbitraryPatternNLOS2023`: `egbib_2026_updates.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `sommerPassiveAcousticNLOS2025` / `sommerPassiveAcousticNLOS2025`: `egbib_2026_updates.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `somasundaramConsumerLiDARNLOS2026` / `somasundaramConsumerLiDARNLOS2026`: `egbib_2026_updates.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `suDGNLOS2025` / `suDGNLOS2025`: `egbib_20260703_updates.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `choiSelfCalibratingDifferentiableNLOS2023` / `choiSelfCalibratingDifferentiableNLOS2023`: `egbib_20260708_updates.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `shenMARMOT2025` / `shenMARMOT2025`: `egbib_20260729_transient_pretraining_holistic_nlos.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `yasmeenRISRadar2026` / `yasmeenRISRadar2026`: `egbib_2026_updates.bib` → `egbib_zz_20261029_final_venue_audit.bib`
+- `weiQuasiFresnelNLOS2025` / `weiQuasiFresnelNLOS2025`: `egbib_20260718_reconstruction_pose_consistency.bib` → `egbib_zz_20261029_final_venue_audit.bib`
 
 ## Citation-key spellings normalized
 

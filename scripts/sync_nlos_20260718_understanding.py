@@ -59,13 +59,16 @@ def paper_object(paper: dict[str, object]) -> str:
 def append_to_timeline_year(text: str, year: int, sentence: str) -> str:
     lines = text.splitlines(keepends=True)
     matches = [i for i, line in enumerate(lines) if f'<div class="year">{year}</div>' in line]
-    if len(matches) != 1:
-        raise RuntimeError(f"Expected one homepage timeline row for {year}, found {len(matches)}")
-    if sentence.strip() not in lines[matches[0]]:
+    if not matches:
+        raise RuntimeError(f"No homepage timeline row found for {year}")
+    # The Paper Explorer source can contain more than one block for a year;
+    # append to the first (canonical timeline) row instead of failing on duplicates.
+    target = matches[0]
+    if sentence.strip() not in lines[target]:
         closing = "</p></div></div>"
-        if closing not in lines[matches[0]]:
+        if closing not in lines[target]:
             raise RuntimeError(f"Timeline closing marker missing for {year}")
-        lines[matches[0]] = lines[matches[0]].replace(closing, " " + sentence.strip() + closing, 1)
+        lines[target] = lines[target].replace(closing, " " + sentence.strip() + closing, 1)
     return "".join(lines)
 
 
@@ -96,32 +99,33 @@ def update_readme() -> None:
 
 
 def update_index() -> None:
-    path = ROOT / "index.html"
-    text = path.read_text(encoding="utf-8")
-    additions = [paper_object(p) for p in PAPERS if f'title:"{p["title"]}"' not in text]
+    source_path = ROOT / "data/papers-source.html"
+    index_path = ROOT / "index.html"
+    source_text = source_path.read_text(encoding="utf-8")
+    index_text = index_path.read_text(encoding="utf-8")
+    additions = [paper_object(p) for p in PAPERS if f'title:"{p["title"]}"' not in source_text]
     if additions:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + "\n".join(additions) + "\n", "homepage paper array")
+        source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + "\n".join(additions) + "\n", "paper-source array")
 
     stat_pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
-    match = stat_pattern.search(text)
+    expected = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', source_text, flags=re.MULTILINE))
+    match = stat_pattern.search(source_text)
     if not match:
-        raise RuntimeError("Homepage tracked-entry statistic not found")
-    expected = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', text, flags=re.MULTILINE))
+        raise RuntimeError("paper-source tracked-entry statistic not found")
     current = int(match.group(2))
     if current != expected:
-        text = stat_pattern.sub(lambda m: m.group(1) + str(expected) + m.group(3), text, count=1)
+        source_text = stat_pattern.sub(lambda m: m.group(1) + str(expected) + m.group(3), source_text, count=1)
 
-    text = append_to_timeline_year(
-        text,
-        2025,
+    source_text = append_to_timeline_year(
+        source_text, 2025,
         "AME-Net and NLOS-Action moved ordinary-camera passive sensing from hidden-image recovery toward robust hidden-action recognition from subtle relay-wall motion.",
     )
-    text = append_to_timeline_year(
-        text,
-        2026,
+    source_text = append_to_timeline_year(
+        source_text, 2026,
         "NCR-MVC and QSS-Net broadened learned NLOS from reconstruction toward photon-robust clustering and efficient semantic classification.",
     )
-    path.write_text(text, encoding="utf-8")
+    source_path.write_text(source_text, encoding="utf-8")
+    index_path.write_text(index_text, encoding="utf-8")
 
 
 def insert_passive_table_row(text: str) -> str:
