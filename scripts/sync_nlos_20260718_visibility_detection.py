@@ -121,16 +121,20 @@ def paper_object(paper: dict[str, object]) -> str:
 
 
 def update_index() -> None:
-    path = ROOT / "index.html"
-    text = path.read_text(encoding="utf-8")
+    source_path = ROOT / "data/papers-source.html"
+    index_path = ROOT / "index.html"
+    source_text = source_path.read_text(encoding="utf-8")
+    index_text = index_path.read_text(encoding="utf-8")
     new_lines = ""
     for paper in PAPERS:
-        if f'title:"{paper["title"]}"' not in text:
+        if f'title:"{paper["title"]}"' not in source_text:
             new_lines += paper_object(paper) + "\n"
     if new_lines:
-        text = replace_once(text, "    const papers=[\n", "    const papers=[\n" + new_lines, "homepage paper array")
-    text = append_homepage_timeline(text)
-    path.write_text(text, encoding="utf-8")
+        source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + new_lines, "paper-source array")
+    source_text = append_homepage_timeline(source_text)
+    index_text = append_homepage_timeline(index_text)
+    source_path.write_text(source_text, encoding="utf-8")
+    index_path.write_text(index_text, encoding="utf-8")
 
 
 def update_active() -> None:
