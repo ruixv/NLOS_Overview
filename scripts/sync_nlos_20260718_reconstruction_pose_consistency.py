@@ -144,7 +144,7 @@ def update_index() -> None:
             "https://opg.optica.org/oe/abstract.cfm?uri=oe-34-14-26271",
             "https://doi.org/10.1364/OE.601398",
         )
-        if "Pulse multiplexing computationally exceeds detector timing resolution" not in value:
+        if value_name == "paper source" and "Pulse multiplexing computationally exceeds detector timing resolution" not in value:
             lines = value.splitlines(keepends=True)
             ids = [i for i, line in enumerate(lines) if '<div class="year">2026</div>' in line]
             if len(ids) != 1:
