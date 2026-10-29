@@ -252,7 +252,7 @@ def validate() -> None:
         name: (ROOT / path).read_text(encoding="utf-8")
         for name, path in {
             "readme": "README.md",
-            "index": "index.html",
+            "index": "data/papers-source.html",
             "active": "article/2active.tex",
             "learning": "article/4datadriven.tex",
             "new": "article/5newscenes.tex",
