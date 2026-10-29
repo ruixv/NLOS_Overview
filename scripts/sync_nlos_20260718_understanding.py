@@ -126,14 +126,6 @@ def update_index() -> None:
         source_text, 2026,
         "NCR-MVC and QSS-Net broadened learned NLOS from reconstruction toward photon-robust clustering and efficient semantic classification.",
     )
-    index_text = append_to_timeline_year(
-        index_text, 2025,
-        "AME-Net and NLOS-Action moved ordinary-camera passive sensing from hidden-image recovery toward robust hidden-action recognition from subtle relay-wall motion.",
-    )
-    index_text = append_to_timeline_year(
-        index_text, 2026,
-        "NCR-MVC and QSS-Net broadened learned NLOS from reconstruction toward photon-robust clustering and efficient semantic classification.",
-    )
     source_path.write_text(source_text, encoding="utf-8")
     index_path.write_text(index_text, encoding="utf-8")
 
