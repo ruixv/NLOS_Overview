@@ -120,7 +120,7 @@ jobs:
               if bib.lower().count("{" + key.lower() + ",") != 1:
                   raise SystemExit(f"Bibliography key missing or duplicated: {key}")
 
-          paper_count = papers.count('title:"')
+          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', papers, flags=re.MULTILINE))
           match = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', papers)
           if not match or int(match.group(1)) != paper_count:
               raise SystemExit("Homepage tracked-entry count does not match the paper array")
