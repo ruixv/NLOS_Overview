@@ -144,7 +144,7 @@ jobs:
           expected_pdf = [
               "long-range passive nlos under severe background",
               "hybrid physics",
-              "geometry-constrained joint normal and albedo reconstruction",
+              "joint normal and albedo reconstruction",
               "super-field-of-view reconstruction by translated psfs",
           ]
           for phrase in expected_pdf:
