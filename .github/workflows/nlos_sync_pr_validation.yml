@@ -102,6 +102,8 @@ jobs:
           files = {
               'readme': read('README.md'),
               'index': read('index.html'),
+              'papers': read('data/papers-source.html'),
+              'intro': read('article/1introduction.tex'),
               'active': read('article/2active.tex'),
               'passive': read('article/3passive.tex'),
               'learning': read('article/4datadriven.tex'),
@@ -129,7 +131,7 @@ jobs:
           for title, key in records:
               if files['readme'].lower().count('[' + title.lower() + ']') != 1:
                   raise SystemExit(f'README entry missing or duplicated: {title}')
-              if files['index'].lower().count('title:"' + title.lower() + '"') != 1:
+              if files['papers'].lower().count('title:"' + title.lower() + '"') != 1:
                   raise SystemExit(f'Homepage entry missing or duplicated: {title}')
               if key not in source:
                   raise SystemExit(f'Survey citation missing: {key}')
@@ -146,22 +148,22 @@ jobs:
                   raise SystemExit('A geometry-constrained README record retains preliminary metadata')
           if '[Geometric Constrained Non-Line-of-Sight Imaging]' in files['readme']:
               raise SystemExit('Preliminary geometry-constrained title remains public')
-          if files['index'].lower().count('title:"' + geometry_title.lower() + '"') != 1:
+          if files['papers'].lower().count('title:"' + geometry_title.lower() + '"') != 1:
               raise SystemExit('Final geometry-constrained homepage record is missing or duplicated')
           if geometry_key not in source or files['bib'].lower().count('{' + geometry_key.lower() + ',') != 1:
               raise SystemExit('Geometry-constrained survey or bibliography record is inconsistent')
 
-          displayed = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', files['index'])
+          displayed = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', files['papers'])
           if not displayed:
               raise SystemExit('Homepage tracked-count stat is missing')
-          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', files['index'], flags=re.MULTILINE))
+          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', files['papers'], flags=re.MULTILINE))
           if int(displayed.group(1)) != paper_count:
               raise SystemExit(f'Homepage count mismatch: stat={displayed.group(1)}, objects={paper_count}')
 
           if '18 July 2026' not in files['readme'] or '18 July 2026' not in files['index']:
               raise SystemExit('Public update dates are not synchronized')
-          if 'advances from 2022 through 18 July 2026' not in files['main']:
-              raise SystemExit('Survey update horizon is not explicit')
+          if 'Update (2022--2026)' not in files['intro'] or 'This updated survey incorporates these advances' not in files['intro']:
+              raise SystemExit('Survey update horizon is not explicit in the introduction')
 
           normalized_pdf = re.sub(r'\s+', ' ', files['pdf']).lower()
           expected_pdf = [
