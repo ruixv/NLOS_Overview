@@ -138,8 +138,8 @@ jobs:
           if int(displayed.group(1)) != paper_count:
               raise SystemExit(f"Homepage count mismatch: stat={displayed.group(1)}, objects={paper_count}")
 
-          if "18 July 2026" not in readme or "18 July 2026" not in index:
-              raise SystemExit("Public update dates are not synchronized")
+          if "29 October 2026" not in readme or "29 October 2026" not in index:
+              raise SystemExit("Latest public audit dates are not synchronized")
 
           expected_pdf = [
               "long-range passive nlos under severe background",
