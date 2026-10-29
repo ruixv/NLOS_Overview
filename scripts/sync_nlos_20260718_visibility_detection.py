@@ -132,7 +132,6 @@ def update_index() -> None:
     if new_lines:
         source_text = replace_once(source_text, "    const papers=[\n", "    const papers=[\n" + new_lines, "paper-source array")
     source_text = append_homepage_timeline(source_text)
-    index_text = append_homepage_timeline(index_text)
     source_path.write_text(source_text, encoding="utf-8")
     index_path.write_text(index_text, encoding="utf-8")
 
