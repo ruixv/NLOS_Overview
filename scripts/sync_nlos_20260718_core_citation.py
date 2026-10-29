@@ -227,14 +227,9 @@ def update_index() -> None:
 
     pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
     count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', source_text, flags=re.MULTILINE))
-    for name, value in (("paper source", source_text), ("index", index_text)):
-        if not pattern.search(value):
-            raise RuntimeError(f"{name} tracked-entry statistic not found")
-        value = pattern.sub(lambda m: f"{m.group(1)}{count}{m.group(3)}", value, count=1)
-        if name == "paper source":
-            source_text = value
-        else:
-            index_text = value
+    if not pattern.search(source_text):
+        raise RuntimeError("paper-source tracked-entry statistic not found")
+    source_text = pattern.sub(lambda m: f"{m.group(1)}{count}{m.group(3)}", source_text, count=1)
     source_path.write_text(source_text, encoding="utf-8")
     index_path.write_text(index_text, encoding="utf-8")
 
