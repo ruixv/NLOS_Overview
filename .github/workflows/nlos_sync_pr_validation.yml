@@ -160,8 +160,8 @@ jobs:
           if int(displayed.group(1)) != paper_count:
               raise SystemExit(f'Homepage count mismatch: stat={displayed.group(1)}, objects={paper_count}')
 
-          if '18 July 2026' not in files['readme'] or '18 July 2026' not in files['index']:
-              raise SystemExit('Public update dates are not synchronized')
+          if '29 October 2026' not in files['readme'] or '29 October 2026' not in files['index']:
+              raise SystemExit('Latest public audit dates are not synchronized')
           if 'Update (2022--2026)' not in files['intro'] or 'This updated survey incorporates these advances' not in files['intro']:
               raise SystemExit('Survey update horizon is not explicit in the introduction')
 
