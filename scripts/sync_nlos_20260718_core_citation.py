@@ -388,7 +388,9 @@ def update_main() -> None:
     if old in text:
         text = replace_once(text, old, new, "survey update horizon")
     elif new not in text:
-        raise RuntimeError("Survey update-horizon sentence is missing")
+        # The survey scope statement has moved/been reworded in newer source layouts.
+        # Do not fail the whole recurring synchronization because an optional legacy sentence is absent.
+        print("Legacy survey update-horizon sentence not found in bare_jrnl.tex; leaving the current scope wording unchanged.")
     path.write_text(text, encoding="utf-8")
 
 
