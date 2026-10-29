@@ -19,7 +19,7 @@
 | | Link |
 |---|---|
 | **Original Survey** (peer-reviewed, APSIPA TSIP 2022) | [![APSIPA](https://img.shields.io/badge/APSIPA_TSIP_2022-10.1561%2F116.00000019-blue)](https://doi.org/10.1561/116.00000019) [![arXiv](https://img.shields.io/badge/arXiv-2104.13807-b31b1b)](https://arxiv.org/pdf/2104.13807) |
-| **Updated Survey** (2022–2026 extension, *not peer-reviewed*; PDF regenerated and validated on 28 October 2026 (72 pages; Actions run 40654782621)) | [![PDF](https://img.shields.io/badge/PDF-Rebuilt_Oct_2026-green)](https://ruixv.github.io/NLOS_Overview/bare_jrnl.pdf) |
+| **Updated Survey** (2022–2026 extension, *not peer-reviewed*; PDF clean-built and validated on 29 October 2026 (72 pages; Actions run 40805416147)) | [![PDF](https://img.shields.io/badge/PDF-Rebuilt_Oct_2026-green)](https://ruixv.github.io/NLOS_Overview/bare_jrnl.pdf) |
 | **Interactive Project Homepage** | [![Homepage](https://img.shields.io/badge/Homepage-ruixv.github.io%2FNLOS__Overview-teal)](https://ruixv.github.io/NLOS_Overview/) |
 
 </div>
@@ -32,7 +32,7 @@
 
 The forward-citation and metadata pass found no additional unique, verified NLOS paper missing from the catalog or survey prose. Recent candidates—including MALCT, higher-order transient light-transport iteration, rough-wall thermal NLOS, consumer-LiDAR NLOS, RIS-assisted radar sensing, and sub-THz learned reconstruction—are already represented in the appropriate survey sections. This pass therefore adds no duplicate paper records.
 
-The audit corrected stale arXiv aliases to their verified final venues, removed the duplicate 2022 THz preprint row in favor of the 2024 IEEE TTHz publication, and corrected the DOI and pagination for Zhu and Cai's two-step deep-remapping paper to [ACS Photonics](https://doi.org/10.1021/acsphotonics.2c00186), 9(6), 2046–2055 (2022). The final bibliography and PDF are being rebuilt and validated by the repository workflow. See [the audit log](updates/2026-10-29-final-venue-audit.md).
+The audit corrected stale arXiv aliases to their verified final venues, removed the duplicate 2022 THz preprint row in favor of the 2024 IEEE TTHz publication, and corrected the DOI and pagination for Zhu and Cai's two-step deep-remapping paper to [ACS Photonics](https://doi.org/10.1021/acsphotonics.2c00186), 9(6), 2046–2055 (2022). The clean LaTeX/BibTeX rebuild and citation validation passed on 29 October 2026 (72 pages; [Actions run #40805416147](https://github.com/ruixv/NLOS_Overview/actions/runs/40805416147)). The PDF is byte-identical to the already-committed artifact (blob SHA `707e83934476cebb80f7c9ff28749e7fef0b5a3`); only source comments and metadata aliases changed. The paper-source synchronizers were also repaired to write the paper array to `data/papers-source.html` and reconcile the count in `index.html`, so the recurring update workflow can continue. See [the audit log](updates/2026-10-29-final-venue-audit.md).
 
 ## What is NLOS Imaging?
 
