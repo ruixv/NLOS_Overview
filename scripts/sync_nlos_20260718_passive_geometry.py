@@ -202,11 +202,11 @@ def update_index() -> None:
 
     if inserted:
         pattern = re.compile(r'(<div class="stat"><b>)(\d+)(</b><span>tracked latest entries</span></div>)')
-        match = pattern.search(text)
+        match = pattern.search(source_text)
         if not match:
-            raise RuntimeError("Homepage tracked-count anchor is missing")
-        new_count = int(match.group(2)) + inserted
-        text = pattern.sub(lambda m: f"{m.group(1)}{new_count}{m.group(3)}", text, count=1)
+            raise RuntimeError("Paper-source tracked-count anchor is missing")
+        new_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', source_text, flags=re.MULTILINE))
+        source_text = pattern.sub(lambda m: f"{m.group(1)}{new_count}{m.group(3)}", source_text, count=1)
 
     text = append_timeline_sentence(
         text,
