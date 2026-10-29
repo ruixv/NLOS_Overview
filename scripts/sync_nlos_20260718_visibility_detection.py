@@ -175,7 +175,7 @@ Celebi and Turkoglu built an active SPAD--TCSPC NLOS sensing system and collecte
 def validate() -> None:
     files = {
         "readme": (ROOT / "README.md").read_text(encoding="utf-8"),
-        "index": (ROOT / "index.html").read_text(encoding="utf-8"),
+        "index": (ROOT / "data/papers-source.html").read_text(encoding="utf-8"),
         "active": (ROOT / "article/2active.tex").read_text(encoding="utf-8"),
         "bib": (ROOT / "egbib_20260718_visibility_detection_updates.bib").read_text(encoding="utf-8"),
     }
