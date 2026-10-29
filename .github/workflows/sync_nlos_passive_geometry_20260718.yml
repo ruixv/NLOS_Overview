@@ -97,6 +97,7 @@ jobs:
 
           readme = read("README.md")
           index = read("index.html")
+          papers = read("data/papers-source.html")
           active = read("article/2active.tex")
           passive = read("article/3passive.tex")
           learning = read("article/4datadriven.tex")
@@ -113,7 +114,7 @@ jobs:
           for title, key, section in records:
               if readme.lower().count("[" + title.lower() + "]") != 1:
                   raise SystemExit(f"README entry missing or duplicated: {title}")
-              if index.lower().count('title:"' + title.lower() + '"') != 1:
+              if papers.lower().count('title:"' + title.lower() + '"') != 1:
                   raise SystemExit(f"Homepage entry missing or duplicated: {title}")
               if key not in section:
                   raise SystemExit(f"Survey citation missing: {key}")
@@ -121,19 +122,19 @@ jobs:
                   raise SystemExit(f"Bibliography key missing or duplicated: {key}")
 
           geometry_readme = [line for line in readme.splitlines() if "[Geometry-Constrained Non-Line-of-Sight Imaging]" in line]
-          geometry_index = [line for line in index.splitlines() if 'title:"Geometry-Constrained Non-Line-of-Sight Imaging"' in line]
+          geometry_index = [line for line in papers.splitlines() if 'title:"Geometry-Constrained Non-Line-of-Sight Imaging"' in line]
           if len(geometry_readme) != 1 or len(geometry_index) != 1:
               raise SystemExit("Final geometry-constrained record is missing or duplicated")
           for line in geometry_readme + geometry_index:
               if "2026" not in line or "10.1109/TVCG.2026.3684832" not in line:
                   raise SystemExit("Geometry-constrained final venue metadata is missing")
-          if "[Geometric Constrained Non-Line-of-Sight Imaging]" in readme or 'title:"Geometric Constrained Non-Line-of-Sight Imaging"' in index:
+          if "[Geometric Constrained Non-Line-of-Sight Imaging]" in readme or 'title:"Geometric Constrained Non-Line-of-Sight Imaging"' in papers:
               raise SystemExit("The preliminary geometry-constrained title remains public")
 
-          displayed = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', index)
+          displayed = re.search(r'<div class="stat"><b>(\d+)</b><span>tracked latest entries</span></div>', papers)
           if not displayed:
               raise SystemExit("Homepage tracked-count stat is missing")
-          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', index, flags=re.MULTILINE))
+          paper_count = len(re.findall(r'^\s*\{cat:"[^"]+",title:"', papers, flags=re.MULTILINE))
           if int(displayed.group(1)) != paper_count:
               raise SystemExit(f"Homepage count mismatch: stat={displayed.group(1)}, objects={paper_count}")
 
