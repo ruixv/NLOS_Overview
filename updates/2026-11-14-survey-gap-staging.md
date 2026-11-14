@@ -16,3 +16,12 @@
 Read full current `article/2active.tex` and its blob SHA, insert the two citations in semantically appropriate paragraphs, verify both keys in the consolidated bibliography, then build `bare_jrnl.tex` and update `bare_jrnl.pdf` only after a successful compilation. This run deliberately did not replace the ~150 KB chapter without full structural editing/build verification. The existing PDF is **not** updated by this note.
 
 This is a targeted search and cross-artifact check, not an exhaustive scholarly forward-citation export.
+
+## 15 November 2026 follow-up: resolved — no insertion required
+
+A full-file, current-blob check of `article/2active.tex` (blob `ddb005b145a00881e9166a63ab70ed6cadc2a15f`) shows that the two papers flagged above **were already integrated into the survey prose**. The earlier omission finding was caused by searching the wrong polarization citation alias and incomplete chapter coverage.
+
+- The PRL paper uses the valid citation key `zhouPolarizationSpeckleNLOS2026`, **not** `zhouPolarizationSinglePixel2026` in the active chapter. It is cited in the active-methods table (line 8) and in two dedicated polarization-speckle paragraphs (approximately lines 186 and 301). Both aliases are currently present in `egbib_merged_20260711.bib`; they should be reconciled only after checking whether the entries are true duplicates and verifying publisher author metadata.
+- The compact Optics Express imager uses `zengCompactLongRangeNLOS2026`, cited in the active-methods table (line 8) and an explicit long-range hardware discussion (approximately line 162).
+
+**Corrected status:** neither work is missing from survey prose, and no LaTeX insertion or PDF rebuild is warranted on their account. The previous "Safe follow-up" instructions above are superseded. This follow-up did not change the survey or PDF. A future metadata-only cleanup may consolidate the redundant PRL BibTeX alias, guarded by a repository-wide citation-key check.
