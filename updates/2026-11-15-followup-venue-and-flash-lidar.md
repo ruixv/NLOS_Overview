@@ -1,0 +1,15 @@
+# 2026-11-15 follow-up: verified venue correction and pending flash-LiDAR integration
+
+## Scope and repository checks
+Read the current full README.md (blob 2eccb6b7bc4dde230f9d01ecd17fda9b56d4a54f), data/papers-source.html (db66d69fe405e40db0bc973951746b7ff12b255e), article/2active.tex (ddb005b145a00881e9166a63ab70ed6cadc2a15f), and egbib_merged_20260711.bib (200bbb3b6aa4069486ae4a8444f9d4980a320227). Exact arXiv ID 2611.04068 and proposed key qiuFlashLiDAROcclusionNLOS2026 are absent from all four. Existing GPU reconstruction paper arXiv:2608.28183 is present in README, explorer, and bibliography; do not duplicate it. This is a targeted check, not exhaustive forward-citation enumeration.
+
+## Verified journal venue correction (high priority)
+**Measurement-adaptive light-cone transform for robust non-line-of-sight imaging**, Lianfang Wang, Xueying Liu, Junnan Dong, Qinghua Zhang, Jun Liu, Yong Wang, Yuping Duan, **Optics Express 34(22), 42680–42695 (2026)**, DOI **10.1364/OE.612439**; electronic publication 29 October 2026, issue date 2 November 2026. Authoritative PubMed record: https://pubmed.ncbi.nlm.nih.gov/42972817/ . README currently lists MALCT as arXiv:2610.22847 with unverified final venue. Update that entry, the matching Paper Explorer metadata, any timeline entry and the existing BibTeX entry by *matching title and arXiv ID*, preserving its existing citation key. Do not create a duplicate paper.
+
+## Verified candidate pending safe multi-artifact integration
+**Simulation-Driven Approach for Occlusion-Based Non-Line-Of-Sight Detection Using a Low-Cost Flash LiDAR**, Peizhao Qiu, Emmanuel A. Olowe, Zhenya Zang, Istvan Gyongy, Danial Chitnis, arXiv:2611.04068 (2 November 2026), https://arxiv.org/abs/2611.04068 . No final venue verified. Uses Monte Carlo photon simulation and TMF8829 commercial SPAD flash LiDAR to detect occluded targets from multibounce signatures; reports AP 0.91 synthetic, 86.67% accuracy and AP 0.95 on 180 real measurements. **Detection, not 3D reconstruction.** Prior staging note: updates/2026-11-15-flash-lidar-nlos-staging.md (contains proposed BibTeX).
+
+Precise insertion targets: README.md > Latest Additions and 2026 timeline; data/papers-source.html > active/commodity LiDAR or detection category; index.html > matching timeline/latest count; article/2active.tex > Hardware Devices in Active Methods, adjacent to ToF/SPAD/commodity LiDAR detection (not 3D reconstruction), with citation key qiuFlashLiDAROcclusionNLOS2026; egbib_2026_updates.bib and egbib_merged_20260711.bib > same single verified BibTeX entry. Rebuild bare_jrnl.tex using the repository's LaTeX/BibTeX workflow, validate citations and commit bare_jrnl.pdf only after successful binary build.
+
+## Execution status
+This follow-up intentionally stages precise edits instead of overwriting 150–465 KB files without a transactional cross-file build. No source, catalog, website, or PDF changes are claimed; no PDF rebuild was run. Continue on a guarded branch with SHA-based writes and build verification.
