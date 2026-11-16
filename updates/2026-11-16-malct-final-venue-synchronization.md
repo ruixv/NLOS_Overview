@@ -1,0 +1,7 @@
+# 2026-11-16 MALCT final-venue synchronization (partial)
+
+Verified final venue: Lianfang Wang et al., *Measurement-Adaptive Light-Cone Transform for Robust Non-Line-of-Sight Imaging*, **Optics Express 34(22), 42680–42695 (2026)**, DOI https://doi.org/10.1364/OE.612439. The arXiv version is https://arxiv.org/abs/2610.22847.
+
+Updated **master** README.md (both matching timeline/catalog entries), data/papers-source.html (Paper Explorer entry and historical timeline), and egbib_merged_20260711.bib (same existing citation key wangMeasurementAdaptiveLCT2026, now an @article with journal, volume, issue, pages and DOI). Confirmed article/2active.tex already cites this key; no new survey prose required for this metadata-only change. Avoid duplicating the SIGGRAPH 2026 3D Gaussian Transient Rendering entry, which already has correct final-venue metadata.
+
+**Not yet done:** The previously identified low-cost flash-LiDAR occlusion detection paper arXiv:2611.04068 remains absent from README, Paper Explorer, article/2active.tex, and merged bibliography; see updates/2026-11-15-followup-venue-and-flash-lidar.md for the proposed insertion and metadata. This paper detects occluded targets, not full 3D geometry. No new PDF was compiled or uploaded during this run; bare_jrnl.pdf remains the earlier build. Rebuild the survey with the existing LaTeX/BibTeX workflow and verify the PDF before describing it as refreshed. No exhaustive forward-citation export was completed in this pass.
