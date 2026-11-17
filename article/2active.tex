@@ -194,6 +194,8 @@ Fang~\etal~examined non-Lambertian relay surfaces using a lower-cost modulated T
 
 Caligiuri~\etal~demonstrated that the lower-cost modulated-light branch can be pushed to commodity indirect-ToF hardware: NIGHT uses an off-the-shelf iToF sensor without additional time-resolved instrumentation and learns a virtual-mirror representation that maps multipath measurements to hidden-scene depth~\cite{caligiuriNIGHT2024}. Together with a purpose-built synthetic dataset, the method shifts consumer-ToF NLOS from analytic phase-based models toward learned reconstruction, although its reported validation remains primarily synthetic.
 
+Recent low-cost SPAD sensing also broadens the task from hidden-scene reconstruction to occlusion-based target detection. Qiu~\etal~used photon Monte Carlo simulation to train a detector of multi-bounce signatures measured by a commercial TMF8829 flash LiDAR, reporting transfer to 180 real measurements without reconstructing the hidden scene geometry~\cite{qiuSimulationDrivenOcclusionNLOS2026}. This simulation-driven detection setting should be distinguished from three-dimensional around-the-corner reconstruction.\par
+
 \bookmark[dest=\HyperLocalCurrentHref,level=3]{Active light source and interferometry}
 \subsubsection{Active light source and interferometry}
 Willomitzer~\etal~demonstrated high-resolution, wide-field NLOS reconstruction using synthetic-wavelength holography, recovering hidden-scene information from coherent optical interference rather than requiring picosecond-resolved photon histograms~\cite{willomitzerSyntheticWavelengthNLOS2021}. This method extends earlier superheterodyne interferometric demonstrations~\cite{Willomitzer:18} toward practical coherent hidden-scene imaging.
